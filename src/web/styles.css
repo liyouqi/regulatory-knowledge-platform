@@ -1074,6 +1074,202 @@ kbd {
   margin: 0;
 }
 
+.explorer-level2-summary {
+  border-top: 1px solid #41483b;
+  margin-top: 32px;
+  padding-top: 20px;
+}
+
+.explorer-level2-summary > p {
+  color: #a7b09e;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  margin: 0 0 11px;
+}
+
+.explorer-level2-summary > div,
+.level2-type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.explorer-level2-summary a,
+.level2-type-tabs a {
+  align-items: center;
+  border: 1px solid #59614e;
+  border-radius: 999px;
+  color: #eef0e7;
+  display: inline-flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.explorer-level2-summary a:last-child {
+  border-color: transparent;
+  color: #d7e690;
+}
+
+.explorer-level2-summary b,
+.level2-type-tabs b {
+  color: #d7e690;
+}
+
+.level2-library-shell {
+  background: #eeece4;
+  color: #22251f;
+  min-height: 100vh;
+}
+
+.level2-library-hero {
+  background: #20251d;
+  color: #f1f1e9;
+  padding: 72px max(28px, calc((100vw - 1180px) / 2)) 58px;
+}
+
+.level2-library-hero h1 {
+  font-size: clamp(50px, 7vw, 94px);
+  font-weight: 450;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+  margin: 0;
+}
+
+.level2-library-hero > p:not(.explorer-kicker) {
+  color: #bbc0b5;
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 24px 0 30px;
+  max-width: 42rem;
+}
+
+.level2-type-tabs a[aria-current="page"] {
+  background: #d7e690;
+  border-color: #d7e690;
+  color: #26301d;
+}
+
+.level2-type-tabs a[aria-current="page"] b {
+  color: inherit;
+}
+
+.level2-library-list {
+  display: grid;
+  gap: 22px;
+  margin: 0 auto;
+  max-width: 980px;
+  padding: 66px 28px 120px;
+}
+
+.level2-measure-card {
+  background: #f7f6f0;
+  border: 1px solid #d1cfc4;
+  border-radius: 12px;
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.level2-measure-card > header,
+.level2-measure-card footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+  justify-content: space-between;
+}
+
+.level2-measure-card > header span {
+  color: #647241;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.level2-measure-card time {
+  color: #777c71;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.level2-measure-card h2 {
+  font-size: clamp(28px, 4vw, 43px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+  margin: 28px 0 15px;
+}
+
+.level2-measure-card > p {
+  color: #565b51;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.level2-measure-card dl {
+  border-top: 1px solid #d8d6cc;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(110px, 0.35fr) 1fr;
+  margin: 28px 0;
+  padding-top: 20px;
+}
+
+.level2-measure-card dl div {
+  display: contents;
+}
+
+.level2-measure-card dt {
+  color: #777c71;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.level2-measure-card dd {
+  color: #343a30;
+  font-size: 13px;
+  margin: 0;
+}
+
+.level2-measure-card dd a,
+.level2-measure-card footer a {
+  color: #53632d;
+  text-decoration: none;
+}
+
+.level2-measure-card footer {
+  border-top: 1px solid #d8d6cc;
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.level2-measure-card footer a {
+  align-items: center;
+  display: inline-flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 750;
+  gap: 5px;
+}
+
+.level2-measure-card footer a:last-child {
+  margin-left: auto;
+}
+
+.level2-empty {
+  color: #65695f;
+  font-size: 15px;
+}
+
 .explorer-layout {
   display: grid;
   gap: 68px;
@@ -1689,6 +1885,31 @@ kbd {
 
   .explorer-official-title {
     font-size: 13px;
+  }
+
+  .level2-library-hero {
+    padding: 42px 20px 38px;
+  }
+
+  .level2-library-hero h1 {
+    font-size: 52px;
+  }
+
+  .level2-library-list {
+    padding: 42px 20px 80px;
+  }
+
+  .level2-measure-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .level2-measure-card dl div {
+    display: grid;
+    gap: 5px;
+  }
+
+  .level2-measure-card footer a:last-child {
+    margin-left: 0;
   }
 
   .explorer-stats {

@@ -4,6 +4,7 @@ import {
   findDocument,
   findDocumentBySlug,
   findExplorerBySlug,
+  findFamilyLevel2,
   findLaws,
   findProvisionRelationships,
   findRelationshipPreview,
@@ -108,5 +109,19 @@ describe("Document lookup", () => {
         target: expect.objectContaining({ entityId: "eu:32025R0305" }),
       }),
     );
+  });
+
+  it("serves a family Level 2 library without reading curated mapping source data", () => {
+    expect(findFamilyLevel2("dora", "rts")).toMatchObject({
+      familyId: "family:dora",
+      measures: [
+        expect.objectContaining({
+          id: "eu:32024R1774",
+          mandates: expect.arrayContaining([
+            expect.objectContaining({ label: "Article 15" }),
+          ]),
+        }),
+      ],
+    });
   });
 });

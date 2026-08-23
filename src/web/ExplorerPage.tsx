@@ -11,10 +11,12 @@ import {
   type DocumentSummary,
   type ExplorerDocument,
   type ExplorerNode,
+  type FamilyLevel2Response,
   documentCatalogSchema,
   explorerDocumentSchema,
+  familyLevel2ResponseSchema,
 } from "../shared/legal";
-import { explorerPath } from "../shared/reader-route";
+import { explorerPath, level2LibraryPath } from "../shared/reader-route";
 import { recordOpenedLaw } from "./opened-laws";
 
 function flattenArticles(nodes: ExplorerNode[]): ExplorerNode[] {
@@ -86,6 +88,7 @@ export function ExplorerPage({
   const navigate = useNavigate();
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [document, setDocument] = useState<ExplorerDocument | null>(null);
+  const [level2, setLevel2] = useState<FamilyLevel2Response | null>(null);
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
@@ -127,6 +130,27 @@ export function ExplorerPage({
       });
     return () => controller.abort();
   }, [slug]);
+
+  const documentSummary = catalog.find((item) => item.slug === slug);
+
+  useEffect(() => {
+    if (documentSummary?.regulatoryLevel !== "level-1") {
+      setLevel2(null);
+      return;
+    }
+    const controller = new AbortController();
+    const familySlug = documentSummary.familyId.slice("family:".length);
+    void fetch(`/api/families/${encodeURIComponent(familySlug)}/level-2`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load Level 2 summary");
+        return familyLevel2ResponseSchema.parse(await response.json());
+      })
+      .then(setLevel2)
+      .catch(() => setLevel2(null));
+    return () => controller.abort();
+  }, [documentSummary]);
 
   useEffect(() => {
     if (!document) return;
@@ -237,6 +261,23 @@ export function ExplorerPage({
             <dd>{document.lastChecked.slice(0, 10)}</dd>
           </div>
         </dl>
+        {level2 &&
+        level2.counts.rts + level2.counts.its + level2.counts.guidelines > 0 ? (
+          <section className="explorer-level2-summary">
+            <p>LEVEL 2</p>
+            <div>
+              <Link to={level2LibraryPath(slug, "rts")}>
+                RTS <b>{level2.counts.rts}</b>
+              </Link>
+              <Link to={level2LibraryPath(slug, "its")}>
+                ITS <b>{level2.counts.its}</b>
+              </Link>
+              <Link to={level2LibraryPath(slug)}>
+                View library <ArrowRight aria-hidden="true" size={14} />
+              </Link>
+            </div>
+          </section>
+        ) : null}
       </section>
 
       <div className="explorer-layout">

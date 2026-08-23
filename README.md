@@ -415,4 +415,4 @@ Release 0.5 is now in progress and additionally includes:
 - direct-Article Formex support with a parser fixture and parser version `1.3.0`;
 - desktop and 390px browser verification of DORA Article 15, reverse RTS legal bases, and exact MiCA RTS search.
 
-The next Release 0.5 slice is the family-level RTS/ITS library and summary counts, followed by additional reviewed DORA/MiCA measures. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.
+The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, and official sources without duplicating the curated mapping input. The next Release 0.5 slice is additional reviewed DORA/MiCA measures. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.

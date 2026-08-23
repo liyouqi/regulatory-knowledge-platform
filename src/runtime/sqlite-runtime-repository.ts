@@ -10,14 +10,18 @@ import {
   type DocumentSummary,
   type DocumentView,
   type ExplorerDocument,
+  type FamilyLevel2Response,
+  type Level2Measure,
   type ProvisionRelationship,
   type ProvisionRelationshipsResponse,
   type RelationshipPreview,
   documentViewSchema,
   explorerDocumentSchema,
+  familyLevel2ResponseSchema,
   provisionRelationshipsResponseSchema,
   relationshipPreviewSchema,
 } from "../shared/legal";
+import { explorerPath } from "../shared/reader-route";
 
 type LawSearchSource = Pick<
   SourceDefinition,
@@ -79,6 +83,29 @@ interface EntityPreviewRow {
   path: string;
   documentShortName: string;
   sourceUrl: string;
+}
+
+interface FamilyPrimaryRow {
+  familyId: string;
+  familyShortName: string;
+}
+
+interface Level2MeasureRow {
+  id: string;
+  slug: string;
+  shortName: string;
+  officialTitle: string;
+  celex: string;
+  measureType: Level2Measure["measureType"];
+  publicationDate: string;
+  sourceUrl: string;
+  readerPath: string;
+  articleEntityId: string | null;
+  mandateDocumentId: string | null;
+  mandateDocumentShortName: string | null;
+  mandateLabel: string | null;
+  mandateTitle: string | null;
+  mandatePath: string | null;
 }
 
 const RELATIONSHIP_SELECT = `
@@ -335,6 +362,110 @@ export class SqliteRuntimeRepository {
       sources.set(row.documentId, source);
     }
     return [...sources.values()];
+  }
+
+  findFamilyLevel2(
+    familyId: string,
+    measureType?: "rts" | "its",
+  ): FamilyLevel2Response | null {
+    const primary = this.database
+      .prepare(`
+        SELECT family_id AS familyId, short_name AS familyShortName
+        FROM documents
+        WHERE family_id = ? AND regulatory_level = 'level-1'
+        ORDER BY display_order ASC
+        LIMIT 1
+      `)
+      .get(familyId) as FamilyPrimaryRow | undefined;
+    if (!primary) return null;
+
+    const countRows = this.database
+      .prepare(`
+        SELECT measure_type AS measureType, count(*) AS count
+        FROM documents
+        WHERE family_id = ? AND regulatory_level = 'level-2'
+        GROUP BY measure_type
+      `)
+      .all(familyId) as Array<{ measureType: string; count: number }>;
+    const counts = { rts: 0, its: 0, guidelines: 0 };
+    for (const row of countRows) {
+      if (row.measureType === "rts") counts.rts = row.count;
+      else if (row.measureType === "its") counts.its = row.count;
+      else if (row.measureType === "guideline") counts.guidelines = row.count;
+    }
+
+    const rows = this.database
+      .prepare(`
+        SELECT
+          d.id,
+          d.slug,
+          d.short_name AS shortName,
+          d.official_title AS officialTitle,
+          d.celex,
+          d.measure_type AS measureType,
+          d.publication_date AS publicationDate,
+          d.source_url AS sourceUrl,
+          d.default_path AS readerPath,
+          te.id AS articleEntityId,
+          td.id AS mandateDocumentId,
+          td.short_name AS mandateDocumentShortName,
+          te.label AS mandateLabel,
+          te.title AS mandateTitle,
+          te.path AS mandatePath
+        FROM documents d
+        LEFT JOIN relationships r
+          ON r.source_entity_id = d.id
+          AND r.relation_type = 'ADOPTED_UNDER'
+          AND r.provenance = 'OFFICIAL_MAPPING'
+        LEFT JOIN legal_entities te ON te.id = r.target_entity_id
+        LEFT JOIN documents td ON td.id = te.document_id
+        WHERE d.family_id = @familyId AND d.regulatory_level = 'level-2'
+        ORDER BY d.publication_date DESC, d.short_name ASC, te.path ASC
+      `)
+      .all({ familyId }) as Level2MeasureRow[];
+    const measures = new Map<string, Level2Measure>();
+    for (const row of rows) {
+      if (measureType && row.measureType !== measureType) continue;
+      const measure = measures.get(row.id) ?? {
+        id: row.id,
+        slug: row.slug,
+        shortName: row.shortName,
+        officialTitle: row.officialTitle,
+        celex: row.celex,
+        measureType: row.measureType,
+        publicationDate: row.publicationDate,
+        sourceUrl: row.sourceUrl,
+        explorerPath: explorerPath(row.slug),
+        readerPath: row.readerPath,
+        mandates: [],
+      };
+      if (
+        row.articleEntityId &&
+        row.mandateDocumentId &&
+        row.mandateDocumentShortName &&
+        row.mandateLabel &&
+        row.mandatePath &&
+        !measure.mandates.some(
+          (mandate) => mandate.articleEntityId === row.articleEntityId,
+        )
+      ) {
+        measure.mandates.push({
+          articleEntityId: row.articleEntityId,
+          documentId: row.mandateDocumentId,
+          documentShortName: row.mandateDocumentShortName,
+          label: row.mandateLabel,
+          title: row.mandateTitle,
+          path: row.mandatePath,
+        });
+      }
+      measures.set(row.id, measure);
+    }
+
+    return familyLevel2ResponseSchema.parse({
+      ...primary,
+      counts,
+      measures: [...measures.values()],
+    });
   }
 
   findProvisionRelationships(

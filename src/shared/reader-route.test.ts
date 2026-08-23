@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   explorerPath,
+  level2LibraryPath,
   parseExplorerPath,
+  parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
   provisionPath,
@@ -37,5 +39,17 @@ describe("Reader routes", () => {
     expect(explorerPath("ai-act")).toBe("/explore/ai-act");
     expect(parseExplorerPath("/explore/ai-act")).toEqual({ slug: "ai-act" });
     expect(parseExplorerPath("/read/ai-act/articles/1")).toBeNull();
+  });
+
+  it("builds and parses family Level 2 library routes", () => {
+    expect(level2LibraryPath("dora", "rts")).toBe("/library/dora/rts");
+    expect(parseLevel2LibraryPath("/library/dora/rts")).toEqual({
+      familySlug: "dora",
+      measureType: "rts",
+    });
+    expect(parseLevel2LibraryPath("/library/mica")).toEqual({
+      familySlug: "mica",
+    });
+    expect(parseLevel2LibraryPath("/library/dora/guideline")).toBeNull();
   });
 });

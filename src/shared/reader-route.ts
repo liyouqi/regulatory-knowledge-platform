@@ -15,6 +15,26 @@ export function parseExplorerPath(pathname: string): { slug: string } | null {
   return match ? { slug: decodeURIComponent(match[1]) } : null;
 }
 
+export function level2LibraryPath(
+  familySlug: string,
+  measureType?: "rts" | "its",
+): string {
+  return measureType
+    ? `/library/${encodeURIComponent(familySlug)}/${measureType}`
+    : `/library/${encodeURIComponent(familySlug)}`;
+}
+
+export function parseLevel2LibraryPath(
+  pathname: string,
+): { familySlug: string; measureType?: "rts" | "its" } | null {
+  const match = /^\/library\/([^/]+)(?:\/(rts|its))?\/?$/u.exec(pathname);
+  if (!match) return null;
+  return {
+    familySlug: decodeURIComponent(match[1]),
+    measureType: match[2] as "rts" | "its" | undefined,
+  };
+}
+
 export function provisionPath(
   slug: string,
   collectionId: CollectionId,

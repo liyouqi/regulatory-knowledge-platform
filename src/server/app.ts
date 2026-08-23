@@ -50,6 +50,16 @@ export function findRelationshipPreview(entityId: string) {
   return runtimeRepository.findRelationshipPreview(entityId);
 }
 
+export function findFamilyLevel2(
+  familySlug: string,
+  measureType?: "rts" | "its",
+) {
+  return runtimeRepository.findFamilyLevel2(
+    `family:${familySlug}`,
+    measureType,
+  );
+}
+
 app.get("/api/health", (_request, response) => {
   response.json({
     status: "ok",
@@ -68,6 +78,39 @@ app.get("/api/health", (_request, response) => {
 app.get("/api/documents", (_request, response) => {
   response.json({ documents: runtimeRepository.listDocumentSummaries() });
 });
+
+function sendFamilyLevel2(
+  familySlug: string,
+  measureType: "rts" | "its" | undefined,
+  response: express.Response,
+) {
+  const family = findFamilyLevel2(familySlug, measureType);
+  if (!family) {
+    response.status(404).json({ error: "Regulatory family not found" });
+    return;
+  }
+  response.json(family);
+}
+
+app.get("/api/families/:familySlug/level-2", (request, response) => {
+  sendFamilyLevel2(request.params.familySlug, undefined, response);
+});
+
+app.get(
+  "/api/families/:familySlug/level-2/:measureType",
+  (request, response) => {
+    const measureType =
+      request.params.measureType === "rts" ||
+      request.params.measureType === "its"
+        ? request.params.measureType
+        : undefined;
+    if (!measureType) {
+      response.status(404).json({ error: "Level 2 measure type not found" });
+      return;
+    }
+    sendFamilyLevel2(request.params.familySlug, measureType, response);
+  },
+);
 
 app.get("/api/search/laws", (request, response) => {
   const query = typeof request.query.q === "string" ? request.query.q : "";

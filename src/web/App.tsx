@@ -44,11 +44,13 @@ import {
 import {
   explorerPath,
   parseExplorerPath,
+  parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
 } from "../shared/reader-route";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
+import { Level2LibraryPage } from "./Level2LibraryPage";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -1047,6 +1049,7 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
 export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
+  const level2Library = parseLevel2LibraryPath(location.pathname);
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
@@ -1064,7 +1067,13 @@ export function App() {
 
   return (
     <>
-      {explorer ? (
+      {level2Library ? (
+        <Level2LibraryPage
+          familySlug={level2Library.familySlug}
+          measureType={level2Library.measureType}
+          onOpenSearch={() => setSearchOpen(true)}
+        />
+      ) : explorer ? (
         <ExplorerPage
           onOpenSearch={() => setSearchOpen(true)}
           slug={explorer.slug}

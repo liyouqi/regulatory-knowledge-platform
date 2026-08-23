@@ -170,6 +170,47 @@ describe("SQLite runtime repository", () => {
     );
   });
 
+  it("lists Level 2 measures from SQLite with counts and mandate Articles", () => {
+    expect(repository?.findFamilyLevel2("family:dora")).toMatchObject({
+      familyId: "family:dora",
+      familyShortName: "DORA",
+      counts: { rts: 1, its: 0, guidelines: 0 },
+      measures: [
+        expect.objectContaining({
+          id: "eu:32024R1774",
+          measureType: "rts",
+          celex: "32024R1774",
+          mandates: expect.arrayContaining([
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:15",
+              path: "/read/dora/articles/15",
+            }),
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:16",
+            }),
+          ]),
+        }),
+      ],
+    });
+    expect(repository?.findFamilyLevel2("family:mica", "rts")).toMatchObject({
+      counts: { rts: 1, its: 0, guidelines: 0 },
+      measures: [
+        expect.objectContaining({
+          id: "eu:32025R0305",
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32023R1114:article:62",
+            }),
+          ],
+        }),
+      ],
+    });
+    expect(repository?.findFamilyLevel2("family:gdpr")).toMatchObject({
+      measures: [],
+    });
+    expect(repository?.findFamilyLevel2("family:unknown")).toBeNull();
+  });
+
   it("returns a short on-demand preview without adding legal text to relation rows", () => {
     expect(
       repository?.findRelationshipPreview("eu:32022L2555:article:3"),

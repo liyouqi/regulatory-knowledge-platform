@@ -140,6 +140,48 @@ export const documentCatalogSchema = z.object({
   documents: z.array(documentSummarySchema),
 });
 
+export const level2MeasureTypeSchema = z.enum([
+  "rts",
+  "its",
+  "guideline",
+  "qa",
+  "other",
+]);
+
+export const level2MandateSchema = z.object({
+  articleEntityId: z.string().min(1),
+  documentId: z.string().min(1),
+  documentShortName: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().nullable(),
+  path: z.string().startsWith("/"),
+});
+
+export const level2MeasureSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  officialTitle: z.string().min(1),
+  celex: z.string().min(1),
+  measureType: level2MeasureTypeSchema,
+  publicationDate: z.string().date(),
+  sourceUrl: z.string().url(),
+  explorerPath: z.string().startsWith("/"),
+  readerPath: z.string().startsWith("/"),
+  mandates: z.array(level2MandateSchema),
+});
+
+export const familyLevel2ResponseSchema = z.object({
+  familyId: z.string().startsWith("family:"),
+  familyShortName: z.string().min(1),
+  counts: z.object({
+    rts: z.number().int().nonnegative(),
+    its: z.number().int().nonnegative(),
+    guidelines: z.number().int().nonnegative(),
+  }),
+  measures: z.array(level2MeasureSchema),
+});
+
 export const lawSearchMatchReasonSchema = z.enum([
   "catalog",
   "exact-celex",
@@ -356,6 +398,8 @@ export type ContentCollection = z.infer<typeof contentCollectionSchema>;
 export type ProvisionView = z.infer<typeof provisionViewSchema>;
 export type DocumentView = z.infer<typeof documentViewSchema>;
 export type DocumentSummary = z.infer<typeof documentSummarySchema>;
+export type Level2Measure = z.infer<typeof level2MeasureSchema>;
+export type FamilyLevel2Response = z.infer<typeof familyLevel2ResponseSchema>;
 export type ExplorerDocument = z.infer<typeof explorerDocumentSchema>;
 export type LawSearchResult = z.infer<typeof lawSearchResultSchema>;
 export type LawSearchResponse = z.infer<typeof lawSearchResponseSchema>;
