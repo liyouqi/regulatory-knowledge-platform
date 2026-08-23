@@ -9,8 +9,9 @@ import {
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
 import type { BodyBlock, DocumentView, ProvisionView } from "../shared/legal";
+import { normalizeSearchText } from "./current-document-search";
 
-export const SEARCH_INDEX_SCHEMA_VERSION = "1.0.0";
+export const SEARCH_INDEX_SCHEMA_VERSION = "1.1.0";
 export const DEFAULT_SEARCH_INDEX_PATH = resolve(
   process.cwd(),
   "data/artifacts/search/global-search.sqlite",
@@ -22,6 +23,7 @@ export interface SearchIndexManifest {
   builtAt: string;
   documentCount: number;
   recordCount: number;
+  definitionCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
   outputPath: string;
   byteCount: number;
@@ -39,6 +41,82 @@ interface IndexRow {
   heading: string;
   body: string;
   scope: "heading" | "body";
+}
+
+interface DefinitionRow {
+  definitionId: string;
+  documentId: string;
+  provisionId: string;
+  term: string;
+  normalizedTerm: string;
+  definitionText: string;
+  definitionType: "direct" | "incorporated";
+  label: string;
+  title: string | null;
+  marker: string | null;
+  path: string;
+}
+
+const DEFINITION_TERM_PATTERN = /^(.{1,240}?)\s+means(?:\s|:)/iu;
+
+function completeBlockText(block: BodyBlock): string {
+  return [
+    block.text,
+    ...block.children.map((child) =>
+      [child.marker, completeBlockText(child)].filter(Boolean).join(" "),
+    ),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function definitionRowsForBlocks(
+  document: DocumentView,
+  provision: ProvisionView,
+  blocks: BodyBlock[],
+): DefinitionRow[] {
+  return blocks.flatMap((block) => {
+    const match =
+      block.kind === "point"
+        ? block.text.trim().match(DEFINITION_TERM_PATTERN)
+        : null;
+    const term = match?.[1]?.trim().replace(/^[“”‘’"']+|[“”‘’"']+$/gu, "");
+    const definitionType: DefinitionRow["definitionType"] =
+      /\bas defined in\b/iu.test(block.text) ? "incorporated" : "direct";
+    const current = term
+      ? [
+          {
+            definitionId: `${block.id}:definition`,
+            documentId: document.id,
+            provisionId: provision.id,
+            term,
+            normalizedTerm: normalizeSearchText(term),
+            definitionText: completeBlockText(block),
+            definitionType,
+            label: provision.label,
+            title: provision.title ?? null,
+            marker: block.marker ?? null,
+            path: `${provision.path}#${block.anchor}`,
+          },
+        ]
+      : [];
+    return [
+      ...current,
+      ...definitionRowsForBlocks(document, provision, block.children),
+    ];
+  });
+}
+
+function definitionRows(documents: DocumentView[]): DefinitionRow[] {
+  return documents.flatMap((document) =>
+    document.provisions
+      .filter((provision) =>
+        /^definitions?$/iu.test(provision.title?.trim() ?? ""),
+      )
+      .flatMap((provision) =>
+        definitionRowsForBlocks(document, provision, provision.blocks),
+      ),
+  );
 }
 
 function blockRows(
@@ -130,6 +208,7 @@ export function buildSearchIndex(
   if (existsSync(temporaryPath)) unlinkSync(temporaryPath);
   const database = new Database(temporaryPath);
   const rows = indexRows(documents);
+  const definitions = definitionRows(documents);
   const buildId = searchBuildId(documents);
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -145,6 +224,7 @@ export function buildSearchIndex(
       ) STRICT;
       CREATE TABLE documents (
         id TEXT PRIMARY KEY,
+        jurisdiction TEXT NOT NULL,
         slug TEXT NOT NULL UNIQUE,
         celex TEXT NOT NULL UNIQUE,
         short_name TEXT NOT NULL,
@@ -178,14 +258,38 @@ export function buildSearchIndex(
         tokenize='unicode61 remove_diacritics 2',
         prefix='2 3 4'
       );
+      CREATE TABLE definitions (
+        rowid INTEGER PRIMARY KEY,
+        definition_id TEXT NOT NULL UNIQUE,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        provision_id TEXT NOT NULL,
+        term TEXT NOT NULL,
+        normalized_term TEXT NOT NULL,
+        definition_text TEXT NOT NULL,
+        definition_type TEXT NOT NULL CHECK (definition_type IN ('direct', 'incorporated')),
+        label TEXT NOT NULL,
+        title TEXT,
+        marker TEXT,
+        path TEXT NOT NULL
+      ) STRICT;
+      CREATE INDEX definitions_document_id ON definitions(document_id);
+      CREATE INDEX definitions_normalized_term ON definitions(normalized_term);
+      CREATE VIRTUAL TABLE definitions_fts USING fts5(
+        term,
+        definition_text,
+        content='definitions',
+        content_rowid='rowid',
+        tokenize='unicode61 remove_diacritics 2',
+        prefix='2 3 4'
+      );
     `);
 
     const insertDocument = database.prepare(`
       INSERT INTO documents (
-        id, slug, celex, short_name, official_title, document_type,
+        id, jurisdiction, slug, celex, short_name, official_title, document_type,
         publication_date, source_version, build_id
       ) VALUES (
-        @id, @slug, @celex, @shortName, @officialTitle, @documentType,
+        @id, @jurisdiction, @slug, @celex, @shortName, @officialTitle, @documentType,
         @publicationDate, @sourceVersion, @buildId
       )
     `);
@@ -201,6 +305,18 @@ export function buildSearchIndex(
     const insertFts = database.prepare(
       "INSERT INTO provisions_fts(rowid, heading, body) VALUES (?, ?, ?)",
     );
+    const insertDefinition = database.prepare(`
+      INSERT INTO definitions (
+        definition_id, document_id, provision_id, term, normalized_term,
+        definition_text, definition_type, label, title, marker, path
+      ) VALUES (
+        @definitionId, @documentId, @provisionId, @term, @normalizedTerm,
+        @definitionText, @definitionType, @label, @title, @marker, @path
+      )
+    `);
+    const insertDefinitionFts = database.prepare(
+      "INSERT INTO definitions_fts(rowid, term, definition_text) VALUES (?, ?, ?)",
+    );
     const insertManifest = database.prepare(
       "INSERT INTO build_manifest(key, value) VALUES (?, ?)",
     );
@@ -208,6 +324,7 @@ export function buildSearchIndex(
       for (const document of documents) {
         insertDocument.run({
           id: document.id,
+          jurisdiction: document.jurisdiction,
           slug: document.slug,
           celex: document.celex,
           shortName: document.shortName,
@@ -222,12 +339,21 @@ export function buildSearchIndex(
         const result = insertProvision.run(row);
         insertFts.run(result.lastInsertRowid, row.heading, row.body);
       }
+      for (const definition of definitions) {
+        const result = insertDefinition.run(definition);
+        insertDefinitionFts.run(
+          result.lastInsertRowid,
+          definition.term,
+          definition.definitionText,
+        );
+      }
       const manifestEntries = {
         schemaVersion: SEARCH_INDEX_SCHEMA_VERSION,
         buildId,
         builtAt,
         documentCount: String(documents.length),
         recordCount: String(rows.length),
+        definitionCount: String(definitions.length),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
             documentId: document.id,
@@ -242,6 +368,9 @@ export function buildSearchIndex(
     populate();
     database.exec(
       "INSERT INTO provisions_fts(provisions_fts) VALUES ('optimize')",
+    );
+    database.exec(
+      "INSERT INTO definitions_fts(definitions_fts) VALUES ('optimize')",
     );
     const integrity = database.pragma("integrity_check") as Array<{
       integrity_check: string;
@@ -270,6 +399,7 @@ export function buildSearchIndex(
     builtAt,
     documentCount: documents.length,
     recordCount: rows.length,
+    definitionCount: definitions.length,
     documentBuilds: documents.map((document) => ({
       documentId: document.id,
       buildId: document.buildId,

@@ -3,23 +3,27 @@ import {
   BookOpen,
   FileSearch,
   LoaderCircle,
+  Quote,
   Search,
   X,
 } from "lucide-react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
+  DefinitionSearchResponse,
+  DefinitionSearchResult,
   FullTextSearchResponse,
   FullTextSearchResult,
   LawSearchResponse,
   LawSearchResult,
 } from "../shared/legal";
 import {
+  definitionSearchResponseSchema,
   fullTextSearchResponseSchema,
   lawSearchResponseSchema,
 } from "../shared/legal";
 
-type SearchMode = "laws" | "fulltext";
+type SearchMode = "laws" | "definitions" | "fulltext";
 
 const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
   catalog: "Available law",
@@ -149,6 +153,51 @@ function FullTextResultRow({
   );
 }
 
+function DefinitionResultRow({
+  result,
+  active,
+  index,
+  onOpen,
+  onSelect,
+}: {
+  result: DefinitionSearchResult;
+  active: boolean;
+  index: number;
+  onOpen: (result: DefinitionSearchResult) => void;
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <button
+      aria-current={active ? "true" : undefined}
+      className={`law-search-result definition-search-result${active ? " active" : ""}`}
+      onClick={() => onOpen(result)}
+      onMouseEnter={() => onSelect(index)}
+      ref={
+        active
+          ? (node) => node?.scrollIntoView({ block: "nearest" })
+          : undefined
+      }
+      type="button"
+    >
+      <span className="law-result-mark">{result.shortName.slice(0, 2)}</span>
+      <span className="law-result-copy">
+        <span>
+          <strong>“{result.term}”</strong>
+          <em>{result.definitionType}</em>
+        </span>
+        <span className="definition-text">{result.definitionText}</span>
+        <span className="law-result-meta">
+          {result.jurisdiction} · {result.shortName} · {result.label}
+          {result.marker ? ` · ${result.marker}` : ""} · CELEX {result.celex}
+        </span>
+      </span>
+      <span className="law-result-action">
+        Read <ArrowRight aria-hidden="true" size={15} />
+      </span>
+    </button>
+  );
+}
+
 export function GlobalLawSearch({
   open,
   onClose,
@@ -165,14 +214,21 @@ export function GlobalLawSearch({
   );
   const [fullTextResponse, setFullTextResponse] =
     useState<FullTextSearchResponse | null>(null);
+  const [definitionResponse, setDefinitionResponse] =
+    useState<DefinitionSearchResponse | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const lawResults = lawResponse?.results ?? [];
   const fullTextResults = fullTextResponse?.results ?? [];
+  const definitionResults = definitionResponse?.results ?? [];
   const resultCount =
-    mode === "laws" ? lawResults.length : fullTextResults.length;
+    mode === "laws"
+      ? lawResults.length
+      : mode === "definitions"
+        ? definitionResults.length
+        : fullTextResults.length;
 
   useEffect(() => {
     if (!open) return;
@@ -187,8 +243,9 @@ export function GlobalLawSearch({
 
   useEffect(() => {
     if (!open) return;
-    if (mode === "fulltext" && query.trim().length < 2) {
-      setFullTextResponse(null);
+    if (mode !== "laws" && query.trim().length < 2) {
+      if (mode === "fulltext") setFullTextResponse(null);
+      if (mode === "definitions") setDefinitionResponse(null);
       setLoading(false);
       setError("");
       return;
@@ -200,7 +257,9 @@ export function GlobalLawSearch({
     const endpoint =
       mode === "laws"
         ? `/api/search/laws?q=${encodeURIComponent(query)}`
-        : `/api/search/full-text?q=${encodeURIComponent(query)}&limit=20`;
+        : mode === "definitions"
+          ? `/api/search/definitions?q=${encodeURIComponent(query)}&limit=20`
+          : `/api/search/full-text?q=${encodeURIComponent(query)}&limit=20`;
 
     void fetch(endpoint, { signal: controller.signal })
       .then(async (fetchResponse) => {
@@ -208,12 +267,16 @@ export function GlobalLawSearch({
           throw new Error(
             mode === "laws"
               ? "Unable to search laws"
-              : "Unable to search legal text",
+              : mode === "definitions"
+                ? "Unable to search definitions"
+                : "Unable to search legal text",
           );
         }
         const payload: unknown = await fetchResponse.json();
         if (mode === "laws") {
           setLawResponse(lawSearchResponseSchema.parse(payload));
+        } else if (mode === "definitions") {
+          setDefinitionResponse(definitionSearchResponseSchema.parse(payload));
         } else {
           setFullTextResponse(fullTextSearchResponseSchema.parse(payload));
         }
@@ -248,6 +311,11 @@ export function GlobalLawSearch({
     navigate(result.path);
   }
 
+  function openDefinitionResult(result: DefinitionSearchResult) {
+    onClose();
+    navigate(result.path);
+  }
+
   function selectMode(nextMode: SearchMode) {
     setMode(nextMode);
     setSelectedIndex(0);
@@ -263,7 +331,12 @@ export function GlobalLawSearch({
     }
     if (event.key === "Tab") {
       event.preventDefault();
-      selectMode(mode === "laws" ? "fulltext" : "laws");
+      const modes: SearchMode[] = ["laws", "definitions", "fulltext"];
+      const currentIndex = modes.indexOf(mode);
+      const direction = event.shiftKey ? -1 : 1;
+      selectMode(
+        modes[(currentIndex + direction + modes.length) % modes.length],
+      );
       return;
     }
     if (event.key === "ArrowDown") {
@@ -284,6 +357,11 @@ export function GlobalLawSearch({
         if (!result) return;
         event.preventDefault();
         openLawResult(result);
+      } else if (mode === "definitions") {
+        const result = definitionResults[selectedIndex];
+        if (!result) return;
+        event.preventDefault();
+        openDefinitionResult(result);
       } else {
         const result = fullTextResults[selectedIndex];
         if (!result) return;
@@ -322,7 +400,9 @@ export function GlobalLawSearch({
             aria-label={
               mode === "laws"
                 ? "Find laws by name, CELEX, or citation"
-                : "Search full text across loaded laws"
+                : mode === "definitions"
+                  ? "Search legal definitions"
+                  : "Search full text across loaded laws"
             }
             maxLength={200}
             onChange={(event) => {
@@ -333,7 +413,9 @@ export function GlobalLawSearch({
             placeholder={
               mode === "laws"
                 ? "DORA, DORA article 3, 32022R2554…"
-                : 'Operational risk, "management body"…'
+                : mode === "definitions"
+                  ? 'Controller, personal data, "AI system"…'
+                  : 'Operational risk, "management body"…'
             }
             ref={inputRef}
             value={query}
@@ -359,6 +441,15 @@ export function GlobalLawSearch({
               <BookOpen aria-hidden="true" size={14} /> Find laws
             </button>
             <button
+              aria-selected={mode === "definitions"}
+              className={mode === "definitions" ? "active" : ""}
+              onClick={() => selectMode("definitions")}
+              role="tab"
+              type="button"
+            >
+              <Quote aria-hidden="true" size={14} /> Definitions
+            </button>
+            <button
               aria-selected={mode === "fulltext"}
               className={mode === "fulltext" ? "active" : ""}
               onClick={() => selectMode("fulltext")}
@@ -371,7 +462,9 @@ export function GlobalLawSearch({
           <small>
             {mode === "laws"
               ? "Name · alias · CELEX · citation"
-              : "SQLite FTS5 · all laws"}
+              : mode === "definitions"
+                ? "Official terms · traceable sources"
+                : "SQLite FTS5 · all laws"}
           </small>
         </div>
 
@@ -385,6 +478,17 @@ export function GlobalLawSearch({
               <span>
                 Try <code>operational risk</code> or the exact phrase{" "}
                 <code>"management body"</code>.
+              </span>
+            </div>
+          ) : null}
+
+          {!error && mode === "definitions" && query.trim().length < 2 ? (
+            <div className="search-empty full-text-intro">
+              <Quote aria-hidden="true" size={25} />
+              <strong>Look up official legal definitions</strong>
+              <span>
+                Try <code>controller</code>, <code>personal data</code>, or{" "}
+                <code>"AI system"</code>.
               </span>
             </div>
           ) : null}
@@ -404,6 +508,15 @@ export function GlobalLawSearch({
           fullTextResults.length === 0 ? (
             <p className="search-empty">
               No provision matches all of these terms.
+            </p>
+          ) : null}
+
+          {!error &&
+          mode === "definitions" &&
+          definitionResponse &&
+          definitionResults.length === 0 ? (
+            <p className="search-empty">
+              No official definition matches this term.
             </p>
           ) : null}
 
@@ -452,6 +565,24 @@ export function GlobalLawSearch({
                   index={index}
                   key={result.id}
                   onOpen={openFullTextResult}
+                  onSelect={setSelectedIndex}
+                  result={result}
+                />
+              ))}
+            </>
+          ) : null}
+
+          {mode === "definitions" && definitionResults.length > 0 ? (
+            <>
+              <p className="search-section-label">
+                DEFINITIONS · TRACEABLE SOURCES
+              </p>
+              {definitionResults.map((result, index) => (
+                <DefinitionResultRow
+                  active={selectedIndex === index}
+                  index={index}
+                  key={result.id}
+                  onOpen={openDefinitionResult}
                   onSelect={setSelectedIndex}
                   result={result}
                 />

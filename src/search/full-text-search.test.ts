@@ -3,7 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadDoraDocumentView } from "../data/document-repository";
-import { FullTextSearchService, parseFullTextQuery } from "./full-text-search";
+import {
+  FullTextSearchService,
+  parseDefinitionQuery,
+  parseFullTextQuery,
+} from "./full-text-search";
 import { buildSearchIndex } from "./sqlite-search-index";
 
 const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-search-"));
@@ -28,6 +32,7 @@ describe("SQLite FTS5 search artifact", () => {
     expect(first.buildId).toBe(second.buildId);
     expect(first).toMatchObject({ documentCount: 1 });
     expect(first.recordCount).toBeGreaterThan(900);
+    expect(first.definitionCount).toBe(65);
     expect(first.byteCount).toBeGreaterThan(0);
   });
 
@@ -82,5 +87,42 @@ describe("SQLite FTS5 search artifact", () => {
     expect(
       service?.search("operational", { documentId: "eu:unknown" }).results,
     ).toEqual([]);
+  });
+
+  it("builds bounded definition term queries without raw FTS syntax", () => {
+    expect(parseDefinitionQuery('"digital operational resilience"')).toEqual({
+      normalizedQuery: "digital operational resilience",
+      matchExpression: 'term : "digital operational resilience"',
+    });
+    expect(parseDefinitionQuery("risk OR *** management")).toEqual({
+      normalizedQuery: "risk or management",
+      matchExpression: 'term : ("risk"* AND "or"* AND "management"*)',
+    });
+    expect(parseDefinitionQuery("a")).toEqual({
+      normalizedQuery: "a",
+      matchExpression: 'term : ("a"*)',
+    });
+  });
+
+  it("returns exact and prefix definition terms with traceable source text", () => {
+    const exact = service?.searchDefinitions("digital operational resilience");
+    expect(exact?.results[0]).toMatchObject({
+      jurisdiction: "EU",
+      shortName: "DORA",
+      term: "digital operational resilience",
+      label: "Article 3",
+      marker: "(1)",
+      definitionType: "direct",
+      path: "/read/dora/articles/3#subparagraph-1-point-1",
+    });
+    expect(exact?.results[0]?.definitionText).toContain(
+      "digital operational resilience means",
+    );
+    expect(service?.searchDefinitions("legacy ict").results[0]?.term).toBe(
+      "legacy ICT system",
+    );
+    expect(
+      service?.searchDefinitions("network and information system").results[0],
+    ).toMatchObject({ definitionType: "incorporated" });
   });
 });

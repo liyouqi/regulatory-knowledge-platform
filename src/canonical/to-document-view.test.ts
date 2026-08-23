@@ -57,6 +57,7 @@ describe("structured Reader DTO", () => {
 
     expect(first.path).toBe("/read/dora/articles/1");
     expect(view).toMatchObject({
+      jurisdiction: "EU",
       documentType: "regulation",
       lastChecked: doraCanonicalFixture.source.retrievedAt,
       sourceVersion: doraCanonicalFixture.source.sourceVersion,

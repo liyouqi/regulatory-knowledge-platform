@@ -1211,6 +1211,17 @@ kbd {
   padding: 0 1px;
 }
 
+.definition-text {
+  color: #b9bdb2;
+  display: -webkit-box;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .law-result-meta {
   color: #777f71;
   font-size: 9px;

@@ -18,6 +18,7 @@ console.table({
   buildId: manifest.buildId,
   documents: manifest.documentCount,
   records: manifest.recordCount,
+  definitions: manifest.definitionCount,
   bytes: manifest.byteCount,
   output: manifest.outputPath,
 });

@@ -264,6 +264,7 @@ export function toDocumentView(
 
   return {
     id: document.logicalId,
+    jurisdiction: document.jurisdiction,
     slug,
     celex: document.identifiers.celex ?? "Not applicable",
     shortName: document.shortName,

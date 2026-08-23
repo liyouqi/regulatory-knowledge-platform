@@ -94,6 +94,7 @@ export const contentCollectionSchema = z.object({
 
 export const documentViewSchema = z.object({
   id: z.string().min(1),
+  jurisdiction: z.enum(["EU", "LU"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
   celex: z.string().min(1),
   shortName: z.string().min(1),
@@ -200,6 +201,31 @@ export const fullTextSearchResponseSchema = z.object({
   results: z.array(fullTextSearchResultSchema),
 });
 
+export const definitionSearchResultSchema = z.object({
+  id: z.string().min(1),
+  documentId: z.string().min(1),
+  jurisdiction: z.enum(["EU", "LU"]),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  celex: z.string().min(1),
+  term: z.string().min(1),
+  normalizedTerm: z.string().min(1),
+  definitionText: z.string().min(1),
+  definitionType: z.enum(["direct", "incorporated"]),
+  provisionId: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().optional(),
+  marker: z.string().optional(),
+  path: z.string().startsWith("/"),
+});
+
+export const definitionSearchResponseSchema = z.object({
+  query: z.string(),
+  normalizedQuery: z.string(),
+  indexBuildId: z.string().min(1),
+  results: z.array(definitionSearchResultSchema),
+});
+
 export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
   z.object({
     id: z.string().min(1),
@@ -255,4 +281,10 @@ export type SearchSnippetSegment = z.infer<typeof searchSnippetSegmentSchema>;
 export type FullTextSearchResult = z.infer<typeof fullTextSearchResultSchema>;
 export type FullTextSearchResponse = z.infer<
   typeof fullTextSearchResponseSchema
+>;
+export type DefinitionSearchResult = z.infer<
+  typeof definitionSearchResultSchema
+>;
+export type DefinitionSearchResponse = z.infer<
+  typeof definitionSearchResponseSchema
 >;

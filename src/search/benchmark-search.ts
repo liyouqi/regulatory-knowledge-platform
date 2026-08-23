@@ -13,6 +13,15 @@ const EVALUATION_CASES = [
   { query: "data holder", expectedLaw: "Data Act" },
 ] as const;
 
+const DEFINITION_EVALUATION_CASES = [
+  { query: "digital operational resilience", expectedLaw: "DORA" },
+  { query: "controller", expectedLaw: "GDPR" },
+  { query: '"AI system"', expectedLaw: "AI Act" },
+  { query: "crypto asset", expectedLaw: "MiCA" },
+  { query: "network and information system", expectedLaw: "NIS2" },
+  { query: "data holder", expectedLaw: "Data Act" },
+] as const;
+
 const WARMUP_CYCLES = 10;
 const MEASURED_CYCLES = 100;
 
@@ -58,6 +67,25 @@ try {
       firstQueryMs: Number(firstQueryMs.toFixed(3)),
     };
   });
+  const definitionEvaluation = DEFINITION_EVALUATION_CASES.map(
+    ({ query, expectedLaw }) => {
+      const response = service.searchDefinitions(query, 20);
+      const laws = [
+        ...new Set(response.results.map((result) => result.shortName)),
+      ];
+      if (!laws.includes(expectedLaw)) {
+        throw new Error(
+          `Definition evaluation failed for ${JSON.stringify(query)}: expected ${expectedLaw}`,
+        );
+      }
+      return {
+        query,
+        expectedLaw,
+        resultCount: response.results.length,
+        laws,
+      };
+    },
+  );
 
   for (let cycle = 0; cycle < WARMUP_CYCLES; cycle += 1) {
     for (const { query } of EVALUATION_CASES)
@@ -91,6 +119,7 @@ try {
           buildId: service.buildId,
           documentCount: service.documentCount,
           recordCount: service.recordCount,
+          definitionCount: service.definitionCount,
         },
         method: {
           queryCount: EVALUATION_CASES.length,
@@ -105,6 +134,7 @@ try {
           max: Number(timings.at(-1)?.toFixed(3)),
         },
         evaluation,
+        definitionEvaluation,
       },
       null,
       2,

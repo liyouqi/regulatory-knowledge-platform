@@ -2,7 +2,7 @@ import express from "express";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
-import { FullTextSearchService } from "../search/full-text-search";
+import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 import type { DocumentSummary } from "../shared/legal";
 
@@ -13,11 +13,11 @@ const lawSearchRecords = createLawSearchRecords(
   documentViews,
   loadSourceRegistrySync(),
 );
-let fullTextSearchService: FullTextSearchService | null = null;
+let searchService: SearchService | null = null;
 try {
-  fullTextSearchService = new FullTextSearchService();
+  searchService = new SearchService();
 } catch {
-  fullTextSearchService = null;
+  searchService = null;
 }
 
 function summary(document: (typeof documentViews)[number]): DocumentSummary {
@@ -51,14 +51,23 @@ export function searchFullText(
   query: string,
   options: { documentId?: string; limit?: number } = {},
 ) {
-  return fullTextSearchService?.search(query, options) ?? null;
+  return searchService?.search(query, options) ?? null;
+}
+
+export function searchDefinitions(query: string, limit?: number) {
+  return searchService?.searchDefinitions(query, limit) ?? null;
 }
 
 app.get("/api/health", (_request, response) => {
   response.json({
     status: "ok",
-    searchIndex: fullTextSearchService
-      ? { available: true, buildId: fullTextSearchService.buildId }
+    searchIndex: searchService
+      ? {
+          available: true,
+          buildId: searchService.buildId,
+          records: searchService.recordCount,
+          definitions: searchService.definitionCount,
+        }
       : { available: false },
   });
 });
@@ -89,6 +98,25 @@ app.get("/api/search/full-text", (request, response) => {
   if (!result) {
     response.status(503).json({
       error: "Full-text search index unavailable; run npm run search:build",
+    });
+    return;
+  }
+  response.json(result);
+});
+
+app.get("/api/search/definitions", (request, response) => {
+  const query = typeof request.query.q === "string" ? request.query.q : "";
+  const requestedLimit =
+    typeof request.query.limit === "string"
+      ? Number.parseInt(request.query.limit, 10)
+      : undefined;
+  const result = searchDefinitions(
+    query.slice(0, 120),
+    Number.isFinite(requestedLimit) ? requestedLimit : undefined,
+  );
+  if (!result) {
+    response.status(503).json({
+      error: "Definitions index unavailable; run npm run search:build",
     });
     return;
   }

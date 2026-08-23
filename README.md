@@ -259,6 +259,26 @@ AI Act annex VII
 
 Compound queries combine a verified law identity with `article`/`art`, `recital`/`rec`, or `annex` and a number. They open the exact stable Reader route only when that provision exists; the service does not guess missing provisions. Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
 
+### Definitions
+
+Open the global panel and select **Definitions**, or press `Tab` once from **Find laws**. Search supports exact normalized terms, term prefixes, and quoted term phrases. Results show the official definition text, EU/LU jurisdiction, source law, Article and point, CELEX ID, and a stable link to the defining point. The same term can appear once per source law, so cross-regulation differences remain visible.
+
+Useful checks include:
+
+```text
+controller
+personal data
+"AI system"
+digital operational resilience
+network and information system
+crypto asset
+data holder
+```
+
+The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run search:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. On the current six-law corpus this produces 294/294 structurally matching definition points and avoids treating ordinary uses of “means” as definitions.
+
+When a definition explicitly says `as defined in`, it is stored as `incorporated`; otherwise it is `direct`. Exact direct definitions rank before incorporated references, while every result retains its own official source text and point link. For example, `personal data` returns the direct GDPR definition first, followed by incorporated MiCA, Data Act, and AI Act definitions.
+
 ### Global full-text search
 
 Open the same global panel with `Cmd+K` or `Ctrl+K`, then select **Full text** or press `Tab` to switch modes. Full-text search covers the headings and legal body blocks of every loaded law. Multiple unquoted terms use strict AND and word-prefix semantics; quoted text is an exact normalized phrase. Results contain safe highlighted text segments and open stable paragraph-level Reader links.
@@ -276,7 +296,7 @@ data holder
 
 The endpoint is `/api/search/full-text?q=<query>&limit=<1-50>`. Add `documentId=eu:<CELEX>` for exact document scope. User input is normalized into bounded parameterized FTS expressions; unsupported operator punctuation is not executed as raw FTS syntax.
 
-The index at `data/artifacts/search/global-search.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, document build IDs, stable provision records, and an FTS5 table; it is never canonical legal data. `npm run dev` and `npm start` rebuild it first, or rebuild it explicitly after adding or updating a canonical law:
+The index at `data/artifacts/search/global-search.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, document build IDs, stable provision and definition records, and separate FTS5 tables; it is never canonical legal data. `npm run dev` and `npm start` rebuild it first, or rebuild it explicitly after adding or updating a canonical law:
 
 ```bash
 npm run search:build
@@ -286,7 +306,7 @@ npm run search:benchmark
 
 The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens the artifact read-only, checks its schema and manifest counts, runs SQLite `integrity_check`, exercises the FTS5 query path, and reports availability plus `buildId` at `/api/health`.
 
-The benchmark fails if any fixed query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
+The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
 
 ## Current Release Status
 
@@ -329,5 +349,9 @@ The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.
 - strict AND, prefix, exact phrase, deterministic BM25 ranking, safe highlighted snippets, and optional document scope;
 - a keyboard-complete **Full text** mode in the shared global panel, verified on desktop and at 390px mobile width;
 - fixed service tests and a reproducible six-query relevance and latency benchmark with complete runtime, machine, corpus, and sampling metadata.
+- 294 first-class definition records across all six laws, extracted only from structurally verified `Definitions` provisions;
+- exact, normalized, prefix, and quoted phrase definition lookup with direct definitions ranked ahead of explicit incorporated references;
+- a traceable `/api/search/definitions` contract and a keyboard-complete **Definitions** mode verified across GDPR/MiCA/Data Act/AI Act sources and at 390px mobile width;
+- a fixed six-query definition evaluation set included in `npm run search:benchmark`.
 
-The next Release 0.3 tasks are Definitions and Opened Laws modes. They are not represented as completed functionality yet.
+The next Release 0.3 task is Opened Laws mode. It is not represented as completed functionality yet.

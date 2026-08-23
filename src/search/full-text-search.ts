@@ -2,6 +2,8 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import Database from "better-sqlite3";
 import type {
+  DefinitionSearchResponse,
+  DefinitionSearchResult,
   FullTextSearchResponse,
   FullTextSearchResult,
   SearchSnippetSegment,
@@ -31,6 +33,24 @@ interface SearchRow {
   path: string;
   markedSnippet: string;
   rank: number;
+}
+
+interface DefinitionRow {
+  id: string;
+  documentId: string;
+  jurisdiction: DefinitionSearchResult["jurisdiction"];
+  slug: string;
+  shortName: string;
+  celex: string;
+  term: string;
+  normalizedTerm: string;
+  definitionText: string;
+  definitionType: DefinitionSearchResult["definitionType"];
+  provisionId: string;
+  label: string;
+  title: string | null;
+  marker: string | null;
+  path: string;
 }
 
 const START_HIGHLIGHT = "\u0001";
@@ -93,6 +113,22 @@ export function parseMarkedSnippet(value: string): SearchSnippetSegment[] {
   return segments.length > 0 ? segments : [{ text: value, highlighted: false }];
 }
 
+export function parseDefinitionQuery(
+  rawQuery: string,
+): ParsedFullTextQuery | null {
+  const query = rawQuery.trim().slice(0, 120);
+  const quotedMatch = query.match(/^"([^"]+)"$/u);
+  const normalizedQuery = normalizeSearchText(quotedMatch?.[1] ?? query);
+  const terms = normalizedQuery.split(" ").filter(Boolean).slice(0, 6);
+  if (terms.length === 0) return null;
+  return {
+    normalizedQuery,
+    matchExpression: quotedMatch
+      ? `term : "${terms.join(" ")}"`
+      : `term : (${terms.map((term) => `"${term}"*`).join(" AND ")})`,
+  };
+}
+
 function manifestValue(database: Database.Database, key: string): string {
   const row = database
     .prepare("SELECT value FROM build_manifest WHERE key = ?")
@@ -101,8 +137,9 @@ function manifestValue(database: Database.Database, key: string): string {
   return row.value;
 }
 
-export class FullTextSearchService {
+export class SearchService {
   readonly buildId: string;
+  readonly definitionCount: number;
   readonly documentCount: number;
   readonly recordCount: number;
   private readonly database: Database.Database;
@@ -138,6 +175,9 @@ export class FullTextSearchService {
           "SELECT count(*) AS count FROM provisions_fts WHERE provisions_fts MATCH ?",
         )
         .get("__fts5_capability_probe__");
+      this.database
+        .prepare("SELECT definition_type FROM definitions LIMIT 1")
+        .get();
       this.buildId = manifestValue(this.database, "buildId");
       this.documentCount = Number.parseInt(
         manifestValue(this.database, "documentCount"),
@@ -147,11 +187,17 @@ export class FullTextSearchService {
         manifestValue(this.database, "recordCount"),
         10,
       );
+      this.definitionCount = Number.parseInt(
+        manifestValue(this.database, "definitionCount"),
+        10,
+      );
       if (
         !Number.isSafeInteger(this.documentCount) ||
         this.documentCount < 1 ||
         !Number.isSafeInteger(this.recordCount) ||
-        this.recordCount < 1
+        this.recordCount < 1 ||
+        !Number.isSafeInteger(this.definitionCount) ||
+        this.definitionCount < 0
       ) {
         throw new Error("Search index manifest has invalid corpus counts");
       }
@@ -233,7 +279,87 @@ export class FullTextSearchService {
     };
   }
 
+  searchDefinitions(rawQuery: string, limit = 20): DefinitionSearchResponse {
+    const query = rawQuery.trim();
+    const parsed = parseDefinitionQuery(query);
+    const boundedLimit = Math.max(1, Math.min(limit, 50));
+    if (!parsed) {
+      return {
+        query,
+        normalizedQuery: "",
+        indexBuildId: this.buildId,
+        results: [],
+      };
+    }
+    const rows = this.database
+      .prepare(`
+        SELECT
+          df.definition_id AS id,
+          df.document_id AS documentId,
+          d.jurisdiction AS jurisdiction,
+          d.slug AS slug,
+          d.short_name AS shortName,
+          d.celex AS celex,
+          df.term AS term,
+          df.normalized_term AS normalizedTerm,
+          df.definition_text AS definitionText,
+          df.definition_type AS definitionType,
+          df.provision_id AS provisionId,
+          df.label AS label,
+          df.title AS title,
+          df.marker AS marker,
+          df.path AS path
+        FROM definitions_fts
+        JOIN definitions df ON df.rowid = definitions_fts.rowid
+        JOIN documents d ON d.id = df.document_id
+        WHERE definitions_fts MATCH @matchExpression
+        ORDER BY
+          CASE
+            WHEN df.normalized_term = @normalizedQuery THEN 0
+            WHEN df.normalized_term LIKE @termPrefix THEN 1
+            ELSE 2
+          END ASC,
+          CASE df.definition_type WHEN 'direct' THEN 0 ELSE 1 END ASC,
+          bm25(definitions_fts, 8.0, 0.2) ASC,
+          df.document_id ASC,
+          df.rowid ASC
+        LIMIT @limit
+      `)
+      .all({
+        matchExpression: parsed.matchExpression,
+        normalizedQuery: parsed.normalizedQuery,
+        termPrefix: `${parsed.normalizedQuery}%`,
+        limit: boundedLimit,
+      }) as DefinitionRow[];
+    return {
+      query,
+      normalizedQuery: parsed.normalizedQuery,
+      indexBuildId: this.buildId,
+      results: rows.map(
+        (row): DefinitionSearchResult => ({
+          id: row.id,
+          documentId: row.documentId,
+          jurisdiction: row.jurisdiction,
+          slug: row.slug,
+          shortName: row.shortName,
+          celex: row.celex,
+          term: row.term,
+          normalizedTerm: row.normalizedTerm,
+          definitionText: row.definitionText,
+          definitionType: row.definitionType,
+          provisionId: row.provisionId,
+          label: row.label,
+          title: row.title ?? undefined,
+          marker: row.marker ?? undefined,
+          path: row.path,
+        }),
+      ),
+    };
+  }
+
   close(): void {
     this.database.close();
   }
 }
+
+export { SearchService as FullTextSearchService };
