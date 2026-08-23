@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedAt": "2026-08-24",
+  "records": [
+    {
+      "id": "official-mapping:dora:32024r1774:article-15",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:15",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:15:subparagraph:1",
+          "text": "The ESAs shall, through the Joint Committee, in consultation with the European Union Agency on Cybersecurity (ENISA), develop common draft regulatory technical standards in order to:",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32024R1774",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2024/1774 of 13 March 2024 supplementing Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to regulatory technical standards specifying ICT risk management tools, methods, processes, and policies and the simplified ICT risk management framework (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2024/1774",
+        "adoptionEvidence": {
+          "text": "in particular Article 15, fourth subparagraph, and Article 16(3), fourth subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32024r1774:article-16",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:16",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:16:paragraph:3",
+          "text": "The ESAs shall, through the Joint Committee, in consultation with the ENISA, develop common draft regulatory technical standards in order to:",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32024R1774",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2024/1774 of 13 March 2024 supplementing Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to regulatory technical standards specifying ICT risk management tools, methods, processes, and policies and the simplified ICT risk management framework (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2024/1774",
+        "adoptionEvidence": {
+          "text": "in particular Article 15, fourth subparagraph, and Article 16(3), fourth subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:mica:32025r0305:article-62",
+      "familyId": "family:mica",
+      "level1": {
+        "celex": "32023R1114",
+        "articleEntityId": "eu:32023R1114:article:62",
+        "mandateEvidence": {
+          "entityId": "eu:32023R1114:article:62:paragraph:5",
+          "text": "ESMA, in close cooperation with EBA, shall develop draft regulatory technical standards to further specify the information referred to in paragraphs 2 and 3.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2023/1114/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32025R0305",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2025/305 of 31 October 2024 supplementing Regulation (EU) 2023/1114 of the European Parliament and of the Council with regard to regulatory technical standards specifying the information to be included in an application for authorisation as a crypto-asset service provider (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2025/305",
+        "adoptionEvidence": {
+          "text": "in particular Article 62(5), third subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/305/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
+    }
+  ]
+}

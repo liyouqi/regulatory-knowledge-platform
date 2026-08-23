@@ -52,10 +52,15 @@ describe("SQLite runtime repository", () => {
       officialTitle: dora.officialTitle,
       defaultPath: dora.provisions[0].path,
       provenance: dora.provenance,
+      familyId: "family:dora",
+      regulatoryLevel: "level-1",
+      measureType: "primary-act",
     });
     expect(repository?.listLawSearchSources()).toContainEqual({
       celex: "32022R2554",
       familyId: "family:dora",
+      regulatoryLevel: "level-1",
+      measureType: "primary-act",
       aliases: [
         "Digital Operational Resilience Act",
         "Digital Operational Resilience Regulation",
@@ -115,6 +120,54 @@ describe("SQLite runtime repository", () => {
         "eu:32022R2554:article:999",
       ),
     ).toBeNull();
+  });
+
+  it("returns reviewed Level 2 mappings in both legal directions", () => {
+    const doraMandate = repository?.findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:15",
+    );
+    expect(doraMandate?.mandates).toContainEqual(
+      expect.objectContaining({
+        relationType: "MANDATES",
+        provenance: "OFFICIAL_MAPPING",
+        target: expect.objectContaining({
+          entityId: "eu:32024R1774",
+          documentShortName: "DORA RTS ICT Risk Management",
+        }),
+      }),
+    );
+
+    const doraRts = repository?.findProvisionRelationships(
+      "eu:32024R1774",
+      "eu:32024R1774:article:1",
+    );
+    expect(doraRts?.adoptedUnder).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "ADOPTED_UNDER",
+          provenance: "OFFICIAL_MAPPING",
+          target: expect.objectContaining({
+            entityId: "eu:32022R2554:article:15",
+          }),
+        }),
+        expect.objectContaining({
+          target: expect.objectContaining({
+            entityId: "eu:32022R2554:article:16",
+          }),
+        }),
+      ]),
+    );
+
+    const micaMandate = repository?.findProvisionRelationships(
+      "eu:32023R1114",
+      "eu:32023R1114:article:62",
+    );
+    expect(micaMandate?.mandates).toContainEqual(
+      expect.objectContaining({
+        target: expect.objectContaining({ entityId: "eu:32025R0305" }),
+      }),
+    );
   });
 
   it("returns a short on-demand preview without adding legal text to relation rows", () => {

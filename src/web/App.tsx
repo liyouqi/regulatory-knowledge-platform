@@ -318,6 +318,66 @@ function RelationshipList({
     "references",
   );
   const citedBy = uniqueRelationships(relationships?.citedBy ?? [], "citedBy");
+  const groups = [
+    {
+      key: "references",
+      label: "References",
+      direction: "references" as const,
+      items: references,
+    },
+    {
+      key: "mandates",
+      label: "Level 2 measures",
+      direction: "references" as const,
+      items: uniqueRelationships(relationships?.mandates ?? [], "references"),
+    },
+    {
+      key: "adopted-under",
+      label: "Adopted under",
+      direction: "references" as const,
+      items: uniqueRelationships(
+        relationships?.adoptedUnder ?? [],
+        "references",
+      ),
+    },
+    {
+      key: "supplements",
+      label: "Supplements",
+      direction: "references" as const,
+      items: uniqueRelationships(
+        relationships?.supplements ?? [],
+        "references",
+      ),
+    },
+    {
+      key: "related-documents",
+      label: "Related documents",
+      direction: "references" as const,
+      items: uniqueRelationships(
+        relationships?.relatedDocuments ?? [],
+        "references",
+      ),
+    },
+    {
+      key: "related-recitals",
+      label: "Related recitals",
+      direction: "references" as const,
+      items: uniqueRelationships(
+        relationships?.relatedRecitals ?? [],
+        "references",
+      ),
+    },
+    {
+      key: "cited-by",
+      label: "Cited by",
+      direction: "citedBy" as const,
+      items: citedBy,
+    },
+  ];
+  const relationshipCount = groups.reduce(
+    (total, group) => total + group.items.length,
+    0,
+  );
 
   return (
     <section className={`relationships-panel ${className}`.trim()}>
@@ -328,85 +388,66 @@ function RelationshipList({
       {error ? (
         <p className="relationships-status error-state">{error}</p>
       ) : null}
-      {!loading && !error && references.length === 0 && citedBy.length === 0 ? (
+      {!loading && !error && relationshipCount === 0 ? (
         <p className="relationships-status">
-          No resolved explicit references for this provision.
+          No resolved relationships for this provision.
         </p>
       ) : null}
-      {references.length > 0 ? (
-        <details open>
-          <summary>
-            <span>
-              <Link2 aria-hidden="true" size={13} /> References
-            </span>
-            <b>{references.length}</b>
-          </summary>
-          <div className="relationship-items">
-            {references.map(({ relationship, mentions }) => (
-              <div className="relationship-item" key={relationship.id}>
-                <Link to={relationship.target.path}>
-                  <strong>
-                    {relationship.target.documentShortName} ·{" "}
-                    {relationship.target.label}
-                  </strong>
-                  {relationship.target.title ? (
-                    <span>{relationship.target.title}</span>
-                  ) : null}
-                  <small>
-                    “{relationship.evidence.text}”
-                    {mentions > 1 ? ` · ${mentions} mentions` : ""}
-                  </small>
-                </Link>
-                <a
-                  className="relationship-evidence"
-                  href={relationship.evidence.sourceUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Official text <ArrowUpRight aria-hidden="true" size={11} />
-                </a>
-              </div>
-            ))}
-          </div>
-        </details>
-      ) : null}
-      {citedBy.length > 0 ? (
-        <details>
-          <summary>
-            <span>
-              <Undo2 aria-hidden="true" size={13} /> Cited by
-            </span>
-            <b>{citedBy.length}</b>
-          </summary>
-          <div className="relationship-items">
-            {citedBy.map(({ relationship, mentions }) => (
-              <div className="relationship-item" key={relationship.id}>
-                <Link to={relationship.source.path}>
-                  <strong>
-                    {relationship.source.documentShortName} ·{" "}
-                    {relationship.source.label}
-                  </strong>
-                  {relationship.source.title ? (
-                    <span>{relationship.source.title}</span>
-                  ) : null}
-                  <small>
-                    “{relationship.evidence.text}”
-                    {mentions > 1 ? ` · ${mentions} mentions` : ""}
-                  </small>
-                </Link>
-                <a
-                  className="relationship-evidence"
-                  href={relationship.evidence.sourceUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Official text <ArrowUpRight aria-hidden="true" size={11} />
-                </a>
-              </div>
-            ))}
-          </div>
-        </details>
-      ) : null}
+      {groups.map((group) =>
+        group.items.length > 0 ? (
+          <details
+            key={group.key}
+            open={["references", "mandates", "adopted-under"].includes(
+              group.key,
+            )}
+          >
+            <summary>
+              <span>
+                {group.direction === "citedBy" ? (
+                  <Undo2 aria-hidden="true" size={13} />
+                ) : (
+                  <Link2 aria-hidden="true" size={13} />
+                )}
+                {group.label}
+              </span>
+              <b>{group.items.length}</b>
+            </summary>
+            <div className="relationship-items">
+              {group.items.map(({ relationship, mentions }) => {
+                const endpoint =
+                  group.direction === "citedBy"
+                    ? relationship.source
+                    : relationship.target;
+                return (
+                  <div className="relationship-item" key={relationship.id}>
+                    <Link to={endpoint.path}>
+                      <strong>
+                        {endpoint.documentShortName} · {endpoint.label}
+                      </strong>
+                      {endpoint.title ? <span>{endpoint.title}</span> : null}
+                      <small>
+                        “{relationship.evidence.text}”
+                        {mentions > 1 ? ` · ${mentions} mentions` : ""}
+                      </small>
+                    </Link>
+                    <a
+                      className="relationship-evidence"
+                      href={relationship.evidence.sourceUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {relationship.provenance === "OFFICIAL_MAPPING"
+                        ? "Official mapping"
+                        : "Official text"}{" "}
+                      <ArrowUpRight aria-hidden="true" size={11} />
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        ) : null,
+      )}
     </section>
   );
 }

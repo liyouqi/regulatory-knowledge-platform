@@ -124,6 +124,16 @@ export const documentSummarySchema = z.object({
   officialTitle: z.string().min(1),
   defaultPath: z.string().startsWith("/"),
   provenance: z.enum(["official", "fixture"]),
+  familyId: z.string().startsWith("family:"),
+  regulatoryLevel: z.enum(["level-1", "level-2", "level-3"]),
+  measureType: z.enum([
+    "primary-act",
+    "rts",
+    "its",
+    "guideline",
+    "qa",
+    "other",
+  ]),
 });
 
 export const documentCatalogSchema = z.object({
@@ -151,6 +161,8 @@ export const lawSearchTargetSchema = z.object({
 export const lawSearchResultSchema = z.object({
   id: z.string().min(1),
   familyId: z.string().startsWith("family:"),
+  regulatoryLevel: documentSummarySchema.shape.regulatoryLevel,
+  measureType: documentSummarySchema.shape.measureType,
   slug: z.string().regex(/^[a-z0-9-]+$/),
   shortName: z.string().min(1),
   officialTitle: z.string().min(1),
@@ -291,7 +303,15 @@ export const relationshipEndpointSchema = z.object({
 
 export const provisionRelationshipSchema = z.object({
   id: z.string().startsWith("relationship:"),
-  relationType: z.enum(["REFERENCES", "CITED_BY"]),
+  relationType: z.enum([
+    "REFERENCES",
+    "CITED_BY",
+    "MANDATES",
+    "ADOPTED_UNDER",
+    "SUPPLEMENTS",
+    "RELATED_DOCUMENT",
+    "RELATED_RECITAL",
+  ]),
   provenance: relationshipProvenanceSchema,
   source: relationshipEndpointSchema,
   target: relationshipEndpointSchema,
@@ -313,6 +333,11 @@ export const provisionRelationshipsResponseSchema = z.object({
   buildId: z.string().min(1),
   references: z.array(provisionRelationshipSchema),
   citedBy: z.array(provisionRelationshipSchema),
+  mandates: z.array(provisionRelationshipSchema),
+  adoptedUnder: z.array(provisionRelationshipSchema),
+  supplements: z.array(provisionRelationshipSchema),
+  relatedDocuments: z.array(provisionRelationshipSchema),
+  relatedRecitals: z.array(provisionRelationshipSchema),
 });
 
 export const relationshipPreviewSchema = z.object({

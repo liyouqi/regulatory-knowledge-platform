@@ -95,4 +95,18 @@ describe("Document lookup", () => {
       excerpt: expect.any(String),
     });
   });
+
+  it("serves official Level 2 mandates separately from explicit references", () => {
+    const result = findProvisionRelationships(
+      "eu:32023R1114",
+      "eu:32023R1114:article:62",
+    );
+    expect(result?.mandates).toContainEqual(
+      expect.objectContaining({
+        relationType: "MANDATES",
+        provenance: "OFFICIAL_MAPPING",
+        target: expect.objectContaining({ entityId: "eu:32025R0305" }),
+      }),
+    );
+  });
 });

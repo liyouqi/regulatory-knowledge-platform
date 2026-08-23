@@ -86,7 +86,9 @@ function LawResultRow({
         <span className="law-result-meta">
           {result.target ? `${result.target.kind} · ` : ""}
           {result.familyId.replace("family:", "").replaceAll("-", " ")} family ·{" "}
-          {result.documentType}
+          {result.measureType === "primary-act"
+            ? result.documentType
+            : result.measureType.toUpperCase()}
           {" · "}
           {result.publicationDate.slice(0, 4)} · CELEX {result.celex}
         </span>

@@ -11,6 +11,8 @@ const source = sourceDefinitionSchema.parse({
   celex: "32025R0001",
   language: "ENG",
   documentType: "regulation",
+  regulatoryLevel: "level-1",
+  measureType: "primary-act",
   publicationDate: "2025-01-02",
   eliUrl: "https://eur-lex.europa.eu/eli/reg/2025/1/oj/eng",
 });
@@ -131,6 +133,24 @@ describe("Formex ACT parser", () => {
         provision.sourceVersionId.endsWith("@Con-20250102030405000"),
       ),
     ).toBe(true);
+  });
+
+  it("parses official acts whose articles are direct ENACTING.TERMS children", () => {
+    const ungroupedXml = xml
+      .replace("<ENACTING.TERMS><DIVISION>", "<ENACTING.TERMS>")
+      .replace("</DIVISION></ENACTING.TERMS>", "</ENACTING.TERMS>");
+    const { document, report } = parseFormexAct(ungroupedXml, source, snapshot);
+
+    expect(report).toMatchObject({
+      articleCount: 2,
+      structuralNodeCount: 0,
+      warningCount: 0,
+    });
+    expect(
+      document.provisions.find(
+        (provision) => provision.logicalId === "eu:32025R0001:article:1",
+      )?.parentLogicalId,
+    ).toBe(document.logicalId);
   });
 
   it("parses separately stored annexes with stable internal anchors", () => {

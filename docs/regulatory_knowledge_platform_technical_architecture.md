@@ -555,6 +555,8 @@ CaseCitationBuilder              # Phase 2
 
 当前 `explicit-reference@1.0.0` 先覆盖可保守确认的 singular Article / Annex、typed modern EU Regulation / Directive，以及“Article … of Regulation/Directive …” compound citation。parser 尚未保留的 Formex structured-link metadata 和无法可靠判断目标的 shorthand/range 不由文本规则猜测。builder method/version 参与 runtime build ID，关系语义变化必须升级 builder version 并运行 dedicated relationship fixtures。
 
+Release 0.5 的 `official-mapping@1.0.0` 读取版本控制且经 schema 校验的 `data/official-mappings/level2.json`。Level 2 法规本身先走相同 official snapshot → Canonical → Document/Entity 流水线，因此 mapping 不引入 external-node 旁路或第二份正文。builder 验证两端文档、Article endpoint、Canonical official title 以及 mandate evidence 是否真实存在于 Level 1 正文，再为每条核验记录输出 `MANDATES` 与 `ADOPTED_UNDER` 两条有向边。mapping 内容和 builder version 均参与 runtime build ID。
+
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
 当前问题可以由简单 builder + resolver 完成：
@@ -740,7 +742,7 @@ Release 0.3 先采用最小化 runtime schema，以现有稳定 API DTO 作为 m
 | search_records | paragraph-level derived search records |
 | definitions | normalized, traceable definitions |
 | search_records_fts / definitions_fts | FTS5 virtual tables |
-| legal_entities / relationships | Release 0.4 stable entity JOIN、explicit references、reverse cited-by |
+| legal_entities / relationships | stable entity JOIN、explicit references、reverse cited-by、official Level 2 mappings |
 
 `document_views` 是有意的 build-time denormalization：Reader / Explorer 一次主键查询即可返回现有 DTO，不在每次请求中用多表 JOIN 重建递归树。它与全文记录、Definitions 都由同一次 Canonical → SQLite build 生成，不存在人工双写。
 

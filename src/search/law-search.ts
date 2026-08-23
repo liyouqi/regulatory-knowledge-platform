@@ -123,7 +123,10 @@ function toResult(
 
 export function createLawSearchRecords(
   documents: DocumentView[],
-  sources: Pick<SourceDefinition, "celex" | "familyId" | "aliases">[],
+  sources: Pick<
+    SourceDefinition,
+    "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+  >[],
 ): LawSearchRecord[] {
   const sourceByCelex = new Map(
     sources.map((source) => [source.celex, source]),
@@ -136,6 +139,8 @@ export function createLawSearchRecords(
       {
         id: document.id,
         familyId: source.familyId,
+        regulatoryLevel: source.regulatoryLevel,
+        measureType: source.measureType,
         slug: document.slug,
         shortName: document.shortName,
         officialTitle: document.officialTitle,

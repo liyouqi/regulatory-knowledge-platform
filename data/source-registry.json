@@ -9,6 +9,8 @@
     "celex": "32022R2554",
     "language": "ENG",
     "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2022-12-27",
     "quality": {
       "articleCount": 64,
@@ -33,6 +35,8 @@
     "celex": "32016R0679",
     "language": "ENG",
     "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2016-05-04",
     "quality": {
       "articleCount": 99,
@@ -57,6 +61,8 @@
     "celex": "32024R1689",
     "language": "ENG",
     "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2024-07-12",
     "quality": {
       "articleCount": 113,
@@ -87,6 +93,8 @@
     "celex": "32023R1114",
     "language": "ENG",
     "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2023-06-09",
     "quality": {
       "articleCount": 149,
@@ -117,6 +125,8 @@
     "celex": "32022L2555",
     "language": "ENG",
     "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2022-12-27",
     "quality": {
       "articleCount": 46,
@@ -143,6 +153,8 @@
     "celex": "32023R2854",
     "language": "ENG",
     "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
     "publicationDate": "2023-12-22",
     "quality": {
       "articleCount": 50,
@@ -159,5 +171,65 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS ICT Risk Management",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/1774",
+      "DORA RTS 2024/1774",
+      "DORA ICT Risk Management RTS"
+    ],
+    "celex": "32024R1774",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2024-06-25",
+    "quality": {
+      "articleCount": 42,
+      "recitalCount": 30,
+      "annexCount": 0,
+      "paragraphCount": 120,
+      "pointCount": 404,
+      "structuralNodeCount": 21,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1774:recital:1": "sha256:60bdf836fae2b01089bd3480647414a17e76ac59a678d5a75de7da83c94d64e6",
+        "eu:32024R1774:article:1:subparagraph:1": "sha256:8f24b41b37a7574134be69e62211c8b63ef6b62aee08d61ac13da1ec32f6a44f",
+        "eu:32024R1774:article:42:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj/eng"
+  },
+  {
+    "familyId": "family:mica",
+    "shortName": "MiCA RTS CASP Authorisation",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/305",
+      "MiCA RTS 2025/305",
+      "MiCA CASP Authorisation RTS"
+    ],
+    "celex": "32025R0305",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-03-31",
+    "quality": {
+      "articleCount": 18,
+      "recitalCount": 17,
+      "annexCount": 0,
+      "paragraphCount": 25,
+      "pointCount": 200,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0305:recital:1": "sha256:f590118278b7139d4cff65b83448447cb0626d61122821be31e28f8838105e69",
+        "eu:32025R0305:article:1:subparagraph:1": "sha256:fcd2055cfac2f1231bee32ba3d283c9e012303ab5ac3a0b6b4775ce7df2c5ed1",
+        "eu:32025R0305:article:18:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/305/oj/eng"
   }
 ]

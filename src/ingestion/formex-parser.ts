@@ -662,7 +662,8 @@ class FormexDocumentBuilder {
     this.addRecitals(act);
     const enactingTerms = childElement(act, "ENACTING.TERMS");
     if (!enactingTerms) throw new Error("Formex ACT has no ENACTING.TERMS");
-    directElements(enactingTerms, "DIVISION").forEach((division, index) =>
+    const divisions = directElements(enactingTerms, "DIVISION");
+    divisions.forEach((division, index) =>
       this.addDivision(
         division,
         this.documentId,
@@ -671,6 +672,9 @@ class FormexDocumentBuilder {
         index + 1,
       ),
     );
+    for (const article of directElements(enactingTerms, "ARTICLE")) {
+      this.addArticle(article, this.documentId, [], "/ACT/ENACTING.TERMS");
+    }
     annexes.forEach(({ fileName, node }, index) =>
       this.addAnnex(node, fileName, index + 1),
     );

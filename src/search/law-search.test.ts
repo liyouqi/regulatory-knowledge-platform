@@ -6,6 +6,8 @@ const base = {
   officialTitle: "Official title",
   publicationDate: "2022-01-01",
   documentType: "regulation" as const,
+  regulatoryLevel: "level-1" as const,
+  measureType: "primary-act" as const,
   readerPath: "/read/example/articles/1",
   explorerPath: "/explore/example",
   provenance: "official" as const,

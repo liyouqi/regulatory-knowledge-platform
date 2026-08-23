@@ -19,7 +19,10 @@ import {
   relationshipPreviewSchema,
 } from "../shared/legal";
 
-type LawSearchSource = Pick<SourceDefinition, "celex" | "familyId" | "aliases">;
+type LawSearchSource = Pick<
+  SourceDefinition,
+  "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+>;
 
 interface DocumentPayloadRow {
   readerPayload: string;
@@ -33,11 +36,14 @@ interface LawSourceRow {
   documentId: string;
   celex: string;
   familyId: string;
+  regulatoryLevel: LawSearchSource["regulatoryLevel"];
+  measureType: LawSearchSource["measureType"];
   alias: string | null;
 }
 
 interface RelationshipRow {
   id: string;
+  relationType: ProvisionRelationship["relationType"];
   provenance: ProvisionRelationship["provenance"];
   evidenceText: string;
   evidenceLocator: string;
@@ -78,6 +84,7 @@ interface EntityPreviewRow {
 const RELATIONSHIP_SELECT = `
   SELECT
     r.relationship_id AS id,
+    r.relation_type AS relationType,
     r.provenance,
     r.evidence_text AS evidenceText,
     r.evidence_locator AS evidenceLocator,
@@ -113,7 +120,7 @@ const RELATIONSHIP_SELECT = `
 
 function toProvisionRelationship(
   row: RelationshipRow,
-  relationType: ProvisionRelationship["relationType"],
+  relationType = row.relationType,
 ): ProvisionRelationship {
   return {
     id: row.id,
@@ -239,7 +246,10 @@ export class SqliteRuntimeRepository {
           short_name AS shortName,
           official_title AS officialTitle,
           default_path AS defaultPath,
-          provenance
+          provenance,
+          family_id AS familyId,
+          regulatory_level AS regulatoryLevel,
+          measure_type AS measureType
         FROM documents
         ORDER BY display_order ASC
       `)
@@ -304,6 +314,8 @@ export class SqliteRuntimeRepository {
           d.id AS documentId,
           d.celex AS celex,
           d.family_id AS familyId,
+          d.regulatory_level AS regulatoryLevel,
+          d.measure_type AS measureType,
           da.alias AS alias
         FROM documents d
         LEFT JOIN document_aliases da ON da.document_id = d.id
@@ -315,6 +327,8 @@ export class SqliteRuntimeRepository {
       const source = sources.get(row.documentId) ?? {
         celex: row.celex,
         familyId: row.familyId,
+        regulatoryLevel: row.regulatoryLevel,
+        measureType: row.measureType,
         aliases: [],
       };
       if (row.alias) source.aliases.push(row.alias);
@@ -335,18 +349,21 @@ export class SqliteRuntimeRepository {
       .get(provisionId, documentId);
     if (!provision) return null;
 
-    const references = this.database
+    const outgoing = this.database
       .prepare(`
         ${RELATIONSHIP_SELECT}
-        WHERE se.document_id = @documentId
+        WHERE (
+          se.document_id = @documentId
           AND (se.id = @provisionId OR se.root_provision_id = @provisionId)
+        ) OR se.id = @documentId
         ORDER BY td.display_order ASC, targetPath ASC, sourcePath ASC, id ASC
       `)
       .all({ documentId, provisionId }) as RelationshipRow[];
     const citedBy = this.database
       .prepare(`
         ${RELATIONSHIP_SELECT}
-        WHERE te.document_id = @documentId
+        WHERE r.relation_type = 'REFERENCES'
+          AND te.document_id = @documentId
           AND (te.id = @provisionId OR te.root_provision_id = @provisionId)
         ORDER BY sd.display_order ASC, sourcePath ASC, id ASC
       `)
@@ -356,10 +373,25 @@ export class SqliteRuntimeRepository {
       documentId,
       provisionId,
       buildId: this.buildId,
-      references: references.map((row) =>
-        toProvisionRelationship(row, "REFERENCES"),
-      ),
+      references: outgoing
+        .filter((row) => row.relationType === "REFERENCES")
+        .map((row) => toProvisionRelationship(row)),
       citedBy: citedBy.map((row) => toProvisionRelationship(row, "CITED_BY")),
+      mandates: outgoing
+        .filter((row) => row.relationType === "MANDATES")
+        .map((row) => toProvisionRelationship(row)),
+      adoptedUnder: outgoing
+        .filter((row) => row.relationType === "ADOPTED_UNDER")
+        .map((row) => toProvisionRelationship(row)),
+      supplements: outgoing
+        .filter((row) => row.relationType === "SUPPLEMENTS")
+        .map((row) => toProvisionRelationship(row)),
+      relatedDocuments: outgoing
+        .filter((row) => row.relationType === "RELATED_DOCUMENT")
+        .map((row) => toProvisionRelationship(row)),
+      relatedRecitals: outgoing
+        .filter((row) => row.relationType === "RELATED_RECITAL")
+        .map((row) => toProvisionRelationship(row)),
     });
   }
 

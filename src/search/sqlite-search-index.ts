@@ -16,6 +16,12 @@ import {
   buildExplicitReferences,
 } from "../relationships/explicit-reference";
 import {
+  OFFICIAL_MAPPING_BUILDER,
+  OFFICIAL_MAPPING_BUILDER_VERSION,
+  buildOfficialMappings,
+  loadOfficialMappings,
+} from "../relationships/official-mapping";
+import {
   type BodyBlock,
   type DocumentView,
   type ProvisionView,
@@ -24,7 +30,7 @@ import {
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "3.0.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.0.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -184,7 +190,10 @@ function indexRows(documents: DocumentView[]): IndexRow[] {
   );
 }
 
-function runtimeBuildId(documents: DocumentView[]): string {
+function runtimeBuildId(
+  documents: DocumentView[],
+  officialMappings: ReturnType<typeof loadOfficialMappings>,
+): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
     .sort()
@@ -194,6 +203,8 @@ function runtimeBuildId(documents: DocumentView[]): string {
       [
         RUNTIME_DATABASE_SCHEMA_VERSION,
         `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
+        `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
+        JSON.stringify(officialMappings),
         input,
       ].join("\n"),
     )
@@ -219,7 +230,10 @@ export function assertFts5(database: Database.Database): void {
 
 export function buildRuntimeDatabase(
   documents: DocumentView[],
-  sources: Pick<SourceDefinition, "celex" | "familyId" | "aliases">[] = [],
+  sources: Pick<
+    SourceDefinition,
+    "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+  >[] = [],
   outputPath = DEFAULT_RUNTIME_DATABASE_PATH,
 ): RuntimeDatabaseManifest {
   if (documents.length === 0)
@@ -232,11 +246,38 @@ export function buildRuntimeDatabase(
   const rows = indexRows(documents);
   const definitions = definitionRows(documents);
   const relationshipBuild = buildExplicitReferences(documents);
-  const buildId = runtimeBuildId(documents);
-  const builtAt = new Date().toISOString();
   const sourceByCelex = new Map(
     sources.map((source) => [source.celex, source]),
   );
+  const registeredCelex = new Set(sourceByCelex.keys());
+  const officialMappings = loadOfficialMappings().filter(
+    (mapping) =>
+      registeredCelex.has(mapping.level1.celex) &&
+      registeredCelex.has(mapping.level2.celex),
+  );
+  for (const mapping of officialMappings) {
+    const level1Source = sourceByCelex.get(mapping.level1.celex);
+    const level2Source = sourceByCelex.get(mapping.level2.celex);
+    if (
+      level1Source?.familyId !== mapping.familyId ||
+      level2Source?.familyId !== mapping.familyId ||
+      level2Source.regulatoryLevel !== "level-2" ||
+      level2Source.measureType !== mapping.level2.measureType
+    ) {
+      throw new Error(`Source registry mismatch for ${mapping.id}`);
+    }
+  }
+  const officialRelationships = buildOfficialMappings(
+    documents,
+    relationshipBuild.entities,
+    officialMappings,
+  );
+  const relationships = [
+    ...relationshipBuild.relationships,
+    ...officialRelationships,
+  ];
+  const buildId = runtimeBuildId(documents, officialMappings);
+  const builtAt = new Date().toISOString();
   let completed = false;
 
   try {
@@ -264,6 +305,8 @@ export function buildRuntimeDatabase(
         canonical_build_id TEXT NOT NULL,
         provenance TEXT NOT NULL CHECK (provenance IN ('official', 'fixture')),
         family_id TEXT NOT NULL,
+        regulatory_level TEXT NOT NULL CHECK (regulatory_level IN ('level-1', 'level-2', 'level-3')),
+        measure_type TEXT NOT NULL CHECK (measure_type IN ('primary-act', 'rts', 'its', 'guideline', 'qa', 'other')),
         default_path TEXT NOT NULL,
         display_order INTEGER NOT NULL
       ) STRICT;
@@ -373,11 +416,13 @@ export function buildRuntimeDatabase(
       INSERT INTO documents (
         id, jurisdiction, slug, celex, short_name, official_title, document_type,
         publication_date, source_url, last_checked, source_version,
-        canonical_build_id, provenance, family_id, default_path, display_order
+        canonical_build_id, provenance, family_id, regulatory_level,
+        measure_type, default_path, display_order
       ) VALUES (
         @id, @jurisdiction, @slug, @celex, @shortName, @officialTitle, @documentType,
         @publicationDate, @sourceUrl, @lastChecked, @sourceVersion,
-        @canonicalBuildId, @provenance, @familyId, @defaultPath, @displayOrder
+        @canonicalBuildId, @provenance, @familyId, @regulatoryLevel,
+        @measureType, @defaultPath, @displayOrder
       )
     `);
     const insertDocumentView = database.prepare(`
@@ -430,7 +475,7 @@ export function buildRuntimeDatabase(
         builder_method, builder_version, resolution_status, build_id
       ) VALUES (
         @id, @sourceEntityId, @relationType, @targetEntityId,
-        @provenance, @evidenceText, @evidenceLocator, NULL, @sourceRef,
+        @provenance, @evidenceText, @evidenceLocator, @score, @sourceRef,
         @builderMethod, @builderVersion, @resolutionStatus, @buildId
       )
     `);
@@ -457,6 +502,8 @@ export function buildRuntimeDatabase(
           canonicalBuildId: document.buildId,
           provenance: document.provenance,
           familyId: source?.familyId ?? `family:${document.slug}`,
+          regulatoryLevel: source?.regulatoryLevel ?? "level-1",
+          measureType: source?.measureType ?? "primary-act",
           defaultPath: document.provisions[0]?.path ?? `/read/${document.slug}`,
           displayOrder,
         });
@@ -489,8 +536,12 @@ export function buildRuntimeDatabase(
       for (const entity of relationshipBuild.entities) {
         insertEntity.run(entity);
       }
-      for (const relationship of relationshipBuild.relationships) {
-        insertRelationship.run({ ...relationship, buildId });
+      for (const relationship of relationships) {
+        insertRelationship.run({
+          ...relationship,
+          score: relationship.score ?? null,
+          buildId,
+        });
       }
       const manifestEntries = {
         schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
@@ -499,9 +550,13 @@ export function buildRuntimeDatabase(
         documentCount: String(documents.length),
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
-        relationshipCount: String(relationshipBuild.relationships.length),
+        relationshipCount: String(relationships.length),
+        officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
-        relationshipBuilder: `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
+        relationshipBuilders: JSON.stringify([
+          `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
+          `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
+        ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
             documentId: document.id,
@@ -550,7 +605,7 @@ export function buildRuntimeDatabase(
     documentCount: documents.length,
     recordCount: rows.length,
     definitionCount: definitions.length,
-    relationshipCount: relationshipBuild.relationships.length,
+    relationshipCount: relationships.length,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({
       documentId: document.id,

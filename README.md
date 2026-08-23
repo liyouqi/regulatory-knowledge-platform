@@ -85,7 +85,7 @@ The source pipeline resolves an EU law from its CELEX work to the English expres
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains DORA, GDPR, the AI Act, MiCA, NIS2, and the Data Act.
+The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts plus one DORA RTS and one MiCA RTS. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
 
 ### Download an official immutable snapshot
 
@@ -130,7 +130,7 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
 
 ### Add another EU law
 
-1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, a unique `familyId`, and reviewed common names in `aliases`. Do not add speculative or ambiguous aliases.
+1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, the appropriate shared `familyId`, explicit `regulatoryLevel` / `measureType`, and reviewed common names in `aliases`. CELEX and aliases must be unique; family IDs are intentionally reusable. Do not add speculative or ambiguous aliases.
 2. Validate the registry and check the new row:
 
    ```bash
@@ -160,7 +160,24 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
    npm run dev
    ```
 
-If discovery or a fidelity gate fails, stop. Do not substitute an unofficial mirror, fabricate Cellar identifiers, or weaken the baseline merely to make the build pass. The current parser is production-gated for DORA; laws with materially different Formex structures, especially annex-heavy acts, require targeted parser tests before publication.
+If discovery or a fidelity gate fails, stop. Do not substitute an unofficial mirror, fabricate Cellar identifiers, or weaken the baseline merely to make the build pass. Acts with materially different Formex structures require a targeted parser fixture before publication. Parser `1.3.0` covers both division-wrapped acts and newer acts whose Articles are direct `ENACTING.TERMS` children.
+
+### Add or update an official Level 2 mapping
+
+1. Ingest the RTS or ITS as a normal official document using the steps above. Give it the same `familyId` as its Level 1 act, `regulatoryLevel: "level-2"`, and the correct `measureType`.
+2. Verify the adopted act and its exact legal basis in EUR-Lex. Do not map a draft technical standard as an adopted act.
+3. Add one record per mandate Article to `data/official-mappings/level2.json`. Preserve the Level 1 Article/entity IDs, an exact mandate excerpt, the Level 2 CELEX/official title/document number, the adoption-basis wording, both official URLs, and `OFFICIAL_MAPPING` provenance.
+4. Rebuild and run the dedicated gates:
+
+   ```bash
+   npm run runtime:build
+   npx vitest run src/relationships/official-mapping.test.ts
+   npm run check
+   npm test
+   npm run build
+   ```
+
+The builder rejects missing documents, invalid Article endpoints, an official-title mismatch, or mandate evidence that is not present in the loaded official Article. It emits `Article → MANDATES → RTS/ITS` and `RTS/ITS → ADOPTED_UNDER → Article` into the same relationship table. The UI and API never read the curated JSON directly.
 
 ### Refresh an existing law
 
@@ -180,6 +197,7 @@ official source snapshot ✓
 → current-document full-text ✓
 → SQLite FTS5 global search build ✓
 → explicit relationship build ✓
+→ official Level 2 mapping build ✓
 → atomic publish or rollback
 ```
 
@@ -313,7 +331,7 @@ npm run search:benchmark
 
 The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts.
 
-The website never reads Canonical JSON or `data/source-registry.json` at runtime. `documents` holds queryable metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Six-law parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
+The website never reads Canonical JSON, `data/source-registry.json`, or curated mappings at runtime. `documents` holds queryable family/level/measure/source metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Eight-document parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 
 The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
 
@@ -321,11 +339,11 @@ The benchmark fails if any fixed full-text or definition query loses its expecte
 
 The Reader relationship panel shows deterministic references derived at build time from official legal text. **References** opens an internal Article, Annex, or loaded law; **Cited by** is the reverse query over the same stored edge, not a duplicated or separately parsed relation. Each result retains the exact matched citation, source entity, official source URL, provenance (`LEGAL_TEXT`), resolver method/version, and a stable target ID. The same panel appears below the legal text on tablet and mobile.
 
-The runtime endpoint is `/api/relationships/:documentId/:provisionId`. Its response contains separate `references` and `citedBy` arrays and the runtime build ID. The current `explicit-reference@1.0.0` resolver conservatively publishes singular Article/Annex references within a loaded law, modern typed EU Regulation/Directive citations, and compound cross-law Article citations when the target exists in the six-law corpus. Unresolved, ambiguous, plural/range, shorthand, and unloaded external targets remain ordinary official text; they are counted in the build manifest but are not guessed into links.
+The runtime endpoint is `/api/relationships/:documentId/:provisionId`. Its response keeps `references`, `citedBy`, `mandates`, `adoptedUnder`, `supplements`, `relatedDocuments`, and `relatedRecitals` separate, plus the runtime build ID. The current `explicit-reference@1.0.0` resolver conservatively publishes singular Article/Annex references within a loaded law, modern typed EU Regulation/Directive citations, and compound cross-law Article citations when the target exists in the loaded corpus. Unresolved, ambiguous, plural/range, shorthand, and unloaded external targets remain ordinary official text; they are counted in the build manifest but are not guessed into links.
 
 In the Reader, an inline citation becomes clickable only when the builder supplied an exact `sourceEntityId` plus a validated character range whose stored evidence text still matches the rendered official text. The browser never re-parses legal prose with regex. Clicking opens Side Peek without changing the Reader URL; it requests `/api/relationship-previews/:entityId` only then, derives a short target excerpt from the existing read-only Reader payload, and provides explicit **Open full** and official-source actions. Closing Side Peek leaves the reading position untouched.
 
-`npm run runtime:build` currently publishes 1,797 resolved explicit-reference edges and reports 816 unmaterialized references for the current immutable six-law snapshots. These are corpus-specific audit counts, not permanent product constants. The relationship builder version participates in the runtime build ID, so changing resolver semantics invalidates the artifact deterministically.
+`npm run runtime:build` currently publishes 1,967 resolved explicit-reference edges plus 6 directed official-mapping edges from 3 reviewed mandate records, and reports 863 unmaterialized references across eight immutable documents. These are corpus-specific audit counts, not permanent product constants. Builder versions and the curated mapping content participate in the runtime build ID, so changing resolver semantics or evidence invalidates the artifact deterministically.
 
 ## Current Release Status
 
@@ -386,4 +404,15 @@ Release 0.4 is now in progress and additionally includes:
 - browser verification of DORA Article 1 → NIS2 Article 3 navigation, the reverse Cited By view, and AI Act Article 11 → Annex IV on a 390px viewport;
 - evidence-span-only inline citations and an on-demand, URL-preserving Side Peek with an official target excerpt.
 
-The explicit-reference portion of Release 0.4 is complete locally. The next planned relationship scope is official DORA/MiCA Level 2 mappings; it requires a Sol High review because it introduces new legal relation semantics and curated evidence.
+The explicit-reference portion of Release 0.4 is complete locally.
+
+Release 0.5 is now in progress and additionally includes:
+
+- full official ingestion, Reader, Explorer, and search coverage for DORA Delegated Regulation (EU) 2024/1774 and MiCA Delegated Regulation (EU) 2025/305;
+- version-controlled, schema-validated DORA/MiCA mapping evidence;
+- `official-mapping@1.0.0` paired `MANDATES` / `ADOPTED_UNDER` edges in the unified SQLite relationship store;
+- separate relationship API groups and responsive Reader presentation with official-evidence links;
+- direct-Article Formex support with a parser fixture and parser version `1.3.0`;
+- desktop and 390px browser verification of DORA Article 15, reverse RTS legal bases, and exact MiCA RTS search.
+
+The next Release 0.5 slice is the family-level RTS/ITS library and summary counts, followed by additional reviewed DORA/MiCA measures. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.

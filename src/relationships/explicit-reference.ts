@@ -1,6 +1,6 @@
-import { createHash } from "node:crypto";
 import type { BodyBlock, DocumentView, ProvisionView } from "../shared/legal";
 import { explorerPath } from "../shared/reader-route";
+import { type RelationshipRecord, relationshipId } from "./contract";
 
 export const EXPLICIT_REFERENCE_BUILDER = "explicit-reference";
 export const EXPLICIT_REFERENCE_BUILDER_VERSION = "1.0.0";
@@ -23,18 +23,11 @@ export interface LegalEntityRecord {
   path: string;
 }
 
-export interface ExplicitRelationshipRecord {
-  id: string;
-  sourceEntityId: string;
+export interface ExplicitRelationshipRecord extends RelationshipRecord {
   relationType: "REFERENCES";
-  targetEntityId: string;
   provenance: "LEGAL_TEXT";
-  evidenceText: string;
-  evidenceLocator: string;
-  sourceRef: string;
   builderMethod: typeof EXPLICIT_REFERENCE_BUILDER;
   builderVersion: typeof EXPLICIT_REFERENCE_BUILDER_VERSION;
-  resolutionStatus: "resolved";
 }
 
 export interface ExplicitReferenceBuild {
@@ -82,26 +75,6 @@ function celexForCitation(
   if (!/^(?:19|20)[0-9]{2}$/u.test(year)) return null;
   const typeCode = documentType.toLowerCase() === "regulation" ? "R" : "L";
   return `3${year}${typeCode}${number.padStart(4, "0")}`;
-}
-
-function relationId(
-  sourceEntityId: string,
-  targetEntityId: string,
-  evidenceLocator: string,
-): string {
-  const hash = createHash("sha256")
-    .update(
-      [
-        sourceEntityId,
-        "REFERENCES",
-        targetEntityId,
-        "LEGAL_TEXT",
-        evidenceLocator,
-      ].join("\n"),
-    )
-    .digest("hex")
-    .slice(0, 24);
-  return `relationship:${hash}`;
 }
 
 function addBodyEntities(
@@ -294,9 +267,11 @@ export function buildExplicitReferences(
       seenTargets.add(candidate.targetEntityId);
       const evidenceLocator = `${source.entity.id}:text:${candidate.start}-${candidate.end}`;
       relationships.push({
-        id: relationId(
+        id: relationshipId(
           source.entity.id,
+          "REFERENCES",
           candidate.targetEntityId,
+          "LEGAL_TEXT",
           evidenceLocator,
         ),
         sourceEntityId: source.entity.id,

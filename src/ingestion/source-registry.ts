@@ -11,6 +11,15 @@ export const sourceDefinitionSchema = z.object({
   celex: z.string().transform(normalizeCelex),
   language: z.literal("ENG"),
   documentType: z.enum(["regulation", "directive"]),
+  regulatoryLevel: z.enum(["level-1", "level-2", "level-3"]),
+  measureType: z.enum([
+    "primary-act",
+    "rts",
+    "its",
+    "guideline",
+    "qa",
+    "other",
+  ]),
   publicationDate: z.string().date(),
   quality: z
     .object({
@@ -35,29 +44,22 @@ export type SourceDefinition = z.infer<typeof sourceDefinitionSchema>;
 function parseSourceRegistry(raw: unknown): SourceDefinition[] {
   const sources = z.array(sourceDefinitionSchema).min(1).parse(raw);
   const seenCelex = new Set<string>();
-  const seenFamilies = new Set<string>();
   const aliasOwners = new Map<string, string>();
 
   for (const source of sources) {
     if (seenCelex.has(source.celex)) {
       throw new Error(`Duplicate CELEX in source registry: ${source.celex}`);
     }
-    if (seenFamilies.has(source.familyId)) {
-      throw new Error(
-        `Duplicate family ID in source registry: ${source.familyId}`,
-      );
-    }
     seenCelex.add(source.celex);
-    seenFamilies.add(source.familyId);
     for (const alias of [source.shortName, ...source.aliases]) {
       const normalizedAlias = alias.normalize("NFKC").trim().toLowerCase();
       const owner = aliasOwners.get(normalizedAlias);
-      if (owner && owner !== source.familyId) {
+      if (owner && owner !== source.celex) {
         throw new Error(
-          `Ambiguous source alias ${alias}: used by ${owner} and ${source.familyId}`,
+          `Ambiguous source alias ${alias}: used by ${owner} and ${source.celex}`,
         );
       }
-      aliasOwners.set(normalizedAlias, source.familyId);
+      aliasOwners.set(normalizedAlias, source.celex);
     }
   }
 

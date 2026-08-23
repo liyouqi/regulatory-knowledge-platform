@@ -1160,6 +1160,8 @@ Article → MANDATES → RTS/ITS
 
 人工核验 mapping 必须作为版本控制的 source data 保存，并由 builder 导入 Relationship Repository；UI 不直接读取 DORA/MiCA 专用 mapping 文件。
 
+当前 Release 0.5 纵切已验证两类映射形态：DORA Delegated Regulation (EU) 2024/1774 同时对应 Article 15 与 Article 16，以及 MiCA Delegated Regulation (EU) 2025/305 对应 Article 62。两份 Level 2 法规均作为完整 Document 进入 Reader、Explorer、Search 和统一 Entity Store；3 条核验记录生成 6 条 `OFFICIAL_MAPPING` 有向边。后续扩充 RTS/ITS 只增加 official source registry、Canonical artifact 与 curated mapping record，不增加法规专用 UI 或表。
+
 ## 13.4 TF-IDF Article ↔ Recital
 
 TF-IDF 是 Phase 1 的可选增强功能，安排在 explicit references 和 DORA/MiCA official mappings 之后。它不阻塞 `Release 0.1–0.4` 发布，只有通过小型人工 benchmark 后才默认展示。
@@ -3137,6 +3139,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - Relationship Panel / provenance / badges；
 - TF-IDF benchmark；
 - benchmark 通过时启用 Related Recitals，否则保持关闭。
+
+当前状态：official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、双向关系 API/Reader 展示已完成；family-level RTS/ITS library、summary count、更多核验 measures 与 TF-IDF benchmark 尚待完成。
 
 ## Release 0.6 — CSSF & Product Hardening
 
