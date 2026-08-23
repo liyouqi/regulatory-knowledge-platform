@@ -123,7 +123,7 @@ function toResult(
 
 export function createLawSearchRecords(
   documents: DocumentView[],
-  sources: SourceDefinition[],
+  sources: Pick<SourceDefinition, "celex" | "familyId" | "aliases">[],
 ): LawSearchRecord[] {
   const sourceByCelex = new Map(
     sources.map((source) => [source.celex, source]),

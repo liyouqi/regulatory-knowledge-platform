@@ -8,12 +8,12 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
-    "predev": "npm run search:build",
+    "predev": "npm run runtime:build",
     "dev": "concurrently --kill-others-on-fail npm:dev:server npm:dev:web",
     "dev:server": "tsx watch src/server/index.ts",
     "dev:web": "vite",
     "build": "tsc --noEmit && vite build",
-    "prestart": "npm run search:build",
+    "prestart": "npm run runtime:build",
     "start": "node --import tsx src/server/index.ts",
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write .",
@@ -22,8 +22,9 @@
     "source:verify": "node --import tsx src/ingestion/cli.ts verify",
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
-    "search:build": "node --import tsx src/search/build-search-index.ts",
+    "runtime:build": "node --import tsx src/search/build-search-index.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
+    "pretest": "npm run runtime:build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"

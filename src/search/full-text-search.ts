@@ -10,8 +10,8 @@ import type {
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 import {
-  DEFAULT_SEARCH_INDEX_PATH,
-  SEARCH_INDEX_SCHEMA_VERSION,
+  DEFAULT_RUNTIME_DATABASE_PATH,
+  RUNTIME_DATABASE_SCHEMA_VERSION,
 } from "./sqlite-search-index";
 
 interface ParsedFullTextQuery {
@@ -133,7 +133,8 @@ function manifestValue(database: Database.Database, key: string): string {
   const row = database
     .prepare("SELECT value FROM build_manifest WHERE key = ?")
     .get(key) as { value?: string } | undefined;
-  if (!row?.value) throw new Error(`Search index manifest is missing ${key}`);
+  if (!row?.value)
+    throw new Error(`Runtime database manifest is missing ${key}`);
   return row.value;
 }
 
@@ -144,10 +145,10 @@ export class SearchService {
   readonly recordCount: number;
   private readonly database: Database.Database;
 
-  constructor(indexPath = DEFAULT_SEARCH_INDEX_PATH) {
+  constructor(indexPath = DEFAULT_RUNTIME_DATABASE_PATH) {
     const resolvedPath = resolve(indexPath);
     if (!existsSync(resolvedPath)) {
-      throw new Error(`Search index does not exist: ${resolvedPath}`);
+      throw new Error(`Runtime database does not exist: ${resolvedPath}`);
     }
     this.database = new Database(resolvedPath, {
       readonly: true,
@@ -156,9 +157,9 @@ export class SearchService {
     try {
       this.database.pragma("query_only = ON");
       const schemaVersion = manifestValue(this.database, "schemaVersion");
-      if (schemaVersion !== SEARCH_INDEX_SCHEMA_VERSION) {
+      if (schemaVersion !== RUNTIME_DATABASE_SCHEMA_VERSION) {
         throw new Error(
-          `Unsupported search index schema ${schemaVersion}; expected ${SEARCH_INDEX_SCHEMA_VERSION}`,
+          `Unsupported runtime database schema ${schemaVersion}; expected ${RUNTIME_DATABASE_SCHEMA_VERSION}`,
         );
       }
       const integrity = this.database.pragma("integrity_check") as Array<{
@@ -168,11 +169,11 @@ export class SearchService {
         integrity.length !== 1 ||
         integrity[0]?.integrity_check.toLowerCase() !== "ok"
       ) {
-        throw new Error("Search index failed SQLite integrity_check");
+        throw new Error("Runtime database failed SQLite integrity_check");
       }
       this.database
         .prepare(
-          "SELECT count(*) AS count FROM provisions_fts WHERE provisions_fts MATCH ?",
+          "SELECT count(*) AS count FROM search_records_fts WHERE search_records_fts MATCH ?",
         )
         .get("__fts5_capability_probe__");
       this.database
@@ -199,7 +200,7 @@ export class SearchService {
         !Number.isSafeInteger(this.definitionCount) ||
         this.definitionCount < 0
       ) {
-        throw new Error("Search index manifest has invalid corpus counts");
+        throw new Error("Runtime database manifest has invalid corpus counts");
       }
     } catch (error) {
       this.database.close();
@@ -240,12 +241,12 @@ export class SearchService {
           p.title AS title,
           p.marker AS marker,
           p.path AS path,
-          snippet(provisions_fts, -1, char(1), char(2), '…', 28) AS markedSnippet,
-          bm25(provisions_fts, 5.0, 1.0) AS rank
-        FROM provisions_fts
-        JOIN provisions p ON p.rowid = provisions_fts.rowid
+          snippet(search_records_fts, -1, char(1), char(2), '…', 28) AS markedSnippet,
+          bm25(search_records_fts, 5.0, 1.0) AS rank
+        FROM search_records_fts
+        JOIN search_records p ON p.rowid = search_records_fts.rowid
         JOIN documents d ON d.id = p.document_id
-        WHERE provisions_fts MATCH @matchExpression
+        WHERE search_records_fts MATCH @matchExpression
         ${scopeClause}
         ORDER BY rank ASC, p.document_id ASC, p.rowid ASC
         LIMIT @limit

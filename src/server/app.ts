@@ -1,46 +1,27 @@
 import express from "express";
-import { toExplorerView } from "../canonical/to-explorer-view";
-import { loadDocumentViews } from "../data/document-repository";
-import { loadSourceRegistrySync } from "../ingestion/source-registry";
+import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
-import type { DocumentSummary } from "../shared/legal";
 
 export const app = express();
-const documentViews = loadDocumentViews();
-const explorerViews = documentViews.map(toExplorerView);
+const runtimeRepository = new SqliteRuntimeRepository();
+const documentViews = runtimeRepository.listDocumentViews();
 const lawSearchRecords = createLawSearchRecords(
   documentViews,
-  loadSourceRegistrySync(),
+  runtimeRepository.listLawSearchSources(),
 );
-let searchService: SearchService | null = null;
-try {
-  searchService = new SearchService();
-} catch {
-  searchService = null;
-}
-
-function summary(document: (typeof documentViews)[number]): DocumentSummary {
-  return {
-    id: document.id,
-    slug: document.slug,
-    shortName: document.shortName,
-    officialTitle: document.officialTitle,
-    defaultPath: document.provisions[0]?.path ?? `/read/${document.slug}`,
-    provenance: document.provenance,
-  };
-}
+const searchService = new SearchService();
 
 export function findDocument(documentId: string) {
-  return documentViews.find((document) => document.id === documentId) ?? null;
+  return runtimeRepository.findDocument(documentId);
 }
 
 export function findDocumentBySlug(slug: string) {
-  return documentViews.find((document) => document.slug === slug) ?? null;
+  return runtimeRepository.findDocumentBySlug(slug);
 }
 
 export function findExplorerBySlug(slug: string) {
-  return explorerViews.find((document) => document.slug === slug) ?? null;
+  return runtimeRepository.findExplorerBySlug(slug);
 }
 
 export function findLaws(query: string) {
@@ -51,29 +32,28 @@ export function searchFullText(
   query: string,
   options: { documentId?: string; limit?: number } = {},
 ) {
-  return searchService?.search(query, options) ?? null;
+  return searchService.search(query, options);
 }
 
 export function searchDefinitions(query: string, limit?: number) {
-  return searchService?.searchDefinitions(query, limit) ?? null;
+  return searchService.searchDefinitions(query, limit);
 }
 
 app.get("/api/health", (_request, response) => {
   response.json({
     status: "ok",
-    searchIndex: searchService
-      ? {
-          available: true,
-          buildId: searchService.buildId,
-          records: searchService.recordCount,
-          definitions: searchService.definitionCount,
-        }
-      : { available: false },
+    runtimeDatabase: {
+      available: true,
+      buildId: runtimeRepository.buildId,
+      documents: searchService.documentCount,
+      records: searchService.recordCount,
+      definitions: searchService.definitionCount,
+    },
   });
 });
 
 app.get("/api/documents", (_request, response) => {
-  response.json({ documents: documentViews.map(summary) });
+  response.json({ documents: runtimeRepository.listDocumentSummaries() });
 });
 
 app.get("/api/search/laws", (request, response) => {
@@ -95,12 +75,6 @@ app.get("/api/search/full-text", (request, response) => {
     documentId,
     limit: Number.isFinite(requestedLimit) ? requestedLimit : undefined,
   });
-  if (!result) {
-    response.status(503).json({
-      error: "Full-text search index unavailable; run npm run search:build",
-    });
-    return;
-  }
   response.json(result);
 });
 
@@ -114,12 +88,6 @@ app.get("/api/search/definitions", (request, response) => {
     query.slice(0, 120),
     Number.isFinite(requestedLimit) ? requestedLimit : undefined,
   );
-  if (!result) {
-    response.status(503).json({
-      error: "Definitions index unavailable; run npm run search:build",
-    });
-    return;
-  }
   response.json(result);
 });
 

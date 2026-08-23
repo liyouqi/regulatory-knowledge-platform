@@ -8,7 +8,7 @@ import {
   parseDefinitionQuery,
   parseFullTextQuery,
 } from "./full-text-search";
-import { buildSearchIndex } from "./sqlite-search-index";
+import { buildRuntimeDatabase } from "./sqlite-search-index";
 
 const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-search-"));
 const firstPath = join(testDirectory, "search.sqlite");
@@ -16,7 +16,7 @@ const secondPath = join(testDirectory, "search-rebuilt.sqlite");
 let service: FullTextSearchService | undefined;
 
 beforeAll(() => {
-  buildSearchIndex([loadDoraDocumentView()], firstPath);
+  buildRuntimeDatabase([loadDoraDocumentView()], [], firstPath);
   service = new FullTextSearchService(firstPath);
 });
 
@@ -27,8 +27,16 @@ afterAll(() => {
 
 describe("SQLite FTS5 search artifact", () => {
   it("rebuilds with a stable content-derived build ID", () => {
-    const first = buildSearchIndex([loadDoraDocumentView()], secondPath);
-    const second = buildSearchIndex([loadDoraDocumentView()], secondPath);
+    const first = buildRuntimeDatabase(
+      [loadDoraDocumentView()],
+      [],
+      secondPath,
+    );
+    const second = buildRuntimeDatabase(
+      [loadDoraDocumentView()],
+      [],
+      secondPath,
+    );
     expect(first.buildId).toBe(second.buildId);
     expect(first).toMatchObject({ documentCount: 1 });
     expect(first.recordCount).toBeGreaterThan(900);

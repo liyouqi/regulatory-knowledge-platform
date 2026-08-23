@@ -8,17 +8,25 @@ import {
 } from "node:fs";
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
-import type { BodyBlock, DocumentView, ProvisionView } from "../shared/legal";
+import { toExplorerView } from "../canonical/to-explorer-view";
+import type { SourceDefinition } from "../ingestion/source-registry";
+import {
+  type BodyBlock,
+  type DocumentView,
+  type ProvisionView,
+  documentViewSchema,
+  explorerDocumentSchema,
+} from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 
-export const SEARCH_INDEX_SCHEMA_VERSION = "1.1.0";
-export const DEFAULT_SEARCH_INDEX_PATH = resolve(
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "2.0.0";
+export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
-  "data/artifacts/search/global-search.sqlite",
+  "data/artifacts/runtime/regulatory.sqlite",
 );
 
-export interface SearchIndexManifest {
-  schemaVersion: typeof SEARCH_INDEX_SCHEMA_VERSION;
+export interface RuntimeDatabaseManifest {
+  schemaVersion: typeof RUNTIME_DATABASE_SCHEMA_VERSION;
   buildId: string;
   builtAt: string;
   documentCount: number;
@@ -169,16 +177,16 @@ function indexRows(documents: DocumentView[]): IndexRow[] {
   );
 }
 
-function searchBuildId(documents: DocumentView[]): string {
+function runtimeBuildId(documents: DocumentView[]): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
     .sort()
     .join("\n");
   const hash = createHash("sha256")
-    .update(`${SEARCH_INDEX_SCHEMA_VERSION}\n${input}`)
+    .update(`${RUNTIME_DATABASE_SCHEMA_VERSION}\n${input}`)
     .digest("hex")
     .slice(0, 16);
-  return `search-${SEARCH_INDEX_SCHEMA_VERSION}-${hash}`;
+  return `runtime-${RUNTIME_DATABASE_SCHEMA_VERSION}-${hash}`;
 }
 
 export function assertFts5(database: Database.Database): void {
@@ -196,12 +204,13 @@ export function assertFts5(database: Database.Database): void {
     throw new Error("SQLite FTS5 capability check failed");
 }
 
-export function buildSearchIndex(
+export function buildRuntimeDatabase(
   documents: DocumentView[],
-  outputPath = DEFAULT_SEARCH_INDEX_PATH,
-): SearchIndexManifest {
+  sources: Pick<SourceDefinition, "celex" | "familyId" | "aliases">[] = [],
+  outputPath = DEFAULT_RUNTIME_DATABASE_PATH,
+): RuntimeDatabaseManifest {
   if (documents.length === 0)
-    throw new Error("Cannot build an empty search index");
+    throw new Error("Cannot build an empty runtime database");
   const resolvedOutput = resolve(outputPath);
   mkdirSync(dirname(resolvedOutput), { recursive: true });
   const temporaryPath = `${resolvedOutput}.${process.pid}.tmp`;
@@ -209,8 +218,11 @@ export function buildSearchIndex(
   const database = new Database(temporaryPath);
   const rows = indexRows(documents);
   const definitions = definitionRows(documents);
-  const buildId = searchBuildId(documents);
+  const buildId = runtimeBuildId(documents);
   const builtAt = new Date().toISOString();
+  const sourceByCelex = new Map(
+    sources.map((source) => [source.celex, source]),
+  );
   let completed = false;
 
   try {
@@ -231,10 +243,29 @@ export function buildSearchIndex(
         official_title TEXT NOT NULL,
         document_type TEXT NOT NULL,
         publication_date TEXT NOT NULL,
+        source_url TEXT NOT NULL,
+        last_checked TEXT NOT NULL,
         source_version TEXT NOT NULL,
-        build_id TEXT NOT NULL
+        canonical_build_id TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance IN ('official', 'fixture')),
+        family_id TEXT NOT NULL,
+        default_path TEXT NOT NULL,
+        display_order INTEGER NOT NULL
       ) STRICT;
-      CREATE TABLE provisions (
+      CREATE TABLE document_views (
+        document_id TEXT PRIMARY KEY REFERENCES documents(id),
+        reader_payload_json TEXT NOT NULL,
+        explorer_payload_json TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE document_aliases (
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        alias TEXT NOT NULL,
+        normalized_alias TEXT NOT NULL,
+        display_order INTEGER NOT NULL,
+        PRIMARY KEY (document_id, alias)
+      ) STRICT;
+      CREATE INDEX document_aliases_normalized ON document_aliases(normalized_alias);
+      CREATE TABLE search_records (
         rowid INTEGER PRIMARY KEY,
         record_id TEXT NOT NULL UNIQUE,
         provision_id TEXT NOT NULL,
@@ -248,12 +279,12 @@ export function buildSearchIndex(
         body TEXT NOT NULL,
         scope TEXT NOT NULL CHECK (scope IN ('heading', 'body'))
       ) STRICT;
-      CREATE INDEX provisions_document_id ON provisions(document_id);
-      CREATE INDEX provisions_provision_id ON provisions(provision_id);
-      CREATE VIRTUAL TABLE provisions_fts USING fts5(
+      CREATE INDEX search_records_document_id ON search_records(document_id);
+      CREATE INDEX search_records_provision_id ON search_records(provision_id);
+      CREATE VIRTUAL TABLE search_records_fts USING fts5(
         heading,
         body,
-        content='provisions',
+        content='search_records',
         content_rowid='rowid',
         tokenize='unicode61 remove_diacritics 2',
         prefix='2 3 4'
@@ -287,14 +318,26 @@ export function buildSearchIndex(
     const insertDocument = database.prepare(`
       INSERT INTO documents (
         id, jurisdiction, slug, celex, short_name, official_title, document_type,
-        publication_date, source_version, build_id
+        publication_date, source_url, last_checked, source_version,
+        canonical_build_id, provenance, family_id, default_path, display_order
       ) VALUES (
         @id, @jurisdiction, @slug, @celex, @shortName, @officialTitle, @documentType,
-        @publicationDate, @sourceVersion, @buildId
+        @publicationDate, @sourceUrl, @lastChecked, @sourceVersion,
+        @canonicalBuildId, @provenance, @familyId, @defaultPath, @displayOrder
       )
     `);
+    const insertDocumentView = database.prepare(`
+      INSERT INTO document_views (
+        document_id, reader_payload_json, explorer_payload_json
+      ) VALUES (?, ?, ?)
+    `);
+    const insertAlias = database.prepare(`
+      INSERT INTO document_aliases (
+        document_id, alias, normalized_alias, display_order
+      ) VALUES (?, ?, ?, ?)
+    `);
     const insertProvision = database.prepare(`
-      INSERT INTO provisions (
+      INSERT INTO search_records (
         record_id, provision_id, document_id, kind, label, title, marker,
         path, heading, body, scope
       ) VALUES (
@@ -303,7 +346,7 @@ export function buildSearchIndex(
       )
     `);
     const insertFts = database.prepare(
-      "INSERT INTO provisions_fts(rowid, heading, body) VALUES (?, ?, ?)",
+      "INSERT INTO search_records_fts(rowid, heading, body) VALUES (?, ?, ?)",
     );
     const insertDefinition = database.prepare(`
       INSERT INTO definitions (
@@ -321,7 +364,10 @@ export function buildSearchIndex(
       "INSERT INTO build_manifest(key, value) VALUES (?, ?)",
     );
     const populate = database.transaction(() => {
-      for (const document of documents) {
+      for (const [displayOrder, document] of documents.entries()) {
+        const source = sourceByCelex.get(document.celex);
+        const aliases = [...new Set(source?.aliases ?? [])];
+        const explorer = explorerDocumentSchema.parse(toExplorerView(document));
         insertDocument.run({
           id: document.id,
           jurisdiction: document.jurisdiction,
@@ -331,8 +377,27 @@ export function buildSearchIndex(
           officialTitle: document.officialTitle,
           documentType: document.documentType,
           publicationDate: document.asOf,
+          sourceUrl: document.sourceUrl,
+          lastChecked: document.lastChecked,
           sourceVersion: document.sourceVersion,
-          buildId: document.buildId,
+          canonicalBuildId: document.buildId,
+          provenance: document.provenance,
+          familyId: source?.familyId ?? `family:${document.slug}`,
+          defaultPath: document.provisions[0]?.path ?? `/read/${document.slug}`,
+          displayOrder,
+        });
+        insertDocumentView.run(
+          document.id,
+          JSON.stringify(documentViewSchema.parse(document)),
+          JSON.stringify(explorer),
+        );
+        aliases.forEach((alias, index) => {
+          insertAlias.run(
+            document.id,
+            alias,
+            normalizeSearchText(alias),
+            index,
+          );
         });
       }
       for (const row of rows) {
@@ -348,7 +413,7 @@ export function buildSearchIndex(
         );
       }
       const manifestEntries = {
-        schemaVersion: SEARCH_INDEX_SCHEMA_VERSION,
+        schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
         buildId,
         builtAt,
         documentCount: String(documents.length),
@@ -367,7 +432,7 @@ export function buildSearchIndex(
     });
     populate();
     database.exec(
-      "INSERT INTO provisions_fts(provisions_fts) VALUES ('optimize')",
+      "INSERT INTO search_records_fts(search_records_fts) VALUES ('optimize')",
     );
     database.exec(
       "INSERT INTO definitions_fts(definitions_fts) VALUES ('optimize')",
@@ -379,7 +444,9 @@ export function buildSearchIndex(
       integrity.length !== 1 ||
       integrity[0]?.integrity_check.toLowerCase() !== "ok"
     ) {
-      throw new Error("Generated search index failed SQLite integrity_check");
+      throw new Error(
+        "Generated runtime database failed SQLite integrity_check",
+      );
     }
     completed = true;
   } finally {
@@ -394,7 +461,7 @@ export function buildSearchIndex(
     throw error;
   }
   return {
-    schemaVersion: SEARCH_INDEX_SCHEMA_VERSION,
+    schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
     buildId,
     builtAt,
     documentCount: documents.length,

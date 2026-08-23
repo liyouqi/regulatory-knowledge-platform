@@ -720,18 +720,22 @@ Search Service 统一提供：
 
 Phase 1 推荐一个 SQLite artifact，避免多数据库同步。
 
-逻辑表族：
+Release 0.3 先采用最小化 runtime schema，以现有稳定 API DTO 作为 materialized read model，不为了关系型纯度拆解递归 Reader 树。逻辑表族：
 
 | 表族 | 用途 |
 |---|---|
-| documents | document/family metadata |
-| structural_nodes | Explorer / TOC |
-| provisions | Article / paragraph / point / Recital / Annex 等统一可定位正文；可按 type 建 view/index |
-| definitions | normalized definitions |
-| relationships | unified local relation store |
-| aliases | short names / legal citations |
-| build_manifest | data lineage |
-| *_fts | FTS5 virtual tables |
+| build_manifest | schema/build ID、Canonical input lineage 与 corpus counts |
+| documents | 可查询的 document/family/source metadata |
+| document_views | 经 schema 校验的 Reader / Explorer JSON read model |
+| document_aliases | reviewed short names / legal aliases |
+| search_records | paragraph-level derived search records |
+| definitions | normalized, traceable definitions |
+| search_records_fts / definitions_fts | FTS5 virtual tables |
+| relationships | Release 0.4 出现真实关系查询后再加入 |
+
+`document_views` 是有意的 build-time denormalization：Reader / Explorer 一次主键查询即可返回现有 DTO，不在每次请求中用多表 JOIN 重建递归树。它与全文记录、Definitions 都由同一次 Canonical → SQLite build 生成，不存在人工双写。
+
+只有当 References / Relationships 出现需要独立查询的真实实体访问模式时，才增加最小的 entity/relationship 表；不提前建立通用 ontology、RDF store 或十余张未被运行时使用的结构表。稳定 ID 保证 materialized view 将来可以无损拆分或导出 RDF。
 
 不使用 Prisma/Drizzle 作为 Phase 1 默认 ORM。
 

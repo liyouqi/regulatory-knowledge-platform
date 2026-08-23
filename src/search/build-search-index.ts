@@ -1,18 +1,20 @@
 import { loadDocumentViews } from "../data/document-repository";
+import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
-  DEFAULT_SEARCH_INDEX_PATH,
-  buildSearchIndex,
+  DEFAULT_RUNTIME_DATABASE_PATH,
+  buildRuntimeDatabase,
 } from "./sqlite-search-index";
 
 const outputIndex = process.argv.indexOf("--output");
 const outputPath = outputIndex >= 0 ? process.argv[outputIndex + 1] : undefined;
 if (outputIndex >= 0 && !outputPath) {
-  throw new Error("Usage: npm run search:build -- [--output <sqlite-path>]");
+  throw new Error("Usage: npm run runtime:build -- [--output <sqlite-path>]");
 }
 
-const manifest = buildSearchIndex(
+const manifest = buildRuntimeDatabase(
   loadDocumentViews(),
-  outputPath ?? DEFAULT_SEARCH_INDEX_PATH,
+  loadSourceRegistrySync(),
+  outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
 );
 console.table({
   buildId: manifest.buildId,

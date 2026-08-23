@@ -38,7 +38,7 @@ From the repository root:
 
 ```bash
 npm ci
-npm run search:build
+npm run runtime:build
 npm run check
 npm test
 npm run build
@@ -71,7 +71,7 @@ npm run build
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
-| `npm run search:build` | Atomically rebuild the local SQLite FTS5 index from validated document artifacts. |
+| `npm run runtime:build` | Atomically rebuild the read-only runtime SQLite from validated Canonical artifacts. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
@@ -153,10 +153,10 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
 
 5. Compare the reported Article, Recital, Annex, paragraph, point, structural-node, warning, and suggested anchor-text results with the official source. Add the complete reviewed `quality` baseline to the registry.
 6. Run `canonical:build`. It refuses to publish a law whose quality baseline is missing.
-7. Rebuild the derived search index, then restart the development server:
+7. Rebuild the derived runtime database, then restart the development server:
 
    ```bash
-   npm run search:build
+   npm run runtime:build
    npm run dev
    ```
 
@@ -164,7 +164,7 @@ If discovery or a fidelity gate fails, stop. Do not substitute an unofficial mir
 
 ### Refresh an existing law
 
-Run `source:fetch` again with the same CELEX ID, verify the new directory, and run `canonical:build` against it. A new timestamped source snapshot and canonical artifact are created; previous artifacts remain available for comparison and rollback. Identical Formex content produces the same content hash and `snapshotId`, even though retrieval metadata has a later timestamp. Then run `npm run search:build` and restart the server so global full-text search opens the new read-only index.
+Run `source:fetch` again with the same CELEX ID, verify the new directory, and run `canonical:build` against it. A new timestamped source snapshot and canonical artifact are created; previous artifacts remain available for comparison and rollback. Identical Formex content produces the same content hash and `snapshotId`, even though retrieval metadata has a later timestamp. Then run `npm run runtime:build` and restart the server so the API opens the new read-only runtime artifact.
 
 The implemented workflow is now:
 
@@ -275,7 +275,7 @@ crypto asset
 data holder
 ```
 
-The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run search:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. On the current six-law corpus this produces 294/294 structurally matching definition points and avoids treating ordinary uses of “means” as definitions.
+The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run runtime:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. On the current six-law corpus this produces 294/294 structurally matching definition points and avoids treating ordinary uses of “means” as definitions.
 
 When a definition explicitly says `as defined in`, it is stored as `incorporated`; otherwise it is `direct`. Exact direct definitions rank before incorporated references, while every result retains its own official source text and point link. For example, `personal data` returns the direct GDPR definition first, followed by incorporated MiCA, Data Act, and AI Act definitions.
 
@@ -296,15 +296,17 @@ data holder
 
 The endpoint is `/api/search/full-text?q=<query>&limit=<1-50>`. Add `documentId=eu:<CELEX>` for exact document scope. User input is normalized into bounded parameterized FTS expressions; unsupported operator punctuation is not executed as raw FTS syntax.
 
-The index at `data/artifacts/search/global-search.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, document build IDs, stable provision and definition records, and separate FTS5 tables; it is never canonical legal data. `npm run dev` and `npm start` rebuild it first, or rebuild it explicitly after adding or updating a canonical law:
+The artifact at `data/artifacts/runtime/regulatory.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, Canonical document build IDs, materialized Reader and Explorer payloads, reviewed aliases, stable search and definition records, and separate FTS5 tables. It is never canonical legal data. `npm run dev`, `npm start`, and `npm test` rebuild it first, or rebuild it explicitly after adding or updating a Canonical law:
 
 ```bash
-npm run search:build
+npm run runtime:build
 npm test -- src/search/full-text-search.test.ts
 npm run search:benchmark
 ```
 
-The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens the artifact read-only, checks its schema and manifest counts, runs SQLite `integrity_check`, exercises the FTS5 query path, and reports availability plus `buildId` at `/api/health`.
+The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts.
+
+The website never reads Canonical JSON or `data/source-registry.json` at runtime. `documents` holds queryable metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. Search and Definitions reuse the same artifact. Six-law parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 
 The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
 
