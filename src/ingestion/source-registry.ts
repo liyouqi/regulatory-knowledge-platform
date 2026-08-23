@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
 import { normalizeCelex } from "../canonical/ids";
+import { sourceStatusSchema } from "../shared/source-status";
 
 export const sourceDefinitionSchema = z.object({
   familyId: z.string().regex(/^family:[a-z0-9-]+$/),
@@ -21,6 +22,7 @@ export const sourceDefinitionSchema = z.object({
     "other",
   ]),
   publicationDate: z.string().date(),
+  sourceStatus: sourceStatusSchema.optional(),
   quality: z
     .object({
       articleCount: z.number().int().positive(),

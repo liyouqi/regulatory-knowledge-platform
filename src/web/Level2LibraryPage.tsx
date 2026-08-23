@@ -12,6 +12,7 @@ import {
   familyLevel2ResponseSchema,
 } from "../shared/legal";
 import { explorerPath, level2LibraryPath } from "../shared/reader-route";
+import { SourceStatusNotice } from "./SourceStatusNotice";
 
 const typeLabels = {
   rts: "RTS",
@@ -163,6 +164,9 @@ export function Level2LibraryPage({
                   </dd>
                 </div>
               </dl>
+              {measure.sourceStatus ? (
+                <SourceStatusNotice status={measure.sourceStatus} />
+              ) : null}
               <footer>
                 <Link to={measure.readerPath}>
                   Read measure <ArrowRight aria-hidden="true" size={15} />

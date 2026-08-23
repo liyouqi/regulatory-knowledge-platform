@@ -45,6 +45,7 @@ export function toExplorerView(document: DocumentView): ExplorerDocument {
     sourceUrl: document.sourceUrl,
     asOf: document.asOf,
     lastChecked: document.lastChecked,
+    sourceStatus: document.sourceStatus,
     buildId: document.buildId,
     articleCount: count("articles"),
     recitalCount: count("recitals"),

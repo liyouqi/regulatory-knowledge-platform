@@ -711,6 +711,7 @@ class FormexDocumentBuilder {
         sha256: sourceSnapshot.content.sha256,
         bytes: sourceSnapshot.content.bytes,
         sourceVersion: this.version,
+        sourceStatus: this.source.sourceStatus,
         workUri: sourceSnapshot.workUri,
         expressionUri: sourceSnapshot.expressionUri,
         manifestationUri: sourceSnapshot.manifestationUri,

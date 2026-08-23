@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sourceStatusSchema } from "../shared/source-status";
 
 export const CANONICAL_SCHEMA_VERSION = "1.0.0" as const;
 
@@ -88,6 +89,7 @@ export const sourceSnapshotSchema = z.object({
   sha256: sha256Schema,
   bytes: z.number().int().nonnegative(),
   sourceVersion: z.string().min(1),
+  sourceStatus: sourceStatusSchema.optional(),
   workUri: z.string().url().optional(),
   expressionUri: z.string().url().optional(),
   manifestationUri: z.string().url().optional(),

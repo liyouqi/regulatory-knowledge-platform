@@ -51,6 +51,7 @@ import {
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { Level2LibraryPage } from "./Level2LibraryPage";
+import { SourceStatusNotice } from "./SourceStatusNotice";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -1030,6 +1031,9 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         <a href={legalDocument.sourceUrl} rel="noreferrer" target="_blank">
           Open official source <ArrowUpRight aria-hidden="true" size={15} />
         </a>
+        {legalDocument.sourceStatus ? (
+          <SourceStatusNotice status={legalDocument.sourceStatus} />
+        ) : null}
         {legalDocument.provenance === "fixture" ? (
           <p className="fixture-notice">
             This screen uses a temporary UI fixture, not production legal text.

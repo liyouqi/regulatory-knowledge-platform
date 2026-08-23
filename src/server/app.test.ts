@@ -115,7 +115,7 @@ describe("Document lookup", () => {
     const dora = findFamilyLevel2("dora", "rts");
     expect(dora).toMatchObject({
       familyId: "family:dora",
-      counts: { rts: 3, its: 0, guidelines: 0 },
+      counts: { rts: 3, its: 1, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -138,6 +138,14 @@ describe("Document lookup", () => {
           ]),
         }),
       ]),
+    );
+    expect(findFamilyLevel2("dora", "its")?.measures).toContainEqual(
+      expect.objectContaining({
+        id: "eu:32024R2956",
+        sourceStatus: expect.objectContaining({
+          corrections: [expect.objectContaining({ date: "2025-09-19" })],
+        }),
+      }),
     );
   });
 });

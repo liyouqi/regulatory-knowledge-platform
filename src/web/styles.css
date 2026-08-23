@@ -968,6 +968,29 @@ kbd {
   padding-top: 18px;
 }
 
+.source-status-notice {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.9rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line));
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--accent) 5%, var(--panel));
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.source-status-notice strong {
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.source-status-notice a {
+  color: var(--accent);
+  font-weight: 650;
+}
+
 .explorer-shell {
   background: #eeece4;
   color: #22251f;

@@ -274,6 +274,7 @@ export function toDocumentView(
     asOf: document.publicationDate,
     lastChecked: document.source.retrievedAt,
     sourceVersion: document.source.sourceVersion,
+    sourceStatus: document.source.sourceStatus,
     buildId,
     provenance: document.source.provenance,
     collections,

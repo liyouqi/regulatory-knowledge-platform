@@ -85,7 +85,7 @@ The source pipeline resolves an EU law from its CELEX work to the English expres
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, three DORA RTS measures, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
+The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, three DORA RTS measures, one DORA ITS measure, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
 
 ### Download an official immutable snapshot
 
@@ -130,7 +130,7 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
 
 ### Add another EU law
 
-1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, the appropriate shared `familyId`, explicit `regulatoryLevel` / `measureType`, and reviewed common names in `aliases`. CELEX and aliases must be unique; family IDs are intentionally reusable. Do not add speculative or ambiguous aliases.
+1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, the appropriate shared `familyId`, explicit `regulatoryLevel` / `measureType`, and reviewed common names in `aliases`. CELEX and aliases must be unique; family IDs are intentionally reusable. Do not add speculative or ambiguous aliases. When EUR-Lex records a consolidated version or corrigendum, also add the bounded `sourceStatus` metadata (`basis`, `textAsOf`, `checkedAt`, `currentVersionUrl`, and official correction date/URL); do not imply that an original OJ snapshot already incorporates a later correction. The status hash participates in the immutable Canonical artifact and runtime build identities, so a later correction produces a new build without overwriting the original snapshot.
 2. Validate the registry and check the new row:
 
    ```bash
@@ -331,7 +331,7 @@ npm run search:benchmark
 
 The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts.
 
-The website never reads Canonical JSON, `data/source-registry.json`, or curated mappings at runtime. `documents` holds queryable family/level/measure/source metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Eight-document parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
+The website never reads Canonical JSON, `data/source-registry.json`, or curated mappings at runtime. `documents` holds queryable family/level/measure/source metadata plus a bounded `source_status_json` object, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Corpus parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 
 The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
 
@@ -411,10 +411,12 @@ Release 0.5 is now in progress and additionally includes:
 - full official ingestion, Reader, Explorer, and search coverage for DORA Delegated Regulation (EU) 2024/1774 and MiCA Delegated Regulation (EU) 2025/305;
 - full official ingestion and reviewed Article 28(10) mapping for DORA Delegated Regulation (EU) 2024/1773 (ICT third-party contractual-policy RTS);
 - full official ingestion and reviewed Article 18 mapping for DORA Delegated Regulation (EU) 2024/1772 (incident classification and materiality-threshold RTS);
+- full official ingestion, four Annexes, reviewed Article 28(9) mapping, and the first real ITS filter for DORA Implementing Regulation (EU) 2024/2956;
+- a minimal legal-text status contract that distinguishes original OJ text from a current EUR-Lex version and exposes known corrigenda in Reader and Level 2 Library;
 - version-controlled, schema-validated DORA/MiCA mapping evidence;
 - `official-mapping@1.0.0` paired `MANDATES` / `ADOPTED_UNDER` edges in the unified SQLite relationship store;
 - separate relationship API groups and responsive Reader presentation with official-evidence links;
 - direct-Article Formex support with a parser fixture and parser version `1.3.0`;
 - desktop and 390px browser verification of DORA Article 15, reverse RTS legal bases, and exact MiCA RTS search.
 
-The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, and official sources without duplicating the curated mapping input. The next Release 0.5 slice is additional reviewed DORA/MiCA measures. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.
+The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, source status, and official sources without duplicating the curated mapping input. The next Release 0.5 slice is the DORA incident-reporting RTS/ITS pair. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.

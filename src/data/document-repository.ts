@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { toDocumentView } from "../canonical/to-document-view";
@@ -28,9 +29,27 @@ function officialCandidates(artifactRoot: string, celex: string) {
         document.identifiers.celex === celex &&
         document.source.provenance === "official",
     )
-    .sort((left, right) =>
-      right.source.retrievedAt.localeCompare(left.source.retrievedAt),
-    );
+    .sort((left, right) => {
+      const retrievalOrder = right.source.retrievedAt.localeCompare(
+        left.source.retrievedAt,
+      );
+      if (retrievalOrder !== 0) return retrievalOrder;
+      return (right.source.sourceStatus?.checkedAt ?? "").localeCompare(
+        left.source.sourceStatus?.checkedAt ?? "",
+      );
+    });
+}
+
+function documentBuildId(
+  document: ReturnType<typeof validateCanonicalDocument>,
+): string {
+  const sourceStatusToken = document.source.sourceStatus
+    ? `-status-${createHash("sha256")
+        .update(JSON.stringify(document.source.sourceStatus))
+        .digest("hex")
+        .slice(0, 12)}`
+    : "";
+  return `canonical-${document.schemaVersion}-parser-${FORMEX_PARSER_VERSION}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;
 }
 
 export function loadDocumentViews(
@@ -56,7 +75,7 @@ export function loadDocumentViews(
         toDocumentView(
           document,
           document.source.provenance === "official"
-            ? `canonical-${document.schemaVersion}-parser-${FORMEX_PARSER_VERSION}-${document.source.sha256.slice(7, 19)}`
+            ? documentBuildId(document)
             : "fixture-0.2",
         ),
       ),

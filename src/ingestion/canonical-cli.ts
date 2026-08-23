@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
@@ -56,6 +57,10 @@ async function buildCanonicalDocument(): Promise<void> {
     formex.annexes,
   );
   const sourceHash = verified.snapshot.content.sha256.slice(7);
+  const sourceStatusHash = createHash("sha256")
+    .update(JSON.stringify(source.sourceStatus ?? null))
+    .digest("hex")
+    .slice(0, 12);
   if (inspectOnly) {
     const recitals = document.provisions.filter(
       (provision) => provision.kind === "recital",
@@ -115,7 +120,7 @@ async function buildCanonicalDocument(): Promise<void> {
   const outputDirectory = resolve(
     process.cwd(),
     argument("--output") ??
-      `data/artifacts/canonical/${source.celex}/${retrievalToken}-${sourceHash.slice(0, 12)}-parser-${FORMEX_PARSER_VERSION}`,
+      `data/artifacts/canonical/${source.celex}/${retrievalToken}-${sourceHash.slice(0, 12)}-status-${sourceStatusHash}-parser-${FORMEX_PARSER_VERSION}`,
   );
   const buildReport = {
     ...report,
@@ -126,6 +131,7 @@ async function buildCanonicalDocument(): Promise<void> {
       ...formex.annexes.map(({ fileName }) => fileName),
     ],
     parserVersion: FORMEX_PARSER_VERSION,
+    sourceStatusHash,
     canonicalFile: "document.json",
   };
   const documentJson = `${JSON.stringify(document, null, 2)}\n`;

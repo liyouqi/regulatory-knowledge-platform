@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sourceStatusSchema } from "./source-status";
 
 export const collectionIdSchema = z.enum(["articles", "recitals", "annexes"]);
 
@@ -111,6 +112,7 @@ export const documentViewSchema = z.object({
   asOf: z.string().date(),
   lastChecked: z.string().datetime(),
   sourceVersion: z.string().min(1),
+  sourceStatus: sourceStatusSchema.optional(),
   buildId: z.string().min(1),
   provenance: z.enum(["official", "fixture"]),
   collections: z.array(contentCollectionSchema).min(1),
@@ -166,6 +168,7 @@ export const level2MeasureSchema = z.object({
   measureType: level2MeasureTypeSchema,
   publicationDate: z.string().date(),
   sourceUrl: z.string().url(),
+  sourceStatus: sourceStatusSchema.optional(),
   explorerPath: z.string().startsWith("/"),
   readerPath: z.string().startsWith("/"),
   mandates: z.array(level2MandateSchema),
@@ -316,6 +319,7 @@ export const explorerDocumentSchema = z.object({
   sourceUrl: z.string().url(),
   asOf: z.string().date(),
   lastChecked: z.string().datetime(),
+  sourceStatus: sourceStatusSchema.optional(),
   buildId: z.string().min(1),
   articleCount: z.number().int().nonnegative(),
   recitalCount: z.number().int().nonnegative(),

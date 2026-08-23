@@ -121,6 +121,30 @@
         }
       },
       "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32024r2956:article-28",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:28",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:28:paragraph:9",
+          "text": "The ESAs shall, through the Joint Committee, develop draft implementing technical standards to establish the standard templates for the purposes of the register of information referred to in paragraph 3, including information that is common to all contractual arrangements on the use of ICT services.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32024R2956",
+        "measureType": "its",
+        "officialTitle": "Commission Implementing Regulation (EU) 2024/2956 of 29 November 2024 laying down implementing technical standards for the application of Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to standard templates for the register of information (Text with EEA relevance)",
+        "documentNumber": "Commission Implementing Regulation (EU) 2024/2956",
+        "adoptionEvidence": {
+          "text": "in particular Article 28(9), second subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
     }
   ]
 }

@@ -171,11 +171,21 @@ describe("SQLite runtime repository", () => {
   });
 
   it("lists Level 2 measures from SQLite with counts and mandate Articles", () => {
+    expect(repository?.findDocument("eu:32024R2956")).toMatchObject({
+      buildId: expect.stringContaining("status-"),
+      sourceStatus: {
+        basis: "original-oj",
+        textAsOf: "2024-12-02",
+        checkedAt: "2026-08-23T23:37:57.439Z",
+        currentVersionUrl: "https://eur-lex.europa.eu/eli/reg_impl/2024/2956",
+        corrections: [expect.objectContaining({ date: "2025-09-19" })],
+      },
+    });
     const dora = repository?.findFamilyLevel2("family:dora");
     expect(dora).toMatchObject({
       familyId: "family:dora",
       familyShortName: "DORA",
-      counts: { rts: 3, its: 0, guidelines: 0 },
+      counts: { rts: 3, its: 1, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -208,6 +218,19 @@ describe("SQLite runtime repository", () => {
             expect.objectContaining({
               articleEntityId: "eu:32022R2554:article:18",
               path: "/read/dora/articles/18",
+            }),
+          ],
+        }),
+        expect.objectContaining({
+          id: "eu:32024R2956",
+          measureType: "its",
+          sourceStatus: expect.objectContaining({
+            basis: "original-oj",
+            corrections: [expect.objectContaining({ date: "2025-09-19" })],
+          }),
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:28",
             }),
           ],
         }),

@@ -51,7 +51,14 @@ describe("structured Reader DTO", () => {
   });
 
   it("adds stable routes, breadcrumbs, body anchors, and adjacent navigation", () => {
-    const view = toDocumentView(fixtureWithChapter(), "test-build");
+    const document = fixtureWithChapter();
+    document.source.sourceStatus = {
+      basis: "original-oj",
+      textAsOf: "2022-12-27",
+      currentVersionUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+      corrections: [],
+    };
+    const view = toDocumentView(document, "test-build");
     const first = view.provisions[0];
     const second = view.provisions[1];
 
@@ -61,6 +68,7 @@ describe("structured Reader DTO", () => {
       documentType: "regulation",
       lastChecked: doraCanonicalFixture.source.retrievedAt,
       sourceVersion: doraCanonicalFixture.source.sourceVersion,
+      sourceStatus: document.source.sourceStatus,
     });
     expect(first.breadcrumbs[0]).toMatchObject({
       label: "CHAPTER I",

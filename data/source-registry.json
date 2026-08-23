@@ -291,5 +291,49 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1772/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA ITS Register of Information",
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2024/2956",
+      "DORA ITS 2024/2956",
+      "DORA Register of Information ITS"
+    ],
+    "celex": "32024R2956",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "its",
+    "publicationDate": "2024-12-02",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 15,
+      "annexCount": 4,
+      "paragraphCount": 48,
+      "pointCount": 59,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R2956:recital:1": "sha256:348dc95d7b6874a9c329309c166876001f309188d9056c005e9d21dbd01b41c7",
+        "eu:32024R2956:article:1:subparagraph:1": "sha256:f61de16c4d042bd36ae212623114bd98b5a1ae865fa92d14fb1101ed21c444ff",
+        "eu:32024R2956:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32024R2956:annex:i": "sha256:331ba9e52441c83082bd211e2d06b3fb16e46b33fb160cac65d21f3ec0b3400e",
+        "eu:32024R2956:annex:iv": "sha256:ab712323bae64ba0783ac8e0514296ee60f96ab3839a88ce8c1bfe23d9a08767"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2024-12-02",
+      "checkedAt": "2026-08-23T23:37:57.439Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956",
+      "corrections": [
+        {
+          "date": "2025-09-19",
+          "url": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/corrigendum/2025-09-19/oj/eng"
+        }
+      ]
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng"
   }
 ]

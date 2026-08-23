@@ -22,6 +22,7 @@ import {
   relationshipPreviewSchema,
 } from "../shared/legal";
 import { explorerPath } from "../shared/reader-route";
+import { sourceStatusSchema } from "../shared/source-status";
 
 type LawSearchSource = Pick<
   SourceDefinition,
@@ -99,6 +100,7 @@ interface Level2MeasureRow {
   measureType: Level2Measure["measureType"];
   publicationDate: string;
   sourceUrl: string;
+  sourceStatusJson: string | null;
   readerPath: string;
   articleEntityId: string | null;
   mandateDocumentId: string | null;
@@ -405,6 +407,7 @@ export class SqliteRuntimeRepository {
           d.measure_type AS measureType,
           d.publication_date AS publicationDate,
           d.source_url AS sourceUrl,
+          d.source_status_json AS sourceStatusJson,
           d.default_path AS readerPath,
           te.id AS articleEntityId,
           td.id AS mandateDocumentId,
@@ -435,6 +438,9 @@ export class SqliteRuntimeRepository {
         measureType: row.measureType,
         publicationDate: row.publicationDate,
         sourceUrl: row.sourceUrl,
+        sourceStatus: row.sourceStatusJson
+          ? sourceStatusSchema.parse(JSON.parse(row.sourceStatusJson))
+          : undefined,
         explorerPath: explorerPath(row.slug),
         readerPath: row.readerPath,
         mandates: [],

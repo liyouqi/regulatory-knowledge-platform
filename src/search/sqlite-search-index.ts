@@ -30,7 +30,7 @@ import {
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.0.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.1.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -300,6 +300,7 @@ export function buildRuntimeDatabase(
         document_type TEXT NOT NULL,
         publication_date TEXT NOT NULL,
         source_url TEXT NOT NULL,
+        source_status_json TEXT,
         last_checked TEXT NOT NULL,
         source_version TEXT NOT NULL,
         canonical_build_id TEXT NOT NULL,
@@ -415,12 +416,12 @@ export function buildRuntimeDatabase(
     const insertDocument = database.prepare(`
       INSERT INTO documents (
         id, jurisdiction, slug, celex, short_name, official_title, document_type,
-        publication_date, source_url, last_checked, source_version,
+        publication_date, source_url, source_status_json, last_checked, source_version,
         canonical_build_id, provenance, family_id, regulatory_level,
         measure_type, default_path, display_order
       ) VALUES (
         @id, @jurisdiction, @slug, @celex, @shortName, @officialTitle, @documentType,
-        @publicationDate, @sourceUrl, @lastChecked, @sourceVersion,
+        @publicationDate, @sourceUrl, @sourceStatusJson, @lastChecked, @sourceVersion,
         @canonicalBuildId, @provenance, @familyId, @regulatoryLevel,
         @measureType, @defaultPath, @displayOrder
       )
@@ -497,6 +498,9 @@ export function buildRuntimeDatabase(
           documentType: document.documentType,
           publicationDate: document.asOf,
           sourceUrl: document.sourceUrl,
+          sourceStatusJson: document.sourceStatus
+            ? JSON.stringify(document.sourceStatus)
+            : null,
           lastChecked: document.lastChecked,
           sourceVersion: document.sourceVersion,
           canonicalBuildId: document.buildId,
