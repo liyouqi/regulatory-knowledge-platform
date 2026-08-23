@@ -1066,16 +1066,35 @@ kbd {
   padding: 0 20px;
 }
 
-.search-mode-bar > span {
+.search-mode-tabs {
+  align-self: stretch;
+  display: flex;
+  gap: 18px;
+}
+
+.search-mode-tabs button {
   align-items: center;
   align-self: stretch;
-  border-bottom: 2px solid #a8b86b;
-  color: #e7ebda;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: #7f8778;
+  cursor: pointer;
   display: flex;
   font-size: 11px;
   font-weight: 750;
   gap: 7px;
+  padding: 0;
   text-transform: uppercase;
+}
+
+.search-mode-tabs button:hover {
+  color: #c6ccbc;
+}
+
+.search-mode-tabs button.active {
+  border-bottom-color: #a8b86b;
+  color: #e7ebda;
 }
 
 .search-mode-bar small {
@@ -1174,6 +1193,24 @@ kbd {
   white-space: nowrap;
 }
 
+.full-text-snippet {
+  color: #aeb3a7;
+  display: -webkit-box;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.full-text-snippet mark {
+  background: #7e873d;
+  border-radius: 2px;
+  color: #fffde8;
+  padding: 0 1px;
+}
+
 .law-result-meta {
   color: #777f71;
   font-size: 9px;
@@ -1195,6 +1232,32 @@ kbd {
   margin: 0;
   padding: 58px 24px;
   text-align: center;
+}
+
+.full-text-intro {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.full-text-intro svg {
+  color: #a8b86b;
+  margin-bottom: 3px;
+}
+
+.full-text-intro strong {
+  color: #e8eadf;
+  font-size: 13px;
+}
+
+.full-text-intro code {
+  background: #2d3329;
+  border: 1px solid #434a3c;
+  border-radius: 3px;
+  color: #cdd7aa;
+  font-size: 10px;
+  padding: 2px 4px;
 }
 
 .search-help {

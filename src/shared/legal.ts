@@ -172,6 +172,34 @@ export const lawSearchResponseSchema = z.object({
   results: z.array(lawSearchResultSchema),
 });
 
+export const searchSnippetSegmentSchema = z.object({
+  text: z.string(),
+  highlighted: z.boolean(),
+});
+
+export const fullTextSearchResultSchema = z.object({
+  id: z.string().min(1),
+  documentId: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  celex: z.string().min(1),
+  provisionId: z.string().min(1),
+  kind: z.enum(["article", "recital", "annex"]),
+  label: z.string().min(1),
+  title: z.string().optional(),
+  marker: z.string().optional(),
+  path: z.string().startsWith("/"),
+  snippet: z.array(searchSnippetSegmentSchema).min(1),
+});
+
+export const fullTextSearchResponseSchema = z.object({
+  query: z.string(),
+  normalizedQuery: z.string(),
+  scopeDocumentId: z.string().optional(),
+  indexBuildId: z.string().min(1),
+  results: z.array(fullTextSearchResultSchema),
+});
+
 export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
   z.object({
     id: z.string().min(1),
@@ -223,3 +251,8 @@ export type DocumentSummary = z.infer<typeof documentSummarySchema>;
 export type ExplorerDocument = z.infer<typeof explorerDocumentSchema>;
 export type LawSearchResult = z.infer<typeof lawSearchResultSchema>;
 export type LawSearchResponse = z.infer<typeof lawSearchResponseSchema>;
+export type SearchSnippetSegment = z.infer<typeof searchSnippetSegmentSchema>;
+export type FullTextSearchResult = z.infer<typeof fullTextSearchResultSchema>;
+export type FullTextSearchResponse = z.infer<
+  typeof fullTextSearchResponseSchema
+>;

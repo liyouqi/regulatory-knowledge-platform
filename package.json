@@ -8,10 +8,12 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
+    "predev": "npm run search:build",
     "dev": "concurrently --kill-others-on-fail npm:dev:server npm:dev:web",
     "dev:server": "tsx watch src/server/index.ts",
     "dev:web": "vite",
     "build": "tsc --noEmit && vite build",
+    "prestart": "npm run search:build",
     "start": "node --import tsx src/server/index.ts",
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write .",
@@ -20,11 +22,14 @@
     "source:verify": "node --import tsx src/ingestion/cli.ts verify",
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
+    "search:build": "node --import tsx src/search/build-search-index.ts",
+    "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "express": "^5.1.0",
     "fast-xml-parser": "5.11.0",
     "fflate": "0.8.2",
@@ -37,6 +42,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@playwright/test": "^1.51.0",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.0",
     "@types/node": "24.3.0",
     "@types/react": "^19.0.0",

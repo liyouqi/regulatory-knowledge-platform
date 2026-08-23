@@ -2,6 +2,7 @@ import express from "express";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
+import { FullTextSearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 import type { DocumentSummary } from "../shared/legal";
 
@@ -12,6 +13,12 @@ const lawSearchRecords = createLawSearchRecords(
   documentViews,
   loadSourceRegistrySync(),
 );
+let fullTextSearchService: FullTextSearchService | null = null;
+try {
+  fullTextSearchService = new FullTextSearchService();
+} catch {
+  fullTextSearchService = null;
+}
 
 function summary(document: (typeof documentViews)[number]): DocumentSummary {
   return {
@@ -40,8 +47,20 @@ export function findLaws(query: string) {
   return searchLaws(lawSearchRecords, query);
 }
 
+export function searchFullText(
+  query: string,
+  options: { documentId?: string; limit?: number } = {},
+) {
+  return fullTextSearchService?.search(query, options) ?? null;
+}
+
 app.get("/api/health", (_request, response) => {
-  response.json({ status: "ok" });
+  response.json({
+    status: "ok",
+    searchIndex: fullTextSearchService
+      ? { available: true, buildId: fullTextSearchService.buildId }
+      : { available: false },
+  });
 });
 
 app.get("/api/documents", (_request, response) => {
@@ -51,6 +70,29 @@ app.get("/api/documents", (_request, response) => {
 app.get("/api/search/laws", (request, response) => {
   const query = typeof request.query.q === "string" ? request.query.q : "";
   response.json(findLaws(query.slice(0, 200)));
+});
+
+app.get("/api/search/full-text", (request, response) => {
+  const query = typeof request.query.q === "string" ? request.query.q : "";
+  const documentId =
+    typeof request.query.documentId === "string"
+      ? request.query.documentId.slice(0, 160)
+      : undefined;
+  const requestedLimit =
+    typeof request.query.limit === "string"
+      ? Number.parseInt(request.query.limit, 10)
+      : undefined;
+  const result = searchFullText(query.slice(0, 200), {
+    documentId,
+    limit: Number.isFinite(requestedLimit) ? requestedLimit : undefined,
+  });
+  if (!result) {
+    response.status(503).json({
+      error: "Full-text search index unavailable; run npm run search:build",
+    });
+    return;
+  }
+  response.json(result);
 });
 
 app.get("/api/documents/by-slug/:slug", (request, response) => {

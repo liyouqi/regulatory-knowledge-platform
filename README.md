@@ -38,6 +38,7 @@ From the repository root:
 
 ```bash
 npm ci
+npm run search:build
 npm run check
 npm test
 npm run build
@@ -70,6 +71,8 @@ npm run build
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
+| `npm run search:build` | Atomically rebuild the local SQLite FTS5 index from validated document artifacts. |
+| `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
 ## Legal Data Operations
@@ -150,12 +153,18 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
 
 5. Compare the reported Article, Recital, Annex, paragraph, point, structural-node, warning, and suggested anchor-text results with the official source. Add the complete reviewed `quality` baseline to the registry.
 6. Run `canonical:build`. It refuses to publish a law whose quality baseline is missing.
+7. Rebuild the derived search index, then restart the development server:
+
+   ```bash
+   npm run search:build
+   npm run dev
+   ```
 
 If discovery or a fidelity gate fails, stop. Do not substitute an unofficial mirror, fabricate Cellar identifiers, or weaken the baseline merely to make the build pass. The current parser is production-gated for DORA; laws with materially different Formex structures, especially annex-heavy acts, require targeted parser tests before publication.
 
 ### Refresh an existing law
 
-Run `source:fetch` again with the same CELEX ID, verify the new directory, and run `canonical:build` against it. A new timestamped source snapshot and canonical artifact are created; previous artifacts remain available for comparison and rollback. Identical Formex content produces the same content hash and `snapshotId`, even though retrieval metadata has a later timestamp.
+Run `source:fetch` again with the same CELEX ID, verify the new directory, and run `canonical:build` against it. A new timestamped source snapshot and canonical artifact are created; previous artifacts remain available for comparison and rollback. Identical Formex content produces the same content hash and `snapshotId`, even though retrieval metadata has a later timestamp. Then run `npm run search:build` and restart the server so global full-text search opens the new read-only index.
 
 The implemented workflow is now:
 
@@ -169,7 +178,7 @@ official source snapshot ✓
 → Universal One-page Act Explorer ✓
 → global law discovery / Find Laws ✓
 → current-document full-text ✓
-→ SQLite FTS5 global search build (next)
+→ SQLite FTS5 global search build ✓
 → relationship build
 → atomic publish or rollback
 ```
@@ -250,6 +259,35 @@ AI Act annex VII
 
 Compound queries combine a verified law identity with `article`/`art`, `recital`/`rec`, or `annex` and a number. They open the exact stable Reader route only when that provision exists; the service does not guess missing provisions. Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
 
+### Global full-text search
+
+Open the same global panel with `Cmd+K` or `Ctrl+K`, then select **Full text** or press `Tab` to switch modes. Full-text search covers the headings and legal body blocks of every loaded law. Multiple unquoted terms use strict AND and word-prefix semantics; quoted text is an exact normalized phrase. Results contain safe highlighted text segments and open stable paragraph-level Reader links.
+
+Useful checks include:
+
+```text
+operational risk
+"management body"
+personal data controller
+artificial intelligence system
+crypto asset
+data holder
+```
+
+The endpoint is `/api/search/full-text?q=<query>&limit=<1-50>`. Add `documentId=eu:<CELEX>` for exact document scope. User input is normalized into bounded parameterized FTS expressions; unsupported operator punctuation is not executed as raw FTS syntax.
+
+The index at `data/artifacts/search/global-search.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, document build IDs, stable provision records, and an FTS5 table; it is never canonical legal data. `npm run dev` and `npm start` rebuild it first, or rebuild it explicitly after adding or updating a canonical law:
+
+```bash
+npm run search:build
+npm test -- src/search/full-text-search.test.ts
+npm run search:benchmark
+```
+
+The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens the artifact read-only, checks its schema and manifest counts, runs SQLite `integrity_check`, exercises the FTS5 query path, and reports availability plus `buildId` at `/api/health`.
+
+The benchmark fails if any fixed query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
+
 ## Current Release Status
 
 Release 0.1 has a complete local multi-law Reader foundation:
@@ -283,4 +321,13 @@ Release 0.2 is now in progress and additionally includes:
 - a deterministic current-document inverted index over provision headings and legal body blocks, with strict AND, phrase, prefix, snippets, highlights, and paragraph-level navigation;
 - responsive current-law search integrated with Quick Go and verified against exact locators, DORA body text, phrase queries, and 390px layout.
 
-The Release 0.2 Explorer & Basic Discovery scope is complete locally. The next implementation task is Release 0.3: a rebuildable SQLite FTS5 artifact and Search Service, followed by Definitions and Opened Laws modes. These global modes are not represented as completed functionality yet.
+The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.3 is now in progress and additionally includes:
+
+- a rebuildable, schema-versioned SQLite FTS5 artifact derived from validated `DocumentView` records;
+- content-derived index build IDs, source document build metadata, stable paragraph targets, and atomic publication;
+- a read-only Search Service and `/api/search/full-text` endpoint with bounded parameterized queries;
+- strict AND, prefix, exact phrase, deterministic BM25 ranking, safe highlighted snippets, and optional document scope;
+- a keyboard-complete **Full text** mode in the shared global panel, verified on desktop and at 390px mobile width;
+- fixed service tests and a reproducible six-query relevance and latency benchmark with complete runtime, machine, corpus, and sampling metadata.
+
+The next Release 0.3 tasks are Definitions and Opened Laws modes. They are not represented as completed functionality yet.
