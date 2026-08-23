@@ -15,7 +15,7 @@ describe("official Level 2 mapping builder", () => {
   it("builds paired mandate and adoption edges from reviewed source data", () => {
     const relationships = buildOfficialMappings(documents, entities);
 
-    expect(relationships).toHaveLength(6);
+    expect(relationships).toHaveLength(8);
     expect(relationships).toContainEqual(
       expect.objectContaining({
         sourceEntityId: "eu:32022R2554:article:15",
@@ -31,6 +31,13 @@ describe("official Level 2 mapping builder", () => {
         sourceEntityId: "eu:32025R0305",
         relationType: "ADOPTED_UNDER",
         targetEntityId: "eu:32023R1114:article:62",
+      }),
+    );
+    expect(relationships).toContainEqual(
+      expect.objectContaining({
+        sourceEntityId: "eu:32022R2554:article:28",
+        relationType: "MANDATES",
+        targetEntityId: "eu:32024R1773",
       }),
     );
   });

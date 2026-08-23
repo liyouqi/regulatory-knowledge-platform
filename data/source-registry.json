@@ -231,5 +231,35 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/305/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS ICT Third-Party Policy",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/1773",
+      "DORA RTS 2024/1773",
+      "DORA ICT Third-Party Policy RTS"
+    ],
+    "celex": "32024R1773",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2024-06-25",
+    "quality": {
+      "articleCount": 11,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 30,
+      "pointCount": 64,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1773:recital:1": "sha256:373ed5ec7c69cdc97bead2ac9a3b29dd839b1dedda49c830d715cc8485426c5b",
+        "eu:32024R1773:article:1:subparagraph:1": "sha256:4d969624cd50c451785234e5918e366d94fecb711242a980de901784c910e745",
+        "eu:32024R1773:article:11:subparagraph:1": "sha256:43014c7c23ae89f22ac2fe4828a8aa9584cfb7214b251d8c71de00b0505f61f2"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1773/oj/eng"
   }
 ]

@@ -171,11 +171,14 @@ describe("SQLite runtime repository", () => {
   });
 
   it("lists Level 2 measures from SQLite with counts and mandate Articles", () => {
-    expect(repository?.findFamilyLevel2("family:dora")).toMatchObject({
+    const dora = repository?.findFamilyLevel2("family:dora");
+    expect(dora).toMatchObject({
       familyId: "family:dora",
       familyShortName: "DORA",
-      counts: { rts: 1, its: 0, guidelines: 0 },
-      measures: [
+      counts: { rts: 2, its: 0, guidelines: 0 },
+    });
+    expect(dora?.measures).toEqual(
+      expect.arrayContaining([
         expect.objectContaining({
           id: "eu:32024R1774",
           measureType: "rts",
@@ -190,8 +193,17 @@ describe("SQLite runtime repository", () => {
             }),
           ]),
         }),
-      ],
-    });
+        expect.objectContaining({
+          id: "eu:32024R1773",
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:28",
+              path: "/read/dora/articles/28",
+            }),
+          ],
+        }),
+      ]),
+    );
     expect(repository?.findFamilyLevel2("family:mica", "rts")).toMatchObject({
       counts: { rts: 1, its: 0, guidelines: 0 },
       measures: [

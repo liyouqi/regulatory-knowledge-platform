@@ -112,16 +112,26 @@ describe("Document lookup", () => {
   });
 
   it("serves a family Level 2 library without reading curated mapping source data", () => {
-    expect(findFamilyLevel2("dora", "rts")).toMatchObject({
+    const dora = findFamilyLevel2("dora", "rts");
+    expect(dora).toMatchObject({
       familyId: "family:dora",
-      measures: [
+      counts: { rts: 2, its: 0, guidelines: 0 },
+    });
+    expect(dora?.measures).toEqual(
+      expect.arrayContaining([
         expect.objectContaining({
           id: "eu:32024R1774",
           mandates: expect.arrayContaining([
             expect.objectContaining({ label: "Article 15" }),
           ]),
         }),
-      ],
-    });
+        expect.objectContaining({
+          id: "eu:32024R1773",
+          mandates: expect.arrayContaining([
+            expect.objectContaining({ label: "Article 28" }),
+          ]),
+        }),
+      ]),
+    );
   });
 });

@@ -85,7 +85,7 @@ The source pipeline resolves an EU law from its CELEX work to the English expres
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts plus one DORA RTS and one MiCA RTS. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
+The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, two DORA RTS measures, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
 
 ### Download an official immutable snapshot
 
@@ -409,6 +409,7 @@ The explicit-reference portion of Release 0.4 is complete locally.
 Release 0.5 is now in progress and additionally includes:
 
 - full official ingestion, Reader, Explorer, and search coverage for DORA Delegated Regulation (EU) 2024/1774 and MiCA Delegated Regulation (EU) 2025/305;
+- full official ingestion and reviewed Article 28(10) mapping for DORA Delegated Regulation (EU) 2024/1773 (ICT third-party contractual-policy RTS);
 - version-controlled, schema-validated DORA/MiCA mapping evidence;
 - `official-mapping@1.0.0` paired `MANDATES` / `ADOPTED_UNDER` edges in the unified SQLite relationship store;
 - separate relationship API groups and responsive Reader presentation with official-evidence links;

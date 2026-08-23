@@ -3140,7 +3140,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - TF-IDF benchmark；
 - benchmark 通过时启用 Related Recitals，否则保持关闭。
 
-当前状态：official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 已完成；更多核验 measures 与 TF-IDF benchmark 尚待完成。Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
+当前状态：official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10) 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 已完成；更多核验 measures 与 TF-IDF benchmark 尚待完成。Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
 
 ## Release 0.6 — CSSF & Product Hardening
 

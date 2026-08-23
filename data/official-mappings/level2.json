@@ -73,6 +73,30 @@
         }
       },
       "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32024r1773:article-28",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:28",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:28:paragraph:10",
+          "text": "The ESAs shall, through the Joint Committee, develop draft regulatory technical standards to further specify the detailed content of the policy referred to in paragraph 2 in relation to the contractual arrangements on the use of ICT services supporting critical or important functions provided by ICT third-party service providers.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32024R1773",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2024/1773 of 13 March 2024 supplementing Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to regulatory technical standards specifying the detailed content of the policy regarding contractual arrangements on the use of ICT services supporting critical or important functions provided by ICT third-party service providers (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2024/1773",
+        "adoptionEvidence": {
+          "text": "in particular Article 28(10), third subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1773/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
     }
   ]
 }
