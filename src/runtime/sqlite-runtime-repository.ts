@@ -12,9 +12,11 @@ import {
   type ExplorerDocument,
   type ProvisionRelationship,
   type ProvisionRelationshipsResponse,
+  type RelationshipPreview,
   documentViewSchema,
   explorerDocumentSchema,
   provisionRelationshipsResponseSchema,
+  relationshipPreviewSchema,
 } from "../shared/legal";
 
 type LawSearchSource = Pick<SourceDefinition, "celex" | "familyId" | "aliases">;
@@ -59,6 +61,18 @@ interface RelationshipRow {
   targetLabel: string;
   targetTitle: string | null;
   targetPath: string;
+}
+
+interface EntityPreviewRow {
+  entityId: string;
+  documentId: string;
+  rootProvisionId: string | null;
+  kind: string;
+  label: string;
+  title: string | null;
+  path: string;
+  documentShortName: string;
+  sourceUrl: string;
 }
 
 const RELATIONSHIP_SELECT = `
@@ -136,6 +150,34 @@ function toProvisionRelationship(
     },
     resolutionStatus: row.resolutionStatus,
   };
+}
+
+function firstExcerpt(
+  blocks: DocumentView["provisions"][number]["blocks"],
+): string | undefined {
+  for (const block of blocks) {
+    if (block.text.trim()) return block.text.trim();
+    const nested = firstExcerpt(block.children);
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
+function blockExcerpt(
+  blocks: DocumentView["provisions"][number]["blocks"],
+  entityId: string,
+): string | undefined {
+  for (const block of blocks) {
+    if (block.id === entityId && block.text.trim()) return block.text.trim();
+    const nested = blockExcerpt(block.children, entityId);
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
+function truncateExcerpt(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return value.length <= 560 ? value : `${value.slice(0, 557).trimEnd()}…`;
 }
 
 function manifestValue(database: Database.Database, key: string): string {
@@ -318,6 +360,52 @@ export class SqliteRuntimeRepository {
         toProvisionRelationship(row, "REFERENCES"),
       ),
       citedBy: citedBy.map((row) => toProvisionRelationship(row, "CITED_BY")),
+    });
+  }
+
+  findRelationshipPreview(entityId: string): RelationshipPreview | null {
+    const entity = this.database
+      .prepare(`
+        SELECT
+          e.id AS entityId,
+          e.document_id AS documentId,
+          e.root_provision_id AS rootProvisionId,
+          e.kind,
+          e.label,
+          e.title,
+          e.path,
+          d.short_name AS documentShortName,
+          d.source_url AS sourceUrl
+        FROM legal_entities e
+        JOIN documents d ON d.id = e.document_id
+        WHERE e.id = ?
+      `)
+      .get(entityId) as EntityPreviewRow | undefined;
+    if (!entity) return null;
+
+    let excerpt: string | undefined;
+    if (entity.kind !== "document") {
+      const document = this.findDocument(entity.documentId);
+      const rootProvisionId = entity.rootProvisionId ?? entity.entityId;
+      const provision = document?.provisions.find(
+        (candidate) => candidate.id === rootProvisionId,
+      );
+      if (provision) {
+        excerpt =
+          blockExcerpt(provision.blocks, entity.entityId) ??
+          firstExcerpt(provision.blocks);
+      }
+    }
+
+    return relationshipPreviewSchema.parse({
+      entityId: entity.entityId,
+      documentId: entity.documentId,
+      documentShortName: entity.documentShortName,
+      label: entity.label,
+      title: entity.title,
+      path: entity.path,
+      sourceUrl: entity.sourceUrl,
+      excerpt: truncateExcerpt(excerpt),
     });
   }
 

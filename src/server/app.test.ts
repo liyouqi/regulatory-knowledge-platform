@@ -6,6 +6,7 @@ import {
   findExplorerBySlug,
   findLaws,
   findProvisionRelationships,
+  findRelationshipPreview,
 } from "./app";
 
 describe("Document lookup", () => {
@@ -85,5 +86,13 @@ describe("Document lookup", () => {
         }),
       }),
     );
+  });
+
+  it("serves a target preview on demand for Side Peek", () => {
+    expect(findRelationshipPreview("eu:32022L2555:article:3")).toMatchObject({
+      documentShortName: "NIS2",
+      label: "Article 3",
+      excerpt: expect.any(String),
+    });
   });
 });

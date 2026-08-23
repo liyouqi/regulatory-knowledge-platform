@@ -46,6 +46,10 @@ export function findProvisionRelationships(
   return runtimeRepository.findProvisionRelationships(documentId, provisionId);
 }
 
+export function findRelationshipPreview(entityId: string) {
+  return runtimeRepository.findRelationshipPreview(entityId);
+}
+
 app.get("/api/health", (_request, response) => {
   response.json({
     status: "ok",
@@ -132,6 +136,15 @@ app.get("/api/relationships/:documentId/:provisionId", (request, response) => {
     return;
   }
   response.json(relationships);
+});
+
+app.get("/api/relationship-previews/:entityId", (request, response) => {
+  const preview = findRelationshipPreview(request.params.entityId);
+  if (!preview) {
+    response.status(404).json({ error: "Relationship target not found" });
+    return;
+  }
+  response.json(preview);
 });
 
 app.get("/api/documents/:documentId", (request, response) => {

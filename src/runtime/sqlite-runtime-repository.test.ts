@@ -116,4 +116,17 @@ describe("SQLite runtime repository", () => {
       ),
     ).toBeNull();
   });
+
+  it("returns a short on-demand preview without adding legal text to relation rows", () => {
+    expect(
+      repository?.findRelationshipPreview("eu:32022L2555:article:3"),
+    ).toMatchObject({
+      entityId: "eu:32022L2555:article:3",
+      documentShortName: "NIS2",
+      label: "Article 3",
+      path: "/read/nis2/articles/3",
+      excerpt: expect.any(String),
+    });
+    expect(repository?.findRelationshipPreview("eu:unknown")).toBeNull();
+  });
 });

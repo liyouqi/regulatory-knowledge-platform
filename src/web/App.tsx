@@ -9,6 +9,7 @@ import {
   Map as MapIcon,
   Search,
   Undo2,
+  X,
 } from "lucide-react";
 import {
   type FormEvent,
@@ -32,11 +33,13 @@ import type {
   ProvisionRelationship,
   ProvisionRelationshipsResponse,
   ProvisionView,
+  RelationshipPreview,
   TocNode,
 } from "../shared/legal";
 import {
   documentCatalogSchema,
   provisionRelationshipsResponseSchema,
+  relationshipPreviewSchema,
 } from "../shared/legal";
 import {
   explorerPath,
@@ -46,6 +49,7 @@ import {
 } from "../shared/reader-route";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
+import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
 
 function containsProvision(node: TocNode, provisionId: string): boolean {
@@ -118,7 +122,14 @@ function TocTree({
 function LegalBlock({
   block,
   provisionPath,
-}: { block: BodyBlock; provisionPath: string }) {
+  relationships,
+  onPreview,
+}: {
+  block: BodyBlock;
+  provisionPath: string;
+  relationships: ProvisionRelationship[];
+  onPreview: (relationship: ProvisionRelationship) => void;
+}) {
   return (
     <div className={`legal-block ${block.kind}`} id={block.anchor}>
       <div className="block-copy">
@@ -128,7 +139,16 @@ function LegalBlock({
         >
           {block.marker ?? "¶"}
         </a>
-        {block.text ? <p>{block.text}</p> : null}
+        {block.text ? (
+          <p>
+            <InlineReferenceText
+              onPreview={onPreview}
+              relationships={relationships}
+              sourceEntityId={block.id}
+              text={block.text}
+            />
+          </p>
+        ) : null}
       </div>
       {block.children.length > 0 ? (
         <div className="nested-blocks">
@@ -136,12 +156,130 @@ function LegalBlock({
             <LegalBlock
               block={child}
               key={child.id}
+              onPreview={onPreview}
               provisionPath={provisionPath}
+              relationships={relationships}
             />
           ))}
         </div>
       ) : null}
     </div>
+  );
+}
+
+function InlineReferenceText({
+  text,
+  sourceEntityId,
+  relationships,
+  onPreview,
+}: {
+  text: string;
+  sourceEntityId: string;
+  relationships: ProvisionRelationship[];
+  onPreview: (relationship: ProvisionRelationship) => void;
+}) {
+  const ranges = inlineReferenceRanges(text, sourceEntityId, relationships);
+  if (ranges.length === 0) return text;
+
+  let cursor = 0;
+  return ranges
+    .flatMap((range) => {
+      const before = text.slice(cursor, range.start);
+      cursor = range.end;
+      return [
+        before,
+        <button
+          aria-label={`Preview ${range.relationship.target.documentShortName} ${range.relationship.target.label}`}
+          className="inline-reference"
+          key={range.relationship.id}
+          onClick={() => onPreview(range.relationship)}
+          type="button"
+        >
+          {text.slice(range.start, range.end)}
+        </button>,
+      ];
+    })
+    .concat(text.slice(cursor));
+}
+
+function ReferencePeek({
+  relationship,
+  onClose,
+}: {
+  relationship: ProvisionRelationship;
+  onClose: () => void;
+}) {
+  const [preview, setPreview] = useState<RelationshipPreview | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setPreview(null);
+    setError("");
+    void fetch(
+      `/api/relationship-previews/${encodeURIComponent(relationship.target.entityId)}`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load reference preview");
+        return relationshipPreviewSchema.parse(await response.json());
+      })
+      .then(setPreview)
+      .catch((caught: unknown) => {
+        if ((caught as DOMException).name !== "AbortError") {
+          setError(
+            caught instanceof Error
+              ? caught.message
+              : "Unable to load reference preview",
+          );
+        }
+      });
+    return () => controller.abort();
+  }, [relationship]);
+
+  const target = preview ?? relationship.target;
+  return (
+    <dialog
+      aria-label="Reference preview"
+      className="reference-peek"
+      onCancel={onClose}
+      open
+    >
+      <header>
+        <p className="eyebrow">REFERENCE PREVIEW</p>
+        <button
+          aria-label="Close reference preview"
+          onClick={onClose}
+          type="button"
+        >
+          <X aria-hidden="true" size={17} />
+        </button>
+      </header>
+      <p className="reference-peek-law">{target.documentShortName}</p>
+      <h2>{target.label}</h2>
+      {target.title ? <h3>{target.title}</h3> : null}
+      <p className="reference-peek-evidence">
+        Cited here as “{relationship.evidence.text}”
+      </p>
+      {preview?.excerpt ? (
+        <blockquote>{preview.excerpt}</blockquote>
+      ) : error ? (
+        <p className="reference-peek-status error-state">{error}</p>
+      ) : (
+        <p className="reference-peek-status">Loading official excerpt…</p>
+      )}
+      <div className="reference-peek-actions">
+        <Link onClick={onClose} to={relationship.target.path}>
+          Open full {relationship.target.kind}
+          <ArrowRight aria-hidden="true" size={15} />
+        </Link>
+        {preview ? (
+          <a href={preview.sourceUrl} rel="noreferrer" target="_blank">
+            Official source <ArrowUpRight aria-hidden="true" size={14} />
+          </a>
+        ) : null}
+      </div>
+    </dialog>
   );
 }
 
@@ -488,6 +626,8 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
     useState<ProvisionRelationshipsResponse | null>(null);
   const [relationshipsLoading, setRelationshipsLoading] = useState(false);
   const [relationshipsError, setRelationshipsError] = useState("");
+  const [previewRelationship, setPreviewRelationship] =
+    useState<ProvisionRelationship | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -572,6 +712,7 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
     if (!legalDocument || !activeProvision) return;
     const controller = new AbortController();
     setRelationships(null);
+    setPreviewRelationship(null);
     setRelationshipsLoading(true);
     setRelationshipsError("");
     void fetch(
@@ -765,7 +906,9 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
             <LegalBlock
               block={block}
               key={block.id}
+              onPreview={setPreviewRelationship}
               provisionPath={activeProvision.path}
+              relationships={relationships?.references ?? []}
             />
           ))}
         </div>
@@ -850,6 +993,12 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           </p>
         ) : null}
       </aside>
+      {previewRelationship ? (
+        <ReferencePeek
+          onClose={() => setPreviewRelationship(null)}
+          relationship={previewRelationship}
+        />
+      ) : null}
     </main>
   );
 }

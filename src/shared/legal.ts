@@ -315,6 +315,17 @@ export const provisionRelationshipsResponseSchema = z.object({
   citedBy: z.array(provisionRelationshipSchema),
 });
 
+export const relationshipPreviewSchema = z.object({
+  entityId: z.string().min(1),
+  documentId: z.string().min(1),
+  documentShortName: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().nullable(),
+  path: z.string().startsWith("/"),
+  sourceUrl: z.string().url(),
+  excerpt: z.string().min(1).optional(),
+});
+
 export type CollectionId = z.infer<typeof collectionIdSchema>;
 export type ContentCollection = z.infer<typeof contentCollectionSchema>;
 export type ProvisionView = z.infer<typeof provisionViewSchema>;
@@ -339,3 +350,4 @@ export type ProvisionRelationship = z.infer<typeof provisionRelationshipSchema>;
 export type ProvisionRelationshipsResponse = z.infer<
   typeof provisionRelationshipsResponseSchema
 >;
+export type RelationshipPreview = z.infer<typeof relationshipPreviewSchema>;

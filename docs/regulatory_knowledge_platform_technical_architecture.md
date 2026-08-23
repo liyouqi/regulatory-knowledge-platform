@@ -956,6 +956,8 @@ Universal Explorer 按 structural node 的 `type / number / title / depth / chil
 3. unresolved ref 显示为普通文本或外部官方链接；
 4. 不允许前端临时用正则重复解析整段正文。
 
+当前 explicit-reference builder 输出 `source_entity_id + evidence_locator(text:start-end) + evidence_text`。Reader 只在 locator 所属 entity、offset 边界和当前渲染文本三者全部校验一致时渲染 inline button；任何 stale、overlap 或不一致 evidence 都保持普通文本。前端不以显示文字重新识别关系。
+
 ## 18.3 Side Peek
 
 Side Peek 请求一个精简 `ProvisionPreview`：
@@ -967,6 +969,8 @@ Side Peek 请求一个精简 `ProvisionPreview`：
 - open full target action。
 
 Side Peek 不改变主页面 URL；只有用户选择 “Open full” 才导航。
+
+当前实现的 `/api/relationship-previews/:entityId` 先读取 `legal_entities` 元数据，再从现有 `document_views.reader_payload_json` 按 stable entity/root provision ID 提取并截断首段官方正文。它不创建第二份法律文本表；浏览器只有用户点击已解析 inline reference 后才请求该 preview。
 
 ## 18.4 Paragraph anchors
 

@@ -323,6 +323,8 @@ The Reader relationship panel shows deterministic references derived at build ti
 
 The runtime endpoint is `/api/relationships/:documentId/:provisionId`. Its response contains separate `references` and `citedBy` arrays and the runtime build ID. The current `explicit-reference@1.0.0` resolver conservatively publishes singular Article/Annex references within a loaded law, modern typed EU Regulation/Directive citations, and compound cross-law Article citations when the target exists in the six-law corpus. Unresolved, ambiguous, plural/range, shorthand, and unloaded external targets remain ordinary official text; they are counted in the build manifest but are not guessed into links.
 
+In the Reader, an inline citation becomes clickable only when the builder supplied an exact `sourceEntityId` plus a validated character range whose stored evidence text still matches the rendered official text. The browser never re-parses legal prose with regex. Clicking opens Side Peek without changing the Reader URL; it requests `/api/relationship-previews/:entityId` only then, derives a short target excerpt from the existing read-only Reader payload, and provides explicit **Open full** and official-source actions. Closing Side Peek leaves the reading position untouched.
+
 `npm run runtime:build` currently publishes 1,797 resolved explicit-reference edges and reports 816 unmaterialized references for the current immutable six-law snapshots. These are corpus-specific audit counts, not permanent product constants. The relationship builder version participates in the runtime build ID, so changing resolver semantics invalidates the artifact deterministically.
 
 ## Current Release Status
@@ -381,6 +383,7 @@ Release 0.4 is now in progress and additionally includes:
 - a normalized SQLite `legal_entities` + `relationships` model with evidence, provenance, builder lineage, indexes, and integrity checks;
 - reverse `CITED_BY` lookup derived from stored `REFERENCES` edges;
 - a schema-validated relationship API and responsive Reader relationship panel;
-- browser verification of DORA Article 1 → NIS2 Article 3 navigation, the reverse Cited By view, and AI Act Article 11 → Annex IV on a 390px viewport.
+- browser verification of DORA Article 1 → NIS2 Article 3 navigation, the reverse Cited By view, and AI Act Article 11 → Annex IV on a 390px viewport;
+- evidence-span-only inline citations and an on-demand, URL-preserving Side Peek with an official target excerpt.
 
-The next Release 0.4 slice is inline reference presentation and Side Peek, built on this stable relationship contract.
+The explicit-reference portion of Release 0.4 is complete locally. The next planned relationship scope is official DORA/MiCA Level 2 mappings; it requires a Sol High review because it introduces new legal relation semantics and curated evidence.
