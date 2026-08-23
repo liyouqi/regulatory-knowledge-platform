@@ -6,7 +6,17 @@ import type {
 } from "../shared/legal";
 import { explorerPath } from "../shared/reader-route";
 
-export type LawSearchRecord = Omit<LawSearchResult, "matchReason" | "score">;
+type SearchableProvision = Pick<
+  DocumentView["provisions"][number],
+  "kind" | "number" | "label" | "title" | "path"
+>;
+
+export type LawSearchRecord = Omit<
+  LawSearchResult,
+  "matchReason" | "score" | "target"
+> & {
+  provisions: SearchableProvision[];
+};
 
 export function normalizeLawQuery(value: string): string {
   return value
@@ -87,6 +97,30 @@ function rankRecord(
   return null;
 }
 
+function parseProvisionIntent(query: string) {
+  const match =
+    /^(.*?)\s+(articles?|art|recitals?|rec|annex(?:es)?|ann)\s+([a-z0-9]+)$/u.exec(
+      query,
+    );
+  if (!match?.[1]) return null;
+  const token = match[2];
+  const kind = token.startsWith("art")
+    ? "article"
+    : token.startsWith("rec")
+      ? "recital"
+      : "annex";
+  return { lawQuery: match[1], kind, number: match[3] } as const;
+}
+
+function toResult(
+  record: LawSearchRecord,
+  rank: Pick<LawSearchResult, "matchReason" | "score">,
+  target?: LawSearchResult["target"],
+): LawSearchResult {
+  const { provisions: _provisions, ...law } = record;
+  return { ...law, ...rank, target };
+}
+
 export function createLawSearchRecords(
   documents: DocumentView[],
   sources: SourceDefinition[],
@@ -112,6 +146,13 @@ export function createLawSearchRecords(
         readerPath,
         explorerPath: explorerPath(document.slug),
         provenance: document.provenance,
+        provisions: document.provisions.map((provision) => ({
+          kind: provision.kind,
+          number: provision.number,
+          label: provision.label,
+          title: provision.title,
+          path: provision.path,
+        })),
       },
     ];
   });
@@ -123,11 +164,30 @@ export function searchLaws(
 ): LawSearchResponse {
   const query = rawQuery.trim();
   const normalizedQuery = normalizeLawQuery(query);
+  const provisionIntent = parseProvisionIntent(normalizedQuery);
+  const lawQuery = provisionIntent?.lawQuery ?? normalizedQuery;
   const results = normalizedQuery
     ? records
         .flatMap((record) => {
-          const rank = rankRecord(record, normalizedQuery);
-          return rank ? [{ ...record, ...rank }] : [];
+          const rank = rankRecord(record, lawQuery);
+          if (!rank) return [];
+          if (!provisionIntent) return [toResult(record, rank)];
+          const provision = record.provisions.find(
+            (candidate) =>
+              candidate.kind === provisionIntent.kind &&
+              normalizeLawQuery(candidate.number) === provisionIntent.number,
+          );
+          return provision
+            ? [
+                toResult(record, rank, {
+                  kind: provision.kind,
+                  number: provision.number,
+                  label: provision.label,
+                  title: provision.title,
+                  path: provision.path,
+                }),
+              ]
+            : [];
         })
         .sort(
           (left, right) =>
@@ -136,11 +196,8 @@ export function searchLaws(
         )
     : records
         .map(
-          (record): LawSearchResult => ({
-            ...record,
-            matchReason: "catalog",
-            score: 0,
-          }),
+          (record): LawSearchResult =>
+            toResult(record, { matchReason: "catalog", score: 0 }),
         )
         .sort((left, right) => left.shortName.localeCompare(right.shortName));
 

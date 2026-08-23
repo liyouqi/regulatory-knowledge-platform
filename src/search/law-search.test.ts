@@ -9,6 +9,15 @@ const base = {
   readerPath: "/read/example/articles/1",
   explorerPath: "/explore/example",
   provenance: "official" as const,
+  provisions: [
+    {
+      kind: "article" as const,
+      number: "3",
+      label: "Article 3",
+      title: "Definitions",
+      path: "/read/example/articles/3",
+    },
+  ],
 };
 
 const records: LawSearchRecord[] = [
@@ -21,6 +30,15 @@ const records: LawSearchRecord[] = [
     officialTitle: "Regulation on digital operational resilience",
     celex: "32022R2554",
     aliases: ["Digital Operational Resilience Act"],
+    provisions: [
+      {
+        kind: "article",
+        number: "3",
+        label: "Article 3",
+        title: "Definitions",
+        path: "/read/dora/articles/3",
+      },
+    ],
   },
   {
     ...base,
@@ -32,6 +50,14 @@ const records: LawSearchRecord[] = [
     officialTitle: "Directive on network and information systems",
     celex: "32022L2555",
     aliases: ["NIS 2"],
+    provisions: [
+      {
+        kind: "recital",
+        number: "79",
+        label: "Recital 79",
+        path: "/read/nis2/recitals/79",
+      },
+    ],
   },
   {
     ...base,
@@ -43,6 +69,15 @@ const records: LawSearchRecord[] = [
       "Regulation laying down harmonised rules on artificial intelligence and amending Regulation 2022/868",
     celex: "32024R1689",
     aliases: ["Artificial Intelligence Act"],
+    provisions: [
+      {
+        kind: "annex",
+        number: "vii",
+        label: "Annex VII",
+        title: "Conformity assessment",
+        path: "/read/ai-act/annexes/vii",
+      },
+    ],
   },
 ];
 
@@ -79,6 +114,22 @@ describe("Find Laws deterministic ranking", () => {
     expect(
       searchLaws(records, "NIS 2").results.map((result) => result.slug),
     ).toEqual(["nis2"]);
+  });
+
+  it.each([
+    ["DORA article 3", "article", "/read/dora/articles/3"],
+    ["DORA art. 3", "article", "/read/dora/articles/3"],
+    ["NIS 2 recital 79", "recital", "/read/nis2/recitals/79"],
+    ["AI Act annex VII", "annex", "/read/ai-act/annexes/vii"],
+  ])("resolves %s to an existing stable provision", (query, kind, path) => {
+    const response = searchLaws(records, query);
+    expect(response.bestMatch?.target).toMatchObject({ kind, path });
+    expect(response.bestMatch).not.toHaveProperty("provisions");
+  });
+
+  it("fails closed when a compound query names no existing provision", () => {
+    expect(searchLaws(records, "DORA article 999").results).toHaveLength(0);
+    expect(searchLaws(records, "article 3").results).toHaveLength(0);
   });
 
   it("returns the available catalog for an empty query", () => {

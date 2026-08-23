@@ -227,15 +227,17 @@ The deterministic server endpoint is `/api/search/laws?q=<query>`. It ranks exac
 
 ```text
 DORA
+DORA article 3
 Digital Operational Resilience Act
 32022R2554
 2022/2554
 Regulation (EU) 2022/2554
 NIS 2
 Directive 2022/2555
+AI Act annex VII
 ```
 
-Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
+Compound queries combine a verified law identity with `article`/`art`, `recital`/`rec`, or `annex` and a number. They open the exact stable Reader route only when that provision exists; the service does not guess missing provisions. Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
 
 ## Current Release Status
 
@@ -265,6 +267,7 @@ Release 0.2 is now in progress and additionally includes:
 - desktop DORA, MiCA structure, and 390px AI Act mobile browser smoke checks.
 - a global Find Laws command panel shared by Reader and Explorer, with live server-side results and complete keyboard navigation;
 - reviewed aliases in the source registry and deterministic CELEX, alias, legal citation, title-prefix, and whole-term ranking;
+- verified compound locators such as `DORA article 3` and `AI Act annex VII`, resolved to stable Reader routes without returning legal body text;
 - global navigation to stable Explorer routes, with desktop and 390px mobile browser checks.
 
 The next implementation task is the remaining Release 0.2 slice: the first rebuildable current-document full-text search artifact and its responsive, keyboard-accessible Reader surface. SQLite FTS5 global search, Definitions, and Opened Laws remain Release 0.3 work and are not represented as completed modes.

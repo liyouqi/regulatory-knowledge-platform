@@ -38,19 +38,24 @@ function ResultRow({
       <span className="law-result-mark">{result.shortName.slice(0, 2)}</span>
       <span className="law-result-copy">
         <span>
-          <strong>{result.shortName}</strong>
+          <strong>
+            {result.shortName}
+            {result.target ? ` · ${result.target.label}` : ""}
+          </strong>
           <em>{reasonLabels[result.matchReason]}</em>
         </span>
-        <small>{result.officialTitle}</small>
+        <small>{result.target?.title ?? result.officialTitle}</small>
         <span className="law-result-meta">
-          {result.familyId.replace("family:", "")} family ·{" "}
+          {result.target ? `${result.target.kind} · ` : ""}
+          {result.familyId.replace("family:", "").replaceAll("-", " ")} family ·{" "}
           {result.documentType}
           {" · "}
           {result.publicationDate.slice(0, 4)} · CELEX {result.celex}
         </span>
       </span>
       <span className="law-result-action">
-        Explore <ArrowRight aria-hidden="true" size={15} />
+        {result.target ? "Read" : "Explore"}{" "}
+        <ArrowRight aria-hidden="true" size={15} />
       </span>
     </button>
   );
@@ -114,7 +119,7 @@ export function GlobalLawSearch({
 
   function openResult(result: LawSearchResult) {
     onClose();
-    navigate(result.explorerPath);
+    navigate(result.target?.path ?? result.explorerPath);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -169,7 +174,7 @@ export function GlobalLawSearch({
             maxLength={200}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="DORA, 32022R2554, Regulation 2022/2554…"
+            placeholder="DORA, DORA article 3, 32022R2554…"
             ref={inputRef}
             value={query}
           />

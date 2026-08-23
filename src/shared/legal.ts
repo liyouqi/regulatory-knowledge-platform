@@ -139,6 +139,14 @@ export const lawSearchMatchReasonSchema = z.enum([
   "title-terms",
 ]);
 
+export const lawSearchTargetSchema = z.object({
+  kind: z.enum(["article", "recital", "annex"]),
+  number: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().optional(),
+  path: z.string().startsWith("/"),
+});
+
 export const lawSearchResultSchema = z.object({
   id: z.string().min(1),
   familyId: z.string().startsWith("family:"),
@@ -154,6 +162,7 @@ export const lawSearchResultSchema = z.object({
   provenance: z.enum(["official", "fixture"]),
   matchReason: lawSearchMatchReasonSchema,
   score: z.number().nonnegative(),
+  target: lawSearchTargetSchema.optional(),
 });
 
 export const lawSearchResponseSchema = z.object({

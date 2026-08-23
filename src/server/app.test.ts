@@ -55,4 +55,16 @@ describe("Document lookup", () => {
       "eu:32022R2554",
     );
   });
+
+  it("resolves a compound law and provision query without returning body data", () => {
+    const result = findLaws("DORA article 3").bestMatch;
+
+    expect(result?.target).toMatchObject({
+      kind: "article",
+      label: "Article 3",
+      path: "/read/dora/articles/3",
+    });
+    expect(result).not.toHaveProperty("provisions");
+    expect(result).not.toHaveProperty("blocks");
+  });
 });
