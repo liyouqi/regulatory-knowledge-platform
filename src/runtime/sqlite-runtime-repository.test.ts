@@ -175,7 +175,7 @@ describe("SQLite runtime repository", () => {
     expect(dora).toMatchObject({
       familyId: "family:dora",
       familyShortName: "DORA",
-      counts: { rts: 2, its: 0, guidelines: 0 },
+      counts: { rts: 3, its: 0, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -199,6 +199,15 @@ describe("SQLite runtime repository", () => {
             expect.objectContaining({
               articleEntityId: "eu:32022R2554:article:28",
               path: "/read/dora/articles/28",
+            }),
+          ],
+        }),
+        expect.objectContaining({
+          id: "eu:32024R1772",
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:18",
+              path: "/read/dora/articles/18",
             }),
           ],
         }),

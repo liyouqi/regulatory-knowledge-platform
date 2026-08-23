@@ -97,6 +97,30 @@
         }
       },
       "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32024r1772:article-18",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:18",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:18:paragraph:3",
+          "text": "The ESAs shall, through the Joint Committee and in consultation with the ECB and ENISA, develop common draft regulatory technical standards further specifying the following:",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32024R1772",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2024/1772 of 13 March 2024 supplementing Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to regulatory technical standards specifying the criteria for the classification of ICT-related incidents and cyber threats, setting out materiality thresholds and specifying the details of reports of major incidents (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2024/1772",
+        "adoptionEvidence": {
+          "text": "in particular Article 18(4), third subparagraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1772/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
     }
   ]
 }
