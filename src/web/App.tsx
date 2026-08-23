@@ -10,13 +10,18 @@ import {
 } from "lucide-react";
 import {
   type FormEvent,
-  type RefObject,
+  type KeyboardEvent as ReactKeyboardEvent,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  type CurrentDocumentSearchResult,
+  buildCurrentDocumentSearchIndex,
+  searchCurrentDocument,
+} from "../search/current-document-search";
 import type {
   BodyBlock,
   ContentCollection,
@@ -132,51 +137,204 @@ function LegalBlock({
   );
 }
 
-function QuickGo({
-  inputRef,
+function escapePattern(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+function HighlightText({
+  text,
+  highlights,
+}: {
+  text: string;
+  highlights: string[];
+}) {
+  if (highlights.length === 0) return text;
+  const pattern = new RegExp(
+    `(${highlights.map(escapePattern).join("|")})`,
+    "giu",
+  );
+  const normalized = new Set(highlights.map((term) => term.toLowerCase()));
+  let offset = 0;
+  return text.split(pattern).map((part) => {
+    const start = offset;
+    offset += part.length;
+    return normalized.has(part.toLowerCase()) ? (
+      <mark key={`${start}-${part}`}>{part}</mark>
+    ) : (
+      part
+    );
+  });
+}
+
+function CurrentSearchResultRow({
+  result,
+  active,
+  onOpen,
+}: {
+  result: CurrentDocumentSearchResult;
+  active: boolean;
+  onOpen: (path: string) => void;
+}) {
+  return (
+    <button
+      aria-current={active ? "true" : undefined}
+      className={`current-search-result${active ? " active" : ""}`}
+      onClick={() => onOpen(result.path)}
+      onMouseDown={(event) => event.preventDefault()}
+      type="button"
+    >
+      <span>
+        <strong>{result.label}</strong>
+        {result.marker ? <em>{result.marker}</em> : null}
+        <small>{result.kind}</small>
+      </span>
+      {result.title ? <b>{result.title}</b> : null}
+      <p>
+        <HighlightText highlights={result.highlights} text={result.snippet} />
+      </p>
+    </button>
+  );
+}
+
+function CurrentDocumentSearch({
   legalDocument,
 }: {
-  inputRef: RefObject<HTMLInputElement | null>;
   legalDocument: DocumentView;
 }) {
   const navigate = useNavigate();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState("");
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const index = useMemo(
+    () => buildCurrentDocumentSearchIndex(legalDocument),
+    [legalDocument],
+  );
+  const locator = useMemo(() => parseQuickGo(value), [value]);
+  const exactTarget = useMemo(
+    () =>
+      locator
+        ? legalDocument.provisions.find(
+            (provision) =>
+              provision.collectionId === locator.collectionId &&
+              provision.number.toLowerCase() === locator.number,
+          )
+        : undefined,
+    [legalDocument, locator],
+  );
+  const results = useMemo(
+    () =>
+      value.trim().length >= 2 && !locator
+        ? searchCurrentDocument(index, value, 10)
+        : [],
+    [index, locator, value],
+  );
+
+  useEffect(() => {
+    const rows = formRef.current?.querySelectorAll<HTMLElement>(
+      ".current-search-result",
+    );
+    rows?.[selectedIndex]?.scrollIntoView({ block: "nearest" });
+  }, [selectedIndex]);
+
+  function openPath(path: string) {
+    setMessage("");
+    setValue("");
+    setOpen(false);
+    navigate(path);
+  }
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    const query = parseQuickGo(value);
-    const target = query
-      ? legalDocument.provisions.find(
-          (provision) =>
-            provision.collectionId === query.collectionId &&
-            provision.number.toLowerCase() === query.number,
-        )
-      : undefined;
-    if (!target) {
-      setMessage("Try 23, art 23, rec 40, or annex 2");
-      return;
+    if (exactTarget) return openPath(exactTarget.path);
+    if (results[selectedIndex]) return openPath(results[selectedIndex].path);
+    setMessage(
+      locator
+        ? "That provision does not exist in this law"
+        : "No title or text match in this law",
+    );
+  }
+
+  function handleKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowDown" && results.length > 0) {
+      event.preventDefault();
+      setSelectedIndex((current) => Math.min(current + 1, results.length - 1));
+    } else if (event.key === "ArrowUp" && results.length > 0) {
+      event.preventDefault();
+      setSelectedIndex((current) => Math.max(current - 1, 0));
+    } else if (event.key === "Escape") {
+      setOpen(false);
+      event.currentTarget.blur();
     }
-    setMessage("");
-    setValue("");
-    navigate(target.path);
   }
 
   return (
-    <form className="quick-go" onSubmit={submit}>
+    <form
+      className="quick-go"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+      onFocus={() => setOpen(true)}
+      onSubmit={submit}
+      ref={formRef}
+    >
       <Search aria-hidden="true" size={14} />
       <input
         aria-describedby="quick-go-message"
-        aria-label="Quick go to provision"
-        onChange={(event) => setValue(event.target.value)}
-        placeholder="Go to art 23…"
-        ref={inputRef}
+        aria-label="Go to provision or search current law"
+        maxLength={200}
+        onChange={(event) => {
+          setValue(event.target.value);
+          setMessage("");
+          setOpen(true);
+          setSelectedIndex(0);
+        }}
+        onKeyDown={handleKeyDown}
+        placeholder="Art. 23 or search this law…"
         value={value}
       />
-      <span className="sr-only" id="quick-go-message">
+      <span aria-live="polite" className="sr-only" id="quick-go-message">
         {message}
       </span>
-      {message ? <div className="quick-go-error">{message}</div> : null}
+      {open && value.trim() ? (
+        <div className="current-search-results">
+          {exactTarget ? (
+            <button
+              className="current-search-result active exact"
+              onClick={() => openPath(exactTarget.path)}
+              onMouseDown={(event) => event.preventDefault()}
+              type="button"
+            >
+              <span>
+                <strong>{exactTarget.label}</strong>
+                <small>Exact locator</small>
+              </span>
+              {exactTarget.title ? <b>{exactTarget.title}</b> : null}
+            </button>
+          ) : null}
+          {!locator
+            ? results.map((result, resultIndex) => (
+                <CurrentSearchResultRow
+                  active={selectedIndex === resultIndex}
+                  key={result.id}
+                  onOpen={openPath}
+                  result={result}
+                />
+              ))
+            : null}
+          {!exactTarget &&
+          results.length === 0 &&
+          (value.trim().length >= 2 || message) ? (
+            <p className="current-search-empty">
+              {message ||
+                (locator
+                  ? "No such provision in this law"
+                  : "No title or text matches")}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </form>
   );
 }
@@ -186,7 +344,6 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
   const navigate = useNavigate();
   const selection = parseReaderPath(location.pathname);
   const requestedSlug = selection?.slug ?? "dora";
-  const quickGoRef = useRef<HTMLInputElement>(null);
   const [legalDocument, setLegalDocument] = useState<DocumentView | null>(null);
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [loadError, setLoadError] = useState("");
@@ -374,7 +531,7 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           <h1>{legalDocument.shortName}</h1>
           <p className="toc-title">{legalDocument.officialTitle}</p>
         </div>
-        <QuickGo inputRef={quickGoRef} legalDocument={legalDocument} />
+        <CurrentDocumentSearch legalDocument={legalDocument} />
         <div className="collection-tabs" role="tablist">
           {legalDocument.collections.map((collection) => {
             const first = legalDocument.provisions.find(

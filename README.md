@@ -168,7 +168,8 @@ official source snapshot ✓
 → six-law parser validation ✓
 → Universal One-page Act Explorer ✓
 → global law discovery / Find Laws ✓
-→ current-document full-text build (next)
+→ current-document full-text ✓
+→ SQLite FTS5 global search build (next)
 → relationship build
 → atomic publish or rollback
 ```
@@ -194,7 +195,17 @@ Reader URLs are stable and readable:
 /read/ai-act/annexes/vii#annex-part-1
 ```
 
-Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. Reader Quick Go accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2` for the current law.
+Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. The Reader's current-law field gives exact locators priority and accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`.
+
+The same field searches the loaded law's Article, Recital, and Annex titles and body text without another server request. Multiple unquoted terms use strict AND semantics, each term supports word-prefix matching, and quoted text is an exact normalized phrase. Results include highlighted snippets and open stable provision or paragraph anchors. For example:
+
+```text
+ICT risk manag
+operational resilience
+"management body"
+```
+
+The in-memory index is rebuilt deterministically from the validated `DocumentView`, carries `schemaVersion`, `documentId`, and `buildId`, and is not a second source of legal truth. Use `↑`/`↓` and `Enter` for result navigation, or `Esc` to close the result list.
 
 ### Explorer links and navigation
 
@@ -269,5 +280,7 @@ Release 0.2 is now in progress and additionally includes:
 - reviewed aliases in the source registry and deterministic CELEX, alias, legal citation, title-prefix, and whole-term ranking;
 - verified compound locators such as `DORA article 3` and `AI Act annex VII`, resolved to stable Reader routes without returning legal body text;
 - global navigation to stable Explorer routes, with desktop and 390px mobile browser checks.
+- a deterministic current-document inverted index over provision headings and legal body blocks, with strict AND, phrase, prefix, snippets, highlights, and paragraph-level navigation;
+- responsive current-law search integrated with Quick Go and verified against exact locators, DORA body text, phrase queries, and 390px layout.
 
-The next implementation task is the remaining Release 0.2 slice: the first rebuildable current-document full-text search artifact and its responsive, keyboard-accessible Reader surface. SQLite FTS5 global search, Definitions, and Opened Laws remain Release 0.3 work and are not represented as completed modes.
+The Release 0.2 Explorer & Basic Discovery scope is complete locally. The next implementation task is Release 0.3: a rebuildable SQLite FTS5 artifact and Search Service, followed by Definitions and Opened Laws modes. These global modes are not represented as completed functionality yet.
