@@ -166,7 +166,8 @@ official source snapshot ✓
 → immutable canonical artifact ✓
 → Reader API and UI ✓
 → six-law parser validation ✓
-→ Universal Explorer and search build (next)
+→ Universal One-page Act Explorer ✓
+→ global law discovery and search build (next)
 → relationship build
 → atomic publish or rollback
 ```
@@ -194,9 +195,32 @@ Reader URLs are stable and readable:
 
 Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. Quick Go accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`; use `Cmd+K` on macOS or `Ctrl+K` elsewhere to focus it.
 
+### Explorer links and navigation
+
+Each registered law has a lightweight one-page structural overview:
+
+```text
+/explore/dora
+/explore/gdpr
+/explore/ai-act
+/explore/mica
+/explore/nis2
+/explore/data-act
+/explore/dora#article-28
+```
+
+The Explorer API is `/api/explorer/:slug`. Its response contains document metadata, counts, and the recursive structural outline, but not legal body text. Article links open the same stable Reader provision routes, while the Reader's **Explore** action returns to the exact Article anchor. Explorer scroll position is restored within the browser session.
+
+After `npm run dev`, manually check one legacy single-XML act and one modern package act, for example:
+
+1. Open `http://localhost:5173/explore/dora` and select Article 28.
+2. Confirm the Reader opens `/read/dora/articles/28`.
+3. Select **Explore** and confirm the browser returns to `/explore/dora#article-28` with the Article visible.
+4. Repeat a structural and mobile check at `http://localhost:5173/explore/ai-act`.
+
 ## Current Release Status
 
-Release 0.1 has an initial application foundation:
+Release 0.1 has a complete local multi-law Reader foundation:
 
 - Node 24, npm, React/Vite, Express, TypeScript, Biome, and Vitest;
 - a three-column DORA Reader and `/api/documents/:documentId` endpoint;
@@ -214,4 +238,11 @@ Release 0.1 has an initial application foundation:
 - desktop and 390px mobile browser smoke checks using the official DORA and AI Act artifacts;
 - unit tests and a production build gate.
 
-The Release 0.1 multi-law Reader scope is complete locally. The next implementation task is Release 0.2: Universal One-page Act Explorer, Explorer ↔ Reader navigation, global law discovery, and the first rebuildable full-text search artifact.
+Release 0.2 is now in progress and additionally includes:
+
+- a universal recursive One-page Act Explorer for all six laws;
+- a separate lightweight Explorer DTO and `/api/explorer/:slug` endpoint that do not duplicate legal body text;
+- stable Explorer ↔ Reader navigation, exact Article anchors, browser-history compatibility, and session scroll restoration;
+- desktop DORA, MiCA structure, and 390px AI Act mobile browser smoke checks.
+
+The next implementation task is the remaining Release 0.2 discovery slice: global family/law navigation, **Find Laws** aliases and exact CELEX lookup, followed by the first rebuildable current-document full-text search artifact.

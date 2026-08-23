@@ -72,6 +72,30 @@ summary {
   z-index: 3;
 }
 
+.topbar-actions {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+}
+
+.view-switch {
+  align-items: center;
+  border-radius: 7px;
+  color: #b7b9ad;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  gap: 6px;
+  padding: 7px 9px;
+  text-decoration: none;
+}
+
+.view-switch:hover,
+.view-switch.active {
+  background: #2a3026;
+  color: #eef0e8;
+}
+
 .brand,
 .context-panel a {
   align-items: center;
@@ -612,6 +636,265 @@ kbd {
   padding-top: 18px;
 }
 
+.explorer-shell {
+  background: #eeece4;
+  color: #22251f;
+  min-height: 100vh;
+}
+
+.explorer-topbar {
+  height: 59px;
+  position: sticky;
+  top: 0;
+}
+
+.explorer-hero {
+  background: #20251d;
+  color: #f1f1e9;
+  padding: 72px max(28px, calc((100vw - 1180px) / 2)) 58px;
+}
+
+.explorer-hero-topline {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+.explorer-hero-topline > a {
+  align-items: center;
+  color: #d7e690;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.explorer-law-switcher {
+  display: grid;
+  gap: 8px;
+}
+
+.explorer-law-switcher > span,
+.explorer-kicker {
+  color: #a7b09e;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+.explorer-law-switcher select {
+  background: #2b3127;
+  border: 1px solid #485143;
+  border-radius: 7px;
+  color: #f1f1e9;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 180px;
+  padding: 9px 12px;
+}
+
+.explorer-kicker {
+  margin: 0 0 15px;
+}
+
+.explorer-hero h1 {
+  font-size: clamp(58px, 8vw, 104px);
+  font-weight: 450;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+  margin: 0;
+}
+
+.explorer-official-title {
+  color: #bbc0b5;
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 26px 0 40px;
+  max-width: 56rem;
+}
+
+.explorer-stats {
+  border-top: 1px solid #41483b;
+  display: flex;
+  gap: clamp(30px, 6vw, 82px);
+  margin: 0;
+  padding-top: 24px;
+}
+
+.explorer-stats div {
+  display: grid;
+  gap: 5px;
+}
+
+.explorer-stats dt {
+  color: #929b8a;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.explorer-stats dd {
+  font-size: 22px;
+  margin: 0;
+}
+
+.explorer-layout {
+  display: grid;
+  gap: 68px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 66px 28px 120px;
+}
+
+.explorer-outline {
+  align-self: start;
+  position: sticky;
+  top: 90px;
+}
+
+.explorer-outline > p {
+  color: #777c71;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+}
+
+.explorer-outline nav {
+  border-left: 1px solid #cac8bd;
+  display: grid;
+}
+
+.explorer-outline a {
+  color: #65695f;
+  display: grid;
+  gap: 3px;
+  padding: 8px 0 8px 14px;
+  text-decoration: none;
+}
+
+.explorer-outline a:hover {
+  border-left: 2px solid #728047;
+  color: #30372a;
+  margin-left: -1px;
+}
+
+.explorer-outline a span {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.explorer-outline a small {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.explorer-map {
+  min-width: 0;
+}
+
+.explorer-group {
+  scroll-margin-top: 88px;
+}
+
+.explorer-group + .explorer-group {
+  border-top: 1px solid #d1cfc4;
+  margin-top: 72px;
+  padding-top: 72px;
+}
+
+.explorer-group .explorer-group {
+  border-left: 1px solid #d0cec3;
+  border-top: 0;
+  margin: 38px 0 0 18px;
+  padding: 0 0 0 30px;
+}
+
+.explorer-group-heading {
+  align-items: end;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin-bottom: 23px;
+}
+
+.explorer-group-heading p {
+  color: #68734e;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  margin: 0 0 7px;
+  text-transform: uppercase;
+}
+
+.explorer-group-heading h2 {
+  font-size: clamp(25px, 3.2vw, 43px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.explorer-group .explorer-group h2 {
+  font-size: clamp(20px, 2.3vw, 29px);
+}
+
+.explorer-group-heading > span {
+  color: #85897f;
+  flex: 0 0 auto;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+}
+
+.explorer-group-children {
+  display: grid;
+}
+
+.explorer-article {
+  align-items: center;
+  border-top: 1px solid #d8d6cc;
+  color: #242820;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 82px minmax(0, 1fr) 20px;
+  padding: 17px 8px;
+  scroll-margin-top: 40vh;
+  text-decoration: none;
+}
+
+.explorer-article:hover {
+  background: #e4e3da;
+  color: #435123;
+  padding-left: 14px;
+}
+
+.explorer-article > span {
+  color: #69734f;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.explorer-article > strong {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.explorer-article > svg {
+  color: #899079;
+}
+
 @media (max-width: 980px) {
   .reader-shell {
     grid-template-columns: 255px minmax(0, 1fr);
@@ -619,6 +902,11 @@ kbd {
 
   .context-panel {
     display: none;
+  }
+
+  .explorer-layout {
+    gap: 38px;
+    grid-template-columns: 180px minmax(0, 1fr);
   }
 }
 
@@ -679,5 +967,68 @@ kbd {
 
   .nested-blocks {
     margin-left: 24px;
+  }
+
+  .view-switch {
+    font-size: 0;
+  }
+
+  .view-switch svg {
+    display: block;
+  }
+
+  .explorer-hero {
+    padding: 42px 20px 38px;
+  }
+
+  .explorer-hero-topline {
+    margin-bottom: 38px;
+  }
+
+  .explorer-hero-topline > a {
+    font-size: 0;
+  }
+
+  .explorer-hero h1 {
+    font-size: 58px;
+  }
+
+  .explorer-official-title {
+    font-size: 13px;
+  }
+
+  .explorer-stats {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .explorer-layout {
+    display: block;
+    padding: 42px 20px 80px;
+  }
+
+  .explorer-outline {
+    display: none;
+  }
+
+  .explorer-group + .explorer-group {
+    margin-top: 52px;
+    padding-top: 52px;
+  }
+
+  .explorer-group .explorer-group {
+    margin-left: 7px;
+    padding-left: 17px;
+  }
+
+  .explorer-article {
+    gap: 10px;
+    grid-template-columns: 64px minmax(0, 1fr) 17px;
+    padding: 15px 3px;
+  }
+
+  .explorer-article > strong {
+    font-size: 15px;
   }
 }

@@ -1,9 +1,11 @@
 import express from "express";
+import { toExplorerView } from "../canonical/to-explorer-view";
 import { loadDocumentViews } from "../data/document-repository";
 import type { DocumentSummary } from "../shared/legal";
 
 export const app = express();
 const documentViews = loadDocumentViews();
+const explorerViews = documentViews.map(toExplorerView);
 
 function summary(document: (typeof documentViews)[number]): DocumentSummary {
   return {
@@ -24,6 +26,10 @@ export function findDocumentBySlug(slug: string) {
   return documentViews.find((document) => document.slug === slug) ?? null;
 }
 
+export function findExplorerBySlug(slug: string) {
+  return explorerViews.find((document) => document.slug === slug) ?? null;
+}
+
 app.get("/api/health", (_request, response) => {
   response.json({ status: "ok" });
 });
@@ -37,6 +43,17 @@ app.get("/api/documents/by-slug/:slug", (request, response) => {
 
   if (!document) {
     response.status(404).json({ error: "Document not found" });
+    return;
+  }
+
+  response.json(document);
+});
+
+app.get("/api/explorer/:slug", (request, response) => {
+  const document = findExplorerBySlug(request.params.slug);
+
+  if (!document) {
+    response.status(404).json({ error: "Document explorer not found" });
     return;
   }
 

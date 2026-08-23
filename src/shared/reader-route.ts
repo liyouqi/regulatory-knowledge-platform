@@ -6,6 +6,15 @@ export interface ReaderSelection {
   number: string;
 }
 
+export function explorerPath(slug: string): string {
+  return `/explore/${encodeURIComponent(slug)}`;
+}
+
+export function parseExplorerPath(pathname: string): { slug: string } | null {
+  const match = /^\/explore\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { slug: decodeURIComponent(match[1]) } : null;
+}
+
 export function provisionPath(
   slug: string,
   collectionId: CollectionId,

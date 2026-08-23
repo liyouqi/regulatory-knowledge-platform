@@ -5,6 +5,7 @@ import {
   BookOpen,
   Check,
   Copy,
+  Map as MapIcon,
   Search,
 } from "lucide-react";
 import {
@@ -25,7 +26,13 @@ import type {
   TocNode,
 } from "../shared/legal";
 import { documentCatalogSchema } from "../shared/legal";
-import { parseQuickGo, parseReaderPath } from "../shared/reader-route";
+import {
+  explorerPath,
+  parseExplorerPath,
+  parseQuickGo,
+  parseReaderPath,
+} from "../shared/reader-route";
+import { ExplorerPage } from "./ExplorerPage";
 
 function containsProvision(node: TocNode, provisionId: string): boolean {
   return (
@@ -173,7 +180,7 @@ function QuickGo({
   );
 }
 
-export function App() {
+function ReaderPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const selection = parseReaderPath(location.pathname);
@@ -331,15 +338,24 @@ export function App() {
           <BookOpen aria-hidden="true" size={18} />
           Regulatory Knowledge
         </Link>
-        <button
-          className="search-button"
-          onClick={() => quickGoRef.current?.focus()}
-          type="button"
-        >
-          <Search aria-hidden="true" size={16} />
-          Quick go
-          <kbd>⌘ K</kbd>
-        </button>
+        <div className="topbar-actions">
+          <Link
+            className="view-switch"
+            to={`${explorerPath(legalDocument.slug)}#${activeProvision.explorerAnchor}`}
+          >
+            <MapIcon aria-hidden="true" size={15} />
+            Explore
+          </Link>
+          <button
+            className="search-button"
+            onClick={() => quickGoRef.current?.focus()}
+            type="button"
+          >
+            <Search aria-hidden="true" size={16} />
+            Quick go
+            <kbd>⌘ K</kbd>
+          </button>
+        </div>
       </header>
 
       <aside className="toc" aria-label="Table of contents">
@@ -498,4 +514,10 @@ export function App() {
       </aside>
     </main>
   );
+}
+
+export function App() {
+  const location = useLocation();
+  const explorer = parseExplorerPath(location.pathname);
+  return explorer ? <ExplorerPage slug={explorer.slug} /> : <ReaderPage />;
 }

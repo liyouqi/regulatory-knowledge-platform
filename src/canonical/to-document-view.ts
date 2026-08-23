@@ -211,6 +211,10 @@ export function toDocumentView(
         collectionId,
         provision.numberNormalized ?? provision.numberRaw ?? provision.label,
       ),
+      explorerAnchor: relativeProvisionAnchor(
+        document.logicalId,
+        provision.logicalId,
+      ),
       breadcrumbs: provision.structuralPath.map((entry) => ({
         id: entry.logicalId,
         kind: entry.kind,

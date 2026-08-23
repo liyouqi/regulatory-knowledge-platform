@@ -54,6 +54,7 @@ export const provisionViewSchema = z.object({
   label: z.string().min(1),
   title: z.string().optional(),
   path: z.string().startsWith("/"),
+  explorerAnchor: z.string().min(1),
   breadcrumbs: z.array(breadcrumbSchema),
   previousId: z.string().optional(),
   nextId: z.string().optional(),
@@ -128,8 +129,52 @@ export const documentCatalogSchema = z.object({
   documents: z.array(documentSummarySchema),
 });
 
+export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
+  z.object({
+    id: z.string().min(1),
+    type: z.enum(["group", "article"]),
+    kind: z.string().min(1),
+    label: z.string().min(1),
+    title: z.string().optional(),
+    range: z.string().optional(),
+    anchor: z.string().min(1),
+    readerPath: z.string().startsWith("/").optional(),
+    children: z.array(explorerNodeSchema),
+  }),
+);
+
+export interface ExplorerNode {
+  id: string;
+  type: "group" | "article";
+  kind: string;
+  label: string;
+  title?: string;
+  range?: string;
+  anchor: string;
+  readerPath?: string;
+  children: ExplorerNode[];
+}
+
+export const explorerDocumentSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  celex: z.string().min(1),
+  shortName: z.string().min(1),
+  officialTitle: z.string().min(1),
+  documentType: documentViewSchema.shape.documentType,
+  sourceUrl: z.string().url(),
+  asOf: z.string().date(),
+  lastChecked: z.string().datetime(),
+  buildId: z.string().min(1),
+  articleCount: z.number().int().nonnegative(),
+  recitalCount: z.number().int().nonnegative(),
+  annexCount: z.number().int().nonnegative(),
+  roots: z.array(explorerNodeSchema),
+});
+
 export type CollectionId = z.infer<typeof collectionIdSchema>;
 export type ContentCollection = z.infer<typeof contentCollectionSchema>;
 export type ProvisionView = z.infer<typeof provisionViewSchema>;
 export type DocumentView = z.infer<typeof documentViewSchema>;
 export type DocumentSummary = z.infer<typeof documentSummarySchema>;
+export type ExplorerDocument = z.infer<typeof explorerDocumentSchema>;

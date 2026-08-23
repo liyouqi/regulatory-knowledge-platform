@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { parseQuickGo, parseReaderPath, provisionPath } from "./reader-route";
+import {
+  explorerPath,
+  parseExplorerPath,
+  parseQuickGo,
+  parseReaderPath,
+  provisionPath,
+} from "./reader-route";
 
 describe("Reader routes", () => {
   it("builds and parses a stable readable provision route", () => {
@@ -25,5 +31,11 @@ describe("Reader routes", () => {
 
   it("rejects ambiguous free text", () => {
     expect(parseQuickGo("security controls")).toBeNull();
+  });
+
+  it("builds and parses a stable Explorer route", () => {
+    expect(explorerPath("ai-act")).toBe("/explore/ai-act");
+    expect(parseExplorerPath("/explore/ai-act")).toEqual({ slug: "ai-act" });
+    expect(parseExplorerPath("/read/ai-act/articles/1")).toBeNull();
   });
 });
