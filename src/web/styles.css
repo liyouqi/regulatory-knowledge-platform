@@ -683,6 +683,119 @@ kbd {
   margin: 28px 0;
 }
 
+.relationships-panel {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.relationships-panel details + details {
+  border-top: 1px solid #32382c;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.relationships-panel summary {
+  align-items: center;
+  color: #dfe3d4;
+  cursor: pointer;
+  display: flex;
+  font-size: 11px;
+  justify-content: space-between;
+  list-style: none;
+  padding: 6px 0;
+}
+
+.relationships-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.relationships-panel summary span {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+}
+
+.relationships-panel summary b {
+  align-items: center;
+  background: #30382a;
+  border-radius: 999px;
+  color: #cbd6a7;
+  display: flex;
+  font-size: 9px;
+  height: 20px;
+  justify-content: center;
+  min-width: 20px;
+  padding: 0 6px;
+}
+
+.relationship-items {
+  display: grid;
+  gap: 7px;
+  padding-top: 7px;
+}
+
+.relationship-item {
+  background: #22271f;
+  border: 1px solid #353d30;
+  border-radius: 7px;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+
+.relationship-item > a:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.relationship-item > a:first-child:hover strong {
+  color: #dceba0;
+}
+
+.relationship-item strong {
+  color: #eef0e8;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.relationship-item span {
+  color: #aeb5a6;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.relationship-item small {
+  color: #828b7b;
+  display: -webkit-box;
+  font-size: 9px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.relationship-item > .relationship-evidence {
+  color: #a8b86b;
+  display: inline-flex;
+  font-size: 9px;
+  gap: 4px;
+  justify-self: start;
+  text-transform: uppercase;
+}
+
+.relationships-status {
+  color: #929b8c;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mobile-relationships {
+  display: none;
+}
+
 .context-panel dl {
   display: grid;
   gap: 18px;
@@ -1330,6 +1443,17 @@ kbd {
 
   .context-panel {
     display: none;
+  }
+
+  .mobile-relationships {
+    background: #1a1d18;
+    border: 1px solid #32382c;
+    border-radius: 10px;
+    color: #e8e7e1;
+    display: block;
+    margin-top: 54px;
+    max-width: 49rem;
+    padding: 20px;
   }
 
   .explorer-layout {

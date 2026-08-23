@@ -179,7 +179,7 @@ official source snapshot ✓
 → global law discovery / Find Laws ✓
 → current-document full-text ✓
 → SQLite FTS5 global search build ✓
-→ relationship build
+→ explicit relationship build ✓
 → atomic publish or rollback
 ```
 
@@ -302,19 +302,28 @@ data holder
 
 The endpoint is `/api/search/full-text?q=<query>&limit=<1-50>`. Add `documentId=eu:<CELEX>` for exact document scope. User input is normalized into bounded parameterized FTS expressions; unsupported operator punctuation is not executed as raw FTS syntax.
 
-The artifact at `data/artifacts/runtime/regulatory.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, Canonical document build IDs, materialized Reader and Explorer payloads, reviewed aliases, stable search and definition records, and separate FTS5 tables. It is never canonical legal data. `npm run dev`, `npm start`, and `npm test` rebuild it first, or rebuild it explicitly after adding or updating a Canonical law:
+The artifact at `data/artifacts/runtime/regulatory.sqlite` is generated and ignored by Git. It contains a schema version, a content-derived build ID, Canonical document build IDs, materialized Reader and Explorer payloads, reviewed aliases, stable search, definition, entity, and relationship records, and separate FTS5 tables. It is never canonical legal data. `npm run dev`, `npm start`, and `npm test` rebuild it first, or rebuild it explicitly after adding or updating a Canonical law:
 
 ```bash
 npm run runtime:build
 npm test -- src/search/full-text-search.test.ts
+npm test -- src/relationships/explicit-reference.test.ts
 npm run search:benchmark
 ```
 
 The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts.
 
-The website never reads Canonical JSON or `data/source-registry.json` at runtime. `documents` holds queryable metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. Search and Definitions reuse the same artifact. Six-law parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
+The website never reads Canonical JSON or `data/source-registry.json` at runtime. `documents` holds queryable metadata, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Six-law parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 
 The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
+
+### References and Cited By
+
+The Reader relationship panel shows deterministic references derived at build time from official legal text. **References** opens an internal Article, Annex, or loaded law; **Cited by** is the reverse query over the same stored edge, not a duplicated or separately parsed relation. Each result retains the exact matched citation, source entity, official source URL, provenance (`LEGAL_TEXT`), resolver method/version, and a stable target ID. The same panel appears below the legal text on tablet and mobile.
+
+The runtime endpoint is `/api/relationships/:documentId/:provisionId`. Its response contains separate `references` and `citedBy` arrays and the runtime build ID. The current `explicit-reference@1.0.0` resolver conservatively publishes singular Article/Annex references within a loaded law, modern typed EU Regulation/Directive citations, and compound cross-law Article citations when the target exists in the six-law corpus. Unresolved, ambiguous, plural/range, shorthand, and unloaded external targets remain ordinary official text; they are counted in the build manifest but are not guessed into links.
+
+`npm run runtime:build` currently publishes 1,797 resolved explicit-reference edges and reports 816 unmaterialized references for the current immutable six-law snapshots. These are corpus-specific audit counts, not permanent product constants. The relationship builder version participates in the runtime build ID, so changing resolver semantics invalidates the artifact deterministically.
 
 ## Current Release Status
 
@@ -349,7 +358,7 @@ Release 0.2 is now in progress and additionally includes:
 - a deterministic current-document inverted index over provision headings and legal body blocks, with strict AND, phrase, prefix, snippets, highlights, and paragraph-level navigation;
 - responsive current-law search integrated with Quick Go and verified against exact locators, DORA body text, phrase queries, and 390px layout.
 
-The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.3 is now in progress and additionally includes:
+The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.3 additionally includes:
 
 - a rebuildable, schema-versioned SQLite FTS5 artifact derived from validated `DocumentView` records;
 - content-derived index build IDs, source document build metadata, stable paragraph targets, and atomic publication;
@@ -364,3 +373,14 @@ The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.
 - a keyboard-complete **Opened laws** mode: a versioned, bounded local-only history of stable document IDs and last Reader/Explorer paths, with clear-history control and no duplication of legal data into browser storage.
 
 Release 0.3 is complete locally. The next planned scope is Release 0.4: structured cross-document relationships, starting only with official, traceable references.
+
+Release 0.4 is now in progress and additionally includes:
+
+- a versioned explicit-reference builder over stable document/provision/body-block entities;
+- internal Article/Annex and resolved cross-law Regulation/Directive targets, with conservative unresolved-reference handling;
+- a normalized SQLite `legal_entities` + `relationships` model with evidence, provenance, builder lineage, indexes, and integrity checks;
+- reverse `CITED_BY` lookup derived from stored `REFERENCES` edges;
+- a schema-validated relationship API and responsive Reader relationship panel;
+- browser verification of DORA Article 1 → NIS2 Article 3 navigation, the reverse Cited By view, and AI Act Article 11 → Annex IV on a 390px viewport.
+
+The next Release 0.4 slice is inline reference presentation and Side Peek, built on this stable relationship contract.

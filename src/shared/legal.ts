@@ -269,6 +269,52 @@ export const explorerDocumentSchema = z.object({
   roots: z.array(explorerNodeSchema),
 });
 
+export const relationshipProvenanceSchema = z.enum([
+  "LEGAL_TEXT",
+  "OFFICIAL_METADATA",
+  "OFFICIAL_MAPPING",
+  "CASE_TEXT",
+  "EDITORIAL",
+  "TFIDF",
+]);
+
+export const relationshipEndpointSchema = z.object({
+  entityId: z.string().min(1),
+  documentId: z.string().min(1),
+  documentShortName: z.string().min(1),
+  provisionId: z.string().min(1).optional(),
+  kind: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().nullable(),
+  path: z.string().startsWith("/"),
+});
+
+export const provisionRelationshipSchema = z.object({
+  id: z.string().startsWith("relationship:"),
+  relationType: z.enum(["REFERENCES", "CITED_BY"]),
+  provenance: relationshipProvenanceSchema,
+  source: relationshipEndpointSchema,
+  target: relationshipEndpointSchema,
+  evidence: z.object({
+    text: z.string().min(1),
+    locator: z.string().min(1),
+    sourceUrl: z.string().url(),
+  }),
+  builder: z.object({
+    method: z.string().min(1),
+    version: z.string().min(1),
+  }),
+  resolutionStatus: z.literal("resolved"),
+});
+
+export const provisionRelationshipsResponseSchema = z.object({
+  documentId: z.string().min(1),
+  provisionId: z.string().min(1),
+  buildId: z.string().min(1),
+  references: z.array(provisionRelationshipSchema),
+  citedBy: z.array(provisionRelationshipSchema),
+});
+
 export type CollectionId = z.infer<typeof collectionIdSchema>;
 export type ContentCollection = z.infer<typeof contentCollectionSchema>;
 export type ProvisionView = z.infer<typeof provisionViewSchema>;
@@ -287,4 +333,9 @@ export type DefinitionSearchResult = z.infer<
 >;
 export type DefinitionSearchResponse = z.infer<
   typeof definitionSearchResponseSchema
+>;
+export type RelationshipEndpoint = z.infer<typeof relationshipEndpointSchema>;
+export type ProvisionRelationship = z.infer<typeof provisionRelationshipSchema>;
+export type ProvisionRelationshipsResponse = z.infer<
+  typeof provisionRelationshipsResponseSchema
 >;

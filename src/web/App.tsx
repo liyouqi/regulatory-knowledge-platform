@@ -5,8 +5,10 @@ import {
   BookOpen,
   Check,
   Copy,
+  Link2,
   Map as MapIcon,
   Search,
+  Undo2,
 } from "lucide-react";
 import {
   type FormEvent,
@@ -27,10 +29,15 @@ import type {
   ContentCollection,
   DocumentSummary,
   DocumentView,
+  ProvisionRelationship,
+  ProvisionRelationshipsResponse,
   ProvisionView,
   TocNode,
 } from "../shared/legal";
-import { documentCatalogSchema } from "../shared/legal";
+import {
+  documentCatalogSchema,
+  provisionRelationshipsResponseSchema,
+} from "../shared/legal";
 import {
   explorerPath,
   parseExplorerPath,
@@ -135,6 +142,134 @@ function LegalBlock({
         </div>
       ) : null}
     </div>
+  );
+}
+
+function uniqueRelationships(
+  relationships: ProvisionRelationship[],
+  direction: "references" | "citedBy",
+) {
+  const grouped = new Map<
+    string,
+    { relationship: ProvisionRelationship; mentions: number }
+  >();
+  for (const relationship of relationships) {
+    const endpoint =
+      direction === "references" ? relationship.target : relationship.source;
+    const key = endpoint.provisionId ?? endpoint.entityId;
+    const existing = grouped.get(key);
+    if (existing) existing.mentions += 1;
+    else grouped.set(key, { relationship, mentions: 1 });
+  }
+  return [...grouped.values()];
+}
+
+function RelationshipList({
+  relationships,
+  loading,
+  error,
+  className = "",
+}: {
+  relationships: ProvisionRelationshipsResponse | null;
+  loading: boolean;
+  error: string;
+  className?: string;
+}) {
+  const references = uniqueRelationships(
+    relationships?.references ?? [],
+    "references",
+  );
+  const citedBy = uniqueRelationships(relationships?.citedBy ?? [], "citedBy");
+
+  return (
+    <section className={`relationships-panel ${className}`.trim()}>
+      <p className="eyebrow">RELATIONSHIPS</p>
+      {loading ? (
+        <p className="relationships-status">Loading references…</p>
+      ) : null}
+      {error ? (
+        <p className="relationships-status error-state">{error}</p>
+      ) : null}
+      {!loading && !error && references.length === 0 && citedBy.length === 0 ? (
+        <p className="relationships-status">
+          No resolved explicit references for this provision.
+        </p>
+      ) : null}
+      {references.length > 0 ? (
+        <details open>
+          <summary>
+            <span>
+              <Link2 aria-hidden="true" size={13} /> References
+            </span>
+            <b>{references.length}</b>
+          </summary>
+          <div className="relationship-items">
+            {references.map(({ relationship, mentions }) => (
+              <div className="relationship-item" key={relationship.id}>
+                <Link to={relationship.target.path}>
+                  <strong>
+                    {relationship.target.documentShortName} ·{" "}
+                    {relationship.target.label}
+                  </strong>
+                  {relationship.target.title ? (
+                    <span>{relationship.target.title}</span>
+                  ) : null}
+                  <small>
+                    “{relationship.evidence.text}”
+                    {mentions > 1 ? ` · ${mentions} mentions` : ""}
+                  </small>
+                </Link>
+                <a
+                  className="relationship-evidence"
+                  href={relationship.evidence.sourceUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Official text <ArrowUpRight aria-hidden="true" size={11} />
+                </a>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
+      {citedBy.length > 0 ? (
+        <details>
+          <summary>
+            <span>
+              <Undo2 aria-hidden="true" size={13} /> Cited by
+            </span>
+            <b>{citedBy.length}</b>
+          </summary>
+          <div className="relationship-items">
+            {citedBy.map(({ relationship, mentions }) => (
+              <div className="relationship-item" key={relationship.id}>
+                <Link to={relationship.source.path}>
+                  <strong>
+                    {relationship.source.documentShortName} ·{" "}
+                    {relationship.source.label}
+                  </strong>
+                  {relationship.source.title ? (
+                    <span>{relationship.source.title}</span>
+                  ) : null}
+                  <small>
+                    “{relationship.evidence.text}”
+                    {mentions > 1 ? ` · ${mentions} mentions` : ""}
+                  </small>
+                </Link>
+                <a
+                  className="relationship-evidence"
+                  href={relationship.evidence.sourceUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Official text <ArrowUpRight aria-hidden="true" size={11} />
+                </a>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
+    </section>
   );
 }
 
@@ -349,6 +484,10 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [loadError, setLoadError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [relationships, setRelationships] =
+    useState<ProvisionRelationshipsResponse | null>(null);
+  const [relationshipsLoading, setRelationshipsLoading] = useState(false);
+  const [relationshipsError, setRelationshipsError] = useState("");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -405,12 +544,13 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
 
   useEffect(() => {
     if (!legalDocument || activeProvision) return;
+    if (selection && selection.slug !== legalDocument.slug) return;
     const firstArticle = legalDocument.provisions.find(
       (provision) => provision.collectionId === "articles",
     );
     const fallback = firstArticle ?? legalDocument.provisions[0];
     if (fallback) navigate(fallback.path, { replace: true });
-  }, [activeProvision, legalDocument, navigate]);
+  }, [activeProvision, legalDocument, navigate, selection]);
 
   useEffect(() => {
     if (!activeProvision || !location.hash) return;
@@ -427,6 +567,38 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         ?.classList.remove("deep-link-target");
     };
   }, [activeProvision, location.hash]);
+
+  useEffect(() => {
+    if (!legalDocument || !activeProvision) return;
+    const controller = new AbortController();
+    setRelationships(null);
+    setRelationshipsLoading(true);
+    setRelationshipsError("");
+    void fetch(
+      `/api/relationships/${encodeURIComponent(legalDocument.id)}/${encodeURIComponent(activeProvision.id)}`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load relationships");
+        return provisionRelationshipsResponseSchema.parse(
+          await response.json(),
+        );
+      })
+      .then(setRelationships)
+      .catch((error: unknown) => {
+        if ((error as DOMException).name !== "AbortError") {
+          setRelationshipsError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load relationships",
+          );
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setRelationshipsLoading(false);
+      });
+    return () => controller.abort();
+  }, [activeProvision, legalDocument]);
 
   useEffect(() => {
     if (!legalDocument || !activeProvision) return;
@@ -597,6 +769,12 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
             />
           ))}
         </div>
+        <RelationshipList
+          className="mobile-relationships"
+          error={relationshipsError}
+          loading={relationshipsLoading}
+          relationships={relationships}
+        />
         <nav className="provision-pagination" aria-label="Provision navigation">
           {previous ? (
             <button onClick={() => navigate(previous.path)} type="button">
@@ -633,6 +811,12 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           )}
           {copied ? "Copied" : "Copy permalink"}
         </button>
+        <div className="context-divider" />
+        <RelationshipList
+          error={relationshipsError}
+          loading={relationshipsLoading}
+          relationships={relationships}
+        />
         <div className="context-divider" />
         <p className="eyebrow">SOURCE</p>
         <dl>

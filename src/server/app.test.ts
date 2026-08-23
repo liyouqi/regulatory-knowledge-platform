@@ -5,6 +5,7 @@ import {
   findDocumentBySlug,
   findExplorerBySlug,
   findLaws,
+  findProvisionRelationships,
 } from "./app";
 
 describe("Document lookup", () => {
@@ -66,5 +67,23 @@ describe("Document lookup", () => {
     });
     expect(result).not.toHaveProperty("provisions");
     expect(result).not.toHaveProperty("blocks");
+  });
+
+  it("serves traceable provision relationships from the runtime repository", () => {
+    const result = findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:1",
+    );
+    expect(result?.references).toContainEqual(
+      expect.objectContaining({
+        provenance: "LEGAL_TEXT",
+        target: expect.objectContaining({
+          entityId: "eu:32022L2555:article:3",
+        }),
+        evidence: expect.objectContaining({
+          text: "Article 3 of Directive (EU) 2022/2555",
+        }),
+      }),
+    );
   });
 });

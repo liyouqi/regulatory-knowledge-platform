@@ -519,10 +519,10 @@ Phase 1 直接使用 SQLite 普通表。
 | 字段 | 说明 |
 |---|---|
 | relationship_id | 确定性或持久化关系 ID |
-| source_id | 源实体 stable ID |
+| source_entity_id | 源实体 stable ID；正文引用精确到 paragraph / point 等 block entity |
 | relation_type | REFERENCES / MANDATES / ADOPTED_UNDER / SUPPLEMENTS / RELATED_RECITAL 等受控关系类型 |
-| target_id | 目标 stable ID |
-| provenance | LEGAL_TEXT / OFFICIAL_METADATA / MANUAL_OFFICIAL_MAPPING / TFIDF 等 |
+| target_entity_id | 目标 Document / Article / Annex stable ID |
+| provenance | LEGAL_TEXT / OFFICIAL_METADATA / OFFICIAL_MAPPING / TFIDF 等 |
 | evidence_locator | 原文 span、XML path、metadata predicate 或 curated record ID |
 | score | TF-IDF 等算法关系分数 |
 | source_ref | 原始官方 URL / query / snapshot |
@@ -530,7 +530,14 @@ Phase 1 直接使用 SQLite 普通表。
 | resolution_status | resolved / external / unresolved / ambiguous |
 | build_id | 哪次数据构建生成 |
 
-关系表需要唯一约束，至少覆盖 `source_id + relation_type + target_id + provenance + evidence_locator`。`CITED_BY` 默认由 `REFERENCES` 反向查询，不要求保存重复边；只有性能数据证明必要时才物化。RTS/ITS 是 Document type，不编码成 `RELATED_RTS` / `RELATED_ITS` 两套平行关系。
+关系表需要唯一约束，至少覆盖 `source_entity_id + relation_type + target_entity_id + provenance + evidence_locator`。`CITED_BY` 默认由 `REFERENCES` 反向查询，不要求保存重复边；只有性能数据证明必要时才物化。RTS/ITS 是 Document type，不编码成 `RELATED_RTS` / `RELATED_ITS` 两套平行关系。
+
+Release 0.4 实际 runtime schema 使用两张普通表：
+
+- `legal_entities`：为 Document、顶层 Provision 与 paragraph/point 等正文 block 提供统一 stable-ID JOIN 边界；保留 `document_id`、`parent_entity_id`、`root_provision_id`、kind/label/title/path；
+- `relationships`：保存有向边、原文 evidence、官方 source ref、provenance、builder method/version、resolution status 与 runtime build ID。
+
+当前只物化 `resolution_status=resolved` 的边。无法确定、歧义或目标未进入本地 corpus 的引用不写入关系表，只进入 build manifest 的 `unresolvedReferenceCount`；官方正文保持原样。`CITED_BY` 使用 `target_entity_id` 索引反向查询同一条 `REFERENCES` edge。
 
 ## 9.3 Builder pattern
 
@@ -545,6 +552,8 @@ CaseCitationBuilder              # Phase 2
 ```
 
 所有 builder 输出同一 Relationship Contract。
+
+当前 `explicit-reference@1.0.0` 先覆盖可保守确认的 singular Article / Annex、typed modern EU Regulation / Directive，以及“Article … of Regulation/Directive …” compound citation。parser 尚未保留的 Formex structured-link metadata 和无法可靠判断目标的 shorthand/range 不由文本规则猜测。builder method/version 参与 runtime build ID，关系语义变化必须升级 builder version 并运行 dedicated relationship fixtures。
 
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
@@ -731,7 +740,7 @@ Release 0.3 先采用最小化 runtime schema，以现有稳定 API DTO 作为 m
 | search_records | paragraph-level derived search records |
 | definitions | normalized, traceable definitions |
 | search_records_fts / definitions_fts | FTS5 virtual tables |
-| relationships | Release 0.4 出现真实关系查询后再加入 |
+| legal_entities / relationships | Release 0.4 stable entity JOIN、explicit references、reverse cited-by |
 
 `document_views` 是有意的 build-time denormalization：Reader / Explorer 一次主键查询即可返回现有 DTO，不在每次请求中用多表 JOIN 重建递归树。它与全文记录、Definitions 都由同一次 Canonical → SQLite build 生成，不存在人工双写。
 
@@ -830,7 +839,7 @@ Phase 1 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边界�
 /api/documents/:documentId
 /api/documents/:documentId/structure
 /api/provisions/:provisionId
-/api/provisions/:provisionId/relationships
+/api/relationships/:documentId/:provisionId
 /api/search/laws
 /api/search/fulltext
 /api/search/definitions

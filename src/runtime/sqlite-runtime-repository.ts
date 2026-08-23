@@ -10,8 +10,11 @@ import {
   type DocumentSummary,
   type DocumentView,
   type ExplorerDocument,
+  type ProvisionRelationship,
+  type ProvisionRelationshipsResponse,
   documentViewSchema,
   explorerDocumentSchema,
+  provisionRelationshipsResponseSchema,
 } from "../shared/legal";
 
 type LawSearchSource = Pick<SourceDefinition, "celex" | "familyId" | "aliases">;
@@ -31,6 +34,110 @@ interface LawSourceRow {
   alias: string | null;
 }
 
+interface RelationshipRow {
+  id: string;
+  provenance: ProvisionRelationship["provenance"];
+  evidenceText: string;
+  evidenceLocator: string;
+  sourceRef: string;
+  builderMethod: string;
+  builderVersion: string;
+  resolutionStatus: "resolved";
+  sourceEntityId: string;
+  sourceDocumentId: string;
+  sourceDocumentShortName: string;
+  sourceProvisionId: string | null;
+  sourceKind: string;
+  sourceLabel: string;
+  sourceTitle: string | null;
+  sourcePath: string;
+  targetEntityId: string;
+  targetDocumentId: string;
+  targetDocumentShortName: string;
+  targetProvisionId: string | null;
+  targetKind: string;
+  targetLabel: string;
+  targetTitle: string | null;
+  targetPath: string;
+}
+
+const RELATIONSHIP_SELECT = `
+  SELECT
+    r.relationship_id AS id,
+    r.provenance,
+    r.evidence_text AS evidenceText,
+    r.evidence_locator AS evidenceLocator,
+    r.source_ref AS sourceRef,
+    r.builder_method AS builderMethod,
+    r.builder_version AS builderVersion,
+    r.resolution_status AS resolutionStatus,
+    se.id AS sourceEntityId,
+    sd.id AS sourceDocumentId,
+    sd.short_name AS sourceDocumentShortName,
+    CASE WHEN se.kind = 'document' THEN NULL
+      ELSE COALESCE(se.root_provision_id, se.id) END AS sourceProvisionId,
+    COALESCE(sr.kind, se.kind) AS sourceKind,
+    COALESCE(sr.label, se.label) AS sourceLabel,
+    COALESCE(sr.title, se.title) AS sourceTitle,
+    se.path AS sourcePath,
+    te.id AS targetEntityId,
+    td.id AS targetDocumentId,
+    td.short_name AS targetDocumentShortName,
+    CASE WHEN te.kind = 'document' THEN NULL
+      ELSE COALESCE(te.root_provision_id, te.id) END AS targetProvisionId,
+    te.kind AS targetKind,
+    te.label AS targetLabel,
+    te.title AS targetTitle,
+    te.path AS targetPath
+  FROM relationships r
+  JOIN legal_entities se ON se.id = r.source_entity_id
+  JOIN documents sd ON sd.id = se.document_id
+  LEFT JOIN legal_entities sr ON sr.id = se.root_provision_id
+  JOIN legal_entities te ON te.id = r.target_entity_id
+  JOIN documents td ON td.id = te.document_id
+`;
+
+function toProvisionRelationship(
+  row: RelationshipRow,
+  relationType: ProvisionRelationship["relationType"],
+): ProvisionRelationship {
+  return {
+    id: row.id,
+    relationType,
+    provenance: row.provenance,
+    source: {
+      entityId: row.sourceEntityId,
+      documentId: row.sourceDocumentId,
+      documentShortName: row.sourceDocumentShortName,
+      provisionId: row.sourceProvisionId ?? undefined,
+      kind: row.sourceKind,
+      label: row.sourceLabel,
+      title: row.sourceTitle,
+      path: row.sourcePath,
+    },
+    target: {
+      entityId: row.targetEntityId,
+      documentId: row.targetDocumentId,
+      documentShortName: row.targetDocumentShortName,
+      provisionId: row.targetProvisionId ?? undefined,
+      kind: row.targetKind,
+      label: row.targetLabel,
+      title: row.targetTitle,
+      path: row.targetPath,
+    },
+    evidence: {
+      text: row.evidenceText,
+      locator: row.evidenceLocator,
+      sourceUrl: row.sourceRef,
+    },
+    builder: {
+      method: row.builderMethod,
+      version: row.builderVersion,
+    },
+    resolutionStatus: row.resolutionStatus,
+  };
+}
+
 function manifestValue(database: Database.Database, key: string): string {
   const row = database
     .prepare("SELECT value FROM build_manifest WHERE key = ?")
@@ -42,6 +149,8 @@ function manifestValue(database: Database.Database, key: string): string {
 
 export class SqliteRuntimeRepository {
   readonly buildId: string;
+  readonly relationshipCount: number;
+  readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
   constructor(databasePath = DEFAULT_RUNTIME_DATABASE_PATH) {
@@ -62,6 +171,14 @@ export class SqliteRuntimeRepository {
         );
       }
       this.buildId = manifestValue(this.database, "buildId");
+      this.relationshipCount = Number.parseInt(
+        manifestValue(this.database, "relationshipCount"),
+        10,
+      );
+      this.unresolvedReferenceCount = Number.parseInt(
+        manifestValue(this.database, "unresolvedReferenceCount"),
+        10,
+      );
       this.database
         .prepare("SELECT reader_payload_json FROM document_views LIMIT 1")
         .get();
@@ -162,6 +279,46 @@ export class SqliteRuntimeRepository {
       sources.set(row.documentId, source);
     }
     return [...sources.values()];
+  }
+
+  findProvisionRelationships(
+    documentId: string,
+    provisionId: string,
+  ): ProvisionRelationshipsResponse | null {
+    const provision = this.database
+      .prepare(
+        `SELECT id FROM legal_entities
+         WHERE id = ? AND document_id = ? AND kind != 'document'`,
+      )
+      .get(provisionId, documentId);
+    if (!provision) return null;
+
+    const references = this.database
+      .prepare(`
+        ${RELATIONSHIP_SELECT}
+        WHERE se.document_id = @documentId
+          AND (se.id = @provisionId OR se.root_provision_id = @provisionId)
+        ORDER BY td.display_order ASC, targetPath ASC, sourcePath ASC, id ASC
+      `)
+      .all({ documentId, provisionId }) as RelationshipRow[];
+    const citedBy = this.database
+      .prepare(`
+        ${RELATIONSHIP_SELECT}
+        WHERE te.document_id = @documentId
+          AND (te.id = @provisionId OR te.root_provision_id = @provisionId)
+        ORDER BY sd.display_order ASC, sourcePath ASC, id ASC
+      `)
+      .all({ documentId, provisionId }) as RelationshipRow[];
+
+    return provisionRelationshipsResponseSchema.parse({
+      documentId,
+      provisionId,
+      buildId: this.buildId,
+      references: references.map((row) =>
+        toProvisionRelationship(row, "REFERENCES"),
+      ),
+      citedBy: citedBy.map((row) => toProvisionRelationship(row, "CITED_BY")),
+    });
   }
 
   close(): void {

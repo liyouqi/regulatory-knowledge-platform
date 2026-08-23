@@ -21,6 +21,8 @@ console.table({
   documents: manifest.documentCount,
   records: manifest.recordCount,
   definitions: manifest.definitionCount,
+  relationships: manifest.relationshipCount,
+  unresolvedReferences: manifest.unresolvedReferenceCount,
   bytes: manifest.byteCount,
   output: manifest.outputPath,
 });

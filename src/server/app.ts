@@ -39,6 +39,13 @@ export function searchDefinitions(query: string, limit?: number) {
   return searchService.searchDefinitions(query, limit);
 }
 
+export function findProvisionRelationships(
+  documentId: string,
+  provisionId: string,
+) {
+  return runtimeRepository.findProvisionRelationships(documentId, provisionId);
+}
+
 app.get("/api/health", (_request, response) => {
   response.json({
     status: "ok",
@@ -48,6 +55,8 @@ app.get("/api/health", (_request, response) => {
       documents: searchService.documentCount,
       records: searchService.recordCount,
       definitions: searchService.definitionCount,
+      relationships: runtimeRepository.relationshipCount,
+      unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
 });
@@ -111,6 +120,18 @@ app.get("/api/explorer/:slug", (request, response) => {
   }
 
   response.json(document);
+});
+
+app.get("/api/relationships/:documentId/:provisionId", (request, response) => {
+  const relationships = findProvisionRelationships(
+    request.params.documentId,
+    request.params.provisionId,
+  );
+  if (!relationships) {
+    response.status(404).json({ error: "Provision not found" });
+    return;
+  }
+  response.json(relationships);
 });
 
 app.get("/api/documents/:documentId", (request, response) => {

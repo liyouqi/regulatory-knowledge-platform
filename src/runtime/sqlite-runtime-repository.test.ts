@@ -68,4 +68,52 @@ describe("SQLite runtime repository", () => {
     expect(repository?.findDocumentBySlug("unknown")).toBeNull();
     expect(repository?.findExplorerBySlug("unknown")).toBeNull();
   });
+
+  it("returns explicit references and derives cited-by without duplicate edges", () => {
+    const doraArticleOne = repository?.findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:1",
+    );
+    expect(doraArticleOne?.references).toContainEqual(
+      expect.objectContaining({
+        relationType: "REFERENCES",
+        provenance: "LEGAL_TEXT",
+        source: expect.objectContaining({
+          provisionId: "eu:32022R2554:article:1",
+        }),
+        target: expect.objectContaining({
+          entityId: "eu:32022L2555:article:3",
+          path: "/read/nis2/articles/3",
+        }),
+        evidence: expect.objectContaining({
+          text: "Article 3 of Directive (EU) 2022/2555",
+        }),
+      }),
+    );
+
+    const nisArticleThree = repository?.findProvisionRelationships(
+      "eu:32022L2555",
+      "eu:32022L2555:article:3",
+    );
+    expect(nisArticleThree?.citedBy).toContainEqual(
+      expect.objectContaining({
+        relationType: "CITED_BY",
+        source: expect.objectContaining({
+          documentShortName: "DORA",
+          provisionId: "eu:32022R2554:article:1",
+        }),
+      }),
+    );
+    expect(repository?.relationshipCount).toBeGreaterThan(1_000);
+    expect(repository?.unresolvedReferenceCount).toBeGreaterThan(0);
+  });
+
+  it("returns null when a relationship query uses an unknown provision", () => {
+    expect(
+      repository?.findProvisionRelationships(
+        "eu:32022R2554",
+        "eu:32022R2554:article:999",
+      ),
+    ).toBeNull();
+  });
 });

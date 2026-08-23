@@ -11,6 +11,11 @@ import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import type { SourceDefinition } from "../ingestion/source-registry";
 import {
+  EXPLICIT_REFERENCE_BUILDER,
+  EXPLICIT_REFERENCE_BUILDER_VERSION,
+  buildExplicitReferences,
+} from "../relationships/explicit-reference";
+import {
   type BodyBlock,
   type DocumentView,
   type ProvisionView,
@@ -19,7 +24,7 @@ import {
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "2.0.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "3.0.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -32,6 +37,8 @@ export interface RuntimeDatabaseManifest {
   documentCount: number;
   recordCount: number;
   definitionCount: number;
+  relationshipCount: number;
+  unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
   outputPath: string;
   byteCount: number;
@@ -183,7 +190,13 @@ function runtimeBuildId(documents: DocumentView[]): string {
     .sort()
     .join("\n");
   const hash = createHash("sha256")
-    .update(`${RUNTIME_DATABASE_SCHEMA_VERSION}\n${input}`)
+    .update(
+      [
+        RUNTIME_DATABASE_SCHEMA_VERSION,
+        `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
+        input,
+      ].join("\n"),
+    )
     .digest("hex")
     .slice(0, 16);
   return `runtime-${RUNTIME_DATABASE_SCHEMA_VERSION}-${hash}`;
@@ -218,6 +231,7 @@ export function buildRuntimeDatabase(
   const database = new Database(temporaryPath);
   const rows = indexRows(documents);
   const definitions = definitionRows(documents);
+  const relationshipBuild = buildExplicitReferences(documents);
   const buildId = runtimeBuildId(documents);
   const builtAt = new Date().toISOString();
   const sourceByCelex = new Map(
@@ -228,6 +242,7 @@ export function buildRuntimeDatabase(
   try {
     database.pragma("journal_mode = OFF");
     database.pragma("synchronous = OFF");
+    database.pragma("foreign_keys = ON");
     assertFts5(database);
     database.exec(`
       CREATE TABLE build_manifest (
@@ -265,6 +280,45 @@ export function buildRuntimeDatabase(
         PRIMARY KEY (document_id, alias)
       ) STRICT;
       CREATE INDEX document_aliases_normalized ON document_aliases(normalized_alias);
+      CREATE TABLE legal_entities (
+        id TEXT PRIMARY KEY,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        parent_entity_id TEXT REFERENCES legal_entities(id),
+        root_provision_id TEXT REFERENCES legal_entities(id),
+        kind TEXT NOT NULL,
+        label TEXT NOT NULL,
+        title TEXT,
+        path TEXT NOT NULL
+      ) STRICT;
+      CREATE INDEX legal_entities_document_id ON legal_entities(document_id);
+      CREATE INDEX legal_entities_root_provision_id ON legal_entities(root_provision_id);
+      CREATE TABLE relationships (
+        relationship_id TEXT PRIMARY KEY,
+        source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        relation_type TEXT NOT NULL CHECK (relation_type IN (
+          'REFERENCES', 'MANDATES', 'ADOPTED_UNDER', 'SUPPLEMENTS',
+          'RELATED_DOCUMENT', 'RELATED_RECITAL'
+        )),
+        target_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        provenance TEXT NOT NULL CHECK (provenance IN (
+          'LEGAL_TEXT', 'OFFICIAL_METADATA', 'OFFICIAL_MAPPING',
+          'CASE_TEXT', 'EDITORIAL', 'TFIDF'
+        )),
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        score REAL,
+        source_ref TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        resolution_status TEXT NOT NULL CHECK (resolution_status = 'resolved'),
+        build_id TEXT NOT NULL,
+        UNIQUE (
+          source_entity_id, relation_type, target_entity_id,
+          provenance, evidence_locator
+        )
+      ) STRICT;
+      CREATE INDEX relationships_source_entity_id ON relationships(source_entity_id);
+      CREATE INDEX relationships_target_entity_id ON relationships(target_entity_id);
       CREATE TABLE search_records (
         rowid INTEGER PRIMARY KEY,
         record_id TEXT NOT NULL UNIQUE,
@@ -360,6 +414,26 @@ export function buildRuntimeDatabase(
     const insertDefinitionFts = database.prepare(
       "INSERT INTO definitions_fts(rowid, term, definition_text) VALUES (?, ?, ?)",
     );
+    const insertEntity = database.prepare(`
+      INSERT INTO legal_entities (
+        id, document_id, parent_entity_id, root_provision_id,
+        kind, label, title, path
+      ) VALUES (
+        @id, @documentId, @parentEntityId, @rootProvisionId,
+        @kind, @label, @title, @path
+      )
+    `);
+    const insertRelationship = database.prepare(`
+      INSERT INTO relationships (
+        relationship_id, source_entity_id, relation_type, target_entity_id,
+        provenance, evidence_text, evidence_locator, score, source_ref,
+        builder_method, builder_version, resolution_status, build_id
+      ) VALUES (
+        @id, @sourceEntityId, @relationType, @targetEntityId,
+        @provenance, @evidenceText, @evidenceLocator, NULL, @sourceRef,
+        @builderMethod, @builderVersion, @resolutionStatus, @buildId
+      )
+    `);
     const insertManifest = database.prepare(
       "INSERT INTO build_manifest(key, value) VALUES (?, ?)",
     );
@@ -412,6 +486,12 @@ export function buildRuntimeDatabase(
           definition.definitionText,
         );
       }
+      for (const entity of relationshipBuild.entities) {
+        insertEntity.run(entity);
+      }
+      for (const relationship of relationshipBuild.relationships) {
+        insertRelationship.run({ ...relationship, buildId });
+      }
       const manifestEntries = {
         schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
         buildId,
@@ -419,6 +499,9 @@ export function buildRuntimeDatabase(
         documentCount: String(documents.length),
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
+        relationshipCount: String(relationshipBuild.relationships.length),
+        unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
+        relationshipBuilder: `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
             documentId: document.id,
@@ -467,6 +550,8 @@ export function buildRuntimeDatabase(
     documentCount: documents.length,
     recordCount: rows.length,
     definitionCount: definitions.length,
+    relationshipCount: relationshipBuild.relationships.length,
+    unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({
       documentId: document.id,
       buildId: document.buildId,
