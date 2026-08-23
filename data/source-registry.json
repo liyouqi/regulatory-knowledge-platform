@@ -1,0 +1,146 @@
+[
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA",
+    "celex": "32022R2554",
+    "language": "ENG",
+    "documentType": "regulation",
+    "publicationDate": "2022-12-27",
+    "quality": {
+      "articleCount": 64,
+      "recitalCount": 106,
+      "annexCount": 0,
+      "paragraphCount": 274,
+      "pointCount": 446,
+      "structuralNodeCount": 15,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32022R2554:recital:1": "sha256:b49a59957e619048d666a19fb8d1904dc8939f9b2602537210f60b7b62c91a76",
+        "eu:32022R2554:article:1:paragraph:1": "sha256:b0bcea0a9cf0a700cb97f02b91634e672c9c2a9f93ceb9da750134e98b5bb38a",
+        "eu:32022R2554:article:64:subparagraph:2": "sha256:59099a0ab1db4bc003f0d00ecf4f4a19c16c20ea06b97d26c40347a430598987"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+  },
+  {
+    "familyId": "family:gdpr",
+    "shortName": "GDPR",
+    "celex": "32016R0679",
+    "language": "ENG",
+    "documentType": "regulation",
+    "publicationDate": "2016-05-04",
+    "quality": {
+      "articleCount": 99,
+      "recitalCount": 173,
+      "annexCount": 0,
+      "paragraphCount": 390,
+      "pointCount": 389,
+      "structuralNodeCount": 26,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R0679:recital:1": "sha256:3baeaf5c9cf4e66538baeb15c106328fa12b35b58caadf5f022b8dae1600c34f",
+        "eu:32016R0679:article:1:paragraph:1": "sha256:9e654552ce9e0e0f0f1bf6f2521b18c3a2985d858414affec7fd60d7c3e4bd30",
+        "eu:32016R0679:article:99:paragraph:2": "sha256:41a55c9b41a1becca4abc825d5d4aed31905d64216e8e9b46234cfc60a3995b2"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng"
+  },
+  {
+    "familyId": "family:ai-act",
+    "shortName": "AI Act",
+    "celex": "32024R1689",
+    "language": "ENG",
+    "documentType": "regulation",
+    "publicationDate": "2024-07-12",
+    "quality": {
+      "articleCount": 113,
+      "recitalCount": 180,
+      "annexCount": 13,
+      "paragraphCount": 581,
+      "pointCount": 632,
+      "structuralNodeCount": 29,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1689:recital:1": "sha256:37a9025a1127e7e256c678005ba459b0c624c3bfb171e3781853cb362493c36a",
+        "eu:32024R1689:article:1:paragraph:1": "sha256:61052d02dfbc5b15efe3f8132180249abd7b1733eb1cb8307b5f33e687e1a188",
+        "eu:32024R1689:article:113:subparagraph:3": "sha256:659bd7e8a2a48684979a6d540518f9dc9850a96275b92bb67552a39d06970fd0",
+        "eu:32024R1689:annex:i": "sha256:e1daf4a8bcb91506d0a05994b9e0cb5b89a190a3fd667fd0bbf6bf9c6b14e435",
+        "eu:32024R1689:annex:xiii": "sha256:8b44634a79c895e17aff37e5221fb0c055823f5eb91e6436f7dbf9ba1da3a439"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+  },
+  {
+    "familyId": "family:mica",
+    "shortName": "MiCA",
+    "celex": "32023R1114",
+    "language": "ENG",
+    "documentType": "regulation",
+    "publicationDate": "2023-06-09",
+    "quality": {
+      "articleCount": 149,
+      "recitalCount": 119,
+      "annexCount": 6,
+      "paragraphCount": 889,
+      "pointCount": 1119,
+      "structuralNodeCount": 27,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32023R1114:recital:1": "sha256:0e409c4acf62b2ca491a7ae9a87fa5f5907cdb9f91c464eba1c8bc94e2e92ab1",
+        "eu:32023R1114:article:1:paragraph:1": "sha256:2c7472ac05bcdf246b14a3392ec6e221813f81009fde991a9d36dcef12e21a06",
+        "eu:32023R1114:article:149:paragraph:4": "sha256:8e51177beed32bf91eddae27c962432ed5803595556e7cddf65d17c80c7ab7a4",
+        "eu:32023R1114:annex:i": "sha256:0259522c00fdc009cec893c2d83a8872562d13f2b4b304f80f740d811e0c067d",
+        "eu:32023R1114:annex:vi": "sha256:0ae71694a9e25073151a353eb9a68798ec7ba3d9465c9e36a5a48293428b2535"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1114/oj/eng"
+  },
+  {
+    "familyId": "family:nis2",
+    "shortName": "NIS2",
+    "celex": "32022L2555",
+    "language": "ENG",
+    "documentType": "directive",
+    "publicationDate": "2022-12-27",
+    "quality": {
+      "articleCount": 46,
+      "recitalCount": 144,
+      "annexCount": 3,
+      "paragraphCount": 200,
+      "pointCount": 271,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32022L2555:recital:1": "sha256:2512f9e73bc58b3af37663dce8a8f5f83c445a21bcf931c4348a608b27dc965e",
+        "eu:32022L2555:article:1:paragraph:1": "sha256:ab9299002d799da83137bce14684ed36ee40ceae7cf73b780fafa7b77b035293",
+        "eu:32022L2555:article:46:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32022L2555:annex:i": "sha256:1f66d16ce7d5dfc504c9f6319e08879c51e33619b1eafe169ebcb5e8a7ac6ecc",
+        "eu:32022L2555:annex:iii": "sha256:bed81065a711a121110d254f8bc5074ed00a18f0ef9b4170ca988d858993d692"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng"
+  },
+  {
+    "familyId": "family:data-act",
+    "shortName": "Data Act",
+    "celex": "32023R2854",
+    "language": "ENG",
+    "documentType": "regulation",
+    "publicationDate": "2023-12-22",
+    "quality": {
+      "articleCount": 50,
+      "recitalCount": 120,
+      "annexCount": 0,
+      "paragraphCount": 240,
+      "pointCount": 260,
+      "structuralNodeCount": 11,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32023R2854:recital:1": "sha256:2e2af877f24a32de4eb7f7d3ac6077b337eca46e83fec8fd195b2d1e868d6d46",
+        "eu:32023R2854:article:1:paragraph:1": "sha256:e6c0094c60073e740f99f80dae15b22d5dd853dfae3159be2df2de592e0ad77a",
+        "eu:32023R2854:article:50:subparagraph:6": "sha256:098752db90a970701a50b8d9d8b78b0c0e09fb1648c3cfa02fef0383f9633685"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng"
+  }
+]

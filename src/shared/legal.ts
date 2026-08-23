@@ -1,0 +1,135 @@
+import { z } from "zod";
+
+export const collectionIdSchema = z.enum(["articles", "recitals", "annexes"]);
+
+export const breadcrumbSchema = z.object({
+  id: z.string().min(1),
+  kind: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().optional(),
+});
+
+export const bodyBlockSchema: z.ZodType<BodyBlock> = z.lazy(() =>
+  z.object({
+    id: z.string().min(1),
+    kind: z.enum([
+      "paragraph",
+      "subparagraph",
+      "point",
+      "subpoint",
+      "recital",
+      "annex",
+      "annex-part",
+      "other",
+    ]),
+    marker: z.string().optional(),
+    text: z.string(),
+    anchor: z.string().min(1),
+    children: z.array(bodyBlockSchema),
+  }),
+);
+
+export interface BodyBlock {
+  id: string;
+  kind:
+    | "paragraph"
+    | "subparagraph"
+    | "point"
+    | "subpoint"
+    | "recital"
+    | "annex"
+    | "annex-part"
+    | "other";
+  marker?: string;
+  text: string;
+  anchor: string;
+  children: BodyBlock[];
+}
+
+export const provisionViewSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(["article", "recital", "annex"]),
+  collectionId: collectionIdSchema,
+  number: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().optional(),
+  path: z.string().startsWith("/"),
+  breadcrumbs: z.array(breadcrumbSchema),
+  previousId: z.string().optional(),
+  nextId: z.string().optional(),
+  blocks: z.array(bodyBlockSchema),
+});
+
+export const tocNodeSchema: z.ZodType<TocNode> = z.lazy(() =>
+  z.object({
+    id: z.string().min(1),
+    type: z.enum(["group", "provision"]),
+    kind: z.string().min(1),
+    label: z.string().min(1),
+    title: z.string().optional(),
+    range: z.string().optional(),
+    provisionId: z.string().optional(),
+    children: z.array(tocNodeSchema),
+  }),
+);
+
+export interface TocNode {
+  id: string;
+  type: "group" | "provision";
+  kind: string;
+  label: string;
+  title?: string;
+  range?: string;
+  provisionId?: string;
+  children: TocNode[];
+}
+
+export const contentCollectionSchema = z.object({
+  id: collectionIdSchema,
+  label: z.string().min(1),
+  count: z.number().int().nonnegative(),
+  roots: z.array(tocNodeSchema),
+});
+
+export const documentViewSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  celex: z.string().min(1),
+  shortName: z.string().min(1),
+  officialTitle: z.string().min(1),
+  documentType: z.enum([
+    "regulation",
+    "directive",
+    "law",
+    "circular",
+    "guidance",
+    "other",
+  ]),
+  sourceUrl: z.string().url(),
+  asOf: z.string().date(),
+  lastChecked: z.string().datetime(),
+  sourceVersion: z.string().min(1),
+  buildId: z.string().min(1),
+  provenance: z.enum(["official", "fixture"]),
+  collections: z.array(contentCollectionSchema).min(1),
+  provisions: z.array(provisionViewSchema),
+});
+
+export const documentSummarySchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  officialTitle: z.string().min(1),
+  defaultPath: z.string().startsWith("/"),
+  provenance: z.enum(["official", "fixture"]),
+});
+
+export const documentCatalogSchema = z.object({
+  documents: z.array(documentSummarySchema),
+});
+
+export type CollectionId = z.infer<typeof collectionIdSchema>;
+export type ContentCollection = z.infer<typeof contentCollectionSchema>;
+export type ProvisionView = z.infer<typeof provisionViewSchema>;
+export type DocumentView = z.infer<typeof documentViewSchema>;
+export type DocumentSummary = z.infer<typeof documentSummarySchema>;

@@ -2,7 +2,7 @@
 
 > 文档版本：v1.1 Revised Technical Baseline  
 > 日期：2026-08-23  
-> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.1 Baseline`  
+> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.2 Revised Baseline`  
 > 产品语言：English  
 > 技术文档语言：中文  
 > 目标：把最终版产品需求落实为一套**简单、可落地、可逐步扩展、适合 Codex 协作开发**的工程架构。
