@@ -1,0 +1,89 @@
+import { describe, expect, it } from "vitest";
+import type { LawSearchRecord } from "./law-search";
+import { normalizeLawQuery, searchLaws } from "./law-search";
+
+const base = {
+  officialTitle: "Official title",
+  publicationDate: "2022-01-01",
+  documentType: "regulation" as const,
+  readerPath: "/read/example/articles/1",
+  explorerPath: "/explore/example",
+  provenance: "official" as const,
+};
+
+const records: LawSearchRecord[] = [
+  {
+    ...base,
+    id: "eu:32022R2554",
+    familyId: "family:dora",
+    slug: "dora",
+    shortName: "DORA",
+    officialTitle: "Regulation on digital operational resilience",
+    celex: "32022R2554",
+    aliases: ["Digital Operational Resilience Act"],
+  },
+  {
+    ...base,
+    id: "eu:32022L2555",
+    familyId: "family:nis2",
+    slug: "nis2",
+    shortName: "NIS2",
+    documentType: "directive",
+    officialTitle: "Directive on network and information systems",
+    celex: "32022L2555",
+    aliases: ["NIS 2"],
+  },
+  {
+    ...base,
+    id: "eu:32024R1689",
+    familyId: "family:ai-act",
+    slug: "ai-act",
+    shortName: "AI Act",
+    officialTitle:
+      "Regulation laying down harmonised rules on artificial intelligence and amending Regulation 2022/868",
+    celex: "32024R1689",
+    aliases: ["Artificial Intelligence Act"],
+  },
+];
+
+describe("Find Laws deterministic ranking", () => {
+  it("normalizes punctuation and case without changing legal tokens", () => {
+    expect(normalizeLawQuery(" Regulation (EU) 2022/2554 ")).toBe(
+      "regulation eu 2022 2554",
+    );
+  });
+
+  it.each([
+    ["32022r2554", "exact-celex"],
+    ["DORA", "exact-alias"],
+    ["digital operational resilience act", "exact-alias"],
+    ["2022/2554", "exact-citation"],
+    ["Regulation (EU) 2022/2554", "exact-citation"],
+  ])("ranks %s as a deterministic DORA match", (query, reason) => {
+    const response = searchLaws(records, query);
+    expect(response.bestMatch).toMatchObject({
+      slug: "dora",
+      matchReason: reason,
+    });
+  });
+
+  it("keeps directive and regulation citations distinct", () => {
+    expect(searchLaws(records, "Directive 2022/2555").bestMatch).toMatchObject({
+      slug: "nis2",
+      matchReason: "exact-citation",
+    });
+    expect(searchLaws(records, "Regulation 2022/2555").results).toHaveLength(0);
+  });
+
+  it("does not treat substrings inside words and numbers as term matches", () => {
+    expect(
+      searchLaws(records, "NIS 2").results.map((result) => result.slug),
+    ).toEqual(["nis2"]);
+  });
+
+  it("returns the available catalog for an empty query", () => {
+    expect(
+      searchLaws(records, "").results.map((result) => result.slug),
+    ).toEqual(["ai-act", "dora", "nis2"]);
+  });
+});

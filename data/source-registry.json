@@ -2,6 +2,10 @@
   {
     "familyId": "family:dora",
     "shortName": "DORA",
+    "aliases": [
+      "Digital Operational Resilience Act",
+      "Digital Operational Resilience Regulation"
+    ],
     "celex": "32022R2554",
     "language": "ENG",
     "documentType": "regulation",
@@ -25,6 +29,7 @@
   {
     "familyId": "family:gdpr",
     "shortName": "GDPR",
+    "aliases": ["General Data Protection Regulation", "EU GDPR"],
     "celex": "32016R0679",
     "language": "ENG",
     "documentType": "regulation",
@@ -48,6 +53,7 @@
   {
     "familyId": "family:ai-act",
     "shortName": "AI Act",
+    "aliases": ["Artificial Intelligence Act", "EU AI Act", "AIA"],
     "celex": "32024R1689",
     "language": "ENG",
     "documentType": "regulation",
@@ -73,6 +79,11 @@
   {
     "familyId": "family:mica",
     "shortName": "MiCA",
+    "aliases": [
+      "Markets in Crypto-assets Regulation",
+      "Markets in Crypto Assets Regulation",
+      "MiCAR"
+    ],
     "celex": "32023R1114",
     "language": "ENG",
     "documentType": "regulation",
@@ -98,6 +109,11 @@
   {
     "familyId": "family:nis2",
     "shortName": "NIS2",
+    "aliases": [
+      "NIS 2",
+      "Network and Information Systems Directive 2",
+      "Second Network and Information Systems Directive"
+    ],
     "celex": "32022L2555",
     "language": "ENG",
     "documentType": "directive",
@@ -123,6 +139,7 @@
   {
     "familyId": "family:data-act",
     "shortName": "Data Act",
+    "aliases": ["EU Data Act"],
     "celex": "32023R2854",
     "language": "ENG",
     "documentType": "regulation",

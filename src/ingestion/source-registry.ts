@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
@@ -6,6 +7,7 @@ import { normalizeCelex } from "../canonical/ids";
 export const sourceDefinitionSchema = z.object({
   familyId: z.string().regex(/^family:[a-z0-9-]+$/),
   shortName: z.string().min(1),
+  aliases: z.array(z.string().min(1)).min(1),
   celex: z.string().transform(normalizeCelex),
   language: z.literal("ENG"),
   documentType: z.enum(["regulation", "directive"]),
@@ -30,13 +32,11 @@ export const sourceDefinitionSchema = z.object({
 
 export type SourceDefinition = z.infer<typeof sourceDefinitionSchema>;
 
-export async function loadSourceRegistry(
-  registryPath = resolve(process.cwd(), "data/source-registry.json"),
-): Promise<SourceDefinition[]> {
-  const raw = JSON.parse(await readFile(registryPath, "utf8"));
+function parseSourceRegistry(raw: unknown): SourceDefinition[] {
   const sources = z.array(sourceDefinitionSchema).min(1).parse(raw);
   const seenCelex = new Set<string>();
   const seenFamilies = new Set<string>();
+  const aliasOwners = new Map<string, string>();
 
   for (const source of sources) {
     if (seenCelex.has(source.celex)) {
@@ -49,9 +49,31 @@ export async function loadSourceRegistry(
     }
     seenCelex.add(source.celex);
     seenFamilies.add(source.familyId);
+    for (const alias of [source.shortName, ...source.aliases]) {
+      const normalizedAlias = alias.normalize("NFKC").trim().toLowerCase();
+      const owner = aliasOwners.get(normalizedAlias);
+      if (owner && owner !== source.familyId) {
+        throw new Error(
+          `Ambiguous source alias ${alias}: used by ${owner} and ${source.familyId}`,
+        );
+      }
+      aliasOwners.set(normalizedAlias, source.familyId);
+    }
   }
 
   return sources;
+}
+
+export function loadSourceRegistrySync(
+  registryPath = resolve(process.cwd(), "data/source-registry.json"),
+): SourceDefinition[] {
+  return parseSourceRegistry(JSON.parse(readFileSync(registryPath, "utf8")));
+}
+
+export async function loadSourceRegistry(
+  registryPath = resolve(process.cwd(), "data/source-registry.json"),
+): Promise<SourceDefinition[]> {
+  return parseSourceRegistry(JSON.parse(await readFile(registryPath, "utf8")));
 }
 
 export async function findSource(celex: string): Promise<SourceDefinition> {

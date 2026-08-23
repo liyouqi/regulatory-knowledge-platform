@@ -127,7 +127,7 @@ The immutable result is written under `data/artifacts/canonical/<CELEX>/`. This 
 
 ### Add another EU law
 
-1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, and a unique `familyId`.
+1. Add one entry to `data/source-registry.json`; use the official CELEX ID, English ELI URL, a unique `familyId`, and reviewed common names in `aliases`. Do not add speculative or ambiguous aliases.
 2. Validate the registry and check the new row:
 
    ```bash
@@ -167,7 +167,8 @@ official source snapshot ✓
 → Reader API and UI ✓
 → six-law parser validation ✓
 → Universal One-page Act Explorer ✓
-→ global law discovery and search build (next)
+→ global law discovery / Find Laws ✓
+→ current-document full-text build (next)
 → relationship build
 → atomic publish or rollback
 ```
@@ -193,7 +194,7 @@ Reader URLs are stable and readable:
 /read/ai-act/annexes/vii#annex-part-1
 ```
 
-Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. Quick Go accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`; use `Cmd+K` on macOS or `Ctrl+K` elsewhere to focus it.
+Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. Reader Quick Go accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2` for the current law.
 
 ### Explorer links and navigation
 
@@ -217,6 +218,24 @@ After `npm run dev`, manually check one legacy single-XML act and one modern pac
 2. Confirm the Reader opens `/read/dora/articles/28`.
 3. Select **Explore** and confirm the browser returns to `/explore/dora#article-28` with the Article visible.
 4. Repeat a structural and mobile check at `http://localhost:5173/explore/ai-act`.
+
+### Find Laws
+
+Use `Cmd+K` on macOS or `Ctrl+K` elsewhere from either Reader or Explorer to open the global Find Laws panel. Search is live; `↑`/`↓` changes the active result, `Enter` opens its Explorer, and `Esc` closes the panel.
+
+The deterministic server endpoint is `/api/search/laws?q=<query>`. It ranks exact legal identity ahead of lexical title matches in this order: CELEX, reviewed name/alias, structured year/number citation, exact title, title prefix, then whole-term matches. Useful checks include:
+
+```text
+DORA
+Digital Operational Resilience Act
+32022R2554
+2022/2554
+Regulation (EU) 2022/2554
+NIS 2
+Directive 2022/2555
+```
+
+Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
 
 ## Current Release Status
 
@@ -244,5 +263,8 @@ Release 0.2 is now in progress and additionally includes:
 - a separate lightweight Explorer DTO and `/api/explorer/:slug` endpoint that do not duplicate legal body text;
 - stable Explorer ↔ Reader navigation, exact Article anchors, browser-history compatibility, and session scroll restoration;
 - desktop DORA, MiCA structure, and 390px AI Act mobile browser smoke checks.
+- a global Find Laws command panel shared by Reader and Explorer, with live server-side results and complete keyboard navigation;
+- reviewed aliases in the source registry and deterministic CELEX, alias, legal citation, title-prefix, and whole-term ranking;
+- global navigation to stable Explorer routes, with desktop and 390px mobile browser checks.
 
-The next implementation task is the remaining Release 0.2 discovery slice: global family/law navigation, **Find Laws** aliases and exact CELEX lookup, followed by the first rebuildable current-document full-text search artifact.
+The next implementation task is the remaining Release 0.2 slice: the first rebuildable current-document full-text search artifact and its responsive, keyboard-accessible Reader surface. SQLite FTS5 global search, Definitions, and Opened Laws remain Release 0.3 work and are not represented as completed modes.

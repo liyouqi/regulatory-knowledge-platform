@@ -16,5 +16,17 @@ describe("EU source registry", () => {
       "Data Act",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
+    expect(sources.every((source) => source.aliases.length > 0)).toBe(true);
+    expect(
+      new Set(
+        sources.flatMap((source) =>
+          [source.shortName, ...source.aliases].map((alias) =>
+            alias.toLowerCase(),
+          ),
+        ),
+      ).size,
+    ).toBe(
+      sources.reduce((count, source) => count + source.aliases.length + 1, 0),
+    );
   });
 });

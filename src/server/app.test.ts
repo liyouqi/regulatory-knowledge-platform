@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { ExplorerNode } from "../shared/legal";
-import { findDocument, findDocumentBySlug, findExplorerBySlug } from "./app";
+import {
+  findDocument,
+  findDocumentBySlug,
+  findExplorerBySlug,
+  findLaws,
+} from "./app";
 
 describe("Document lookup", () => {
   it("returns the DORA fixture by stable document ID", async () => {
@@ -37,6 +42,17 @@ describe("Document lookup", () => {
     });
     expect(JSON.stringify(explorer)).not.toContain(
       "This Regulation lays down uniform requirements",
+    );
+  });
+
+  it("finds laws by alias, CELEX, and structured citation", () => {
+    expect(findLaws("DORA").bestMatch).toMatchObject({
+      id: "eu:32022R2554",
+      matchReason: "exact-alias",
+    });
+    expect(findLaws("32022R2554").bestMatch?.id).toBe("eu:32022R2554");
+    expect(findLaws("Regulation (EU) 2022/2554").bestMatch?.id).toBe(
+      "eu:32022R2554",
     );
   });
 });

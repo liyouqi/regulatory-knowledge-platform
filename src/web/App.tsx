@@ -33,6 +33,7 @@ import {
   parseReaderPath,
 } from "../shared/reader-route";
 import { ExplorerPage } from "./ExplorerPage";
+import { GlobalLawSearch } from "./GlobalLawSearch";
 
 function containsProvision(node: TocNode, provisionId: string): boolean {
   return (
@@ -180,7 +181,7 @@ function QuickGo({
   );
 }
 
-function ReaderPage() {
+function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
   const selection = parseReaderPath(location.pathname);
@@ -190,19 +191,6 @@ function ReaderPage() {
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [loadError, setLoadError] = useState("");
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const handleShortcut = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        quickGoRef.current?.focus();
-      } else if (event.key === "Escape") {
-        quickGoRef.current?.blur();
-      }
-    };
-    globalThis.addEventListener("keydown", handleShortcut);
-    return () => globalThis.removeEventListener("keydown", handleShortcut);
-  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -348,11 +336,11 @@ function ReaderPage() {
           </Link>
           <button
             className="search-button"
-            onClick={() => quickGoRef.current?.focus()}
+            onClick={onOpenSearch}
             type="button"
           >
             <Search aria-hidden="true" size={16} />
-            Quick go
+            Find laws
             <kbd>⌘ K</kbd>
           </button>
         </div>
@@ -519,5 +507,32 @@ function ReaderPage() {
 export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
-  return explorer ? <ExplorerPage slug={explorer.slug} /> : <ReaderPage />;
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      } else if (event.key === "Escape") {
+        setSearchOpen(false);
+      }
+    };
+    globalThis.addEventListener("keydown", handleShortcut);
+    return () => globalThis.removeEventListener("keydown", handleShortcut);
+  }, []);
+
+  return (
+    <>
+      {explorer ? (
+        <ExplorerPage
+          onOpenSearch={() => setSearchOpen(true)}
+          slug={explorer.slug}
+        />
+      ) : (
+        <ReaderPage onOpenSearch={() => setSearchOpen(true)} />
+      )}
+      <GlobalLawSearch onClose={() => setSearchOpen(false)} open={searchOpen} />
+    </>
+  );
 }

@@ -129,6 +129,40 @@ export const documentCatalogSchema = z.object({
   documents: z.array(documentSummarySchema),
 });
 
+export const lawSearchMatchReasonSchema = z.enum([
+  "catalog",
+  "exact-celex",
+  "exact-alias",
+  "exact-citation",
+  "exact-title",
+  "title-prefix",
+  "title-terms",
+]);
+
+export const lawSearchResultSchema = z.object({
+  id: z.string().min(1),
+  familyId: z.string().startsWith("family:"),
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  officialTitle: z.string().min(1),
+  documentType: documentViewSchema.shape.documentType,
+  publicationDate: z.string().date(),
+  celex: z.string().min(1),
+  aliases: z.array(z.string().min(1)),
+  readerPath: z.string().startsWith("/"),
+  explorerPath: z.string().startsWith("/"),
+  provenance: z.enum(["official", "fixture"]),
+  matchReason: lawSearchMatchReasonSchema,
+  score: z.number().nonnegative(),
+});
+
+export const lawSearchResponseSchema = z.object({
+  query: z.string(),
+  normalizedQuery: z.string(),
+  bestMatch: lawSearchResultSchema.optional(),
+  results: z.array(lawSearchResultSchema),
+});
+
 export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
   z.object({
     id: z.string().min(1),
@@ -178,3 +212,5 @@ export type ProvisionView = z.infer<typeof provisionViewSchema>;
 export type DocumentView = z.infer<typeof documentViewSchema>;
 export type DocumentSummary = z.infer<typeof documentSummarySchema>;
 export type ExplorerDocument = z.infer<typeof explorerDocumentSchema>;
+export type LawSearchResult = z.infer<typeof lawSearchResultSchema>;
+export type LawSearchResponse = z.infer<typeof lawSearchResponseSchema>;

@@ -1,4 +1,10 @@
-import { ArrowRight, BookOpen, ExternalLink, ListTree } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  ExternalLink,
+  ListTree,
+  Search,
+} from "lucide-react";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -68,7 +74,13 @@ function ExplorerTree({
   });
 }
 
-export function ExplorerPage({ slug }: { slug: string }) {
+export function ExplorerPage({
+  slug,
+  onOpenSearch,
+}: {
+  slug: string;
+  onOpenSearch: () => void;
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
@@ -159,6 +171,15 @@ export function ExplorerPage({ slug }: { slug: string }) {
               Read
             </Link>
           ) : null}
+          <button
+            className="search-button"
+            onClick={onOpenSearch}
+            type="button"
+          >
+            <Search aria-hidden="true" size={16} />
+            Find laws
+            <kbd>⌘ K</kbd>
+          </button>
         </div>
       </header>
 

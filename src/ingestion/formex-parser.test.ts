@@ -7,6 +7,7 @@ import { sourceDefinitionSchema } from "./source-registry";
 const source = sourceDefinitionSchema.parse({
   familyId: "family:test-act",
   shortName: "Test Act",
+  aliases: ["Test Regulation"],
   celex: "32025R0001",
   language: "ENG",
   documentType: "regulation",
