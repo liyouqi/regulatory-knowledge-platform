@@ -980,6 +980,8 @@ Paragraph / point 必须有稳定 DOM anchor，由 provision stable ID 映射，
 
 Search UI 只负责交互，不实现 ranking。
 
+`Opened Laws` 是唯一的 browser-local mode，不属于 Search Service 或 runtime SQLite。它使用 versioned `localStorage` envelope，单条仅保存 `documentId`、最后 Reader/Explorer `path` 与 `openedAt`，最多保留 10 条，并按 `documentId` 去重；不保存法规正文、搜索索引或用户账号数据。打开时由当前 `/api/documents` catalog hydrate，已不在本地语料中的 ID 不显示。清除动作只删除该 localStorage key，不影响 Canonical、SQLite artifact 或服务端数据。
+
 首页大搜索框与全站 Cmd+K 使用同一 Search Service 和同一结果组件。
 
 ---

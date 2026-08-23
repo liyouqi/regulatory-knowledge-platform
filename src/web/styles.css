@@ -1070,6 +1070,8 @@ kbd {
   align-self: stretch;
   display: flex;
   gap: 18px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .search-mode-tabs button {
@@ -1085,6 +1087,7 @@ kbd {
   font-weight: 750;
   gap: 7px;
   padding: 0;
+  white-space: nowrap;
   text-transform: uppercase;
 }
 
@@ -1120,6 +1123,34 @@ kbd {
   border-top: 1px solid #343a2f;
   margin-top: 12px;
   padding-top: 15px;
+}
+
+.opened-laws-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 10px;
+}
+
+.opened-laws-heading .search-section-label {
+  margin-right: 0;
+}
+
+.opened-laws-heading button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #aeb9a0;
+  cursor: pointer;
+  display: flex;
+  font-size: 10px;
+  gap: 5px;
+  padding: 6px;
+  text-transform: uppercase;
+}
+
+.opened-laws-heading button:hover {
+  color: #d3dba9;
 }
 
 .law-search-result {
@@ -1447,6 +1478,15 @@ kbd {
 
   .search-mode-bar {
     padding: 0 15px;
+  }
+
+  .search-mode-tabs {
+    gap: 13px;
+  }
+
+  .search-mode-tabs button {
+    font-size: 9px;
+    gap: 4px;
   }
 
   .search-mode-bar small,

@@ -39,6 +39,7 @@ import {
 } from "../shared/reader-route";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
+import { recordOpenedLaw } from "./opened-laws";
 
 function containsProvision(node: TocNode, provisionId: string): boolean {
   return (
@@ -426,6 +427,14 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         ?.classList.remove("deep-link-target");
     };
   }, [activeProvision, location.hash]);
+
+  useEffect(() => {
+    if (!legalDocument || !activeProvision) return;
+    recordOpenedLaw({
+      documentId: legalDocument.id,
+      path: `${activeProvision.path}${location.hash}`,
+    });
+  }, [activeProvision, legalDocument, location.hash]);
 
   useEffect(() => {
     if (!activeProvision) return;

@@ -2,9 +2,11 @@ import {
   ArrowRight,
   BookOpen,
   FileSearch,
+  History,
   LoaderCircle,
   Quote,
   Search,
+  Trash2,
   X,
 } from "lucide-react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
@@ -12,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import type {
   DefinitionSearchResponse,
   DefinitionSearchResult,
+  DocumentSummary,
   FullTextSearchResponse,
   FullTextSearchResult,
   LawSearchResponse,
@@ -19,11 +22,20 @@ import type {
 } from "../shared/legal";
 import {
   definitionSearchResponseSchema,
+  documentCatalogSchema,
   fullTextSearchResponseSchema,
   lawSearchResponseSchema,
 } from "../shared/legal";
+import {
+  OPENED_LAWS_CHANGED_EVENT,
+  type ResolvedOpenedLaw,
+  clearOpenedLaws,
+  formatOpenedAt,
+  readOpenedLaws,
+  resolveOpenedLaws,
+} from "./opened-laws";
 
-type SearchMode = "laws" | "definitions" | "fulltext";
+type SearchMode = "laws" | "opened" | "definitions" | "fulltext";
 
 const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
   catalog: "Available law",
@@ -198,6 +210,53 @@ function DefinitionResultRow({
   );
 }
 
+function OpenedLawResultRow({
+  result,
+  active,
+  index,
+  onOpen,
+  onSelect,
+}: {
+  result: ResolvedOpenedLaw;
+  active: boolean;
+  index: number;
+  onOpen: (result: ResolvedOpenedLaw) => void;
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <button
+      aria-current={active ? "true" : undefined}
+      className={`law-search-result${active ? " active" : ""}`}
+      onClick={() => onOpen(result)}
+      onMouseEnter={() => onSelect(index)}
+      ref={
+        active
+          ? (node) => node?.scrollIntoView({ block: "nearest" })
+          : undefined
+      }
+      type="button"
+    >
+      <span className="law-result-mark">
+        {result.document.shortName.slice(0, 2)}
+      </span>
+      <span className="law-result-copy">
+        <span>
+          <strong>{result.document.shortName}</strong>
+          <em>Recently opened</em>
+        </span>
+        <small>{result.document.officialTitle}</small>
+        <span className="law-result-meta">
+          {formatOpenedAt(result.opened.openedAt)} ·{" "}
+          {result.document.provenance}
+        </span>
+      </span>
+      <span className="law-result-action">
+        Open <ArrowRight aria-hidden="true" size={15} />
+      </span>
+    </button>
+  );
+}
+
 export function GlobalLawSearch({
   open,
   onClose,
@@ -216,6 +275,8 @@ export function GlobalLawSearch({
     useState<FullTextSearchResponse | null>(null);
   const [definitionResponse, setDefinitionResponse] =
     useState<DefinitionSearchResponse | null>(null);
+  const [openedLaws, setOpenedLaws] = useState(() => readOpenedLaws());
+  const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -223,12 +284,24 @@ export function GlobalLawSearch({
   const lawResults = lawResponse?.results ?? [];
   const fullTextResults = fullTextResponse?.results ?? [];
   const definitionResults = definitionResponse?.results ?? [];
+  const openedResults = resolveOpenedLaws(openedLaws, catalog).filter(
+    (result) => {
+      const normalizedQuery = query.trim().toLowerCase();
+      return (
+        !normalizedQuery ||
+        result.document.shortName.toLowerCase().includes(normalizedQuery) ||
+        result.document.officialTitle.toLowerCase().includes(normalizedQuery)
+      );
+    },
+  );
   const resultCount =
     mode === "laws"
       ? lawResults.length
-      : mode === "definitions"
-        ? definitionResults.length
-        : fullTextResults.length;
+      : mode === "opened"
+        ? openedResults.length
+        : mode === "definitions"
+          ? definitionResults.length
+          : fullTextResults.length;
 
   useEffect(() => {
     if (!open) return;
@@ -243,6 +316,11 @@ export function GlobalLawSearch({
 
   useEffect(() => {
     if (!open) return;
+    if (mode === "opened") {
+      setLoading(false);
+      setError("");
+      return;
+    }
     if (mode !== "laws" && query.trim().length < 2) {
       if (mode === "fulltext") setFullTextResponse(null);
       if (mode === "definitions") setDefinitionResponse(null);
@@ -294,6 +372,37 @@ export function GlobalLawSearch({
   }, [mode, open, query]);
 
   useEffect(() => {
+    if (!open || mode !== "opened") return;
+    const refresh = () => setOpenedLaws(readOpenedLaws());
+    refresh();
+    globalThis.addEventListener(OPENED_LAWS_CHANGED_EVENT, refresh);
+    globalThis.addEventListener("storage", refresh);
+    return () => {
+      globalThis.removeEventListener(OPENED_LAWS_CHANGED_EVENT, refresh);
+      globalThis.removeEventListener("storage", refresh);
+    };
+  }, [mode, open]);
+
+  useEffect(() => {
+    if (!open || mode !== "opened" || catalog.length > 0) return;
+    const controller = new AbortController();
+    void fetch("/api/documents", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load document catalog");
+        return documentCatalogSchema.parse(await response.json()).documents;
+      })
+      .then(setCatalog)
+      .catch((caught: unknown) => {
+        if ((caught as DOMException).name !== "AbortError") {
+          setError(
+            caught instanceof Error ? caught.message : "Unable to load catalog",
+          );
+        }
+      });
+    return () => controller.abort();
+  }, [catalog.length, mode, open]);
+
+  useEffect(() => {
     if (selectedIndex >= resultCount) {
       setSelectedIndex(Math.max(0, resultCount - 1));
     }
@@ -316,6 +425,11 @@ export function GlobalLawSearch({
     navigate(result.path);
   }
 
+  function openOpenedLaw(result: ResolvedOpenedLaw) {
+    onClose();
+    navigate(result.opened.path);
+  }
+
   function selectMode(nextMode: SearchMode) {
     setMode(nextMode);
     setSelectedIndex(0);
@@ -331,7 +445,7 @@ export function GlobalLawSearch({
     }
     if (event.key === "Tab") {
       event.preventDefault();
-      const modes: SearchMode[] = ["laws", "definitions", "fulltext"];
+      const modes: SearchMode[] = ["laws", "opened", "definitions", "fulltext"];
       const currentIndex = modes.indexOf(mode);
       const direction = event.shiftKey ? -1 : 1;
       selectMode(
@@ -357,6 +471,11 @@ export function GlobalLawSearch({
         if (!result) return;
         event.preventDefault();
         openLawResult(result);
+      } else if (mode === "opened") {
+        const result = openedResults[selectedIndex];
+        if (!result) return;
+        event.preventDefault();
+        openOpenedLaw(result);
       } else if (mode === "definitions") {
         const result = definitionResults[selectedIndex];
         if (!result) return;
@@ -400,9 +519,11 @@ export function GlobalLawSearch({
             aria-label={
               mode === "laws"
                 ? "Find laws by name, CELEX, or citation"
-                : mode === "definitions"
-                  ? "Search legal definitions"
-                  : "Search full text across loaded laws"
+                : mode === "opened"
+                  ? "Filter recently opened laws"
+                  : mode === "definitions"
+                    ? "Search legal definitions"
+                    : "Search full text across loaded laws"
             }
             maxLength={200}
             onChange={(event) => {
@@ -413,9 +534,11 @@ export function GlobalLawSearch({
             placeholder={
               mode === "laws"
                 ? "DORA, DORA article 3, 32022R2554…"
-                : mode === "definitions"
-                  ? 'Controller, personal data, "AI system"…'
-                  : 'Operational risk, "management body"…'
+                : mode === "opened"
+                  ? "Filter recently opened laws…"
+                  : mode === "definitions"
+                    ? 'Controller, personal data, "AI system"…'
+                    : 'Operational risk, "management body"…'
             }
             ref={inputRef}
             value={query}
@@ -441,6 +564,15 @@ export function GlobalLawSearch({
               <BookOpen aria-hidden="true" size={14} /> Find laws
             </button>
             <button
+              aria-selected={mode === "opened"}
+              className={mode === "opened" ? "active" : ""}
+              onClick={() => selectMode("opened")}
+              role="tab"
+              type="button"
+            >
+              <History aria-hidden="true" size={14} /> Opened laws
+            </button>
+            <button
               aria-selected={mode === "definitions"}
               className={mode === "definitions" ? "active" : ""}
               onClick={() => selectMode("definitions")}
@@ -462,9 +594,11 @@ export function GlobalLawSearch({
           <small>
             {mode === "laws"
               ? "Name · alias · CELEX · citation"
-              : mode === "definitions"
-                ? "Official terms · traceable sources"
-                : "SQLite FTS5 · all laws"}
+              : mode === "opened"
+                ? "This browser · no account"
+                : mode === "definitions"
+                  ? "Official terms · traceable sources"
+                  : "SQLite FTS5 · all laws"}
           </small>
         </div>
 
@@ -489,6 +623,17 @@ export function GlobalLawSearch({
               <span>
                 Try <code>controller</code>, <code>personal data</code>, or{" "}
                 <code>"AI system"</code>.
+              </span>
+            </div>
+          ) : null}
+
+          {!error && mode === "opened" && openedResults.length === 0 ? (
+            <div className="search-empty full-text-intro">
+              <History aria-hidden="true" size={25} />
+              <strong>No opened laws yet</strong>
+              <span>
+                Open a law in Reader or Explorer to keep a quick local link
+                here.
               </span>
             </div>
           ) : null}
@@ -518,6 +663,37 @@ export function GlobalLawSearch({
             <p className="search-empty">
               No official definition matches this term.
             </p>
+          ) : null}
+
+          {!error && mode === "opened" && openedResults.length > 0 ? (
+            <>
+              <div className="opened-laws-heading">
+                <p className="search-section-label">
+                  RECENTLY OPENED · THIS BROWSER
+                </p>
+                <button
+                  aria-label="Clear opened law history"
+                  onClick={() => {
+                    clearOpenedLaws();
+                    setOpenedLaws([]);
+                    setSelectedIndex(0);
+                  }}
+                  type="button"
+                >
+                  <Trash2 aria-hidden="true" size={13} /> Clear
+                </button>
+              </div>
+              {openedResults.map((result, index) => (
+                <OpenedLawResultRow
+                  active={selectedIndex === index}
+                  index={index}
+                  key={result.document.id}
+                  onOpen={openOpenedLaw}
+                  onSelect={setSelectedIndex}
+                  result={result}
+                />
+              ))}
+            </>
           ) : null}
 
           {mode === "laws" && lawResults.length > 0 ? (

@@ -15,6 +15,7 @@ import {
   explorerDocumentSchema,
 } from "../shared/legal";
 import { explorerPath } from "../shared/reader-route";
+import { recordOpenedLaw } from "./opened-laws";
 
 function flattenArticles(nodes: ExplorerNode[]): ExplorerNode[] {
   return nodes.flatMap((node) =>
@@ -143,6 +144,14 @@ export function ExplorerPage({
     });
     return () => cancelAnimationFrame(frame);
   }, [document, location.hash, slug]);
+
+  useEffect(() => {
+    if (!document) return;
+    recordOpenedLaw({
+      documentId: document.id,
+      path: `${explorerPath(document.slug)}${location.hash}`,
+    });
+  }, [document, location.hash]);
 
   const articles = useMemo(
     () => flattenArticles(document?.roots ?? []),

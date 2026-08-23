@@ -259,6 +259,12 @@ AI Act annex VII
 
 Compound queries combine a verified law identity with `article`/`art`, `recital`/`rec`, or `annex` and a number. They open the exact stable Reader route only when that provision exists; the service does not guess missing provisions. Known aliases live only in `data/source-registry.json`. After changing them, run `npm run source:list`, `npm run check`, and `npm test`; the UI does not contain a second alias or ranking implementation.
 
+### Opened Laws
+
+Select **Opened laws** in the same panel, or press `Tab` once from **Find laws**, to reopen recent regulations immediately. This is deliberately a local convenience, not regulatory data: the browser stores a versioned list of at most ten stable document IDs, their most recently visited Reader/Explorer path, and a timestamp in `localStorage`. It stores no legal text, requires no account, does not write to SQLite, and can be cleared from the panel.
+
+The current document catalog hydrates those IDs at display time, so a law no longer shipped in the local corpus is simply not shown. Opening a law again moves it to the top and preserves its most recent deep link. The input filters the local list; `↑`/`↓` and `Enter` work exactly as in the other command-palette modes.
+
 ### Definitions
 
 Open the global panel and select **Definitions**, or press `Tab` once from **Find laws**. Search supports exact normalized terms, term prefixes, and quoted term phrases. Results show the official definition text, EU/LU jurisdiction, source law, Article and point, CELEX ID, and a stable link to the defining point. The same term can appear once per source law, so cross-regulation differences remain visible.
@@ -355,5 +361,6 @@ The Release 0.2 Explorer & Basic Discovery scope is complete locally. Release 0.
 - exact, normalized, prefix, and quoted phrase definition lookup with direct definitions ranked ahead of explicit incorporated references;
 - a traceable `/api/search/definitions` contract and a keyboard-complete **Definitions** mode verified across GDPR/MiCA/Data Act/AI Act sources and at 390px mobile width;
 - a fixed six-query definition evaluation set included in `npm run search:benchmark`.
+- a keyboard-complete **Opened laws** mode: a versioned, bounded local-only history of stable document IDs and last Reader/Explorer paths, with clear-history control and no duplication of legal data into browser storage.
 
-The next Release 0.3 task is Opened Laws mode. It is not represented as completed functionality yet.
+Release 0.3 is complete locally. The next planned scope is Release 0.4: structured cross-document relationships, starting only with official, traceable references.
