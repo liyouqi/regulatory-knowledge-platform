@@ -45,7 +45,7 @@ export function provisionPath(
 
 export function parseReaderPath(pathname: string): ReaderSelection | null {
   const match =
-    /^\/read\/([^/]+)\/(articles|recitals|annexes)\/([^/]+)\/?$/u.exec(
+    /^\/read\/([^/]+)\/(articles|recitals|annexes|provisions)\/([^/]+)\/?$/u.exec(
       pathname,
     );
   if (!match) return null;

@@ -19,9 +19,11 @@ import {
 import { explorerPath, level2LibraryPath } from "../shared/reader-route";
 import { recordOpenedLaw } from "./opened-laws";
 
-function flattenArticles(nodes: ExplorerNode[]): ExplorerNode[] {
+function flattenProvisions(nodes: ExplorerNode[]): ExplorerNode[] {
   return nodes.flatMap((node) =>
-    node.type === "article" ? [node] : flattenArticles(node.children),
+    node.type === "article" || node.type === "provision"
+      ? [node]
+      : flattenProvisions(node.children),
   );
 }
 
@@ -39,7 +41,10 @@ function ExplorerTree({
   slug: string;
 }) {
   return nodes.map((node) => {
-    if (node.type === "article" && node.readerPath) {
+    if (
+      (node.type === "article" || node.type === "provision") &&
+      node.readerPath
+    ) {
       return (
         <Link
           className="explorer-article"
@@ -177,8 +182,8 @@ export function ExplorerPage({
     });
   }, [document, location.hash]);
 
-  const articles = useMemo(
-    () => flattenArticles(document?.roots ?? []),
+  const provisions = useMemo(
+    () => flattenProvisions(document?.roots ?? []),
     [document],
   );
 
@@ -210,8 +215,8 @@ export function ExplorerPage({
             <ListTree aria-hidden="true" size={15} />
             Explore
           </span>
-          {articles[0]?.readerPath ? (
-            <Link className="view-switch" to={articles[0].readerPath}>
+          {provisions[0]?.readerPath ? (
+            <Link className="view-switch" to={provisions[0].readerPath}>
               <BookOpen aria-hidden="true" size={15} />
               Read
             </Link>
@@ -251,7 +256,10 @@ export function ExplorerPage({
           </a>
         </div>
         <p className="explorer-kicker">
-          EU {document.documentType.toUpperCase()} · CELEX {document.celex}
+          {document.jurisdiction} {document.documentType.toUpperCase()} ·{" "}
+          {document.celex
+            ? `CELEX ${document.celex}`
+            : `CSSF ${document.localId ?? "local document"}`}
         </p>
         <h1>{document.shortName}</h1>
         <p className="explorer-official-title">{document.officialTitle}</p>
@@ -268,6 +276,12 @@ export function ExplorerPage({
             <dt>Annexes</dt>
             <dd>{document.annexCount}</dd>
           </div>
+          {document.provisionCount > 0 ? (
+            <div>
+              <dt>Provisions</dt>
+              <dd>{document.provisionCount}</dd>
+            </div>
+          ) : null}
           <div>
             <dt>Last checked</dt>
             <dd>{document.lastChecked.slice(0, 10)}</dd>

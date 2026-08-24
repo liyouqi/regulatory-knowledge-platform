@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { sourceStatusSchema } from "./source-status";
 
-export const collectionIdSchema = z.enum(["articles", "recitals", "annexes"]);
+export const collectionIdSchema = z.enum([
+  "articles",
+  "recitals",
+  "annexes",
+  "provisions",
+]);
 
 export const breadcrumbSchema = z.object({
   id: z.string().min(1),
@@ -49,7 +54,7 @@ export interface BodyBlock {
 
 export const provisionViewSchema = z.object({
   id: z.string().min(1),
-  kind: z.enum(["article", "recital", "annex"]),
+  kind: z.enum(["article", "recital", "annex", "other"]),
   collectionId: collectionIdSchema,
   number: z.string().min(1),
   label: z.string().min(1),
@@ -97,7 +102,8 @@ export const documentViewSchema = z.object({
   id: z.string().min(1),
   jurisdiction: z.enum(["EU", "LU"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
-  celex: z.string().min(1),
+  celex: z.string().min(1).optional(),
+  localId: z.string().min(1).optional(),
   shortName: z.string().min(1),
   officialTitle: z.string().min(1),
   documentType: z.enum([
@@ -196,7 +202,7 @@ export const lawSearchMatchReasonSchema = z.enum([
 ]);
 
 export const lawSearchTargetSchema = z.object({
-  kind: z.enum(["article", "recital", "annex"]),
+  kind: z.enum(["article", "recital", "annex", "other"]),
   number: z.string().min(1),
   label: z.string().min(1),
   title: z.string().optional(),
@@ -242,7 +248,7 @@ export const fullTextSearchResultSchema = z.object({
   shortName: z.string().min(1),
   celex: z.string().min(1),
   provisionId: z.string().min(1),
-  kind: z.enum(["article", "recital", "annex"]),
+  kind: z.enum(["article", "recital", "annex", "other"]),
   label: z.string().min(1),
   title: z.string().optional(),
   marker: z.string().optional(),
@@ -286,7 +292,7 @@ export const definitionSearchResponseSchema = z.object({
 export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
   z.object({
     id: z.string().min(1),
-    type: z.enum(["group", "article"]),
+    type: z.enum(["group", "article", "provision"]),
     kind: z.string().min(1),
     label: z.string().min(1),
     title: z.string().optional(),
@@ -299,7 +305,7 @@ export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
 
 export interface ExplorerNode {
   id: string;
-  type: "group" | "article";
+  type: "group" | "article" | "provision";
   kind: string;
   label: string;
   title?: string;
@@ -311,8 +317,10 @@ export interface ExplorerNode {
 
 export const explorerDocumentSchema = z.object({
   id: z.string().min(1),
+  jurisdiction: z.enum(["EU", "LU"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
-  celex: z.string().min(1),
+  celex: z.string().min(1).optional(),
+  localId: z.string().min(1).optional(),
   shortName: z.string().min(1),
   officialTitle: z.string().min(1),
   documentType: documentViewSchema.shape.documentType,
@@ -324,6 +332,7 @@ export const explorerDocumentSchema = z.object({
   articleCount: z.number().int().nonnegative(),
   recitalCount: z.number().int().nonnegative(),
   annexCount: z.number().int().nonnegative(),
+  provisionCount: z.number().int().nonnegative(),
   roots: z.array(explorerNodeSchema),
 });
 

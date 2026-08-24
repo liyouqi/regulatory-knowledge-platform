@@ -235,7 +235,9 @@ export function buildExplicitReferences(
 ): ExplicitReferenceBuild {
   const { entities, textSources } = buildEntities(documents);
   const documentsByCelex = new Map(
-    documents.map((document) => [document.celex, document]),
+    documents.flatMap((document) =>
+      document.celex ? [[document.celex, document] as const] : [],
+    ),
   );
   const provisionTargets = new Map<string, string>();
   for (const document of documents) {

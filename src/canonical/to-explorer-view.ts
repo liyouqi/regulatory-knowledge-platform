@@ -16,7 +16,11 @@ export function toExplorerView(document: DocumentView): ExplorerDocument {
       : undefined;
     return {
       id: node.id,
-      type: provision ? "article" : "group",
+      type: provision
+        ? provision.kind === "article"
+          ? "article"
+          : "provision"
+        : "group",
       kind: node.kind,
       label: node.label,
       title: node.title,
@@ -28,17 +32,24 @@ export function toExplorerView(document: DocumentView): ExplorerDocument {
       children: node.children.map(mapNode),
     };
   };
-  const count = (collectionId: "annexes" | "articles" | "recitals") =>
+  const count = (
+    collectionId: "annexes" | "articles" | "recitals" | "provisions",
+  ) =>
     document.collections.find((collection) => collection.id === collectionId)
       ?.count ?? 0;
   const articleCollection = document.collections.find(
     (collection) => collection.id === "articles",
   );
+  const provisionCollection = document.collections.find(
+    (collection) => collection.id === "provisions",
+  );
 
   return {
     id: document.id,
+    jurisdiction: document.jurisdiction,
     slug: document.slug,
     celex: document.celex,
+    localId: document.localId,
     shortName: document.shortName,
     officialTitle: document.officialTitle,
     documentType: document.documentType,
@@ -50,6 +61,10 @@ export function toExplorerView(document: DocumentView): ExplorerDocument {
     articleCount: count("articles"),
     recitalCount: count("recitals"),
     annexCount: count("annexes"),
-    roots: (articleCollection?.roots ?? []).map(mapNode),
+    provisionCount: count("provisions"),
+    roots: [
+      ...(articleCollection?.roots ?? []),
+      ...(provisionCollection?.roots ?? []),
+    ].map(mapNode),
   };
 }

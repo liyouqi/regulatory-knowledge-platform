@@ -13,6 +13,7 @@ const collectionForKind = {
   article: "articles",
   recital: "recitals",
   annex: "annexes",
+  other: "provisions",
 } as const;
 
 function documentSlug(shortName: string): string {
@@ -179,21 +180,22 @@ export function toDocumentView(
     document.structuralNodes.map((node) => [node.logicalId, node]),
   );
   const topLevel = document.provisions
-    .filter((provision) =>
-      ["article", "recital", "annex"].includes(provision.kind),
+    .filter(
+      (provision) =>
+        ["article", "recital", "annex"].includes(provision.kind) ||
+        (provision.kind === "other" && !provision.parentLogicalId),
     )
     .sort((left, right) => {
-      const kindOrder = { article: 0, recital: 1, annex: 2 } as const;
+      const kindOrder = { article: 0, recital: 1, annex: 2, other: 3 } as const;
       const kindDifference =
         kindOrder[left.kind as keyof typeof kindOrder] -
         kindOrder[right.kind as keyof typeof kindOrder];
       return kindDifference || left.displayOrder - right.displayOrder;
     });
   const provisions: ProvisionView[] = topLevel.map((provision) => {
-    const kind =
-      provision.kind === "recital" || provision.kind === "annex"
-        ? provision.kind
-        : "article";
+    const kind = ["article", "recital", "annex"].includes(provision.kind)
+      ? (provision.kind as "article" | "recital" | "annex")
+      : "other";
     const collectionId = collectionForKind[kind];
     const directChildren = children.get(provision.logicalId) ?? [];
     const blockSources =
@@ -227,7 +229,12 @@ export function toDocumentView(
     };
   });
 
-  for (const collectionId of ["articles", "recitals", "annexes"] as const) {
+  for (const collectionId of [
+    "articles",
+    "recitals",
+    "annexes",
+    "provisions",
+  ] as const) {
     const inCollection = provisions.filter(
       (provision) => provision.collectionId === collectionId,
     );
@@ -244,6 +251,7 @@ export function toDocumentView(
     { id: "articles", label: "Articles" },
     { id: "recitals", label: "Recitals" },
     { id: "annexes", label: "Annexes" },
+    { id: "provisions", label: "Provisions" },
   ];
   const collections = collectionDefinitions
     .map(({ id, label }) => {
@@ -266,7 +274,8 @@ export function toDocumentView(
     id: document.logicalId,
     jurisdiction: document.jurisdiction,
     slug,
-    celex: document.identifiers.celex ?? "Not applicable",
+    celex: document.identifiers.celex,
+    localId: document.identifiers.localId,
     shortName: document.shortName,
     officialTitle: document.officialTitle,
     documentType: document.documentType,

@@ -132,6 +132,7 @@ export function createLawSearchRecords(
     sources.map((source) => [source.celex, source]),
   );
   return documents.flatMap((document) => {
+    if (!document.celex) return [];
     const source = sourceByCelex.get(document.celex);
     const readerPath = document.provisions[0]?.path;
     if (!source || !readerPath) return [];

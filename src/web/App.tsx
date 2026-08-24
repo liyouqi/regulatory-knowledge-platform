@@ -911,7 +911,8 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
             </label>
           ) : null}
           <p className="eyebrow">
-            EU {legalDocument.documentType.toUpperCase()}
+            {legalDocument.jurisdiction}{" "}
+            {legalDocument.documentType.toUpperCase()}
           </p>
           <h1>{legalDocument.shortName}</h1>
           <p className="toc-title">{legalDocument.officialTitle}</p>
@@ -1031,10 +1032,17 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         <div className="context-divider" />
         <p className="eyebrow">SOURCE</p>
         <dl>
-          <div>
-            <dt>CELEX</dt>
-            <dd>{legalDocument.celex}</dd>
-          </div>
+          {legalDocument.celex ? (
+            <div>
+              <dt>CELEX</dt>
+              <dd>{legalDocument.celex}</dd>
+            </div>
+          ) : legalDocument.localId ? (
+            <div>
+              <dt>CSSF ID</dt>
+              <dd>{legalDocument.localId}</dd>
+            </div>
+          ) : null}
           <div>
             <dt>Published</dt>
             <dd>{legalDocument.asOf}</dd>

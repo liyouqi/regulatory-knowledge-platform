@@ -1,7 +1,73 @@
 import { describe, expect, it } from "vitest";
 import { doraCanonicalFixture } from "../data/dora-fixture";
-import type { CanonicalDocument } from "./schema";
+import { documentViewSchema } from "../shared/legal";
+import type { CanonicalDocument, Provision } from "./schema";
 import { toDocumentView } from "./to-document-view";
+
+function cssfCommunicationFixture(): CanonicalDocument {
+  const document = structuredClone(doraCanonicalFixture);
+  const documentId = "lu:cssf:communication-test";
+  const snapshotId = "snapshot:cssf:communication-test:fixture";
+  const sourceVersion = "cssf-html-test";
+  const provision = (
+    suffix: string,
+    displayOrder: number,
+    label: string,
+    text: string,
+    parentLogicalId?: string,
+  ): Provision => {
+    const logicalId = `${documentId}:${suffix}`;
+    return {
+      logicalId,
+      sourceVersionId: `${logicalId}@${sourceVersion}`,
+      sourceSnapshotId: snapshotId,
+      displayOrder,
+      sourceLocator: { kind: "fixture", value: suffix },
+      parserWarnings: [],
+      kind: "other",
+      numberNormalized: suffix.endsWith("introduction")
+        ? "introduction"
+        : undefined,
+      label,
+      text,
+      contentHash:
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      parentLogicalId,
+      structuralPath: [],
+    };
+  };
+  const introductionId = `${documentId}:provision:introduction`;
+  document.logicalId = documentId;
+  document.sourceVersionId = `${documentId}@${sourceVersion}`;
+  document.sourceSnapshotId = snapshotId;
+  document.jurisdiction = "LU";
+  document.documentType = "other";
+  document.identifiers = { localId: "communication-test" };
+  document.familyIds = ["family:cssf"];
+  document.shortName = "CSSF Communication Test";
+  document.officialTitle = "Reviewed CSSF communication";
+  document.structuralNodes = [];
+  document.provisions = [
+    provision("provision:introduction", 1, "Introduction", "Opening text"),
+    provision(
+      "provision:introduction:block:introduction-1",
+      2,
+      "Paragraph",
+      "Opening text",
+      introductionId,
+    ),
+    provision("provision:section-1", 3, "Section 1", "Section text"),
+  ];
+  document.source = {
+    ...document.source,
+    id: snapshotId,
+    sourceSystem: "cssf",
+    canonicalUrl: "https://www.cssf.lu/en/test/",
+    contentUrl: "https://www.cssf.lu/en/test/",
+    sourceVersion,
+  };
+  return document;
+}
 
 function fixtureWithChapter(): CanonicalDocument {
   const document = structuredClone(doraCanonicalFixture);
@@ -80,5 +146,32 @@ describe("structured Reader DTO", () => {
     });
     expect(first.nextId).toBe(second.id);
     expect(second.previousId).toBe(first.id);
+  });
+
+  it("maps non-EU top-level provisions without inventing Articles or CELEX", () => {
+    const view = documentViewSchema.parse(
+      toDocumentView(cssfCommunicationFixture(), "cssf-test-build"),
+    );
+
+    expect(view).toMatchObject({
+      id: "lu:cssf:communication-test",
+      jurisdiction: "LU",
+      localId: "communication-test",
+      celex: undefined,
+    });
+    expect(view.collections).toEqual([
+      expect.objectContaining({
+        id: "provisions",
+        label: "Provisions",
+        count: 2,
+      }),
+    ]);
+    expect(view.provisions[0]).toMatchObject({
+      kind: "other",
+      collectionId: "provisions",
+      path: "/read/cssf-communication-test/provisions/introduction",
+      blocks: [expect.objectContaining({ text: "Opening text" })],
+    });
+    expect(view.provisions[0].nextId).toBe(view.provisions[1].id);
   });
 });

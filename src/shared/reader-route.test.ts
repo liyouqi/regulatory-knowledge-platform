@@ -21,6 +21,16 @@ describe("Reader routes", () => {
     });
   });
 
+  it("supports generic provision routes without treating them as Articles", () => {
+    const path = provisionPath("cssf-test", "provisions", "section-1");
+
+    expect(parseReaderPath(path)).toEqual({
+      slug: "cssf-test",
+      collectionId: "provisions",
+      number: "section-1",
+    });
+  });
+
   it.each([
     ["23", { collectionId: "articles", number: "23" }],
     ["art 23", { collectionId: "articles", number: "23" }],

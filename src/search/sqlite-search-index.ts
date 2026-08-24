@@ -513,7 +513,9 @@ export function buildRuntimeDatabase(
     );
     const populate = database.transaction(() => {
       for (const [displayOrder, document] of documents.entries()) {
-        const source = sourceByCelex.get(document.celex);
+        const source = document.celex
+          ? sourceByCelex.get(document.celex)
+          : undefined;
         const aliases = [...new Set(source?.aliases ?? [])];
         const explorer = explorerDocumentSchema.parse(toExplorerView(document));
         insertDocument.run({

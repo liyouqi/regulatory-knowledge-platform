@@ -15,6 +15,7 @@ describe("Explorer DTO", () => {
       articleCount: 2,
       recitalCount: 0,
       annexCount: 0,
+      provisionCount: 0,
     });
     expect(first).toMatchObject({
       id: "eu:32022R2554:article:1",
@@ -25,5 +26,57 @@ describe("Explorer DTO", () => {
     expect(JSON.stringify(explorer)).not.toContain(
       "This Regulation lays down uniform requirements",
     );
+  });
+
+  it("exposes generic provision roots for a Luxembourg document", () => {
+    const reader = toDocumentView(doraCanonicalFixture, "explorer-test");
+    reader.id = "lu:cssf:test";
+    reader.jurisdiction = "LU";
+    reader.celex = undefined;
+    reader.localId = "test";
+    reader.collections = [
+      {
+        id: "provisions",
+        label: "Provisions",
+        count: 1,
+        roots: [
+          {
+            id: "lu:cssf:test:provision:introduction",
+            type: "provision",
+            kind: "other",
+            label: "Introduction",
+            provisionId: "lu:cssf:test:provision:introduction",
+            children: [],
+          },
+        ],
+      },
+    ];
+    reader.provisions = [
+      {
+        id: "lu:cssf:test:provision:introduction",
+        kind: "other",
+        collectionId: "provisions",
+        number: "introduction",
+        label: "Introduction",
+        path: "/read/cssf-test/provisions/introduction",
+        explorerAnchor: "provision-introduction",
+        breadcrumbs: [],
+        blocks: [],
+      },
+    ];
+
+    const explorer = explorerDocumentSchema.parse(toExplorerView(reader));
+    expect(explorer).toMatchObject({
+      jurisdiction: "LU",
+      localId: "test",
+      articleCount: 0,
+      provisionCount: 1,
+      roots: [
+        {
+          type: "provision",
+          readerPath: "/read/cssf-test/provisions/introduction",
+        },
+      ],
+    });
   });
 });
