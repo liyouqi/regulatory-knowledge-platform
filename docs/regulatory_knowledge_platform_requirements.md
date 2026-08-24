@@ -1854,7 +1854,9 @@ flowchart LR
 - relationship timestamp/snapshot；
 - node 类型可扩展到 external works / judgments。
 
-当前实现：首个 CELLAR focused slice 只查询已加载的 13 个 EU CELEX Work 之间的一跳闭集关系，并只发布经官方 CDM 定义核验的 `resource_legal_based_on_resource_legal` 与 `resource_legal_completes_resource_legal`。前者归一化为 document-level `ADOPTED_UNDER`，后者归一化为 `SUPPLEMENTS`；共 12 条记录，统一使用 `OFFICIAL_METADATA`，保留 source/target CELLAR Work URI、predicate locator、查询版本与 checked timestamp。两端任一文档未加载时不发布。原始 SPARQL response 只保存在 Git ignored snapshot，runtime 只读取人工复核的 normalized dataset。`work_cites_work`、external nodes、amendments、corrigenda 与 case-law predicates 不在本切片发布。
+当前实现：首个 CELLAR focused slice 只查询已加载的 13 个 EU CELEX Work 之间的一跳闭集关系，并只发布经官方 CDM 定义核验的 `resource_legal_based_on_resource_legal` 与 `resource_legal_completes_resource_legal`。前者归一化为 document-level `ADOPTED_UNDER`，后者归一化为 `SUPPLEMENTS`；共 12 条记录，统一使用 `OFFICIAL_METADATA`，保留 source/target CELLAR Work URI、predicate locator、查询版本与 checked timestamp。两端任一文档未加载时不发布。原始 SPARQL response 只保存在 Git ignored snapshot，runtime 只读取人工复核的 normalized dataset。`work_cites_work`、external nodes 与 case-law predicates 不在本切片发布。
+
+第二个 acquisition-only lifecycle slice 已以 `resource_legal_amends_resource_legal` 和 `resource_legal_corrects_resource_legal` 查询同一 13-seed corpus 的开放一跳邻域。2026-08-24 verified snapshot 得到 65 条候选：24 amendment、41 corrigendum；其中 2 条 amendment 指向 seed，22 条由 seed 指向外部 Work，且全部 65 条都至少有一端未加载。query、response、hash manifest 与 normalized candidate 只进入 Git ignored raw snapshot，不写入 reviewed runtime dataset。外部 Work contract 未单独评审前，不创建 placeholder、不发布 relationship，也不改变当前 12 条 CELLAR runtime 计数。
 
 ## 22.2 Amendment & Version Chain
 

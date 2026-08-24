@@ -33,7 +33,7 @@ export const CELLAR_FOCUSED_PREDICATES: Record<
 
 const celexSchema = z.string().transform(normalizeCelex);
 
-function officialWorkUri(value: string): string {
+export function officialCellarWorkUri(value: string): string {
   const normalized = officialCellarHttpsUrl(value);
   const url = new URL(normalized);
   if (!url.pathname.startsWith("/resource/cellar/")) {
@@ -44,10 +44,10 @@ function officialWorkUri(value: string): string {
 
 export const cellarFocusedRelationRecordSchema = z.object({
   sourceCelex: celexSchema,
-  sourceWorkUri: z.string().url().transform(officialWorkUri),
+  sourceWorkUri: z.string().url().transform(officialCellarWorkUri),
   predicate: cellarFocusedPredicateSchema,
   targetCelex: celexSchema,
-  targetWorkUri: z.string().url().transform(officialWorkUri),
+  targetWorkUri: z.string().url().transform(officialCellarWorkUri),
 });
 
 export type CellarFocusedRelationRecord = z.infer<
@@ -81,14 +81,14 @@ const sparqlResponseSchema = z.object({
   }),
 });
 
-function celexFromUri(value: string): string {
+export function cellarCelexFromUri(value: string): string {
   const url = new URL(value);
   if (url.hostname !== "publications.europa.eu") {
     throw new Error(`Unexpected CELLAR CELEX host: ${url.hostname}`);
   }
   const match = /^\/resource\/celex\/([^/]+)$/u.exec(url.pathname);
   if (!match) throw new Error(`Unexpected CELLAR CELEX URI: ${value}`);
-  return normalizeCelex(match[1]);
+  return normalizeCelex(decodeURIComponent(match[1]));
 }
 
 function recordKey(record: CellarFocusedRelationRecord): string {
@@ -124,10 +124,10 @@ export function parseCellarFocusedRelationResults(
   return validateCellarFocusedRelationRecords(
     parsed.results.bindings.map((binding) =>
       cellarFocusedRelationRecordSchema.parse({
-        sourceCelex: celexFromUri(binding.sourceCelexUri.value),
+        sourceCelex: cellarCelexFromUri(binding.sourceCelexUri.value),
         sourceWorkUri: binding.source.value,
         predicate: binding.predicate.value,
-        targetCelex: celexFromUri(binding.targetCelexUri.value),
+        targetCelex: cellarCelexFromUri(binding.targetCelexUri.value),
         targetWorkUri: binding.target.value,
       }),
     ),

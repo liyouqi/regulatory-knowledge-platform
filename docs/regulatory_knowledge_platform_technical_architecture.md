@@ -575,6 +575,8 @@ Phase 2 首个 `cellar-focused-relations@1.0.0` 使用固定 CELEX `VALUES` 和 
 
 `work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship。Document Graph 单独查询所有跨文档 relationship，并只在 UI-owned projection 中把 Article/body-block endpoints 折叠到其 stable document entity；原始 relationship endpoints、evidence 与 provenance 不变，同文档 self-edge 不进入 Document Graph。
 
+独立 `cellar-lifecycle@1.0.0` acquisition adapter 使用开放一跳查询，只允许 `resource_legal_amends_resource_legal` 与 `resource_legal_corrects_resource_legal`，并校验每条结果至少一端属于 seed CELEX。它支持 URL-encoded corrigendum CELEX（例如 `32024R2956R(01)`），同样固定官方 host、response size、query/response SHA-256 与 immutable ignored snapshot。2026-08-24 的 65 条 verified candidate 全部涉及 external Work，因此该 adapter 没有 runtime builder；在 external-work entity/storage/delivery contract 独立评审前，不能绕过 `documents` / `legal_entities` foreign-key boundary。
+
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
 当前问题可以由简单 builder + resolver 完成：
@@ -1084,6 +1086,8 @@ Seed Documents / CELEX
 不让 Reader 直接向 CELLAR 查询。
 
 当前边界：SPARQL 只在显式 fetch 命令中运行，不在 `runtime:build`、server startup 或 Web request 中运行。fetch 产生 ignored raw snapshot 和 normalized candidate；reviewed dataset、builder method/version 与内容共同参与 runtime build ID。当前闭集为 13 个已加载 EU CELEX works，发布 12 条 legal-basis/completion edge；不创建 external entity placeholder，也不把 RDF/XML 作为 UI 输入。
+
+生命周期 discovery 使用单独命令和 ignored snapshot，允许查询 seed 的 external amendment/corrigendum 邻居，但仍不由 runtime 消费。这样可以先量化、复核外部关系，再决定 external Work contract，而不会为追求图密度破坏当前 Canonical/SQLite 边界。
 
 ## 21.2 Amendment / Version
 
