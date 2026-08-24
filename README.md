@@ -74,6 +74,9 @@ npm run build
 | `npm run runtime:build` | Atomically rebuild the read-only runtime SQLite from validated Canonical artifacts. |
 | `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
+| `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
+| `npm run cssf:source:fetch -- --id <ID>` | Save an immutable official CSSF HTML/PDF snapshot under ignored raw data. |
+| `npm run cssf:source:verify -- --snapshot <path>` | Recompute CSSF snapshot byte counts and SHA-256 hashes. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
 ## Legal Data Operations
@@ -87,6 +90,18 @@ npm run source:list
 ```
 
 The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, four DORA RTS measures, two DORA ITS measures, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
+
+### CSSF representative sources
+
+CSSF uses a separate source adapter and registry so that CSSF HTML/PDF handling does not enter the EUR-Lex/Cellar parser. The initial reviewed set contains one structured HTML communiqué and two official PDF circulars: the 9 April 2025 ICT-risk update communiqué, Circular CSSF 25/893 on DORA incident reporting, and the consolidated Circular CSSF 12/552 on internal governance and risk management. The HTML document exercises native heading/list structure; the circulars establish that PDF fallback is required for official legal text. Acquisition accepts only `https://cssf.lu` or `https://www.cssf.lu`, follows only same-authority redirects, enforces bounded media types and sizes, and writes immutable content-hashed snapshots under ignored `data/raw/cssf`.
+
+```bash
+npm run cssf:source:list
+npm run cssf:source:fetch -- --id circular-25-893
+npm run cssf:source:verify -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+```
+
+The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. Raw source snapshots and future parser output remain distinct; a downloaded PDF is not considered Canonical until a dedicated structural adapter passes its fixtures and fidelity gates.
 
 ### Download an official immutable snapshot
 

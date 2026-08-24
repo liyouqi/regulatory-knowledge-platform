@@ -3157,6 +3157,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - performance、accessibility、visual refinement、cross-browser testing；
 - production artifact atomic publish / rollback runbook。
 
+当前状态：已核验并登记首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git，也不会在 structural adapter 通过前进入 Canonical/Reader。该样本证明 CSSF 文档页 HTML 主要承载 metadata，而 Circular 正文仍需 PDF fallback。
+
 ## Phase 2 Sequence
 
 1. CELLAR focused relations；
