@@ -22,6 +22,13 @@ import {
   loadOfficialMappings,
 } from "../relationships/official-mapping";
 import {
+  type RelatedRecitalEvaluation,
+  TFIDF_RELATED_RECITAL_BUILDER,
+  TFIDF_RELATED_RECITAL_BUILDER_VERSION,
+  buildTfidfRelatedRecitals,
+  loadRelatedRecitalBenchmark,
+} from "../relationships/tfidf-related-recital";
+import {
   type BodyBlock,
   type DocumentView,
   type ProvisionView,
@@ -44,6 +51,8 @@ export interface RuntimeDatabaseManifest {
   recordCount: number;
   definitionCount: number;
   relationshipCount: number;
+  relatedRecitalCount: number;
+  tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
   outputPath: string;
@@ -193,6 +202,7 @@ function indexRows(documents: DocumentView[]): IndexRow[] {
 function runtimeBuildId(
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
+  relatedRecitalBenchmark: ReturnType<typeof loadRelatedRecitalBenchmark>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -205,6 +215,8 @@ function runtimeBuildId(
         `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
         `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
         JSON.stringify(officialMappings),
+        `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
+        JSON.stringify(relatedRecitalBenchmark),
         input,
       ].join("\n"),
     )
@@ -272,11 +284,27 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     officialMappings,
   );
+  const relatedRecitalBenchmark = loadRelatedRecitalBenchmark();
+  const loadedDocumentIds = new Set(documents.map((document) => document.id));
+  const benchmarkDocumentIds = new Set(
+    relatedRecitalBenchmark.cases.map((item) => item.documentId),
+  );
+  const canEvaluateRelatedRecitals = [...benchmarkDocumentIds].every(
+    (documentId) => loadedDocumentIds.has(documentId),
+  );
+  const relatedRecitalBuild = canEvaluateRelatedRecitals
+    ? buildTfidfRelatedRecitals(documents, relatedRecitalBenchmark)
+    : null;
   const relationships = [
     ...relationshipBuild.relationships,
     ...officialRelationships,
+    ...(relatedRecitalBuild?.relationships ?? []),
   ];
-  const buildId = runtimeBuildId(documents, officialMappings);
+  const buildId = runtimeBuildId(
+    documents,
+    officialMappings,
+    relatedRecitalBenchmark,
+  );
   const builtAt = new Date().toISOString();
   let completed = false;
 
@@ -555,11 +583,20 @@ export function buildRuntimeDatabase(
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
         relationshipCount: String(relationships.length),
+        relatedRecitalCount: String(
+          relatedRecitalBuild?.relationships.length ?? 0,
+        ),
+        tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
         relationshipBuilders: JSON.stringify([
           `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
           `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
+          ...(relatedRecitalBuild
+            ? [
+                `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
+              ]
+            : []),
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -610,6 +647,8 @@ export function buildRuntimeDatabase(
     recordCount: rows.length,
     definitionCount: definitions.length,
     relationshipCount: relationships.length,
+    relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
+    tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({
       documentId: document.id,

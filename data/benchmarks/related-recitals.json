@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedAt": "2026-08-24",
+  "topN": 5,
+  "minimumScore": 0.05,
+  "minimumHitRate": 1,
+  "cases": [
+    {
+      "id": "related-recital:dora:article-5",
+      "documentId": "eu:32022R2554",
+      "articleId": "eu:32022R2554:article:5",
+      "expectedRecitalIds": [
+        "eu:32022R2554:recital:45",
+        "eu:32022R2554:recital:46"
+      ]
+    },
+    {
+      "id": "related-recital:dora:article-20",
+      "documentId": "eu:32022R2554",
+      "articleId": "eu:32022R2554:article:20",
+      "expectedRecitalIds": [
+        "eu:32022R2554:recital:24",
+        "eu:32022R2554:recital:51",
+        "eu:32022R2554:recital:53"
+      ]
+    },
+    {
+      "id": "related-recital:gdpr:article-5",
+      "documentId": "eu:32016R0679",
+      "articleId": "eu:32016R0679:article:5",
+      "expectedRecitalIds": ["eu:32016R0679:recital:39"]
+    },
+    {
+      "id": "related-recital:gdpr:article-17",
+      "documentId": "eu:32016R0679",
+      "articleId": "eu:32016R0679:article:17",
+      "expectedRecitalIds": [
+        "eu:32016R0679:recital:65",
+        "eu:32016R0679:recital:66"
+      ]
+    },
+    {
+      "id": "related-recital:gdpr:article-25",
+      "documentId": "eu:32016R0679",
+      "articleId": "eu:32016R0679:article:25",
+      "expectedRecitalIds": ["eu:32016R0679:recital:78"]
+    },
+    {
+      "id": "related-recital:ai-act:article-6",
+      "documentId": "eu:32024R1689",
+      "articleId": "eu:32024R1689:article:6",
+      "expectedRecitalIds": [
+        "eu:32024R1689:recital:51",
+        "eu:32024R1689:recital:52",
+        "eu:32024R1689:recital:53"
+      ]
+    },
+    {
+      "id": "related-recital:ai-act:article-9",
+      "documentId": "eu:32024R1689",
+      "articleId": "eu:32024R1689:article:9",
+      "expectedRecitalIds": ["eu:32024R1689:recital:65"]
+    },
+    {
+      "id": "related-recital:ai-act:article-50",
+      "documentId": "eu:32024R1689",
+      "articleId": "eu:32024R1689:article:50",
+      "expectedRecitalIds": [
+        "eu:32024R1689:recital:132",
+        "eu:32024R1689:recital:133",
+        "eu:32024R1689:recital:134"
+      ]
+    }
+  ]
+}

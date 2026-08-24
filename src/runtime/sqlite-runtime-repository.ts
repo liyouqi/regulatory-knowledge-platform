@@ -55,6 +55,7 @@ interface RelationshipRow {
   sourceRef: string;
   builderMethod: string;
   builderVersion: string;
+  score: number | null;
   resolutionStatus: "resolved";
   sourceEntityId: string;
   sourceDocumentId: string;
@@ -120,6 +121,7 @@ const RELATIONSHIP_SELECT = `
     r.source_ref AS sourceRef,
     r.builder_method AS builderMethod,
     r.builder_version AS builderVersion,
+    r.score,
     r.resolution_status AS resolutionStatus,
     se.id AS sourceEntityId,
     sd.id AS sourceDocumentId,
@@ -184,6 +186,7 @@ function toProvisionRelationship(
       method: row.builderMethod,
       version: row.builderVersion,
     },
+    score: row.score ?? undefined,
     resolutionStatus: row.resolutionStatus,
   };
 }
@@ -228,6 +231,7 @@ function manifestValue(database: Database.Database, key: string): string {
 export class SqliteRuntimeRepository {
   readonly buildId: string;
   readonly relationshipCount: number;
+  readonly relatedRecitalCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -251,6 +255,10 @@ export class SqliteRuntimeRepository {
       this.buildId = manifestValue(this.database, "buildId");
       this.relationshipCount = Number.parseInt(
         manifestValue(this.database, "relationshipCount"),
+        10,
+      );
+      this.relatedRecitalCount = Number.parseInt(
+        manifestValue(this.database, "relatedRecitalCount"),
         10,
       );
       this.unresolvedReferenceCount = Number.parseInt(

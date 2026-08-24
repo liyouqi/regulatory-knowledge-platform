@@ -22,6 +22,10 @@ console.table({
   records: manifest.recordCount,
   definitions: manifest.definitionCount,
   relationships: manifest.relationshipCount,
+  relatedRecitals: manifest.relatedRecitalCount,
+  tfidfBenchmark: manifest.tfidfBenchmark?.passed
+    ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
+    : "not published",
   unresolvedReferences: manifest.unresolvedReferenceCount,
   bytes: manifest.byteCount,
   output: manifest.outputPath,

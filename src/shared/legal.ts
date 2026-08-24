@@ -370,6 +370,7 @@ export const provisionRelationshipSchema = z.object({
     method: z.string().min(1),
     version: z.string().min(1),
   }),
+  score: z.number().nonnegative().optional(),
   resolutionStatus: z.literal("resolved"),
 });
 

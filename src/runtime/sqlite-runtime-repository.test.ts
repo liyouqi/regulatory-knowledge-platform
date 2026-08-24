@@ -122,6 +122,29 @@ describe("SQLite runtime repository", () => {
     ).toBeNull();
   });
 
+  it("returns benchmark-gated TF-IDF related recitals with similarity scores", () => {
+    const doraArticleTwenty = repository?.findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:20",
+    );
+
+    expect(doraArticleTwenty?.relatedRecitals).toContainEqual(
+      expect.objectContaining({
+        relationType: "RELATED_RECITAL",
+        provenance: "TFIDF",
+        target: expect.objectContaining({
+          entityId: "eu:32022R2554:recital:53",
+        }),
+        builder: {
+          method: "tfidf-related-recital",
+          version: "1.0.0",
+        },
+        score: expect.any(Number),
+      }),
+    );
+    expect(repository?.relatedRecitalCount).toBeGreaterThan(1_000);
+  });
+
   it("returns reviewed Level 2 mappings in both legal directions", () => {
     const doraMandate = repository?.findProvisionRelationships(
       "eu:32022R2554",
@@ -168,6 +191,33 @@ describe("SQLite runtime repository", () => {
         target: expect.objectContaining({ entityId: "eu:32025R0305" }),
       }),
     );
+
+    const incidentReportingMandates = repository?.findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:20",
+    );
+    expect(incidentReportingMandates?.mandates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          target: expect.objectContaining({ entityId: "eu:32025R0301" }),
+        }),
+        expect.objectContaining({
+          target: expect.objectContaining({ entityId: "eu:32025R0302" }),
+        }),
+      ]),
+    );
+    expect(
+      repository?.findProvisionRelationships(
+        "eu:32025R0302",
+        "eu:32025R0302:article:1",
+      )?.adoptedUnder,
+    ).toContainEqual(
+      expect.objectContaining({
+        target: expect.objectContaining({
+          entityId: "eu:32022R2554:article:20",
+        }),
+      }),
+    );
   });
 
   it("lists Level 2 measures from SQLite with counts and mandate Articles", () => {
@@ -185,7 +235,7 @@ describe("SQLite runtime repository", () => {
     expect(dora).toMatchObject({
       familyId: "family:dora",
       familyShortName: "DORA",
-      counts: { rts: 3, its: 1, guidelines: 0 },
+      counts: { rts: 4, its: 2, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -231,6 +281,24 @@ describe("SQLite runtime repository", () => {
           mandates: [
             expect.objectContaining({
               articleEntityId: "eu:32022R2554:article:28",
+            }),
+          ],
+        }),
+        expect.objectContaining({
+          id: "eu:32025R0301",
+          measureType: "rts",
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:20",
+            }),
+          ],
+        }),
+        expect.objectContaining({
+          id: "eu:32025R0302",
+          measureType: "its",
+          mandates: [
+            expect.objectContaining({
+              articleEntityId: "eu:32022R2554:article:20",
             }),
           ],
         }),

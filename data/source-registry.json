@@ -335,5 +335,67 @@
       ]
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS Incident Reporting",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/301",
+      "DORA RTS 2025/301",
+      "DORA Incident Reporting RTS"
+    ],
+    "celex": "32025R0301",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-02-20",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 9,
+      "annexCount": 0,
+      "paragraphCount": 12,
+      "pointCount": 48,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0301:recital:1": "sha256:08899402606b784ee98e22dc08fd291fa9ea59fcd8717ace4e312d48e709d917",
+        "eu:32025R0301:article:1:subparagraph:1": "sha256:4f0fb9a5ad9dc362bdf935344792fd252dc34e8616728eacda5b88fd575fa088",
+        "eu:32025R0301:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA ITS Incident Reporting",
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2025/302",
+      "DORA ITS 2025/302",
+      "DORA Incident Reporting ITS"
+    ],
+    "celex": "32025R0302",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "its",
+    "publicationDate": "2025-02-20",
+    "quality": {
+      "articleCount": 9,
+      "recitalCount": 12,
+      "annexCount": 4,
+      "paragraphCount": 19,
+      "pointCount": 8,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0302:recital:1": "sha256:c180aee345c92af8e11241cddfefe87c508881b07c8f37d7987d286b63fa8d2c",
+        "eu:32025R0302:article:1:paragraph:1": "sha256:0382976e4929aa54d96dd180c6ebdeb539ed9b3280ca302d6f1dc46e04da81f1",
+        "eu:32025R0302:article:9:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32025R0302:annex:i": "sha256:e68b39d80afb992c08101ace997bf4607aa6d5545fd8f33ab140a49f18b2e788",
+        "eu:32025R0302:annex:iv": "sha256:98aeb5bffe119b051dd846b0ff45e85c0fd2b04f60328e6b7dd5f4ce3d4c7d1d"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/302/oj/eng"
   }
 ]

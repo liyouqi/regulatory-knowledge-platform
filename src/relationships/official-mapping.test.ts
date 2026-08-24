@@ -15,7 +15,7 @@ describe("official Level 2 mapping builder", () => {
   it("builds paired mandate and adoption edges from reviewed source data", () => {
     const relationships = buildOfficialMappings(documents, entities);
 
-    expect(relationships).toHaveLength(12);
+    expect(relationships).toHaveLength(16);
     expect(relationships).toContainEqual(
       expect.objectContaining({
         sourceEntityId: "eu:32022R2554:article:15",
@@ -52,6 +52,42 @@ describe("official Level 2 mapping builder", () => {
         sourceEntityId: "eu:32022R2554:article:28",
         relationType: "MANDATES",
         targetEntityId: "eu:32024R2956",
+      }),
+    );
+    expect(relationships).toContainEqual(
+      expect.objectContaining({
+        sourceEntityId: "eu:32022R2554:article:20",
+        relationType: "MANDATES",
+        targetEntityId: "eu:32025R0301",
+        evidenceText: expect.stringContaining(
+          "common draft regulatory technical standards",
+        ),
+      }),
+    );
+    expect(relationships).toContainEqual(
+      expect.objectContaining({
+        sourceEntityId: "eu:32022R2554:article:20",
+        relationType: "MANDATES",
+        targetEntityId: "eu:32025R0302",
+        evidenceText: expect.stringContaining(
+          "standard forms, templates and procedures",
+        ),
+      }),
+    );
+    expect(relationships).toContainEqual(
+      expect.objectContaining({
+        sourceEntityId: "eu:32025R0301",
+        relationType: "ADOPTED_UNDER",
+        targetEntityId: "eu:32022R2554:article:20",
+        evidenceText: "in particular Article 20, third subparagraph thereof",
+      }),
+    );
+    expect(relationships).toContainEqual(
+      expect.objectContaining({
+        sourceEntityId: "eu:32025R0302",
+        relationType: "ADOPTED_UNDER",
+        targetEntityId: "eu:32022R2554:article:20",
+        evidenceText: "in particular Article 20, fourth paragraph, thereof",
       }),
     );
   });

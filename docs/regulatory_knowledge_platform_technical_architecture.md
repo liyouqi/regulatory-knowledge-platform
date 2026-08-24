@@ -608,6 +608,8 @@ TF-IDF 属于 Phase 1 后段的可选 lightweight statistical relation。它不�
 
 TF-IDF 是代码计算，不需要调用任何 LLM。
 
+当前 `tfidf-related-recital@1.0.0` 对 DORA、GDPR、AI Act 使用版本控制的 8-case benchmark，要求 Top 5 case hit rate 为 100%。完整 benchmark 语料与门禁均满足时，builder 才把 `RELATED_RECITAL` 写入统一 `relationships` 表；不完整测试语料或门禁失败时写入 0 条。benchmark 内容与 builder version 参与 runtime build ID，manifest 记录 case-level evaluation 和发布数量。既有 SQLite schema `4.1.0` 无需变更。
+
 ---
 
 # 11. Search Architecture

@@ -145,6 +145,54 @@
         }
       },
       "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32025r0301:article-20",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:20",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:20:subparagraph:1:point:a",
+          "text": "common draft regulatory technical standards in order to: When developing those draft regulatory technical standards, the ESAs shall take into account the size and the overall risk profile of the financial entity, and the nature, scale and complexity of its services, activities and operations, and in particular, with a view to ensuring that, for the purposes of this paragraph, point (a), point (ii), different time limits may reflect, as appropriate, specificities of financial sectors, without prejudice to maintaining a consistent approach to ICT-related incident reporting pursuant to this Regulation and to Directive (EU) 2022/2555. The ESAs shall, as applicable, provide justification when deviating from the approaches taken in the context of that Directive;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32025R0301",
+        "measureType": "rts",
+        "officialTitle": "Commission Delegated Regulation (EU) 2025/301 of 23 October 2024 supplementing Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to regulatory technical standards specifying the content and time limits for the initial notification of, and intermediate and final report on, major ICT-related incidents, and the content of the voluntary notification for significant cyber threats (Text with EEA relevance)",
+        "documentNumber": "Commission Delegated Regulation (EU) 2025/301",
+        "adoptionEvidence": {
+          "text": "in particular Article 20, third subparagraph thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
+    },
+    {
+      "id": "official-mapping:dora:32025r0302:article-20",
+      "familyId": "family:dora",
+      "level1": {
+        "celex": "32022R2554",
+        "articleEntityId": "eu:32022R2554:article:20",
+        "mandateEvidence": {
+          "entityId": "eu:32022R2554:article:20:subparagraph:1:point:b",
+          "text": "common draft implementing technical standards in order to establish the standard forms, templates and procedures for financial entities to report a major ICT-related incident and to notify a significant cyber threat.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
+        }
+      },
+      "level2": {
+        "celex": "32025R0302",
+        "measureType": "its",
+        "officialTitle": "Commission Implementing Regulation (EU) 2025/302 of 23 October 2024 laying down implementing technical standards for the application of Regulation (EU) 2022/2554 of the European Parliament and of the Council with regard to the standard forms, templates, and procedures for financial entities to report a major ICT-related incident and to notify a significant cyber threat (Text with EEA relevance)",
+        "documentNumber": "Commission Implementing Regulation (EU) 2025/302",
+        "adoptionEvidence": {
+          "text": "in particular Article 20, fourth paragraph, thereof",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/302/oj/eng"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
     }
   ]
 }

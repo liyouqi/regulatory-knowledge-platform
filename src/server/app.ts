@@ -70,6 +70,7 @@ app.get("/api/health", (_request, response) => {
       records: searchService.recordCount,
       definitions: searchService.definitionCount,
       relationships: runtimeRepository.relationshipCount,
+      relatedRecitals: runtimeRepository.relatedRecitalCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });

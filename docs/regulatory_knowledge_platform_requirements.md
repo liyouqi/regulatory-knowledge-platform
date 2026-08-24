@@ -1160,7 +1160,7 @@ Article → MANDATES → RTS/ITS
 
 人工核验 mapping 必须作为版本控制的 source data 保存，并由 builder 导入 Relationship Repository；UI 不直接读取 DORA/MiCA 专用 mapping 文件。
 
-当前 Release 0.5 纵切已验证两类映射形态：DORA Delegated Regulation (EU) 2024/1774 同时对应 Article 15 与 Article 16，以及 MiCA Delegated Regulation (EU) 2025/305 对应 Article 62。两份 Level 2 法规均作为完整 Document 进入 Reader、Explorer、Search 和统一 Entity Store；3 条核验记录生成 6 条 `OFFICIAL_MAPPING` 有向边。后续扩充 RTS/ITS 只增加 official source registry、Canonical artifact 与 curated mapping record，不增加法规专用 UI 或表。
+当前 Release 0.5 纵切已验证 DORA/MiCA 的多种映射形态，包括 DORA Delegated Regulation (EU) 2024/1774 同时对应 Article 15 与 Article 16、MiCA Delegated Regulation (EU) 2025/305 对应 Article 62，以及 DORA Article 20 同时授权重大 ICT 事件报告 RTS 2025/301 与 ITS 2025/302。7 份 Level 2 法规均作为完整 Document 进入 Reader、Explorer、Search 和统一 Entity Store；8 条核验记录生成 16 条 `OFFICIAL_MAPPING` 有向边。后续扩充 RTS/ITS 只增加 official source registry、Canonical artifact 与 curated mapping record，不增加法规专用 UI 或表。
 
 ## 13.4 TF-IDF Article ↔ Recital
 
@@ -1184,6 +1184,8 @@ TF-IDF 是 Phase 1 的可选增强功能，安排在 explicit references 和 DOR
 - score 表示文本相似度，不得命名或表达为法律置信度。
 
 TF-IDF 的目的不是法律推断，而是提高阅读探索效率。
+
+当前实现使用版本控制的 8-case benchmark 覆盖 DORA、GDPR 与 AI Act，Top 5 case hit rate 门槛为 100%。完整 benchmark 通过后，只为这三部已核验法案发布 build-time `RELATED_RECITAL`；不完整测试语料或门禁失败时发布 0 条算法关系。SQLite 与 API 保留 cosine similarity score、`TFIDF` provenance 和 builder version，score 仍仅表示文本相关度。
 
 ## 13.5 Relationship Rebuild
 
@@ -3140,7 +3142,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - TF-IDF benchmark；
 - benchmark 通过时启用 Related Recitals，否则保持关闭。
 
-当前状态：official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18 以及首份 ITS 2024/2956 的 Article 28(9) 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 已完成。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda，但尚未实现完整 amendment/version graph；更多核验 measures 与 TF-IDF benchmark 仍待完成。Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
+当前状态：Release 0.5 已完成。official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18、ITS 2024/2956 的 Article 28(9)，以及重大 ICT 事件报告 RTS 2025/301 / ITS 2025/302 的 Article 20 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 均已完成。DORA/GDPR/AI Act 的 8-case TF-IDF benchmark 已以 Top 5 100% hit rate 通过，Related Recitals 已作为带 score 和 `TFIDF` provenance 的 build-time enrichment 发布。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda，但尚未实现完整 amendment/version graph。更多核验 Level 2 measures 归入无界的后续 backlog；Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
 
 ## Release 0.6 — CSSF & Product Hardening
 

@@ -72,6 +72,7 @@ npm run build
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
 | `npm run runtime:build` | Atomically rebuild the read-only runtime SQLite from validated Canonical artifacts. |
+| `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
@@ -85,7 +86,7 @@ The source pipeline resolves an EU law from its CELEX work to the English expres
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, three DORA RTS measures, one DORA ITS measure, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
+The version-controlled registry is `data/source-registry.json`. It currently contains six Level 1 acts, four DORA RTS measures, two DORA ITS measures, and one MiCA RTS measure. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, and future Level 3 material.
 
 ### Download an official immutable snapshot
 
@@ -299,7 +300,7 @@ crypto asset
 data holder
 ```
 
-The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run runtime:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. On the current six-law corpus this produces 294/294 structurally matching definition points and avoids treating ordinary uses of “means” as definitions.
+The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run runtime:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. The six Level 1 acts still produce 294/294 structurally matching definition points; the current 13-document runtime contains 297 definitions after including three additional structurally matching points from the DORA register ITS.
 
 When a definition explicitly says `as defined in`, it is stored as `incorporated`; otherwise it is `direct`. Exact direct definitions rank before incorporated references, while every result retains its own official source text and point link. For example, `personal data` returns the direct GDPR definition first, followed by incorporated MiCA, Data Act, and AI Act definitions.
 
@@ -343,7 +344,11 @@ The runtime endpoint is `/api/relationships/:documentId/:provisionId`. Its respo
 
 In the Reader, an inline citation becomes clickable only when the builder supplied an exact `sourceEntityId` plus a validated character range whose stored evidence text still matches the rendered official text. The browser never re-parses legal prose with regex. Clicking opens Side Peek without changing the Reader URL; it requests `/api/relationship-previews/:entityId` only then, derives a short target excerpt from the existing read-only Reader payload, and provides explicit **Open full** and official-source actions. Closing Side Peek leaves the reading position untouched.
 
-`npm run runtime:build` currently publishes 1,967 resolved explicit-reference edges plus 6 directed official-mapping edges from 3 reviewed mandate records, and reports 863 unmaterialized references across eight immutable documents. These are corpus-specific audit counts, not permanent product constants. Builder versions and the curated mapping content participate in the runtime build ID, so changing resolver semantics or evidence invalidates the artifact deterministically.
+`npm run runtime:build` currently publishes 2,127 resolved explicit-reference edges, 16 directed official-mapping edges from 8 reviewed mandate records, and 1,374 scored Related Recital edges after the TF-IDF gate passes; it reports 931 unmaterialized references across 13 immutable documents. These are corpus-specific audit counts, not permanent product constants. Builder versions, curated mapping content, and the reviewed TF-IDF benchmark participate in the runtime build ID, so changing resolver semantics, evidence, or benchmark inputs invalidates the artifact deterministically.
+
+### Related Recitals benchmark
+
+Run `npm run relationships:benchmark` before publishing TF-IDF relationship changes. The version-controlled benchmark checks eight reviewed DORA, GDPR, and AI Act Article ↔ Recital cases at Top 5 and currently requires a 100% case hit rate. The runtime builder publishes scored `RELATED_RECITAL` edges only when the complete benchmark corpus is loaded and the gate passes; partial test corpora publish none. These edges use provenance `TFIDF` and remain textual-relevance suggestions, not legal authority or legal-confidence scores.
 
 ## Current Release Status
 
@@ -406,12 +411,14 @@ Release 0.4 is now in progress and additionally includes:
 
 The explicit-reference portion of Release 0.4 is complete locally.
 
-Release 0.5 is now in progress and additionally includes:
+Release 0.5 is complete and includes:
 
 - full official ingestion, Reader, Explorer, and search coverage for DORA Delegated Regulation (EU) 2024/1774 and MiCA Delegated Regulation (EU) 2025/305;
 - full official ingestion and reviewed Article 28(10) mapping for DORA Delegated Regulation (EU) 2024/1773 (ICT third-party contractual-policy RTS);
 - full official ingestion and reviewed Article 18 mapping for DORA Delegated Regulation (EU) 2024/1772 (incident classification and materiality-threshold RTS);
 - full official ingestion, four Annexes, reviewed Article 28(9) mapping, and the first real ITS filter for DORA Implementing Regulation (EU) 2024/2956;
+- full official ingestion and reviewed Article 20 mapping for DORA Delegated Regulation (EU) 2025/301 (major ICT incident reporting-content and time-limit RTS);
+- full official ingestion, four Annexes, and reviewed Article 20 mapping for DORA Implementing Regulation (EU) 2025/302 (major ICT incident reporting forms, templates, and procedures ITS);
 - a minimal legal-text status contract that distinguishes original OJ text from a current EUR-Lex version and exposes known corrigenda in Reader and Level 2 Library;
 - version-controlled, schema-validated DORA/MiCA mapping evidence;
 - `official-mapping@1.0.0` paired `MANDATES` / `ADOPTED_UNDER` edges in the unified SQLite relationship store;
@@ -419,4 +426,4 @@ Release 0.5 is now in progress and additionally includes:
 - direct-Article Formex support with a parser fixture and parser version `1.3.0`;
 - desktop and 390px browser verification of DORA Article 15, reverse RTS legal bases, and exact MiCA RTS search.
 
-The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, source status, and official sources without duplicating the curated mapping input. The next Release 0.5 slice is the DORA incident-reporting RTS/ITS pair. TF-IDF Related Recitals remains optional and disabled until its benchmark passes.
+The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, source status, and official sources without duplicating the curated mapping input. The DORA incident-reporting RTS/ITS pair is complete. The reviewed DORA/GDPR/AI Act TF-IDF benchmark passes 8/8 at Top 5, so build-time Related Recitals are enabled for those three laws with explicit `TFIDF` provenance and retained similarity scores. Additional Level 2 measures are an explicitly unbounded Phase 2 backlog, not a Release 0.5 completion condition.

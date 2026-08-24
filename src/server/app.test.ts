@@ -89,6 +89,24 @@ describe("Document lookup", () => {
     );
   });
 
+  it("serves TF-IDF relevance separately from legal-text relationships", () => {
+    const result = findProvisionRelationships(
+      "eu:32022R2554",
+      "eu:32022R2554:article:20",
+    );
+
+    expect(result?.relatedRecitals).toContainEqual(
+      expect.objectContaining({
+        relationType: "RELATED_RECITAL",
+        provenance: "TFIDF",
+        target: expect.objectContaining({
+          entityId: "eu:32022R2554:recital:53",
+        }),
+        score: expect.any(Number),
+      }),
+    );
+  });
+
   it("serves a target preview on demand for Side Peek", () => {
     expect(findRelationshipPreview("eu:32022L2555:article:3")).toMatchObject({
       documentShortName: "NIS2",
@@ -115,7 +133,7 @@ describe("Document lookup", () => {
     const dora = findFamilyLevel2("dora", "rts");
     expect(dora).toMatchObject({
       familyId: "family:dora",
-      counts: { rts: 3, its: 1, guidelines: 0 },
+      counts: { rts: 4, its: 2, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -137,6 +155,12 @@ describe("Document lookup", () => {
             expect.objectContaining({ label: "Article 18" }),
           ]),
         }),
+        expect.objectContaining({
+          id: "eu:32025R0301",
+          mandates: expect.arrayContaining([
+            expect.objectContaining({ label: "Article 20" }),
+          ]),
+        }),
       ]),
     );
     expect(findFamilyLevel2("dora", "its")?.measures).toContainEqual(
@@ -145,6 +169,14 @@ describe("Document lookup", () => {
         sourceStatus: expect.objectContaining({
           corrections: [expect.objectContaining({ date: "2025-09-19" })],
         }),
+      }),
+    );
+    expect(findFamilyLevel2("dora", "its")?.measures).toContainEqual(
+      expect.objectContaining({
+        id: "eu:32025R0302",
+        mandates: expect.arrayContaining([
+          expect.objectContaining({ label: "Article 20" }),
+        ]),
       }),
     );
   });
