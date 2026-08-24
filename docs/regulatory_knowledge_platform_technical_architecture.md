@@ -1,8 +1,8 @@
 # Regulatory Knowledge Platform — 技术架构与开发实施文档
 
-> 文档版本：v1.1 Revised Technical Baseline  
-> 日期：2026-08-23  
-> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.2 Revised Baseline`  
+> 文档版本：v1.2 Revised Phase Baseline
+> 日期：2026-08-24
+> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.3 Revised Phase Baseline`
 > 产品语言：English  
 > 技术文档语言：中文  
 > 目标：把最终版产品需求落实为一套**简单、可落地、可逐步扩展、适合 Codex 协作开发**的工程架构。
@@ -21,8 +21,9 @@
 - TF-IDF Article ↔ Recital；
 - DORA ↔ RTS/ITS；
 - CSSF structural adapter；
-- Phase 2 的 CELLAR / CJEU / API / MCP；
+- Phase 2 的 CELLAR / CJEU / Relationship Graph；
 - Phase 3 的 regulatory paths / taxonomy / timeline 等能力。
+- Phase 4 的 Public API / MCP / external integrations。
 
 如果本文与产品需求发生冲突，以产品需求为准；如果产品需求没有规定实现方式，则以本文作为默认工程决策。
 
@@ -63,7 +64,7 @@ Phase 1 默认技术栈：
 | Package manager | **npm**，避免额外工具链 |
 | Production deploy | **单 Node 服务 + 静态 React + 单 SQLite artifact** |
 | Container | **Docker 可选但推荐用于部署** |
-| Phase 2 MCP | **实施时稳定的官方 MCP TypeScript SDK，作为 Service adapter** |
+| Phase 4 MCP | **实施时稳定的官方 MCP TypeScript SDK，作为 Service adapter** |
 | Phase 2 SPARQL | **HTTP fetch + SPARQL query templates + adapter** |
 
 Phase 1 不需要为了“未来可能用到”预先增加 Redis、Kafka、Kubernetes、Elasticsearch/OpenSearch、GraphQL、复杂 ORM 或分布式服务。未来需要时可替换 repository / adapter，而不是重写 Reader、Explorer 或 Search UI。
@@ -95,8 +96,9 @@ flowchart LR
         I --> R[Repository Layer]
         R --> S[Services]
         S --> W[Explorer / Reader / Search]
-        S --> API[REST API]
-        API --> MCP[MCP - Phase 2]
+        S --> API[Internal Web API]
+        S --> PUBLIC[Public API - Phase 4]
+        PUBLIC --> MCP[MCP - Phase 4]
     end
 ```
 
@@ -125,8 +127,9 @@ flowchart TD
     G --> I
     H --> I
     I --> J[Web]
-    I --> K[REST API]
-    K --> L[MCP Adapter - Phase 2]
+    I --> K[Internal Web API]
+    I --> P[Public API - Phase 4]
+    P --> L[MCP Adapter - Phase 4]
 ```
 
 **依赖只能向下。**
@@ -163,7 +166,7 @@ flowchart TD
 3. 减少 Python/Node 两套 dependency、环境、模型定义和序列化差异；
 4. Codex 在一个语言栈内更容易做准确重构；
 5. SQLite FTS5 在 `better-sqlite3` 下使用简单；
-6. Phase 2 MCP 可直接复用同一 Service 层。
+6. Phase 4 Public API/MCP 可直接复用同一 Service 层。
 
 ## 3.3 Python 的位置
 
@@ -796,7 +799,7 @@ Repository 是存储替换边界。
 
 # 14. Service Layer
 
-Service 是 Web 与数据访问之间的业务边界，因为 Phase 1 Web、Phase 2 API/MCP 都依赖它。下面名称表示能力分组，不要求每组成为独立进程或无状态 class；优先使用小型函数模块，出现真实复杂度后再拆分。
+Service 是 Web 与数据访问之间的业务边界，因为 Phase 1–3 Web 产品及 Phase 4 Public API/MCP 都依赖它。下面名称表示能力分组，不要求每组成为独立进程或无状态 class；优先使用小型函数模块，出现真实复杂度后再拆分。
 
 ## 14.1 Document Service
 
@@ -840,7 +843,7 @@ Service 是 Web 与数据访问之间的业务边界，因为 Phase 1 Web、Phas
 
 # 15. REST API
 
-Phase 1 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边界，但在首次公开 API version 发布前允许随 repository 内部版本演进；不得为了尚未存在的外部兼容承诺保留不合理设计。
+Phase 1–3 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边界，但在 Phase 4 首次公开 API version 发布前允许随 repository 内部版本演进；不得为了尚未存在的外部兼容承诺保留不合理设计。
 
 建议资源风格：
 
@@ -867,7 +870,7 @@ API response 必须返回 stable IDs，不让前端靠标题重新识别实体�
 - unsupported document structure；
 - build/index mismatch。
 
-Phase 2 MCP 只调用 Service，不通过 HTTP 绕一圈也可以；REST 与 MCP 是两个 adapter。
+Phase 4 MCP 只调用 Service，不需要通过 Public API HTTP 绕一圈；Public REST 与 MCP 是两个 delivery adapter。
 
 ---
 
@@ -1042,7 +1045,7 @@ Phase 1 允许 official curated mapping：
 - Article relationship panel；
 - Explorer badge；
 - search result context；
-- Phase 2 MCP `get_related_acts`。
+- Phase 4 MCP `get_related_acts`。
 
 ---
 
@@ -1093,9 +1096,9 @@ Phase 2 增加 document-level version relationships 即可。
 
 仍进入同一 Relationship Repository。
 
-## 21.4 MCP
+## 21.4 Phase 4 External Adapters（预留）
 
-MCP 是 Service Adapter，不拥有业务逻辑。
+Public API 和 MCP 都是 Service Adapter，不拥有业务逻辑。Phase 2 只需继续形成清晰的内部 service outputs；外部版本兼容、认证、限流和 transport implementation 延后到 Phase 4。
 
 优先工具：
 
@@ -1108,7 +1111,7 @@ MCP 是 Service Adapter，不拥有业务逻辑。
 - get_case_law；
 - get_family_documents。
 
-MCP 返回结构化官方数据与 provenance，不在 MCP 内再次生成“AI 法律解释”。
+Phase 4 MCP 返回结构化官方数据与 provenance，不在 MCP 内再次生成“AI 法律解释”。
 
 ---
 
@@ -1130,7 +1133,7 @@ Phase 3 可能增加：
 - provenance；
 - repository abstraction；
 - dates / authority / jurisdiction 字段；
-- API/MCP 不依赖 SQLite schema 细节。
+- Web 与内部 service/API 不依赖 SQLite schema 细节；Phase 4 adapter 复用同一边界。
 
 具体数据库技术到 Phase 3 根据真实查询负载再决定。
 
@@ -1495,7 +1498,7 @@ deterministic batch script
 | ADR-010 | EUR-Lex / CSSF 通过 Source Adapter | Accepted |
 | ADR-011 | Universal Explorer / Reader 共用数据 | Accepted |
 | ADR-012 | 先验证 LegalViz proven behavior，再选择保留来源适配或独立实现 | Accepted |
-| ADR-013 | MCP = Service Adapter（Phase 2） | Accepted |
+| ADR-013 | Public API / MCP = Service Adapter（Phase 4） | Accepted |
 | ADR-014 | Relationship persistence 与未来专用图技术解耦 | Accepted |
 | ADR-015 | Canonical build 不依赖 LLM | Accepted |
 | ADR-016 | Codex 不进入 canonical runtime/build dependency | Accepted |
@@ -1544,7 +1547,7 @@ LegalViz 是 Phase 1 的第一 reference implementation。
 - CSSF；
 - relationship provenance；
 - broader search corpus；
-- API/MCP family tools。
+- Phase 4 Public API/MCP family tools。
 
 ---
 
@@ -1799,7 +1802,7 @@ Explainable Relationships + Search
     ↓
 Reusable Services
     ↓
-Explorer / Reader / Search / API / MCP
+Explorer / Reader / Search / Phase 4 Public API / MCP
 ```
 
 只要这条链路保持清晰，后续加入 CJEU、CELLAR、更多 CSSF/EBA/ESMA 文件、MCP、监管路径和更高级可视化，都属于“增加能力”，而不是“重做系统”。

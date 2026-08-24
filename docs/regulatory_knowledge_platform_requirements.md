@@ -1,7 +1,7 @@
 # Regulatory Knowledge Platform — 产品需求规格说明书
 
-> 文档版本：v3.2 Revised Baseline  
-> 日期：2026-08-23  
+> 文档版本：v3.3 Revised Phase Baseline
+> 日期：2026-08-24
 > 产品语言：English  
 > 需求文档语言：中文  
 > 文档用途：作为独立 Git 工程的产品需求、阶段规划与架构约束基线
@@ -12,7 +12,7 @@
 
 本文定义一个独立的 **Regulatory Knowledge Platform**。产品以官方 EU / Luxembourg 监管法规为底座，提供高质量 Legal Reader、法规内部与法规之间的关系导航，并逐步演进为可被 MCP、Agent 以及其他外部应用调用的监管知识服务。
 
-本文只描述本项目自身要建设的能力，并按照 **Phase 1 / Phase 2 / Phase 3** 明确演进路径。Phase 1 是完整的产品阶段，但必须拆成可独立运行、可连续发布的 `Release 0.1–0.6`，不能把所有能力绑定成一次性交付。后续阶段的需求在本文中提前定义，是为了保证核心标识和数据来源可演进，而不是要求 Phase 1 提前实现未来抽象。
+本文只描述本项目自身要建设的能力，并按照 **Phase 1 / Phase 2 / Phase 3 / Phase 4** 明确演进路径。Phase 1 是完整的产品阶段，但必须拆成可独立运行、可连续发布的 `Release 0.1–0.6`，不能把所有能力绑定成一次性交付。后续阶段的需求在本文中提前定义，是为了保证核心标识和数据来源可演进，而不是要求 Phase 1 提前实现未来抽象。
 
 产品的核心原则：
 
@@ -69,7 +69,7 @@ Phase 1 主要面向：
 - Technology / Architecture / Engineering staff who need to read regulation
 - Researchers / students working with EU regulation
 
-后续阶段通过 MCP/API 进一步面向：
+Phase 4 通过 Public API/MCP 进一步面向：
 
 - AI Agent builders
 - Internal compliance tools
@@ -92,8 +92,8 @@ flowchart TD
     E --> X[One-page Act Explorer]
     E --> F[Legal Reader]
     E --> S[Global Search]
-    E --> G[API]
-    G --> H[MCP]
+    E --> G[Public API - Phase 4]
+    G --> H[MCP - Phase 4]
     H --> I[Agent / External Clients]
 ```
 
@@ -112,7 +112,7 @@ flowchart TD
 为 Explorer、Reader、Search、API、MCP 提供统一的法规读取与关系查询能力，避免任一前端视图直接依赖 raw XML/PDF 或具体文件结构。Explorer 与 Reader 必须读取同一实体、同一 stable ID 和同一 relationship dataset。
 
 ### Delivery Layer
-包括 One-page Act Explorer、Web Legal Reader、Global Search、API、MCP 等不同消费方式。不同交付形式共享相同的 canonical data 和 relationship data，不允许为 Explorer、Reader 或 Search 各维护一套法规副本。
+包括 One-page Act Explorer、Web Legal Reader、Global Search，以及 Phase 4 Public API/MCP 等不同消费方式。不同交付形式共享相同的 canonical data 和 relationship data，不允许为 Explorer、Reader 或 Search 各维护一套法规副本。
 
 ---
 
@@ -146,7 +146,7 @@ Phase 1 最终完成范围如下；这些能力按 Release 逐步交付，前序
 - short name / CELEX / year-number / legal citation 的 deterministic query rewrite 与 ranking；
 - 官方来源、CELEX、版本等 metadata；
 - Relationship Panel；
-- 稳定的数据、service 和 repository 边界，为 Phase 2 API/MCP/CJEU/CELLAR 预留接口。
+- 稳定的数据、service 和 repository 边界，为 Phase 2/3 产品能力及 Phase 4 Public API/MCP 预留接口。
 
 Phase 1 的实现策略应尽量沿用已经验证的简单方案：**结构化法律数据 + 预计算 SQLite 索引 + 轻量 deterministic ranking + 浏览器端即时导航**，避免在首阶段引入不必要的重型搜索或分布式基础设施。
 
@@ -162,9 +162,9 @@ Phase 1 内部发布边界：
 | `0.6` | CSSF representative documents、PDF fallback、可访问性、性能和部署完善 |
 
 每个 Release 使用自己的验收门槛。Phase 1 总验收用于表示完整阶段完成，不阻塞前序版本发布。
-## 3.2 Phase 2 — Official Relationship & Integration Layer
+## 3.2 Phase 2 — Official Relationship Layer
 
-目标：从“高质量法规阅读器”升级为“官方关系增强的监管知识服务”。
+目标：从“高质量法规阅读器”升级为“官方关系增强的监管知识产品”。
 
 Phase 2 建设：
 
@@ -173,8 +173,6 @@ Phase 2 建设：
 - CJEU case law；
 - Article-level case citation；
 - Version / consolidated text relationship；
-- 对外稳定 API；
-- MCP server；
 - 2D relationship graph view；
 - 更完整的 RTS / ITS / Guidelines / Q&A 体系；
 - Search relation filters / advanced filters；
@@ -193,10 +191,26 @@ Phase 3 建设：
 - implementation timeline；
 - Regulatory Family 跨文件全局视图；
 - focused knowledge graph persistence（必要时引入 GraphDB）；
-- advanced MCP tools for multi-hop regulatory exploration；
-- Agent-ready regulatory paths；
+- explainable multi-hop regulatory paths；
 - deterministic applicability / compliance navigation；
 - richer cross-regulation comparison and navigation。
+
+## 3.4 Phase 4 — External Integration Platform
+
+目标：在 Phase 2/3 的数据、关系与智能产品稳定后，将同一 service capabilities 安全地开放给外部开发者、Agent 与第三方应用。
+
+Phase 4 建设：
+
+- versioned Public API；
+- API authentication / keys；
+- rate limiting、usage policy 与 operational monitoring；
+- external developer documentation；
+- MCP server；
+- structured SDK / client examples；
+- Agent integrations；
+- API/MCP compatibility and deprecation policy。
+
+Phase 2/3 可以持续增加产品内部 API endpoint 和 service capability，但这些接口在 Phase 4 前不构成公开兼容承诺。
 
 ---
 
@@ -1755,7 +1769,7 @@ Web UI 不应知道：
 - CSSF PDF parser 的规则；
 - TF-IDF 如何计算；
 - SPARQL 如何查询（Phase 2）；
-- MCP transport details（Phase 2）。
+- MCP transport details（Phase 4）。
 
 ## 21.3 性能
 
@@ -1791,9 +1805,9 @@ Mobile：正文优先，TOC 和 relationships 使用 drawer/sheet。
 
 ---
 
-# 22. Phase 2 — Official Relationship & Integration Layer
+# 22. Phase 2 — Official Relationship Layer
 
-Phase 2 的目标是在 Phase 1 已有稳定 Reader / Canonical Data / Relationship Model 上增加官方关系、判例与外部调用能力。
+Phase 2 的目标是在 Phase 1 已有稳定 Reader / Canonical Data / Relationship Model 上增加官方关系、判例、关系图和高级关系检索。
 
 Phase 2 不改变 Phase 1 的核心实体，只扩充 relationship types、service capabilities 和 delivery adapters。
 
@@ -1920,72 +1934,7 @@ CASE LAW  n
 - open official judgment；
 - Side Peek / case detail。
 
-## 22.4 API
-
-Phase 2 将 Phase 1 内部 Reader Services 固化为稳定 API。
-
-API 必须围绕业务实体，而不是底层文件：
-
-能力类别：
-
-- search law；
-- resolve law identifier；
-- get document structure；
-- get provision；
-- get recital；
-- get annex；
-- get relationships；
-- get related Level 2 documents；
-- get case law；
-- get metadata / versions。
-
-API response 继续使用 Phase 1 stable IDs 和 Canonical Model。
-
-API versioning 从首次对外开放时启用。
-
-## 22.5 MCP Server
-
-MCP 是 Phase 2 明确能力。
-
-目标：让 ChatGPT、Claude、Cursor、VS Code、内部 Agent 或其他 MCP client 能把平台当作可靠的监管法规工具源。
-
-MCP 不重新实现法律逻辑，只是复用 API / service layer。
-
-建议工具能力：
-
-```text
-search_regulation
-resolve_regulation
-get_law_structure
-get_provision
-get_recital
-get_annex
-get_relationships
-get_level2_measures
-get_case_law
-get_version_info
-```
-
-设计原则参考 LegalViz MCP：
-
-- 返回 structured primary-law data；
-- 一次获取需要的 law part，而不是整部法规全文；
-- 工具输出稳定、可引用；
-- MCP 与 Web 共用同一 service/cache；
-- MCP 不维护第二套法规数据。
-
-### Phase 1 必须预留
-
-- Reader UI 不直接访问 raw data；
-- stable service contract；
-- stable IDs；
-- provision granularity；
-- source metadata；
-- relationship provenance；
-- deterministic lookup；
-- error model 能区分 not found / ambiguous / unavailable。
-
-## 22.6 Relationship Graph View
+## 22.4 Relationship Graph View
 
 Phase 2 提供简单、实用的 2D relationship graph。
 
@@ -2011,7 +1960,7 @@ Graph view 的目标是辅助理解，不替代 Reader。
 
 Graph node 必须可回到同一 canonical entity 的 Reader，并可选择 `Locate in Explorer`。Phase 2 的关系增强不得产生与 Explorer/Reader 分离的第二套实体标识。
 
-## 22.7 Extended Level 2 / Level 3
+## 22.5 Extended Level 2 / Level 3
 
 Phase 2 将 DORA/MiCA regulatory family 扩展为更完整体系：
 
@@ -2031,7 +1980,7 @@ RTS 2 · ITS 1 · GL 3 · Q&A 5
 
 点击进入具体 relation list。
 
-## 22.8 Advanced Search
+## 22.6 Advanced Search
 
 Phase 2 搜索增加：
 
@@ -2188,11 +2137,11 @@ Graph Adapter
 GraphDB
 ```
 
-Web/API/MCP 不直接依赖具体 graph database query language。
+Web 与内部 service/API 不直接依赖具体 graph database query language。
 
-## 23.7 Advanced MCP
+## 23.7 Structured Regulatory Path Service
 
-Phase 3 MCP 增加多跳与 regulatory path tools：
+Phase 3 将多跳导航能力固化为内部 service outputs：
 
 ```text
 get_regulatory_path
@@ -2203,21 +2152,21 @@ get_authority_decisions
 compare_provisions
 ```
 
-这些工具复用 Relationship/Taxonomy/Applicability services，不将业务逻辑放入 MCP transport layer。
+这些能力复用 Relationship/Taxonomy/Applicability services，首先服务 Web 产品。Phase 4 MCP 可以薄适配这些 outputs，但不得把业务逻辑移入 transport layer。
 
 ---
 
 # 24. Phase 1 架构预留矩阵
 
-本节是保证“Phase 1 简单，但 Phase 2/3 不重构”的关键约束。
+本节是保证“Phase 1 简单，但 Phase 2/3/4 不重构”的关键约束。
 
 | 后续能力 | Phase 1 必须提前具备的基础 |
 |---|---|
 | CELLAR SPARQL | stable external IDs、relationship provenance、可扩展 relation types |
 | CJEU | Case-compatible node type、ECLI/CELEX external identifier、Article-level stable ID |
 | Amendment chain | source snapshot、version metadata、document relationship model |
-| MCP | service layer、deterministic lookup、structured responses、stable IDs |
-| API | UI 不直接依赖 raw files、Reader Service contract |
+| MCP（Phase 4） | service layer、deterministic lookup、structured responses、stable IDs |
+| Public API（Phase 4） | UI 不直接依赖 raw files、Reader Service contract、内部 endpoint 不提前承诺兼容 |
 | GraphDB | graph-neutral node/edge model、relationship repository abstraction |
 | Timeline | publication/effective/application temporal fields |
 | Applicability | provision-level IDs、Regulatory Family、explainable relationships |
@@ -2348,9 +2297,9 @@ Web 不解析 FMX，不查询 SPARQL，不拥有 canonical relationship truth。
 
 TF-IDF 可以复用 LegalViz 的 lightweight implementation，但最终 related-recital result 应可重建并带 method / score；为了稳定性，优先在 ingestion/build 阶段生成并缓存，Reader 直接消费。
 
-## 25.8 MCP Adapter
+## 25.8 MCP Adapter（Phase 4）
 
-Phase 2 仅把 service capabilities 变成 MCP tools。
+Phase 4 仅把已经稳定的 service capabilities 变成 MCP tools。
 
 MCP adapter 不拥有法规数据，不拥有新的业务 repository。
 
@@ -2392,8 +2341,8 @@ flowchart TD
     E --> F
     X --> F
     F --> G[Web Views\nExplorer / Reader / Search]
-    F --> H[API]
-    H --> I[MCP]
+    F --> H[Public API - Phase 4]
+    H --> I[MCP - Phase 4]
 ```
 
 禁止形成：
@@ -2575,7 +2524,7 @@ LegalViz 的强项是通用 EU legal reader；本项目不是简单复制，因�
 5. **Search Scope**：不只 primary acts；
 6. **Relationship Provenance**：显式区分 OFFICIAL / LEGAL_TEXT / EDITORIAL / TFIDF 等来源；
 7. **Focused Graph**：后续围绕金融监管法规形成有意义的关系子图；
-8. **Phase 2 MCP**：工具不仅查 EU primary law，还能查 family / level 2 / CSSF / relationships。
+8. **Phase 4 MCP**：工具不仅查 EU primary law，还能查 family / level 2 / CSSF / relationships。
 
 ### I. 开发决策规则
 
@@ -2800,7 +2749,7 @@ EUR-Lex / CELLAR 是平台法律数据的主要 authoritative source。
 | Level 2/3 badges | ESMA | Phase 2 |
 | CELLAR official relations | EUR-Lex/CELLAR | Phase 2 |
 | CJEU | LegalViz + CELLAR | Phase 2 |
-| MCP | LegalViz | Phase 2 |
+| MCP | LegalViz | Phase 4 |
 | Relationship graph | LegalViz concept + own focused graph | Phase 2 |
 | Topic/Pillar view | regulation-dora + gdpr-info | Phase 3 |
 | Decision network | GDPRhub | Phase 3 |
@@ -2986,24 +2935,14 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 - Case Law tab 可展示；
 - ECLI/official source 可追溯。
 
-## 31.3 API
+## 31.3 Internal Services
 
-- Search / Structure / Provision / Relationships / Cases 均有稳定 API；
-- API 使用 stable IDs；
-- response 不暴露 raw XML 依赖；
-- API versioning 已启用。
+- Search / Structure / Provision / Relationships / Cases 均有清晰的内部 service/API boundary；
+- response 使用 stable IDs，且不暴露 raw XML 依赖；
+- Relationship Graph 与 Reader 使用同一 service 和 relationship dataset；
+- Phase 2 endpoint 不要求公开 versioning，也不形成外部兼容承诺。
 
-## 31.4 MCP
-
-- 常见 MCP client 可连接；
-- 能搜索法规；
-- 能读取具体 Article / Recital / Annex；
-- 能获取 relationships；
-- 能获取 case law；
-- 工具输出包含 official source / identifiers；
-- MCP 不要求加载整部法规才能回答单一 Article 请求。
-
-## 31.5 Graph View
+## 31.4 Graph View
 
 - Article 可显示 focused 1-hop graph；
 - relation types 可筛选；
@@ -3035,13 +2974,49 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 
 - 能显示至少一种 multi-hop path；
 - 每一跳都有具体关系来源；
-- path 可从 Web 和 MCP 共用。
+- path 可由 Web 使用，并形成 Phase 4 adapter 可复用的 structured output。
 
 ---
 
-# 33. 数据质量要求
+# 33. Phase 4 — External Integration Platform
 
-## 33.1 Canonical Text Integrity
+Phase 4 才把经过 Phase 2/3 产品验证的内部 service capabilities 固化为外部兼容 contract。公开 API 围绕业务实体，而不是底层文件，继续使用 Phase 1 stable IDs、Canonical Model、official source 与 relationship provenance。
+
+Public API 能力包括：
+
+- search / resolve regulation；
+- get document structure / provision / recital / annex；
+- get relationships / Level 2 measures / case law；
+- get version / topic / timeline / applicability / regulatory paths。
+
+MCP 不重新实现法律逻辑，只是复用同一 service layer。首批工具建议：
+
+```text
+search_regulation
+resolve_regulation
+get_law_structure
+get_provision
+get_relationships
+get_case_law
+get_version_info
+get_regulatory_path
+```
+
+Phase 4 验收要求：
+
+- Public API v1 已启用明确 versioning；
+- authentication、rate limiting、usage policy 和 operational monitoring 已配置；
+- response 不暴露 raw XML、SQLite schema 或内部文件路径；
+- developer documentation、错误模型和 deprecation policy 可用；
+- 常见 MCP client 可连接并获取带 official source / identifiers / provenance 的结构化输出；
+- MCP 不要求加载整部法规才能读取单一 Article；
+- Web、Public API 与 MCP 共用 service/cache，不维护第二套法规或关系数据。
+
+---
+
+# 34. 数据质量要求
+
+## 34.1 Canonical Text Integrity
 
 normalized legal text 必须可与 official source 对照。
 
@@ -3052,26 +3027,26 @@ normalized legal text 必须可与 official source 对照。
 - 删除影响法律意义的 numbering；
 - 将 Title/Chapter/Section 误标为其他法律结构。
 
-## 33.2 Reference Integrity
+## 34.2 Reference Integrity
 
 只有目标能够可靠 resolve 时才创建 explicit reference edge。
 
 关系需保留 evidence 和 parser source location，便于问题定位。
 
-## 33.3 Algorithmic Relationship Quality
+## 34.3 Algorithmic Relationship Quality
 
 TF-IDF 属于 relevance，不属于 legal authority。
 
 score threshold / Top N 应可配置，并允许未来通过人工 benchmark 调整。
 
-## 33.4 Official Mapping Quality
+## 34.4 Official Mapping Quality
 
 RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 
 ---
 
 
-# 34. 推荐的产品实施顺序
+# 35. 推荐的产品实施顺序
 
 这里描述可发布的产品能力顺序，而不是具体代码任务。总体策略是：**先跑通一条纵向链路，立即扩展到全部核心法规，再逐层增加搜索、引用、关系和 CSSF；任何增强功能都不应让已有 Reader 退回不可发布状态。**
 
@@ -3169,11 +3144,9 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 2. amendment/version chain；
 3. CJEU；
 4. citation graph enrichment；
-5. stable public API；
-6. MCP；
-7. graph view；
-8. extended Level 2 / Level 3；
-9. advanced relation-aware search。
+5. graph view；
+6. extended Level 2 / Level 3；
+7. advanced relation-aware search。
 
 ## Phase 3 Sequence
 
@@ -3183,8 +3156,18 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 4. applicability navigation；
 5. cross-regulation paths；
 6. focused graph persistence；
-7. advanced MCP tools。
-# 35. 最终架构原则
+7. structured regulatory path services。
+
+## Phase 4 Sequence
+
+1. stabilize selected internal services as Public API v1；
+2. API versioning、authentication、rate limits 与 developer documentation；
+3. MCP adapter；
+4. SDK / client examples；
+5. Agent and third-party integrations；
+6. compatibility / deprecation policy。
+
+# 36. 最终架构原则
 
 最终架构必须同时遵循以下原则：
 
@@ -3219,7 +3202,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 
 ---
 
-# 36. 最终产品形态
+# 37. 最终产品形态
 
 Phase 1 用户感受到的是：
 
@@ -3244,8 +3227,6 @@ Phase 2 增加：
 Official Relationship Graph
 + Amendment / Version
 + CJEU
-+ API
-+ MCP
 + Focused Graph View
 ```
 
@@ -3257,7 +3238,17 @@ Topics
 + Timelines
 + Applicability
 + Multi-hop Regulatory Paths
-+ Advanced Agent-ready Regulatory Knowledge
++ Explainable Cross-regulation Navigation
+```
+
+Phase 4 增加：
+
+```text
+Versioned Public API
++ Authentication / Rate Limits
++ Developer Documentation
++ MCP Server
++ SDK / Agent / Third-party Integrations
 ```
 
 最终平台的核心不是某一种 UI 或某一种数据库，而是一套稳定的：
