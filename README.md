@@ -356,13 +356,16 @@ npm run runtime:build
 npm test -- src/search/full-text-search.test.ts
 npm test -- src/relationships/explicit-reference.test.ts
 npm run search:benchmark
+npm run performance:benchmark
 ```
 
 The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts. For a staged production artifact, run `npm run runtime:verify -- --input <sqlite-path>` before switching the running service to it; the command checks SQLite integrity/FTS support plus matching Reader and Search manifests.
 
 The website never reads Canonical JSON, `data/source-registry.json`, or curated mappings at runtime. `documents` holds queryable family/level/measure/source metadata plus a bounded `source_status_json` object, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Corpus parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 
-The benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
+The search benchmark fails if any fixed full-text or definition query loses its expected law. Its JSON report records the Node and SQLite versions, platform, architecture, CPU, memory, corpus build ID and counts, warm-up and sample counts, first-query timings, and warm P50/P95/max full-text latency. Treat its values as a machine-specific baseline, not as a portable guarantee.
+
+`npm run performance:benchmark` rebuilds the runtime and web production build, runs the local read-only API with a Vite production preview, and prints a machine-specific JSON baseline. It measures warm loopback HTTP responses for the Reader document and an Article 28 provision-relationship request (10 warm-ups, 100 samples each), and fails when either P95 reaches 100 ms. It also records three fresh-browser-context and three repeat homepage samples for navigation timing, FCP/LCP when the browser reports them, and same-origin transfer payload. “Fresh” means a new browser context; it deliberately does not claim to clear OS or disk caches.
 
 ### References and Cited By
 

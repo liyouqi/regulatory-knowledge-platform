@@ -31,6 +31,7 @@
     "runtime:verify": "node --import tsx src/runtime/verify-runtime-artifact.ts",
     "relationships:benchmark": "node --import tsx src/relationships/benchmark-related-recitals.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
+    "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",
     "pretest": "npm run runtime:build",
     "test": "vitest run",
     "test:watch": "vitest",

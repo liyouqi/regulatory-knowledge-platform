@@ -26,7 +26,9 @@ test("opens DORA Article 28 from Explorer and its Level 2 library", async ({
   await expect(page.getByRole("link", { name: /^ITS\s+\d+/ })).toBeVisible();
 });
 
-test("theme selection persists between Reader and Explorer", async ({ page }) => {
+test("theme selection persists between Reader and Explorer", async ({
+  page,
+}) => {
   await page.goto("/read/dora/articles/1");
   await page.getByRole("button", { name: "Switch to light theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
