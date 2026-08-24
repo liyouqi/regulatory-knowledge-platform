@@ -13,6 +13,7 @@ import {
 } from "../shared/legal";
 import { explorerPath, level2LibraryPath } from "../shared/reader-route";
 import { SourceStatusNotice } from "./SourceStatusNotice";
+import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 
 const typeLabels = {
   rts: "RTS",
@@ -23,10 +24,14 @@ export function Level2LibraryPage({
   familySlug,
   measureType,
   onOpenSearch,
+  onToggleTheme,
+  theme,
 }: {
   familySlug: string;
   measureType?: "rts" | "its";
   onOpenSearch: () => void;
+  onToggleTheme: () => void;
+  theme: ThemeMode;
 }) {
   const [library, setLibrary] = useState<FamilyLevel2Response | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -89,6 +94,7 @@ export function Level2LibraryPage({
           Regulatory Knowledge
         </Link>
         <div className="topbar-actions">
+          <ThemeToggle onToggle={onToggleTheme} theme={theme} />
           <Link className="view-switch" to={explorerPath(familySlug)}>
             <ArrowLeft aria-hidden="true" size={15} />
             Explore

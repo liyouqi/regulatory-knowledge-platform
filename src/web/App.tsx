@@ -54,6 +54,7 @@ import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { Level2LibraryPage } from "./Level2LibraryPage";
+import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
@@ -799,7 +800,15 @@ function CurrentDocumentSearch({
   );
 }
 
-function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
+function ReaderPage({
+  onOpenSearch,
+  onToggleTheme,
+  theme,
+}: {
+  onOpenSearch: () => void;
+  onToggleTheme: () => void;
+  theme: ThemeMode;
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const selection = parseReaderPath(location.pathname);
@@ -1036,6 +1045,7 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           Regulatory Knowledge
         </Link>
         <div className="topbar-actions">
+          <ThemeToggle onToggle={onToggleTheme} theme={theme} />
           <Link
             className="view-switch"
             to={`${explorerPath(legalDocument.slug)}#${activeProvision.explorerAnchor}`}
@@ -1262,6 +1272,27 @@ export function App() {
   const explorer = parseExplorerPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    try {
+      return globalThis.localStorage.getItem("regulatory-theme") === "light"
+        ? "light"
+        : "dark";
+    } catch {
+      return "dark";
+    }
+  });
+
+  useEffect(() => {
+    globalThis.document.documentElement.dataset.theme = theme;
+    try {
+      globalThis.localStorage.setItem("regulatory-theme", theme);
+    } catch {
+      // Theme selection remains available for the current browser session.
+    }
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -1283,14 +1314,22 @@ export function App() {
           familySlug={level2Library.familySlug}
           measureType={level2Library.measureType}
           onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          theme={theme}
         />
       ) : explorer ? (
         <ExplorerPage
           onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
           slug={explorer.slug}
+          theme={theme}
         />
       ) : (
-        <ReaderPage onOpenSearch={() => setSearchOpen(true)} />
+        <ReaderPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          theme={theme}
+        />
       )}
       <GlobalLawSearch onClose={() => setSearchOpen(false)} open={searchOpen} />
     </>

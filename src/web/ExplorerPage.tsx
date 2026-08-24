@@ -17,6 +17,7 @@ import {
   familyLevel2ResponseSchema,
 } from "../shared/legal";
 import { explorerPath, level2LibraryPath } from "../shared/reader-route";
+import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { recordOpenedLaw } from "./opened-laws";
 
 function flattenProvisions(nodes: ExplorerNode[]): ExplorerNode[] {
@@ -85,9 +86,13 @@ function ExplorerTree({
 export function ExplorerPage({
   slug,
   onOpenSearch,
+  onToggleTheme,
+  theme,
 }: {
   slug: string;
   onOpenSearch: () => void;
+  onToggleTheme: () => void;
+  theme: ThemeMode;
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -211,6 +216,7 @@ export function ExplorerPage({
           Regulatory Knowledge
         </Link>
         <div className="topbar-actions">
+          <ThemeToggle onToggle={onToggleTheme} theme={theme} />
           <span className="view-switch active">
             <ListTree aria-hidden="true" size={15} />
             Explore

@@ -56,6 +56,8 @@ npm run dev
 
 Then open `http://localhost:5173`. The Vite web app proxies `/api` calls to the Express API at `http://localhost:3000`.
 
+Use the **Light/Dark** control in the top bar to switch the shared Reader, Explorer, and Level 2 Library chrome. Dark is the default; the browser stores the selected theme locally, without storing legal text or changing the runtime artifact.
+
 Before considering a change complete, run:
 
 ```bash

@@ -26,6 +26,27 @@ test("opens DORA Article 28 from Explorer and its Level 2 library", async ({
   await expect(page.getByRole("link", { name: /^ITS\s+\d+/ })).toBeVisible();
 });
 
+test("theme selection persists between Reader and Explorer", async ({ page }) => {
+  await page.goto("/read/dora/articles/1");
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator(".topbar")).toHaveCSS(
+    "background-color",
+    "rgb(255, 254, 249)",
+  );
+
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Switch to dark theme" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Explore" }).click();
+  await expect(page).toHaveURL(/\/explore\/dora#.+/);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
 test("global law search opens DORA Article 28", async ({ page }) => {
   await page.goto("/explore/dora");
   await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();

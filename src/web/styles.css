@@ -1,8 +1,23 @@
 :root {
+  --accent: #b6ce68;
+  --ink: #e8e7e1;
+  --line: #32382c;
+  --muted: #aeb2a4;
+  --panel: #1a1d18;
   color: #e8e7e1;
   background: #141611;
   font-family: Georgia, "Times New Roman", serif;
   font-synthesis: none;
+}
+
+:root[data-theme="light"] {
+  --accent: #647a31;
+  --ink: #252820;
+  --line: #d2d0c5;
+  --muted: #656b60;
+  --panel: #f3f2eb;
+  background: #f6f5ef;
+  color: #252820;
 }
 
 * {
@@ -156,6 +171,26 @@ select:focus-visible,
   font-size: 13px;
   gap: 8px;
   padding: 7px 9px;
+}
+
+.theme-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #424a3b;
+  border-radius: 7px;
+  color: #b7b9ad;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  gap: 6px;
+  padding: 7px 9px;
+}
+
+.theme-toggle:hover,
+.theme-toggle[aria-pressed="true"] {
+  border-color: #69765c;
+  color: #eef0e8;
 }
 
 .search-button:hover,
@@ -2033,6 +2068,207 @@ kbd {
 .search-help kbd {
   border: 1px solid #434a3c;
   font-size: 9px;
+}
+
+:root[data-theme="light"] .reader-shell {
+  background: #f6f5ef;
+}
+
+:root[data-theme="light"] .topbar {
+  background: #fffef9;
+  border-color: #d2d0c5;
+}
+
+:root[data-theme="light"] .brand,
+:root[data-theme="light"] .context-panel a {
+  color: #252820;
+}
+
+:root[data-theme="light"] .view-switch,
+:root[data-theme="light"] .search-button,
+:root[data-theme="light"] .copy-button,
+:root[data-theme="light"] .theme-toggle {
+  border-color: #cbc9be;
+  color: #555c50;
+}
+
+:root[data-theme="light"] .view-switch:hover,
+:root[data-theme="light"] .view-switch.active,
+:root[data-theme="light"] .search-button:hover,
+:root[data-theme="light"] .copy-button:hover,
+:root[data-theme="light"] .theme-toggle:hover,
+:root[data-theme="light"] .theme-toggle[aria-pressed="true"] {
+  background: #ecebdd;
+  border-color: #a8ad8d;
+  color: #252820;
+}
+
+:root[data-theme="light"] kbd {
+  background: #ebeae2;
+  color: #4d5549;
+}
+
+:root[data-theme="light"] .toc,
+:root[data-theme="light"] .context-panel,
+:root[data-theme="light"] .mobile-relationships {
+  background: #f0efe8;
+  border-color: #d2d0c5;
+  color: #252820;
+}
+
+:root[data-theme="light"] .toc-title,
+:root[data-theme="light"] .law-switcher::after,
+:root[data-theme="light"] .eyebrow,
+:root[data-theme="light"] .context-panel dd,
+:root[data-theme="light"] .fixture-notice {
+  color: #656b60;
+}
+
+:root[data-theme="light"] .law-switcher select,
+:root[data-theme="light"] .quick-go,
+:root[data-theme="light"] .current-search-results {
+  background: #fffef9;
+  border-color: #cbc9be;
+  color: #252820;
+}
+
+:root[data-theme="light"] .quick-go input,
+:root[data-theme="light"] .current-search-result,
+:root[data-theme="light"] .current-search-result strong {
+  color: #252820;
+}
+
+:root[data-theme="light"] .quick-go svg,
+:root[data-theme="light"] .current-search-result em,
+:root[data-theme="light"] .current-search-result small,
+:root[data-theme="light"] .current-search-result p,
+:root[data-theme="light"] .current-search-empty,
+:root[data-theme="light"] .collection-tabs button,
+:root[data-theme="light"] .collection-tabs span,
+:root[data-theme="light"] .toc-group > summary,
+:root[data-theme="light"] .toc-group > summary small,
+:root[data-theme="light"] .toc-group > summary em,
+:root[data-theme="light"] .toc-item {
+  color: #62695e;
+}
+
+:root[data-theme="light"] .current-search-result:hover,
+:root[data-theme="light"] .current-search-result.active,
+:root[data-theme="light"] .toc-item:hover,
+:root[data-theme="light"] .toc-item.active {
+  background: #e5e8d8;
+  border-color: #9ca77c;
+  color: #252820;
+}
+
+:root[data-theme="light"] .collection-tabs,
+:root[data-theme="light"] .toc-group > .toc-tree,
+:root[data-theme="light"] .context-divider,
+:root[data-theme="light"] .fixture-notice {
+  border-color: #d2d0c5;
+}
+
+:root[data-theme="light"] .collection-tabs button.active {
+  border-bottom-color: #647a31;
+  color: #252820;
+}
+
+:root[data-theme="light"] .current-search-result mark {
+  background: #dce5b8;
+  color: #263418;
+}
+
+:root[data-theme="light"] .reference-peek,
+:root[data-theme="light"] .inline-definition-tooltip,
+:root[data-theme="light"] .global-search {
+  background: #fffef9;
+  border-color: #cbc9be;
+  color: #252820;
+}
+
+:root[data-theme="light"] .reference-peek > header button,
+:root[data-theme="light"] .global-search-input button {
+  background: #efeee7;
+  border-color: #cbc9be;
+  color: #4d5549;
+}
+
+:root[data-theme="light"] .reference-peek-law,
+:root[data-theme="light"] .inline-definition-tooltip strong,
+:root[data-theme="light"] .reference-peek h3,
+:root[data-theme="light"] .reference-peek-evidence,
+:root[data-theme="light"] .definition-peek-source,
+:root[data-theme="light"] .reference-peek-status {
+  color: #656b60;
+}
+
+:root[data-theme="light"] .reference-peek h2,
+:root[data-theme="light"] .reference-peek blockquote {
+  color: #252820;
+}
+
+:root[data-theme="light"] .reference-peek-evidence,
+:root[data-theme="light"] .definition-peek-source {
+  border-color: #d2d0c5;
+}
+
+:root[data-theme="light"] .reference-peek-actions a {
+  border-color: #aeb69a;
+  color: #4a5e22;
+}
+
+:root[data-theme="light"] .search-backdrop {
+  background: rgb(34 37 29 / 36%);
+}
+
+:root[data-theme="light"] .global-search-input,
+:root[data-theme="light"] .search-mode-bar,
+:root[data-theme="light"] .search-help,
+:root[data-theme="light"] .search-section-label.secondary {
+  background: #f4f3ec;
+  border-color: #d2d0c5;
+}
+
+:root[data-theme="light"] .global-search-input input,
+:root[data-theme="light"] .law-result-copy strong,
+:root[data-theme="light"] .full-text-intro strong {
+  color: #252820;
+}
+
+:root[data-theme="light"] .global-search-input input::placeholder,
+:root[data-theme="light"] .search-mode-tabs button,
+:root[data-theme="light"] .search-mode-bar small,
+:root[data-theme="light"] .search-section-label,
+:root[data-theme="light"] .law-result-meta,
+:root[data-theme="light"] .search-empty,
+:root[data-theme="light"] .search-help,
+:root[data-theme="light"] .definition-text,
+:root[data-theme="light"] .full-text-snippet {
+  color: #656b60;
+}
+
+:root[data-theme="light"] .search-mode-tabs button.active {
+  border-bottom-color: #647a31;
+  color: #252820;
+}
+
+:root[data-theme="light"] .law-search-result:hover,
+:root[data-theme="light"] .law-search-result.active {
+  background: #e8eadc;
+  border-color: #c0c5a8;
+}
+
+:root[data-theme="light"] .law-result-mark,
+:root[data-theme="light"] .law-result-copy em,
+:root[data-theme="light"] .full-text-intro code {
+  background: #e7ead8;
+  border-color: #bdc5a2;
+  color: #46562e;
+}
+
+:root[data-theme="light"] .full-text-snippet mark {
+  background: #d8e6a6;
+  color: #263418;
 }
 
 @media (max-width: 980px) {
