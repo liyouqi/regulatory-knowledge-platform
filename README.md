@@ -247,7 +247,7 @@ Reader URLs are stable and readable:
 /read/ai-act/annexes/vii#annex-part-1
 ```
 
-Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks. The Reader's current-law field gives exact locators priority and accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`.
+Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks; the adjacent copy control puts the stable URL on the clipboard and briefly confirms success. The Reader's current-law field gives exact locators priority and accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`.
 
 The same field searches the loaded law's Article, Recital, and Annex titles and body text without another server request. Multiple unquoted terms use strict AND semantics, each term supports word-prefix matching, and quoted text is an exact normalized phrase. Results include highlighted snippets and open stable provision or paragraph anchors. For example:
 

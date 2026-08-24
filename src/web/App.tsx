@@ -140,15 +140,46 @@ function LegalBlock({
   onDefinitionPreview: (definition: DefinitionSearchResult) => void;
   onPreview: (relationship: ProvisionRelationship) => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  const blockLabel = block.marker ?? block.kind;
+
+  async function copyBlockPermalink() {
+    const permalink = new URL(
+      `${provisionPath}#${block.anchor}`,
+      globalThis.location.origin,
+    ).href;
+    await navigator.clipboard.writeText(permalink);
+    setCopied(true);
+    globalThis.setTimeout(() => setCopied(false), 1600);
+  }
+
   return (
     <div className={`legal-block ${block.kind}`} id={block.anchor}>
       <div className="block-copy">
-        <a
-          aria-label={`Link to ${block.marker ?? block.kind}`}
-          href={`${provisionPath}#${block.anchor}`}
-        >
-          {block.marker ?? "¶"}
-        </a>
+        <div className="block-marker-actions">
+          <a
+            aria-label={`Link to ${blockLabel}`}
+            href={`${provisionPath}#${block.anchor}`}
+          >
+            {block.marker ?? "¶"}
+          </a>
+          <button
+            aria-label={
+              copied
+                ? `Copied link to ${blockLabel}`
+                : `Copy link to ${blockLabel}`
+            }
+            className="block-copy-button"
+            onClick={copyBlockPermalink}
+            type="button"
+          >
+            {copied ? (
+              <Check aria-hidden="true" size={12} />
+            ) : (
+              <Copy aria-hidden="true" size={12} />
+            )}
+          </button>
+        </div>
         {block.text ? (
           <p>
             <AnnotatedLegalText

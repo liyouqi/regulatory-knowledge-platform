@@ -589,19 +589,53 @@ kbd {
   grid-template-columns: 32px minmax(0, 1fr);
 }
 
-.block-copy > a {
+.block-marker-actions {
+  align-items: flex-start;
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+  padding-top: 7px;
+}
+
+.block-marker-actions > a {
   color: #728047;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 11px;
   font-weight: 650;
-  padding-top: 7px;
   text-align: right;
   text-decoration: none;
 }
 
-.block-copy > a:hover {
+.block-marker-actions > a:hover {
   color: #3e4d15;
   text-decoration: underline;
+}
+
+.block-copy-button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: #728047;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  margin: -2px -2px 0 0;
+  min-height: 18px;
+  min-width: 18px;
+  padding: 2px;
+}
+
+.legal-block:not(:hover) .block-copy-button:not(:focus-visible) {
+  opacity: 0.55;
+}
+
+.block-copy-button:hover,
+.block-copy-button:focus-visible {
+  background: #e2e8ca;
+  color: #263418;
+  opacity: 1;
+  outline: 0;
 }
 
 .block-copy > p {
@@ -829,7 +863,7 @@ kbd {
   display: block;
 }
 
-.legal-block.annex-part > .block-copy > a {
+.legal-block.annex-part > .block-copy > .block-marker-actions > a {
   display: inline-block;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 21px;

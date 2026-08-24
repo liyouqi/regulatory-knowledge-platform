@@ -112,6 +112,27 @@ test("an exact defined term opens its official definition Side Peek", async ({
   );
 });
 
+test("a paragraph marker copies and restores its stable permalink", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/read/dora/articles/1");
+
+  const firstParagraph = page.locator("#paragraph-1");
+  await firstParagraph.getByRole("button", { name: "Copy link to 1." }).click();
+  await expect(
+    firstParagraph.getByRole("button", { name: "Copied link to 1." }),
+  ).toBeVisible();
+  const permalink = await page.evaluate(() => navigator.clipboard.readText());
+  expect(permalink).toBe(
+    "http://localhost:5173/read/dora/articles/1#paragraph-1",
+  );
+
+  await page.goto(permalink);
+  await expect(page.locator("#paragraph-1")).toHaveClass(/deep-link-target/);
+});
+
 test("full-text search opens the matching paragraph anchor", async ({
   page,
 }) => {
