@@ -37,7 +37,7 @@ import {
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.1.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.2.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -242,10 +242,12 @@ export function assertFts5(database: Database.Database): void {
 
 export function buildRuntimeDatabase(
   documents: DocumentView[],
-  sources: Pick<
-    SourceDefinition,
-    "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
-  >[] = [],
+  sources: Array<
+    Pick<
+      SourceDefinition,
+      "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+    > & { celex?: string; localId?: string }
+  > = [],
   outputPath = DEFAULT_RUNTIME_DATABASE_PATH,
 ): RuntimeDatabaseManifest {
   if (documents.length === 0)
@@ -258,8 +260,16 @@ export function buildRuntimeDatabase(
   const rows = indexRows(documents);
   const definitions = definitionRows(documents);
   const relationshipBuild = buildExplicitReferences(documents);
+  const sourceByIdentifier = new Map(
+    sources.flatMap((source) => {
+      const identifier = source.celex ?? source.localId;
+      return identifier ? [[identifier, source] as const] : [];
+    }),
+  );
   const sourceByCelex = new Map(
-    sources.map((source) => [source.celex, source]),
+    sources.flatMap((source) =>
+      source.celex ? [[source.celex, source] as const] : [],
+    ),
   );
   const registeredCelex = new Set(sourceByCelex.keys());
   const officialMappings = loadOfficialMappings().filter(
@@ -322,7 +332,8 @@ export function buildRuntimeDatabase(
         id TEXT PRIMARY KEY,
         jurisdiction TEXT NOT NULL,
         slug TEXT NOT NULL UNIQUE,
-        celex TEXT NOT NULL UNIQUE,
+        celex TEXT UNIQUE,
+        local_id TEXT UNIQUE,
         short_name TEXT NOT NULL,
         official_title TEXT NOT NULL,
         document_type TEXT NOT NULL,
@@ -337,7 +348,8 @@ export function buildRuntimeDatabase(
         regulatory_level TEXT NOT NULL CHECK (regulatory_level IN ('level-1', 'level-2', 'level-3')),
         measure_type TEXT NOT NULL CHECK (measure_type IN ('primary-act', 'rts', 'its', 'guideline', 'qa', 'other')),
         default_path TEXT NOT NULL,
-        display_order INTEGER NOT NULL
+        display_order INTEGER NOT NULL,
+        CHECK (celex IS NOT NULL OR local_id IS NOT NULL)
       ) STRICT;
       CREATE TABLE document_views (
         document_id TEXT PRIMARY KEY REFERENCES documents(id),
@@ -443,12 +455,12 @@ export function buildRuntimeDatabase(
 
     const insertDocument = database.prepare(`
       INSERT INTO documents (
-        id, jurisdiction, slug, celex, short_name, official_title, document_type,
+        id, jurisdiction, slug, celex, local_id, short_name, official_title, document_type,
         publication_date, source_url, source_status_json, last_checked, source_version,
         canonical_build_id, provenance, family_id, regulatory_level,
         measure_type, default_path, display_order
       ) VALUES (
-        @id, @jurisdiction, @slug, @celex, @shortName, @officialTitle, @documentType,
+        @id, @jurisdiction, @slug, @celex, @localId, @shortName, @officialTitle, @documentType,
         @publicationDate, @sourceUrl, @sourceStatusJson, @lastChecked, @sourceVersion,
         @canonicalBuildId, @provenance, @familyId, @regulatoryLevel,
         @measureType, @defaultPath, @displayOrder
@@ -513,8 +525,9 @@ export function buildRuntimeDatabase(
     );
     const populate = database.transaction(() => {
       for (const [displayOrder, document] of documents.entries()) {
-        const source = document.celex
-          ? sourceByCelex.get(document.celex)
+        const identifier = document.celex ?? document.localId;
+        const source = identifier
+          ? sourceByIdentifier.get(identifier)
           : undefined;
         const aliases = [...new Set(source?.aliases ?? [])];
         const explorer = explorerDocumentSchema.parse(toExplorerView(document));
@@ -523,6 +536,7 @@ export function buildRuntimeDatabase(
           jurisdiction: document.jurisdiction,
           slug: document.slug,
           celex: document.celex,
+          localId: document.localId,
           shortName: document.shortName,
           officialTitle: document.officialTitle,
           documentType: document.documentType,

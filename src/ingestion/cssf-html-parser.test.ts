@@ -30,6 +30,8 @@ const source: CssfSourceDefinition = {
   aliases: ["CSSF fixture"],
   language: "en",
   documentType: "communication",
+  regulatoryLevel: "level-3",
+  measureType: "other",
   publicationDate: "2025-04-09",
   checkedAt: "2026-08-24T00:00:00.000Z",
   pageUrl: "https://www.cssf.lu/en/test/",

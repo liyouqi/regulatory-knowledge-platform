@@ -24,7 +24,8 @@ interface SearchRow {
   documentId: string;
   slug: string;
   shortName: string;
-  celex: string;
+  celex: string | null;
+  localId: string | null;
   provisionId: string;
   kind: FullTextSearchResult["kind"];
   label: string;
@@ -41,7 +42,8 @@ interface DefinitionRow {
   jurisdiction: DefinitionSearchResult["jurisdiction"];
   slug: string;
   shortName: string;
-  celex: string;
+  celex: string | null;
+  localId: string | null;
   term: string;
   normalizedTerm: string;
   definitionText: string;
@@ -235,6 +237,7 @@ export class SearchService {
           d.slug AS slug,
           d.short_name AS shortName,
           d.celex AS celex,
+          d.local_id AS localId,
           p.provision_id AS provisionId,
           p.kind AS kind,
           p.label AS label,
@@ -267,7 +270,8 @@ export class SearchService {
           documentId: row.documentId,
           slug: row.slug,
           shortName: row.shortName,
-          celex: row.celex,
+          celex: row.celex ?? undefined,
+          localId: row.localId ?? undefined,
           provisionId: row.provisionId,
           kind: row.kind,
           label: row.label,
@@ -301,6 +305,7 @@ export class SearchService {
           d.slug AS slug,
           d.short_name AS shortName,
           d.celex AS celex,
+          d.local_id AS localId,
           df.term AS term,
           df.normalized_term AS normalizedTerm,
           df.definition_text AS definitionText,
@@ -343,7 +348,8 @@ export class SearchService {
           jurisdiction: row.jurisdiction,
           slug: row.slug,
           shortName: row.shortName,
-          celex: row.celex,
+          celex: row.celex ?? undefined,
+          localId: row.localId ?? undefined,
           term: row.term,
           normalizedTerm: row.normalizedTerm,
           definitionText: row.definitionText,

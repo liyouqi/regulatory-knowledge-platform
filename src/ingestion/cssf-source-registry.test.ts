@@ -21,6 +21,13 @@ describe("CSSF source registry", () => {
       true,
     );
     expect(
+      sources.every(
+        (source) =>
+          source.regulatoryLevel === "level-3" &&
+          source.measureType === "other",
+      ),
+    ).toBe(true);
+    expect(
       sources.every((source) =>
         source.topics.some((topic) => /ICT|DORA/iu.test(topic)),
       ),

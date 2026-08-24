@@ -26,8 +26,8 @@ import { sourceStatusSchema } from "../shared/source-status";
 
 type LawSearchSource = Pick<
   SourceDefinition,
-  "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
->;
+  "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+> & { celex?: string; localId?: string };
 
 interface DocumentPayloadRow {
   readerPayload: string;
@@ -39,7 +39,8 @@ interface ExplorerPayloadRow {
 
 interface LawSourceRow {
   documentId: string;
-  celex: string;
+  celex: string | null;
+  localId: string | null;
   familyId: string;
   regulatoryLevel: LawSearchSource["regulatoryLevel"];
   measureType: LawSearchSource["measureType"];
@@ -350,6 +351,7 @@ export class SqliteRuntimeRepository {
         SELECT
           d.id AS documentId,
           d.celex AS celex,
+          d.local_id AS localId,
           d.family_id AS familyId,
           d.regulatory_level AS regulatoryLevel,
           d.measure_type AS measureType,
@@ -362,7 +364,8 @@ export class SqliteRuntimeRepository {
     const sources = new Map<string, LawSearchSource>();
     for (const row of rows) {
       const source = sources.get(row.documentId) ?? {
-        celex: row.celex,
+        celex: row.celex ?? undefined,
+        localId: row.localId ?? undefined,
         familyId: row.familyId,
         regulatoryLevel: row.regulatoryLevel,
         measureType: row.measureType,

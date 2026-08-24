@@ -4,20 +4,22 @@ import { resolve } from "node:path";
 import { toDocumentView } from "../canonical/to-document-view";
 import { validateCanonicalDocument } from "../canonical/validate";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
+import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
 import { type DocumentView, documentViewSchema } from "../shared/legal";
 import { doraCanonicalFixture } from "./dora-fixture";
 
 const DORA_CELEX = "32022R2554";
 
-function officialCandidates(artifactRoot: string, celex: string) {
-  const directory = resolve(artifactRoot, celex);
+function officialCandidates(artifactRoot: string, identifier: string) {
+  const directory = resolve(artifactRoot, identifier);
   if (!existsSync(directory)) return [];
 
   return readdirSync(directory, { withFileTypes: true })
     .filter(
       (entry) =>
         entry.isDirectory() &&
-        entry.name.endsWith(`-parser-${FORMEX_PARSER_VERSION}`),
+        (entry.name.endsWith(`-parser-${FORMEX_PARSER_VERSION}`) ||
+          entry.name.endsWith(`-parser-cssf-html-${CSSF_HTML_PARSER_VERSION}`)),
     )
     .map((entry) => resolve(directory, entry.name, "document.json"))
     .filter(existsSync)
@@ -26,7 +28,8 @@ function officialCandidates(artifactRoot: string, celex: string) {
     )
     .filter(
       (document) =>
-        document.identifiers.celex === celex &&
+        (document.identifiers.celex === identifier ||
+          document.identifiers.localId === identifier) &&
         document.source.provenance === "official",
     )
     .sort((left, right) => {
@@ -49,7 +52,11 @@ function documentBuildId(
         .digest("hex")
         .slice(0, 12)}`
     : "";
-  return `canonical-${document.schemaVersion}-parser-${FORMEX_PARSER_VERSION}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;
+  const parserToken =
+    document.source.sourceSystem === "cssf"
+      ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
+      : FORMEX_PARSER_VERSION;
+  return `canonical-${document.schemaVersion}-parser-${parserToken}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;
 }
 
 export function loadDocumentViews(

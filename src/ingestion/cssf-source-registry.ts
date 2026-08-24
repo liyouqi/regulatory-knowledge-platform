@@ -37,6 +37,8 @@ export const cssfSourceDefinitionSchema = z
       "regulation",
       "guidance",
     ]),
+    regulatoryLevel: z.literal("level-3"),
+    measureType: z.literal("other"),
     publicationDate: z.string().date(),
     updatedDate: z.string().date().optional(),
     checkedAt: z.string().datetime(),

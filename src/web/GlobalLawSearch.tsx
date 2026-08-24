@@ -40,12 +40,19 @@ type SearchMode = "laws" | "opened" | "definitions" | "fulltext";
 const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
   catalog: "Available law",
   "exact-celex": "Exact CELEX",
+  "exact-local-id": "Exact local ID",
   "exact-alias": "Exact name",
   "exact-citation": "Exact citation",
   "exact-title": "Exact title",
   "title-prefix": "Title prefix",
   "title-terms": "Title terms",
 };
+
+function identifierLabel(result: { celex?: string; localId?: string }): string {
+  return result.celex
+    ? `CELEX ${result.celex}`
+    : `CSSF ${result.localId ?? "local document"}`;
+}
 
 function LawResultRow({
   result,
@@ -90,7 +97,7 @@ function LawResultRow({
             ? result.documentType
             : result.measureType.toUpperCase()}
           {" · "}
-          {result.publicationDate.slice(0, 4)} · CELEX {result.celex}
+          {result.publicationDate.slice(0, 4)} · {identifierLabel(result)}
         </span>
       </span>
       <span className="law-result-action">
@@ -157,7 +164,7 @@ function FullTextResultRow({
         {result.title ? <small>{result.title}</small> : null}
         <HighlightedSnippet result={result} />
         <span className="law-result-meta">
-          Full text · CELEX {result.celex}
+          Full text · {identifierLabel(result)}
         </span>
       </span>
       <span className="law-result-action">
@@ -202,7 +209,8 @@ function DefinitionResultRow({
         <span className="definition-text">{result.definitionText}</span>
         <span className="law-result-meta">
           {result.jurisdiction} · {result.shortName} · {result.label}
-          {result.marker ? ` · ${result.marker}` : ""} · CELEX {result.celex}
+          {result.marker ? ` · ${result.marker}` : ""} ·{" "}
+          {identifierLabel(result)}
         </span>
       </span>
       <span className="law-result-action">

@@ -83,6 +83,31 @@ const records: LawSearchRecord[] = [
   },
 ];
 
+const cssfRecord: LawSearchRecord = {
+  ...base,
+  id: "lu:cssf:communication-2025-04-09-ict-risk-updates",
+  familyId: "family:cssf",
+  regulatoryLevel: "level-3",
+  measureType: "other",
+  slug: "cssf-ict-risk-updates-2025",
+  shortName: "CSSF ICT Risk Updates 2025",
+  officialTitle:
+    "Update of several CSSF circulars related to ICT risk management",
+  documentType: "other",
+  localId: "communication-2025-04-09-ict-risk-updates",
+  aliases: ["CSSF DORA ICT circular updates"],
+  readerPath: "/read/cssf-ict-risk-updates-2025/provisions/introduction",
+  explorerPath: "/explore/cssf-ict-risk-updates-2025",
+  provisions: [
+    {
+      kind: "other",
+      number: "introduction",
+      label: "Introduction",
+      path: "/read/cssf-ict-risk-updates-2025/provisions/introduction",
+    },
+  ],
+};
+
 describe("Find Laws deterministic ranking", () => {
   it("normalizes punctuation and case without changing legal tokens", () => {
     expect(normalizeLawQuery(" Regulation (EU) 2022/2554 ")).toBe(
@@ -110,6 +135,19 @@ describe("Find Laws deterministic ranking", () => {
       matchReason: "exact-citation",
     });
     expect(searchLaws(records, "Regulation 2022/2555").results).toHaveLength(0);
+  });
+
+  it("matches a CSSF local ID without manufacturing a CELEX identifier", () => {
+    const result = searchLaws(
+      [...records, cssfRecord],
+      cssfRecord.localId ?? "",
+    ).bestMatch;
+    expect(result).toMatchObject({
+      id: cssfRecord.id,
+      localId: cssfRecord.localId,
+      matchReason: "exact-local-id",
+    });
+    expect(result).not.toHaveProperty("celex");
   });
 
   it("does not treat substrings inside words and numbers as term matches", () => {

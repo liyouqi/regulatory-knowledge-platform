@@ -107,6 +107,8 @@ npm run cssf:canonical:build -- --snapshot data/raw/cssf/communication-2025-04-0
 
 The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. The independent HTML adapter preserves headings, paragraphs, nested lists, footnotes, source locators, and stable `lu:cssf:*` IDs; unsupported substantive images and excluded related-document cards remain explicit parser warnings. Its reviewed quality gate fixes the expected section/block counts, warning ceiling, and official-text anchor hashes. Raw source snapshots and parser output remain distinct. The representative HTML communiqué can now produce a validated Canonical artifact, while downloaded PDFs are not considered Canonical until the PDF adapter passes its own fixtures and fidelity gate.
 
+Runtime schema `4.2.0` keeps CELEX and CSSF local identifiers in separate nullable columns with an at-least-one constraint. When the validated communiqué artifact is present, `runtime:build` loads it into the same catalog, full-text search, Explorer, and Reader contracts under a generic `Provisions` collection; no CELEX value or Article semantics are invented.
+
 ### Download an official immutable snapshot
 
 ```bash

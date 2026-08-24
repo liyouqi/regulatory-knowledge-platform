@@ -43,7 +43,7 @@ function citationParts(celex: string) {
 }
 
 function isExactCitation(query: string, record: LawSearchRecord): boolean {
-  const citation = citationParts(record.celex);
+  const citation = citationParts(record.celex ?? "");
   if (!citation) return false;
   const shortType = citation.type === "regulation" ? "reg" : "dir";
   return new Set([
@@ -60,8 +60,11 @@ function rankRecord(
   query: string,
 ): Pick<LawSearchResult, "matchReason" | "score"> | null {
   const compactQuery = query.replace(/\s/gu, "").toUpperCase();
-  if (compactQuery === record.celex.toUpperCase()) {
+  if (record.celex && compactQuery === record.celex.toUpperCase()) {
     return { matchReason: "exact-celex", score: 1000 };
+  }
+  if (record.localId && normalizeLawQuery(record.localId) === query) {
+    return { matchReason: "exact-local-id", score: 1000 };
   }
 
   const aliases = [record.shortName, ...record.aliases].map(normalizeLawQuery);
@@ -123,17 +126,22 @@ function toResult(
 
 export function createLawSearchRecords(
   documents: DocumentView[],
-  sources: Pick<
-    SourceDefinition,
-    "celex" | "familyId" | "aliases" | "regulatoryLevel" | "measureType"
-  >[],
+  sources: Array<
+    Pick<
+      SourceDefinition,
+      "familyId" | "aliases" | "regulatoryLevel" | "measureType"
+    > & { celex?: string; localId?: string }
+  >,
 ): LawSearchRecord[] {
-  const sourceByCelex = new Map(
-    sources.map((source) => [source.celex, source]),
+  const sourceByIdentifier = new Map(
+    sources.flatMap((source) => {
+      const identifier = source.celex ?? source.localId;
+      return identifier ? [[identifier, source] as const] : [];
+    }),
   );
   return documents.flatMap((document) => {
-    if (!document.celex) return [];
-    const source = sourceByCelex.get(document.celex);
+    const identifier = document.celex ?? document.localId;
+    const source = identifier ? sourceByIdentifier.get(identifier) : undefined;
     const readerPath = document.provisions[0]?.path;
     if (!source || !readerPath) return [];
     return [
@@ -148,6 +156,7 @@ export function createLawSearchRecords(
         documentType: document.documentType,
         publicationDate: document.asOf,
         celex: document.celex,
+        localId: document.localId,
         aliases: source.aliases,
         readerPath,
         explorerPath: explorerPath(document.slug),

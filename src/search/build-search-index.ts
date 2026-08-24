@@ -1,4 +1,5 @@
 import { loadDocumentViews } from "../data/document-repository";
+import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   DEFAULT_RUNTIME_DATABASE_PATH,
@@ -13,7 +14,7 @@ if (outputIndex >= 0 && !outputPath) {
 
 const manifest = buildRuntimeDatabase(
   loadDocumentViews(),
-  loadSourceRegistrySync(),
+  [...loadSourceRegistrySync(), ...loadCssfSourceRegistrySync()],
   outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
 );
 console.table({
