@@ -164,3 +164,37 @@ test("Reader, Explorer, and search remain usable on a narrow viewport", async ({
       .evaluate((element) => element.scrollWidth <= globalThis.innerWidth),
   ).resolves.toBe(true);
 });
+
+test("search shortcut focuses the query and Escape closes it", async ({
+  page,
+}) => {
+  await page.goto("/explore/dora");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+
+  await page.keyboard.press("Meta+k");
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  const input = search.getByRole("textbox", {
+    name: "Find laws by name, CELEX, or citation",
+  });
+  await expect(input).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(search).toBeHidden();
+});
+
+test("opened laws returns to the most recently read provision", async ({
+  page,
+}) => {
+  await page.goto("/read/dora/articles/28");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+
+  await page.keyboard.press("Meta+k");
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  await search.getByRole("tab", { name: "Opened laws" }).click();
+  await expect(
+    search.getByRole("textbox", { name: "Filter recently opened laws" }),
+  ).toBeFocused();
+  await search.getByRole("button", { name: /DORA.*Recently opened/ }).click();
+
+  await expect(page).toHaveURL(/\/read\/dora\/articles\/28$/);
+});
