@@ -1172,6 +1172,8 @@ raw source → canonical → relationships → search index → SQLite artifact
 
 发布流程必须使用 staging path 构建和验证，完成后以原子 rename/symlink switch 或等价机制切换 active artifact，并保留至少一个 previous artifact。schema/build ID 不兼容或 health check 失败时立即回退。
 
+当前实现以 `REGULATORY_RUNTIME_DATABASE_PATH` 指向运行时只读 SQLite artifact；未设置时仍使用 repository 内的开发默认路径。`npm run runtime:verify -- --input <sqlite-path>` 必须在 promote 前通过，验证 SQLite integrity、FTS5、schema/build manifest 与 Reader/Search read model 一致性。具体 staging、promote、health check 与 rollback 步骤见 `docs/runtime-operation-runbook.md`。
+
 Phase 1 不要求生产服务器自己下载 bulk dump。
 
 ---
@@ -1184,7 +1186,7 @@ Phase 1 不要求生产服务器自己下载 bulk dump。
 |---|---|
 | data | `REGULATORY_DATA_DIR` |
 | server | `PORT`, `HOST` |
-| database | `REGULATORY_DB_PATH` |
+| database | `REGULATORY_RUNTIME_DATABASE_PATH` |
 | environment | `NODE_ENV` |
 | source | EUR-Lex/CSSF endpoint base URL |
 | build | TF-IDF top-N、fixtures、strict mode |

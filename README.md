@@ -72,6 +72,7 @@ npm run build
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
 | `npm run runtime:build` | Atomically rebuild the read-only runtime SQLite from validated Canonical artifacts. |
+| `npm run runtime:verify` | Validate a built runtime SQLite artifact through the read-only Reader and Search services. |
 | `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
@@ -353,7 +354,7 @@ npm test -- src/relationships/explicit-reference.test.ts
 npm run search:benchmark
 ```
 
-The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts.
+The builder checks that the local SQLite runtime supports FTS5, creates a temporary database, validates and optimizes it, then atomically publishes the completed file. At startup the API opens this artifact read-only and fails fast if its schema or manifest is incompatible. `/api/health` reports its `buildId` and corpus counts. For a staged production artifact, run `npm run runtime:verify -- --input <sqlite-path>` before switching the running service to it; the command checks SQLite integrity/FTS support plus matching Reader and Search manifests.
 
 The website never reads Canonical JSON, `data/source-registry.json`, or curated mappings at runtime. `documents` holds queryable family/level/measure/source metadata plus a bounded `source_status_json` object, `document_views` holds schema-validated Reader and Explorer JSON read models, and `document_aliases` holds reviewed aliases. `legal_entities` provides the stable JOIN boundary for documents, provisions, and body blocks; `relationships` stores provenance-aware edges. Search, Definitions, and Relationships reuse the same artifact. Corpus parity tests require every SQLite Reader/Explorer payload to equal its Canonical-derived DTO exactly. This deliberately avoids reconstructing recursive legal trees with many joins while keeping one runtime data source.
 

@@ -1,16 +1,18 @@
 import express from "express";
+import { runtimeDatabasePath } from "../runtime/runtime-database-path";
 import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 
 export const app = express();
-const runtimeRepository = new SqliteRuntimeRepository();
+const runtimePath = runtimeDatabasePath();
+const runtimeRepository = new SqliteRuntimeRepository(runtimePath);
 const documentViews = runtimeRepository.listDocumentViews();
 const lawSearchRecords = createLawSearchRecords(
   documentViews,
   runtimeRepository.listLawSearchSources(),
 );
-const searchService = new SearchService();
+const searchService = new SearchService(runtimePath);
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
