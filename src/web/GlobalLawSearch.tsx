@@ -50,6 +50,7 @@ const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
 
 const incompleteProvisionSuffix =
   /(?:^|\s)(?:articles?|art|recitals?|rec|annex(?:es)?|ann)$/u;
+const searchModes: SearchMode[] = ["laws", "opened", "definitions", "fulltext"];
 
 function identifierLabel(result: { celex?: string; localId?: string }): string {
   return result.celex
@@ -280,6 +281,7 @@ export function GlobalLawSearch({
   const navigate = useNavigate();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [mode, setMode] = useState<SearchMode>("laws");
   const [query, setQuery] = useState("");
   const [lawResponse, setLawResponse] = useState<LawSearchResponse | null>(
@@ -464,6 +466,30 @@ export function GlobalLawSearch({
     requestAnimationFrame(() => inputRef.current?.focus());
   }
 
+  function handleModeKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentMode: SearchMode,
+  ) {
+    const currentIndex = searchModes.indexOf(currentMode);
+    const nextIndex =
+      event.key === "ArrowRight"
+        ? (currentIndex + 1) % searchModes.length
+        : event.key === "ArrowLeft"
+          ? (currentIndex - 1 + searchModes.length) % searchModes.length
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? searchModes.length - 1
+              : undefined;
+    if (nextIndex === undefined) return;
+    event.preventDefault();
+    const nextMode = searchModes[nextIndex];
+    setMode(nextMode);
+    setSelectedIndex(0);
+    setError("");
+    requestAnimationFrame(() => tabRefs.current[nextIndex]?.focus());
+  }
+
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
@@ -577,37 +603,65 @@ export function GlobalLawSearch({
             role="tablist"
           >
             <button
+              aria-controls="law-search-results"
               aria-selected={mode === "laws"}
               className={mode === "laws" ? "active" : ""}
+              id="search-mode-laws"
               onClick={() => selectMode("laws")}
+              onKeyDown={(event) => handleModeKeyDown(event, "laws")}
+              ref={(node) => {
+                tabRefs.current[0] = node;
+              }}
               role="tab"
+              tabIndex={mode === "laws" ? 0 : -1}
               type="button"
             >
               <BookOpen aria-hidden="true" size={14} /> Find laws
             </button>
             <button
+              aria-controls="law-search-results"
               aria-selected={mode === "opened"}
               className={mode === "opened" ? "active" : ""}
+              id="search-mode-opened"
               onClick={() => selectMode("opened")}
+              onKeyDown={(event) => handleModeKeyDown(event, "opened")}
+              ref={(node) => {
+                tabRefs.current[1] = node;
+              }}
               role="tab"
+              tabIndex={mode === "opened" ? 0 : -1}
               type="button"
             >
               <History aria-hidden="true" size={14} /> Opened laws
             </button>
             <button
+              aria-controls="law-search-results"
               aria-selected={mode === "definitions"}
               className={mode === "definitions" ? "active" : ""}
+              id="search-mode-definitions"
               onClick={() => selectMode("definitions")}
+              onKeyDown={(event) => handleModeKeyDown(event, "definitions")}
+              ref={(node) => {
+                tabRefs.current[2] = node;
+              }}
               role="tab"
+              tabIndex={mode === "definitions" ? 0 : -1}
               type="button"
             >
               <Quote aria-hidden="true" size={14} /> Definitions
             </button>
             <button
+              aria-controls="law-search-results"
               aria-selected={mode === "fulltext"}
               className={mode === "fulltext" ? "active" : ""}
+              id="search-mode-fulltext"
               onClick={() => selectMode("fulltext")}
+              onKeyDown={(event) => handleModeKeyDown(event, "fulltext")}
+              ref={(node) => {
+                tabRefs.current[3] = node;
+              }}
               role="tab"
+              tabIndex={mode === "fulltext" ? 0 : -1}
               type="button"
             >
               <FileSearch aria-hidden="true" size={14} /> Full text
@@ -624,7 +678,12 @@ export function GlobalLawSearch({
           </small>
         </div>
 
-        <div className="law-search-results" id="law-search-results">
+        <div
+          aria-labelledby={`search-mode-${mode}`}
+          className="law-search-results"
+          id="law-search-results"
+          role="tabpanel"
+        >
           {error ? (
             <p className="search-empty error-state" role="alert">
               {error}

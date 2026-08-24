@@ -287,6 +287,15 @@ test("search shortcut focuses the query and Escape closes it", async ({
   ).resolves.toBe(true);
   await expect(input).toBeFocused();
 
+  const lawsTab = search.getByRole("tab", { name: "Find laws" });
+  await lawsTab.focus();
+  await lawsTab.press("ArrowRight");
+  const openedTab = search.getByRole("tab", { name: "Opened laws" });
+  await expect(openedTab).toBeFocused();
+  await expect(openedTab).toHaveAttribute("aria-selected", "true");
+  await openedTab.press("End");
+  await expect(search.getByRole("tab", { name: "Full text" })).toBeFocused();
+
   await page.keyboard.press("Escape");
   await expect(search).toBeHidden();
 });
