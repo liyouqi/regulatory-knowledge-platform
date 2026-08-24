@@ -7,6 +7,12 @@ import {
   RUNTIME_DATABASE_SCHEMA_VERSION,
 } from "../search/sqlite-search-index";
 import {
+  type DocumentVersionChain,
+  type DocumentVersionEdge,
+  type DocumentVersionNode,
+  documentVersionChainSchema,
+} from "../shared/document-version-chain";
+import {
   type DocumentSummary,
   type DocumentView,
   type ExplorerDocument,
@@ -36,6 +42,24 @@ interface DocumentPayloadRow {
 interface ExplorerPayloadRow {
   explorerPayload: string;
 }
+
+interface VersionChainRow {
+  coverage: DocumentVersionChain["coverage"];
+  checkedAt: string | null;
+  loadedVersionId: string;
+}
+
+interface VersionNodeRow {
+  id: string;
+  documentId: string;
+  kind: DocumentVersionNode["kind"];
+  label: string;
+  date: string | null;
+  sourceUrl: string;
+  availability: DocumentVersionNode["availability"];
+}
+
+type VersionEdgeRow = DocumentVersionEdge;
 
 interface LawSourceRow {
   documentId: string;
@@ -233,6 +257,8 @@ export class SqliteRuntimeRepository {
   readonly buildId: string;
   readonly relationshipCount: number;
   readonly relatedRecitalCount: number;
+  readonly versionNodeCount: number;
+  readonly versionEdgeCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -260,6 +286,14 @@ export class SqliteRuntimeRepository {
       );
       this.relatedRecitalCount = Number.parseInt(
         manifestValue(this.database, "relatedRecitalCount"),
+        10,
+      );
+      this.versionNodeCount = Number.parseInt(
+        manifestValue(this.database, "versionNodeCount"),
+        10,
+      );
+      this.versionEdgeCount = Number.parseInt(
+        manifestValue(this.database, "versionEdgeCount"),
         10,
       );
       this.unresolvedReferenceCount = Number.parseInt(
@@ -329,6 +363,74 @@ export class SqliteRuntimeRepository {
       `)
       .get(slug) as DocumentPayloadRow | undefined;
     return row ? documentViewSchema.parse(JSON.parse(row.readerPayload)) : null;
+  }
+
+  findDocumentVersionChain(documentId: string): DocumentVersionChain | null {
+    const chain = this.database
+      .prepare(`
+        SELECT
+          coverage,
+          checked_at AS checkedAt,
+          loaded_version_id AS loadedVersionId
+        FROM document_version_chains
+        WHERE document_id = ?
+      `)
+      .get(documentId) as VersionChainRow | undefined;
+    if (!chain) return null;
+
+    const nodeRows = this.database
+      .prepare(`
+        SELECT
+          id,
+          document_id AS documentId,
+          kind,
+          label,
+          version_date AS date,
+          source_url AS sourceUrl,
+          availability
+        FROM document_versions
+        WHERE document_id = ?
+        ORDER BY
+          CASE kind
+            WHEN 'original-oj-snapshot' THEN 0
+            WHEN 'consolidated-snapshot' THEN 0
+            WHEN 'current-version-link' THEN 1
+            ELSE 2
+          END,
+          version_date ASC,
+          id ASC
+      `)
+      .all(documentId) as VersionNodeRow[];
+    const edges = this.database
+      .prepare(`
+        SELECT
+          id,
+          document_id AS documentId,
+          source_version_id AS sourceVersionId,
+          relation_type AS relationType,
+          target_version_id AS targetVersionId,
+          provenance,
+          source_ref AS sourceRef
+        FROM document_version_edges
+        WHERE document_id = ?
+        ORDER BY
+          CASE relation_type WHEN 'CURRENT_VERSION_LINK' THEN 0 ELSE 1 END,
+          id ASC
+      `)
+      .all(documentId) as VersionEdgeRow[];
+
+    return documentVersionChainSchema.parse({
+      documentId,
+      buildId: this.buildId,
+      coverage: chain.coverage,
+      checkedAt: chain.checkedAt ?? undefined,
+      loadedVersionId: chain.loadedVersionId,
+      nodes: nodeRows.map((node) => ({
+        ...node,
+        date: node.date ?? undefined,
+      })),
+      edges,
+    });
   }
 
   findExplorerBySlug(slug: string): ExplorerDocument | null {

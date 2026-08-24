@@ -74,6 +74,45 @@ describe("SQLite runtime repository", () => {
     expect(repository?.findExplorerBySlug("unknown")).toBeNull();
   });
 
+  it("returns a bounded, normalized version chain only for reviewed status", () => {
+    const chain = repository?.findDocumentVersionChain("eu:32024R2956");
+
+    expect(chain).toMatchObject({
+      documentId: "eu:32024R2956",
+      buildId: repository?.buildId,
+      coverage: "source-status-only",
+      checkedAt: "2026-08-23T23:37:57.439Z",
+      loadedVersionId: "version:eu:32024R2956:original-oj:2024-12-02",
+    });
+    expect(chain?.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "original-oj-snapshot",
+          date: "2024-12-02",
+          availability: "loaded",
+        }),
+        expect.objectContaining({
+          kind: "current-version-link",
+          sourceUrl: "https://eur-lex.europa.eu/eli/reg_impl/2024/2956",
+          availability: "external",
+        }),
+        expect.objectContaining({
+          kind: "corrigendum",
+          date: "2025-09-19",
+          availability: "external",
+        }),
+      ]),
+    );
+    expect(chain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+      "HAS_CORRIGENDUM",
+    ]);
+    expect(repository?.findDocumentVersionChain(dora.id)).toBeNull();
+    expect(repository?.findDocumentVersionChain("eu:unknown")).toBeNull();
+    expect(repository?.versionNodeCount).toBe(chain?.nodes.length);
+    expect(repository?.versionEdgeCount).toBe(chain?.edges.length);
+  });
+
   it("returns explicit references and derives cited-by without duplicate edges", () => {
     const doraArticleOne = repository?.findProvisionRelationships(
       "eu:32022R2554",

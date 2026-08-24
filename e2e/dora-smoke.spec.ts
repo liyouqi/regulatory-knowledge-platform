@@ -131,6 +131,31 @@ test("DORA Article 28 opens a mapped RTS measure", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("Reader distinguishes the loaded OJ snapshot from external version records", async ({
+  page,
+}) => {
+  await page.goto("/read/dora-its-register-of-information/articles/1");
+  await expect(
+    page.getByRole("heading", { name: "DORA ITS Register of Information" }),
+  ).toBeVisible();
+
+  const history = page.getByRole("region", {
+    name: "Document version history",
+  });
+  await expect(history).toBeVisible();
+  await expect(
+    history.getByText("Loaded original Official Journal text"),
+  ).toBeVisible();
+  await expect(history.getByText("2024-12-02 · Loaded")).toBeVisible();
+  await expect(history.getByText("Current EUR-Lex version")).toBeVisible();
+  await expect(
+    history.getByText("Official corrigendum 2025-09-19"),
+  ).toBeVisible();
+  await expect(
+    history.getByText("amending acts are not yet mapped", { exact: false }),
+  ).toBeVisible();
+});
+
 test("Reader, Explorer, and search remain usable on a narrow viewport", async ({
   page,
 }) => {

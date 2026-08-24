@@ -22,6 +22,10 @@ export function findDocumentBySlug(slug: string) {
   return runtimeRepository.findDocumentBySlug(slug);
 }
 
+export function findDocumentVersionChain(documentId: string) {
+  return runtimeRepository.findDocumentVersionChain(documentId);
+}
+
 export function findExplorerBySlug(slug: string) {
   return runtimeRepository.findExplorerBySlug(slug);
 }
@@ -73,6 +77,8 @@ app.get("/api/health", (_request, response) => {
       definitions: searchService.definitionCount,
       relationships: runtimeRepository.relationshipCount,
       relatedRecitals: runtimeRepository.relatedRecitalCount,
+      versionNodes: runtimeRepository.versionNodeCount,
+      versionEdges: runtimeRepository.versionEdgeCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -191,6 +197,15 @@ app.get("/api/relationship-previews/:entityId", (request, response) => {
     return;
   }
   response.json(preview);
+});
+
+app.get("/api/documents/:documentId/version-chain", (request, response) => {
+  const chain = findDocumentVersionChain(request.params.documentId);
+  if (!chain) {
+    response.status(404).json({ error: "Document version chain not found" });
+    return;
+  }
+  response.json(chain);
 });
 
 app.get("/api/documents/:documentId", (request, response) => {

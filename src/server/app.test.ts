@@ -3,6 +3,7 @@ import type { ExplorerNode } from "../shared/legal";
 import {
   findDocument,
   findDocumentBySlug,
+  findDocumentVersionChain,
   findExplorerBySlug,
   findFamilyLevel2,
   findLaws,
@@ -28,6 +29,29 @@ describe("Document lookup", () => {
   it("resolves a document by its stable reader slug", () => {
     expect(findDocumentBySlug("dora")?.id).toBe("eu:32022R2554");
     expect(findDocumentBySlug("unknown-law")).toBeNull();
+  });
+
+  it("serves reviewed document version status without inventing amendments", () => {
+    const chain = findDocumentVersionChain("eu:32024R2956");
+
+    expect(chain?.coverage).toBe("source-status-only");
+    expect(chain?.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "original-oj-snapshot",
+          availability: "loaded",
+        }),
+        expect.objectContaining({
+          kind: "corrigendum",
+          date: "2025-09-19",
+          availability: "external",
+        }),
+      ]),
+    );
+    expect(chain?.edges.map((edge) => edge.relationType)).not.toContain(
+      "AMENDED_BY",
+    );
+    expect(findDocumentVersionChain("eu:32022R2554")).toBeNull();
   });
 
   it("serves a lightweight Explorer over the same stable Article IDs", () => {

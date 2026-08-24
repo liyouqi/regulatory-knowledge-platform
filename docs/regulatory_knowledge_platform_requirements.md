@@ -1866,6 +1866,8 @@ Article 页面在能够稳定映射时，进一步显示当前文本所属版本
 - consolidated text link；
 - snapshot comparison entry point。
 
+当前实现：SQLite `4.3.0` 已发布首个有界切片。仅对具备已核验 `sourceStatus` 的文档生成规范化 version chain，并在 Reader/API 中区分 loaded snapshot、外部 current EUR-Lex record 与官方 corrigendum。当前唯一发布实例为 DORA Register of Information ITS 2024/2956；其原始 OJ snapshot、current-version link 与 2025-09-19 corrigendum 均保持各自官方 URL。尚无核验 amendment mapping，因此不生成 amending-act 节点或 `AMENDED_BY` 边；完整 consolidated lineage、Article-level provenance 与 snapshot comparison 仍未完成。
+
 ## 22.3 CJEU Case Law
 
 ### 目标
@@ -3142,7 +3144,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - TF-IDF benchmark；
 - benchmark 通过时启用 Related Recitals，否则保持关闭。
 
-当前状态：Release 0.5 已完成。official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18、ITS 2024/2956 的 Article 28(9)，以及重大 ICT 事件报告 RTS 2025/301 / ITS 2025/302 的 Article 20 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 均已完成。DORA/GDPR/AI Act 的 8-case TF-IDF benchmark 已以 Top 5 100% hit rate 通过，Related Recitals 已作为带 score 和 `TFIDF` provenance 的 build-time enrichment 发布。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda，但尚未实现完整 amendment/version graph。更多核验 Level 2 measures 归入无界的后续 backlog；Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
+当前状态：Release 0.5 已完成。official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18、ITS 2024/2956 的 Article 28(9)，以及重大 ICT 事件报告 RTS 2025/301 / ITS 2025/302 的 Article 20 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 均已完成。DORA/GDPR/AI Act 的 8-case TF-IDF benchmark 已以 Top 5 100% hit rate 通过，Related Recitals 已作为带 score 和 `TFIDF` provenance 的 build-time enrichment 发布。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda；SQLite `4.3.0` 进一步把这组已核验状态投影为独立 version-chain API/Reader history，但尚未发布 amendment edges 或完整 amendment/version graph。更多核验 Level 2 measures 归入无界的后续 backlog；Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
 
 ## Release 0.6 — CSSF & Product Hardening
 
@@ -3157,7 +3159,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - performance、accessibility、visual refinement、cross-browser testing；
 - production artifact atomic publish / rollback runbook。
 
-当前状态：已核验、结构化并接入首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。Tagged-PDF incident-reporting profile 已在 25/893 上恢复 introduction、4 个 chapter、连续 points 1–15、字母/数字嵌套 point 与 footnote，签名 table 作为非正文内容显式排除。独立 consolidated-governance profile 已在 12/552 上恢复 4 个 Part、82 个 Part/Chapter/Sub-chapter/Section/Sub-section 节点、Part I points 1–3 及 19 个 definition entry、Part II points 1–186、Part III points 1–51、Part IV timeline 与 Annex I–II；实质性无编号段落和 tagged table 保留为正文，仅 page 83 contact footer 显式排除。两种 PDF profile 均以 page/structure/provision/point count、warning ceiling 和跨段正文 hash 固化 fidelity gate；Part 内重复 point 编号只在 route token 中稳定消歧，官方 label 不变。三份 CSSF 文档均已通过 SQLite `4.2.0` 的独立 local-ID contract 接入 catalog、full-text search、Explorer 与 Reader，不伪造 CELEX 或 Article 语义。运行时 artifact 现可在 staging path 构建，以 `runtime:verify` 经只读 Search/Reader service 验证，再通过 `REGULATORY_RUNTIME_DATABASE_PATH` promote；runbook 明确保留 previous artifact 并在 health/build ID 不符时回退。
+当前状态：已核验、结构化并接入首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。Tagged-PDF incident-reporting profile 已在 25/893 上恢复 introduction、4 个 chapter、连续 points 1–15、字母/数字嵌套 point 与 footnote，签名 table 作为非正文内容显式排除。独立 consolidated-governance profile 已在 12/552 上恢复 4 个 Part、82 个 Part/Chapter/Sub-chapter/Section/Sub-section 节点、Part I points 1–3 及 19 个 definition entry、Part II points 1–186、Part III points 1–51、Part IV timeline 与 Annex I–II；实质性无编号段落和 tagged table 保留为正文，仅 page 83 contact footer 显式排除。两种 PDF profile 均以 page/structure/provision/point count、warning ceiling 和跨段正文 hash 固化 fidelity gate；Part 内重复 point 编号只在 route token 中稳定消歧，官方 label 不变。三份 CSSF 文档均通过当前 SQLite `4.3.0` 继承的独立 local-ID contract 接入 catalog、full-text search、Explorer 与 Reader，不伪造 CELEX 或 Article 语义。运行时 artifact 现可在 staging path 构建，以 `runtime:verify` 经只读 Search/Reader service 验证，再通过 `REGULATORY_RUNTIME_DATABASE_PATH` promote；runbook 明确保留 previous artifact 并在 health/build ID 不符时回退。
 
 ## Phase 2 Sequence
 

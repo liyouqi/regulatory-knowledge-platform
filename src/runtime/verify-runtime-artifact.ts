@@ -12,6 +12,8 @@ export interface RuntimeArtifactVerification {
   definitions: number;
   relationships: number;
   relatedRecitals: number;
+  versionNodes: number;
+  versionEdges: number;
   unresolvedReferences: number;
   bytes: number;
   input: string;
@@ -47,6 +49,8 @@ export function verifyRuntimeArtifact(
       definitions: search.definitionCount,
       relationships: repository.relationshipCount,
       relatedRecitals: repository.relatedRecitalCount,
+      versionNodes: repository.versionNodeCount,
+      versionEdges: repository.versionEdgeCount,
       unresolvedReferences: repository.unresolvedReferenceCount,
       bytes: statSync(databasePath).size,
       input: databasePath,

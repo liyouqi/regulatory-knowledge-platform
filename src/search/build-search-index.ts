@@ -24,6 +24,8 @@ console.table({
   definitions: manifest.definitionCount,
   relationships: manifest.relationshipCount,
   relatedRecitals: manifest.relatedRecitalCount,
+  versionNodes: manifest.versionNodeCount,
+  versionEdges: manifest.versionEdgeCount,
   tfidfBenchmark: manifest.tfidfBenchmark?.passed
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",

@@ -48,10 +48,10 @@ import {
   parseQuickGo,
   parseReaderPath,
 } from "../shared/reader-route";
+import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { Level2LibraryPage } from "./Level2LibraryPage";
-import { SourceStatusNotice } from "./SourceStatusNotice";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -1064,7 +1064,7 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           Open official source <ArrowUpRight aria-hidden="true" size={15} />
         </a>
         {legalDocument.sourceStatus ? (
-          <SourceStatusNotice status={legalDocument.sourceStatus} />
+          <DocumentVersionHistory documentId={legalDocument.id} />
         ) : null}
         {legalDocument.provenance === "fixture" ? (
           <p className="fixture-notice">

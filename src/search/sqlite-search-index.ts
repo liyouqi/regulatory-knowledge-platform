@@ -35,9 +35,14 @@ import {
   documentViewSchema,
   explorerDocumentSchema,
 } from "../shared/legal";
+import {
+  DOCUMENT_VERSION_CHAIN_BUILDER,
+  DOCUMENT_VERSION_CHAIN_BUILDER_VERSION,
+  buildDocumentVersionChain,
+} from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.2.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.3.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -52,6 +57,8 @@ export interface RuntimeDatabaseManifest {
   definitionCount: number;
   relationshipCount: number;
   relatedRecitalCount: number;
+  versionNodeCount: number;
+  versionEdgeCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -217,6 +224,7 @@ function runtimeBuildId(
         JSON.stringify(officialMappings),
         `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
         JSON.stringify(relatedRecitalBenchmark),
+        `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
         input,
       ].join("\n"),
     )
@@ -259,6 +267,12 @@ export function buildRuntimeDatabase(
   const database = new Database(temporaryPath);
   const rows = indexRows(documents);
   const definitions = definitionRows(documents);
+  const versionChains = documents.flatMap((document) => {
+    const chain = buildDocumentVersionChain(document);
+    return chain ? [chain] : [];
+  });
+  const versionNodes = versionChains.flatMap((chain) => chain.nodes);
+  const versionEdges = versionChains.flatMap((chain) => chain.edges);
   const relationshipBuild = buildExplicitReferences(documents);
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -356,6 +370,41 @@ export function buildRuntimeDatabase(
         reader_payload_json TEXT NOT NULL,
         explorer_payload_json TEXT NOT NULL
       ) STRICT;
+      CREATE TABLE document_versions (
+        id TEXT PRIMARY KEY,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        kind TEXT NOT NULL CHECK (kind IN (
+          'original-oj-snapshot', 'consolidated-snapshot',
+          'current-version-link', 'corrigendum'
+        )),
+        label TEXT NOT NULL,
+        version_date TEXT,
+        source_url TEXT NOT NULL,
+        availability TEXT NOT NULL CHECK (availability IN ('loaded', 'external'))
+      ) STRICT;
+      CREATE INDEX document_versions_document_id ON document_versions(document_id);
+      CREATE TABLE document_version_chains (
+        document_id TEXT PRIMARY KEY REFERENCES documents(id),
+        coverage TEXT NOT NULL CHECK (coverage = 'source-status-only'),
+        checked_at TEXT,
+        loaded_version_id TEXT NOT NULL REFERENCES document_versions(id)
+      ) STRICT;
+      CREATE TABLE document_version_edges (
+        id TEXT PRIMARY KEY,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        source_version_id TEXT NOT NULL REFERENCES document_versions(id),
+        relation_type TEXT NOT NULL CHECK (relation_type IN (
+          'CURRENT_VERSION_LINK', 'HAS_CORRIGENDUM'
+        )),
+        target_version_id TEXT NOT NULL REFERENCES document_versions(id),
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_METADATA'),
+        source_ref TEXT NOT NULL,
+        UNIQUE (
+          source_version_id, relation_type, target_version_id,
+          provenance, source_ref
+        )
+      ) STRICT;
+      CREATE INDEX document_version_edges_document_id ON document_version_edges(document_id);
       CREATE TABLE document_aliases (
         document_id TEXT NOT NULL REFERENCES documents(id),
         alias TEXT NOT NULL,
@@ -471,6 +520,29 @@ export function buildRuntimeDatabase(
         document_id, reader_payload_json, explorer_payload_json
       ) VALUES (?, ?, ?)
     `);
+    const insertDocumentVersion = database.prepare(`
+      INSERT INTO document_versions (
+        id, document_id, kind, label, version_date, source_url, availability
+      ) VALUES (
+        @id, @documentId, @kind, @label, @date, @sourceUrl, @availability
+      )
+    `);
+    const insertDocumentVersionEdge = database.prepare(`
+      INSERT INTO document_version_edges (
+        id, document_id, source_version_id, relation_type,
+        target_version_id, provenance, source_ref
+      ) VALUES (
+        @id, @documentId, @sourceVersionId, @relationType,
+        @targetVersionId, @provenance, @sourceRef
+      )
+    `);
+    const insertDocumentVersionChain = database.prepare(`
+      INSERT INTO document_version_chains (
+        document_id, coverage, checked_at, loaded_version_id
+      ) VALUES (
+        @documentId, @coverage, @checkedAt, @loadedVersionId
+      )
+    `);
     const insertAlias = database.prepare(`
       INSERT INTO document_aliases (
         document_id, alias, normalized_alias, display_order
@@ -569,6 +641,18 @@ export function buildRuntimeDatabase(
           );
         });
       }
+      for (const node of versionNodes) {
+        insertDocumentVersion.run({ ...node, date: node.date ?? null });
+      }
+      for (const chain of versionChains) {
+        insertDocumentVersionChain.run({
+          ...chain,
+          checkedAt: chain.checkedAt ?? null,
+        });
+      }
+      for (const edge of versionEdges) {
+        insertDocumentVersionEdge.run(edge);
+      }
       for (const row of rows) {
         const result = insertProvision.run(row);
         insertFts.run(result.lastInsertRowid, row.heading, row.body);
@@ -602,6 +686,8 @@ export function buildRuntimeDatabase(
         relatedRecitalCount: String(
           relatedRecitalBuild?.relationships.length ?? 0,
         ),
+        versionNodeCount: String(versionNodes.length),
+        versionEdgeCount: String(versionEdges.length),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -613,6 +699,9 @@ export function buildRuntimeDatabase(
                 `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
               ]
             : []),
+        ]),
+        versionBuilders: JSON.stringify([
+          `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -664,6 +753,8 @@ export function buildRuntimeDatabase(
     definitionCount: definitions.length,
     relationshipCount: relationships.length,
     relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
+    versionNodeCount: versionNodes.length,
+    versionEdgeCount: versionEdges.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

@@ -425,7 +425,9 @@ Phase 1 使用 English FMX / Formex 数据作为 EU primary source。
 4. 核心纵向链路稳定后再引入完整 English dump，用于扩大覆盖和批量兼容性验证；
 5. refresh/build 失败不得替换当前 active artifact。
 
-Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（original OJ / consolidated）、`textAsOf`、`checkedAt`、`currentVersionUrl` 和零到多个官方 corrigendum date/URL。它随 Registry → Canonical SourceSnapshot → Reader DTO → SQLite 构建传播。Reader 与 Level 2 Library 必须明确提示“当前载入的是原始 OJ 还是 consolidated text”，且原始 OJ 存在后续勘误时不得暗示勘误已经合并。source-status hash 参与不可变 Canonical artifact 路径和 runtime build identity，同一 OJ snapshot 后续增加勘误不会覆盖旧 artifact。该 contract 不是完整 amendment/version graph；完整版本链仍由 Phase 2 第 22.2 节实现。
+Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（original OJ / consolidated）、`textAsOf`、`checkedAt`、`currentVersionUrl` 和零到多个官方 corrigendum date/URL。它随 Registry → Canonical SourceSnapshot → Reader DTO → SQLite 构建传播。Reader 与 Level 2 Library 必须明确提示“当前载入的是原始 OJ 还是 consolidated text”，且原始 OJ 存在后续勘误时不得暗示勘误已经合并。source-status hash 参与不可变 Canonical artifact 路径和 runtime build identity，同一 OJ snapshot 后续增加勘误不会覆盖旧 artifact。
+
+SQLite `4.3.0` 在不修改 Canonical `1.0.0` 的前提下，增加 `document_version_chains`、`document_versions`、`document_version_edges` 三张规范化只读表，并由 `document-version-chain@1.0.0` 在 build time 从已核验 `sourceStatus` 投影。当前只允许发布 loaded original/consolidated snapshot、外部 current-version link 和官方 corrigendum 节点，以及 `CURRENT_VERSION_LINK` / `HAS_CORRIGENDUM` 两种 `OFFICIAL_METADATA` 边。外部节点不代表其正文已载入 Reader；没有核验输入时不生成 chain，且当前不生成 `AMENDED_BY`。builder version 进入 runtime identity，节点/边数量进入 manifest，并通过独立 API 与 Reader version history 读取。它是第 22.2 节的首个有界切片，不是完整 amendment/version graph；后续修订法案、consolidated lineage、Article-level provenance 和 snapshot comparison 仍需独立核验输入。
 
 ## 7.2 LegalViz reuse strategy
 
