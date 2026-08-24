@@ -99,3 +99,34 @@ test("full-text search opens the matching paragraph anchor", async ({
   await expect(page).toHaveURL(/\/read\/.+#.+/);
   await expect(page.locator(".deep-link-target")).toBeVisible();
 });
+
+test("an inline legal reference opens its Side Peek", async ({ page }) => {
+  await page.goto("/read/dora/articles/1");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Preview NIS2 Article 3" }).click();
+  const preview = page.getByRole("dialog", { name: "Reference preview" });
+  await expect(preview).toBeVisible();
+  await expect(
+    preview.getByRole("heading", { name: "Article 3" }),
+  ).toBeVisible();
+  await expect(
+    preview.getByText("Cited here as", { exact: false }),
+  ).toBeVisible();
+});
+
+test("DORA Article 28 opens a mapped RTS measure", async ({ page }) => {
+  await page.goto("/read/dora/articles/28");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+
+  const relationships = page.locator(".context-panel .relationships-panel");
+  await expect(relationships.getByText("Level 2 measures")).toBeVisible();
+  await relationships
+    .getByRole("link", { name: /DORA RTS ICT Third-Party Policy/ })
+    .click();
+
+  await expect(page).toHaveURL("/explore/dora-rts-ict-third-party-policy");
+  await expect(
+    page.getByRole("heading", { name: "DORA RTS ICT Third-Party Policy" }),
+  ).toBeVisible();
+});
