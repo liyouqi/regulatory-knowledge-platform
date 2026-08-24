@@ -13,6 +13,7 @@ import {
   documentVersionChainSchema,
 } from "../shared/document-version-chain";
 import {
+  type DocumentRelationshipsResponse,
   type DocumentSummary,
   type DocumentView,
   type ExplorerDocument,
@@ -21,6 +22,7 @@ import {
   type ProvisionRelationship,
   type ProvisionRelationshipsResponse,
   type RelationshipPreview,
+  documentRelationshipsResponseSchema,
   documentViewSchema,
   explorerDocumentSchema,
   familyLevel2ResponseSchema,
@@ -647,6 +649,39 @@ export class SqliteRuntimeRepository {
       relatedRecitals: outgoing
         .filter((row) => row.relationType === "RELATED_RECITAL")
         .map((row) => toProvisionRelationship(row)),
+    });
+  }
+
+  findDocumentRelationships(
+    documentId: string,
+  ): DocumentRelationshipsResponse | null {
+    const document = this.database
+      .prepare(
+        `SELECT id FROM legal_entities
+         WHERE id = ? AND document_id = ? AND kind = 'document'`,
+      )
+      .get(documentId, documentId);
+    if (!document) return null;
+
+    const rows = this.database
+      .prepare(`
+        ${RELATIONSHIP_SELECT}
+        WHERE (se.document_id = @documentId OR te.document_id = @documentId)
+          AND se.document_id != te.document_id
+        ORDER BY
+          sd.display_order ASC,
+          td.display_order ASC,
+          relationType ASC,
+          sourcePath ASC,
+          targetPath ASC,
+          id ASC
+      `)
+      .all({ documentId }) as RelationshipRow[];
+
+    return documentRelationshipsResponseSchema.parse({
+      documentId,
+      buildId: this.buildId,
+      relationships: rows.map((row) => toProvisionRelationship(row)),
     });
   }
 

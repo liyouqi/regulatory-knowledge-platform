@@ -34,8 +34,21 @@ export const relationshipGraphResponseSchema = z.object({
   edges: z.array(relationshipGraphEdgeSchema),
 });
 
+export const documentRelationshipGraphResponseSchema = z.object({
+  documentId: z.string().min(1),
+  buildId: z.string().min(1),
+  nodes: z.array(relationshipGraphNodeSchema).min(1),
+  edges: z.array(relationshipGraphEdgeSchema),
+});
+
 export type RelationshipGraphNode = z.infer<typeof relationshipGraphNodeSchema>;
 export type RelationshipGraphEdge = z.infer<typeof relationshipGraphEdgeSchema>;
 export type RelationshipGraphResponse = z.infer<
   typeof relationshipGraphResponseSchema
 >;
+export type DocumentRelationshipGraphResponse = z.infer<
+  typeof documentRelationshipGraphResponseSchema
+>;
+export type AnyRelationshipGraphResponse =
+  | RelationshipGraphResponse
+  | DocumentRelationshipGraphResponse;

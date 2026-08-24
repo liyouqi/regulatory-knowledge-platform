@@ -3,6 +3,7 @@ import {
   BookOpen,
   ExternalLink,
   ListTree,
+  Network,
   Search,
 } from "lucide-react";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
@@ -16,7 +17,11 @@ import {
   explorerDocumentSchema,
   familyLevel2ResponseSchema,
 } from "../shared/legal";
-import { explorerPath, level2LibraryPath } from "../shared/reader-route";
+import {
+  documentRelationshipGraphPath,
+  explorerPath,
+  level2LibraryPath,
+} from "../shared/reader-route";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -221,6 +226,13 @@ export function ExplorerPage({
             <ListTree aria-hidden="true" size={15} />
             Explore
           </span>
+          <Link
+            className="view-switch"
+            to={documentRelationshipGraphPath(document.slug)}
+          >
+            <Network aria-hidden="true" size={15} />
+            Relationships
+          </Link>
           {provisions[0]?.readerPath ? (
             <Link className="view-switch" to={provisions[0].readerPath}>
               <BookOpen aria-hidden="true" size={15} />

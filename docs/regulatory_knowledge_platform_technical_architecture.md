@@ -573,7 +573,7 @@ Phase 2 首个 `cellar-focused-relations@1.0.0` 使用固定 CELEX `VALUES` 和 
 | `resource_legal_based_on_resource_legal` | `ADOPTED_UNDER` | Document → Document |
 | `resource_legal_completes_resource_legal` | `SUPPLEMENTS` | Document → Document |
 
-`work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship；Document-scoped edge 留给 Document Graph 精确展示。
+`work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship。Document Graph 单独查询所有跨文档 relationship，并只在 UI-owned projection 中把 Article/body-block endpoints 折叠到其 stable document entity；原始 relationship endpoints、evidence 与 provenance 不变，同文档 self-edge 不进入 Document Graph。
 
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
@@ -1119,6 +1119,8 @@ Relationship Repository
 ```
 
 Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenance 和 evidence；不包含 React Flow position/node type 等 vendor state。Web 层负责确定性布局、筛选和 React Flow 类型转换，因此未来更换图形组件不改变 Repository、relationship contract 或内部 endpoint。Graph route 继续只读 SQLite runtime artifact，不读取 Canonical JSON、raw source 或 curated mapping 文件。
+
+当前 delivery 提供两种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 使用独立 document relationship response 查询 source/target document 命中的跨文档边，并在投影阶段聚合为 Document nodes。二者共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 CELLAR document metadata 伪装成 Article 关系。
 
 ## 21.5 Phase 4 External Adapters（预留）
 

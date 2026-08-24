@@ -1,14 +1,18 @@
 import type {
+  DocumentRelationshipsResponse,
   DocumentView,
   ProvisionRelationship,
   ProvisionRelationshipsResponse,
   ProvisionView,
   RelationshipEndpoint,
 } from "../shared/legal";
+import { explorerPath } from "../shared/reader-route";
 import {
+  type DocumentRelationshipGraphResponse,
   type RelationshipGraphEdge,
   type RelationshipGraphNode,
   type RelationshipGraphResponse,
+  documentRelationshipGraphResponseSchema,
   relationshipGraphResponseSchema,
 } from "../shared/relationship-graph";
 
@@ -45,6 +49,22 @@ function centerNode(
     path: provision.path,
     role: "center",
     explorerAnchor: provision.explorerAnchor,
+  };
+}
+
+function documentNode(
+  document: DocumentView,
+  role: RelationshipGraphNode["role"],
+): RelationshipGraphNode {
+  return {
+    entityId: document.id,
+    documentId: document.id,
+    documentShortName: document.shortName,
+    kind: "document",
+    label: document.shortName,
+    title: document.officialTitle,
+    path: explorerPath(document.slug),
+    role,
   };
 }
 
@@ -149,6 +169,58 @@ export function toRelationshipGraph(
   return relationshipGraphResponseSchema.parse({
     documentId: response.documentId,
     provisionId: response.provisionId,
+    buildId: response.buildId,
+    nodes: [...nodes.values()],
+    edges: [...edges.values()],
+  });
+}
+
+export function toDocumentRelationshipGraph(
+  document: DocumentView,
+  documents: DocumentView[],
+  response: DocumentRelationshipsResponse,
+): DocumentRelationshipGraphResponse {
+  const center = documentNode(document, "center");
+  const documentsById = new Map(
+    documents.map((candidate) => [candidate.id, candidate]),
+  );
+  const nodes = new Map<string, RelationshipGraphNode>([
+    [center.entityId, center],
+  ]);
+  const edges = new Map<string, RelationshipGraphEdge>();
+
+  for (const relationship of response.relationships) {
+    const sourceDocument = documentsById.get(relationship.source.documentId);
+    const targetDocument = documentsById.get(relationship.target.documentId);
+    if (
+      !sourceDocument ||
+      !targetDocument ||
+      sourceDocument.id === targetDocument.id ||
+      (sourceDocument.id !== document.id && targetDocument.id !== document.id)
+    ) {
+      continue;
+    }
+
+    const source = documentNode(
+      sourceDocument,
+      sourceDocument.id === document.id ? "center" : "neighbor",
+    );
+    const target = documentNode(
+      targetDocument,
+      targetDocument.id === document.id ? "center" : "neighbor",
+    );
+    nodes.set(source.entityId, source);
+    nodes.set(target.entityId, target);
+    const projectedRelationship =
+      relationship.relationType === "REFERENCES" &&
+      targetDocument.id === document.id
+        ? { ...relationship, relationType: "CITED_BY" as const }
+        : relationship;
+    addEdge(edges, source.entityId, target.entityId, projectedRelationship);
+  }
+
+  return documentRelationshipGraphResponseSchema.parse({
+    documentId: response.documentId,
     buildId: response.buildId,
     nodes: [...nodes.values()],
     edges: [...edges.values()],

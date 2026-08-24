@@ -1,5 +1,8 @@
 import express from "express";
-import { toRelationshipGraph } from "../relationships/relationship-graph";
+import {
+  toDocumentRelationshipGraph,
+  toRelationshipGraph,
+} from "../relationships/relationship-graph";
 import { runtimeDatabasePath } from "../runtime/runtime-database-path";
 import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
@@ -76,6 +79,17 @@ export function findRelationshipGraph(
   const relationships = findProvisionRelationships(document.id, provision.id);
   return relationships
     ? toRelationshipGraph(document, provision, relationships)
+    : null;
+}
+
+export function findDocumentRelationshipGraph(slug: string) {
+  const document = findDocumentBySlug(slug);
+  if (!document) return null;
+  const relationships = runtimeRepository.findDocumentRelationships(
+    document.id,
+  );
+  return relationships
+    ? toDocumentRelationshipGraph(document, documentViews, relationships)
     : null;
 }
 
@@ -248,6 +262,17 @@ app.get(
     response.json(graph);
   },
 );
+
+app.get("/api/document-relationship-graphs/:slug", (request, response) => {
+  const graph = findDocumentRelationshipGraph(request.params.slug);
+  if (!graph) {
+    response
+      .status(404)
+      .json({ error: "Document relationship graph not found" });
+    return;
+  }
+  response.json(graph);
+});
 
 app.get("/api/documents/:documentId/version-chain", (request, response) => {
   const chain = findDocumentVersionChain(request.params.documentId);

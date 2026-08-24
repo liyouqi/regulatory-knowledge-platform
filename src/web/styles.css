@@ -1255,6 +1255,34 @@ kbd {
   opacity: 1;
 }
 
+.relationship-source-legend {
+  align-items: center;
+  border-left: 1px solid #394035;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 7px;
+  margin-left: auto;
+  padding-left: 13px;
+}
+
+.relationship-source-legend small {
+  color: #687061;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.relationship-source-legend span {
+  background: #20251d;
+  border: 1px solid #394035;
+  border-radius: 999px;
+  color: #a2aa9b;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  padding: 5px 8px;
+}
+
 .relationship-graph-canvas {
   min-height: 0;
   position: relative;
@@ -2544,6 +2572,20 @@ kbd {
 
 :root[data-theme="light"] .relationship-filter-bar button[aria-pressed="true"] {
   color: #31362d;
+}
+
+:root[data-theme="light"] .relationship-source-legend {
+  border-color: #d0d0c5;
+}
+
+:root[data-theme="light"] .relationship-source-legend small {
+  color: #858a7f;
+}
+
+:root[data-theme="light"] .relationship-source-legend span {
+  background: #f0efe8;
+  border-color: #d0d0c5;
+  color: #656b60;
 }
 
 :root[data-theme="light"] .relationship-graph-node {

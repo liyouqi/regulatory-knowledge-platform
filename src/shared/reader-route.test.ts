@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  documentRelationshipGraphPath,
   explorerPath,
   level2LibraryPath,
   parseExplorerPath,
@@ -38,6 +39,7 @@ describe("Reader routes", () => {
 
     expect(path).toBe("/relationships/dora/articles/20");
     expect(parseRelationshipGraphPath(path)).toEqual({
+      scope: "provision",
       slug: "dora",
       collectionId: "articles",
       number: "20",
@@ -45,6 +47,16 @@ describe("Reader routes", () => {
     expect(
       parseRelationshipGraphPath("/relationships/dora/chapters/2"),
     ).toBeNull();
+  });
+
+  it("builds and parses a document relationship graph route", () => {
+    const path = documentRelationshipGraphPath("dora");
+
+    expect(path).toBe("/relationships/dora");
+    expect(parseRelationshipGraphPath(path)).toEqual({
+      scope: "document",
+      slug: "dora",
+    });
   });
 
   it.each([

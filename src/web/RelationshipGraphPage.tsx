@@ -9,6 +9,7 @@ import {
   Position,
   ReactFlow,
   type Edge as ReactFlowEdge,
+  useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
@@ -28,15 +29,19 @@ import {
 } from "../shared/legal";
 import {
   type RelationshipGraphSelection,
+  documentRelationshipGraphPath,
   explorerPath,
   provisionPath,
 } from "../shared/reader-route";
 import type {
+  AnyRelationshipGraphResponse,
   RelationshipGraphEdge,
   RelationshipGraphNode,
-  RelationshipGraphResponse,
 } from "../shared/relationship-graph";
-import { relationshipGraphResponseSchema } from "../shared/relationship-graph";
+import {
+  documentRelationshipGraphResponseSchema,
+  relationshipGraphResponseSchema,
+} from "../shared/relationship-graph";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 
 const relationDetails = {
@@ -48,6 +53,15 @@ const relationDetails = {
   RELATED_DOCUMENT: { label: "Related document", color: "#8f9bad" },
   RELATED_RECITAL: { label: "Related recital", color: "#9acf78" },
 } as const;
+
+const provenanceLabels: Record<RelationshipGraphEdge["provenance"], string> = {
+  LEGAL_TEXT: "Legal text",
+  OFFICIAL_METADATA: "CELLAR metadata",
+  OFFICIAL_MAPPING: "Reviewed mapping",
+  CASE_TEXT: "Case text",
+  EDITORIAL: "Editorial",
+  TFIDF: "Text similarity",
+};
 
 type RelationType = keyof typeof relationDetails;
 
@@ -76,7 +90,9 @@ function RelationshipNode({ data, selected }: NodeProps<GraphFlowNode>) {
       <strong>{node.label}</strong>
       {node.title ? <p>{node.title}</p> : null}
       {node.role === "center" ? (
-        <small>Current provision</small>
+        <small>
+          {node.kind === "document" ? "Current document" : "Current provision"}
+        </small>
       ) : primaryRelation ? (
         <small>{relationDetails[primaryRelation].label}</small>
       ) : null}
@@ -106,7 +122,7 @@ function relationTypesForNode(
 }
 
 function layoutNodes(
-  graph: RelationshipGraphResponse,
+  graph: AnyRelationshipGraphResponse,
   visibleEdges: RelationshipGraphEdge[],
 ): GraphFlowNode[] {
   const visibleIds = new Set(
@@ -183,6 +199,57 @@ function flowEdges(edges: RelationshipGraphEdge[]): ReactFlowEdge[] {
       labelBgBorderRadius: 5,
     };
   });
+}
+
+function RelationshipGraphCanvas({
+  graph,
+  onSelectNode,
+  theme,
+  visibleEdges,
+}: {
+  graph: AnyRelationshipGraphResponse;
+  onSelectNode: (node: RelationshipGraphNode) => void;
+  theme: ThemeMode;
+  visibleEdges: RelationshipGraphEdge[];
+}) {
+  const layoutedNodes = useMemo(
+    () => layoutNodes(graph, visibleEdges),
+    [graph, visibleEdges],
+  );
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<GraphFlowNode>(layoutedNodes);
+  const edges = useMemo(() => flowEdges(visibleEdges), [visibleEdges]);
+
+  useEffect(() => setNodes(layoutedNodes), [layoutedNodes, setNodes]);
+
+  return (
+    <ReactFlow<GraphFlowNode>
+      colorMode={theme}
+      edges={edges}
+      edgesReconnectable={false}
+      elementsSelectable
+      fitView
+      fitViewOptions={{ padding: 0.26, maxZoom: 1.05 }}
+      maxZoom={1.7}
+      minZoom={0.2}
+      nodes={nodes}
+      nodesConnectable={false}
+      nodesDraggable
+      nodeTypes={nodeTypes}
+      onNodeClick={(_event, node) => onSelectNode(node.data.graphNode)}
+      onNodesChange={onNodesChange}
+      panOnScroll
+      selectionOnDrag={false}
+    >
+      <Background
+        color="var(--graph-grid)"
+        gap={26}
+        size={1.1}
+        variant={BackgroundVariant.Dots}
+      />
+      <Controls position="bottom-left" showInteractive={false} />
+    </ReactFlow>
+  );
 }
 
 function GraphPeek({
@@ -264,7 +331,7 @@ export function RelationshipGraphPage({
   onToggleTheme: () => void;
   theme: ThemeMode;
 }) {
-  const [graph, setGraph] = useState<RelationshipGraphResponse | null>(null);
+  const [graph, setGraph] = useState<AnyRelationshipGraphResponse | null>(null);
   const [loadError, setLoadError] = useState("");
   const [hiddenRelations, setHiddenRelations] = useState<Set<RelationType>>(
     new Set(),
@@ -272,19 +339,24 @@ export function RelationshipGraphPage({
   const [selectedNode, setSelectedNode] =
     useState<RelationshipGraphNode | null>(null);
 
+  const requestPath =
+    selection.scope === "document"
+      ? `/api/document-relationship-graphs/${encodeURIComponent(selection.slug)}`
+      : `/api/relationship-graphs/${encodeURIComponent(selection.slug)}/${selection.collectionId}/${encodeURIComponent(selection.number)}`;
+
   useEffect(() => {
     const controller = new AbortController();
     setGraph(null);
     setLoadError("");
     setHiddenRelations(new Set());
     setSelectedNode(null);
-    void fetch(
-      `/api/relationship-graphs/${encodeURIComponent(selection.slug)}/${selection.collectionId}/${encodeURIComponent(selection.number)}`,
-      { signal: controller.signal },
-    )
+    void fetch(requestPath, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Unable to load relationship graph");
-        return relationshipGraphResponseSchema.parse(await response.json());
+        const payload = await response.json();
+        return selection.scope === "document"
+          ? documentRelationshipGraphResponseSchema.parse(payload)
+          : relationshipGraphResponseSchema.parse(payload);
       })
       .then(setGraph)
       .catch((reason: unknown) => {
@@ -297,7 +369,7 @@ export function RelationshipGraphPage({
         }
       });
     return () => controller.abort();
-  }, [selection.collectionId, selection.number, selection.slug]);
+  }, [requestPath, selection.scope]);
 
   const availableRelations = useMemo(
     () =>
@@ -315,20 +387,16 @@ export function RelationshipGraphPage({
       ) ?? [],
     [graph, hiddenRelations],
   );
-  const nodes = useMemo(
-    () => (graph ? layoutNodes(graph, visibleGraphEdges) : []),
-    [graph, visibleGraphEdges],
-  );
-  const edges = useMemo(
-    () => flowEdges(visibleGraphEdges),
-    [visibleGraphEdges],
+  const availableProvenance = useMemo(
+    () =>
+      graph ? [...new Set(graph.edges.map((edge) => edge.provenance))] : [],
+    [graph],
   );
   const center = graph?.nodes.find((node) => node.role === "center");
-  const readerPath = provisionPath(
-    selection.slug,
-    selection.collectionId,
-    selection.number,
-  );
+  const returnPath =
+    selection.scope === "document"
+      ? explorerPath(selection.slug)
+      : provisionPath(selection.slug, selection.collectionId, selection.number);
 
   function toggleRelation(relationType: RelationType) {
     setHiddenRelations((current) => {
@@ -360,15 +428,15 @@ export function RelationshipGraphPage({
         Skip to relationship graph
       </a>
       <header className="topbar relationship-graph-topbar">
-        <Link className="brand" to={readerPath}>
+        <Link className="brand" to={returnPath}>
           <BookOpen aria-hidden="true" size={18} />
           Regulatory Knowledge
         </Link>
         <div className="topbar-actions">
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
-          <Link className="view-switch" to={readerPath}>
+          <Link className="view-switch" to={returnPath}>
             <ArrowLeft aria-hidden="true" size={15} />
-            Reader
+            {selection.scope === "document" ? "Explorer" : "Reader"}
           </Link>
           <button
             className="search-button"
@@ -387,16 +455,29 @@ export function RelationshipGraphPage({
           <p className="eyebrow">
             <Network aria-hidden="true" size={13} /> RELATIONSHIP GRAPH
           </p>
-          <h1>{center.label} relationships</h1>
+          <h1>
+            {center.label}{" "}
+            {selection.scope === "document"
+              ? "legal relationships"
+              : "relationships"}
+          </h1>
           {center.title ? <p>{center.title}</p> : null}
         </div>
         <nav aria-label="Relationship graph views">
+          {selection.scope === "provision" ? (
+            <Link to={documentRelationshipGraphPath(selection.slug)}>
+              Document graph
+            </Link>
+          ) : null}
           <Link
             to={`${explorerPath(selection.slug)}#${center.explorerAnchor ?? "document-outline"}`}
           >
             Act Explorer
           </Link>
-          <span>{graph.nodes.length - 1} connected nodes</span>
+          <span>
+            {graph.nodes.length - 1} connected nodes · {graph.edges.length}{" "}
+            evidence-backed edges
+          </span>
         </nav>
       </section>
 
@@ -423,37 +504,27 @@ export function RelationshipGraphPage({
             </button>
           );
         })}
+        <div
+          aria-label="Relationship data sources"
+          className="relationship-source-legend"
+        >
+          <small>DATA</small>
+          {availableProvenance.map((provenance) => (
+            <span key={provenance}>{provenanceLabels[provenance]}</span>
+          ))}
+        </div>
       </div>
 
       <section
         className="relationship-graph-canvas"
         id="relationship-graph-canvas"
       >
-        <ReactFlow<GraphFlowNode>
-          colorMode={theme}
-          edges={edges}
-          edgesReconnectable={false}
-          elementsSelectable
-          fitView
-          fitViewOptions={{ padding: 0.26, maxZoom: 1.05 }}
-          maxZoom={1.7}
-          minZoom={0.2}
-          nodes={nodes}
-          nodesConnectable={false}
-          nodesDraggable
-          nodeTypes={nodeTypes}
-          onNodeClick={(_event, node) => setSelectedNode(node.data.graphNode)}
-          panOnScroll
-          selectionOnDrag={false}
-        >
-          <Background
-            color="var(--graph-grid)"
-            gap={26}
-            size={1.1}
-            variant={BackgroundVariant.Dots}
-          />
-          <Controls position="bottom-left" showInteractive={false} />
-        </ReactFlow>
+        <RelationshipGraphCanvas
+          graph={graph}
+          onSelectNode={setSelectedNode}
+          theme={theme}
+          visibleEdges={visibleGraphEdges}
+        />
         <p className="graph-canvas-hint">
           Drag to explore · scroll to zoom · select a node for source text
         </p>

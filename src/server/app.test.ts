@@ -3,6 +3,7 @@ import type { ExplorerNode } from "../shared/legal";
 import {
   findDocument,
   findDocumentBySlug,
+  findDocumentRelationshipGraph,
   findDocumentVersionChain,
   findExplorerBySlug,
   findFamilyLevel2,
@@ -185,6 +186,41 @@ describe("Document lookup", () => {
         provenance: "OFFICIAL_MAPPING",
       }),
     );
+  });
+
+  it("projects reviewed cross-document relations into a document graph", () => {
+    const graph = findDocumentRelationshipGraph("dora");
+
+    expect(graph).toMatchObject({
+      documentId: "eu:32022R2554",
+      nodes: expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "eu:32022R2554",
+          kind: "document",
+          role: "center",
+        }),
+        expect.objectContaining({
+          entityId: "eu:32025R0301",
+          kind: "document",
+          role: "neighbor",
+        }),
+      ]),
+      edges: expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "ADOPTED_UNDER",
+          provenance: "OFFICIAL_METADATA",
+        }),
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+        }),
+      ]),
+    });
+    expect(graph?.nodes.every((node) => node.kind === "document")).toBe(true);
+    expect(graph?.edges.some((edge) => edge.source === edge.target)).toBe(
+      false,
+    );
+    expect(findDocumentRelationshipGraph("unknown-law")).toBeNull();
   });
 
   it("serves a target preview on demand for Side Peek", () => {

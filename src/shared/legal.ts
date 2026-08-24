@@ -407,6 +407,12 @@ export const provisionRelationshipsResponseSchema = z.object({
   relatedRecitals: z.array(provisionRelationshipSchema),
 });
 
+export const documentRelationshipsResponseSchema = z.object({
+  documentId: z.string().min(1),
+  buildId: z.string().min(1),
+  relationships: z.array(provisionRelationshipSchema),
+});
+
 export const relationshipPreviewSchema = z.object({
   entityId: z.string().min(1),
   documentId: z.string().min(1),
@@ -446,5 +452,8 @@ export type RelationshipEndpoint = z.infer<typeof relationshipEndpointSchema>;
 export type ProvisionRelationship = z.infer<typeof provisionRelationshipSchema>;
 export type ProvisionRelationshipsResponse = z.infer<
   typeof provisionRelationshipsResponseSchema
+>;
+export type DocumentRelationshipsResponse = z.infer<
+  typeof documentRelationshipsResponseSchema
 >;
 export type RelationshipPreview = z.infer<typeof relationshipPreviewSchema>;

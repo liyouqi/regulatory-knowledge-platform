@@ -1962,7 +1962,7 @@ Graph view 的目标是辅助理解，不替代 Reader。
 
 Graph node 必须可回到同一 canonical entity 的 Reader，并可选择 `Locate in Explorer`。Phase 2 的关系增强不得产生与 Explorer/Reader 分离的第二套实体标识。
 
-当前实现：已发布 Article focused neighborhood 的首个产品切片。Reader 关系面板提供独立 graph route；Graph 复用同一 read-only Relationship Repository 和 stable entity IDs，展示 References、Cited By、Mandates、Related Recitals 等当前已发布关系，支持 relation type 开关、pan/zoom/drag，以及按需加载官方来源 Side Peek。该切片没有新增或推断法律关系；Document 入口、Case Law 和 CELLAR 官方关系仍属于后续 Phase 2。
+当前实现：已发布 Article 与 Document 两种 focused neighborhood。Reader 关系面板提供 Article graph route，严格只投影真正以当前 root provision 为 endpoint 的关系；Explorer 提供 Document graph route，把所有跨文档边按 stable document ID 聚合，展示正文引用、reviewed Level 2 mapping 与已发布 CELLAR official metadata，并排除折叠后只剩同一文档的 self-edge。两种视图复用同一 read-only Relationship Repository，支持 relation type 开关、可自由拖动的节点、pan/zoom、provenance 图例，以及按需加载官方来源 Side Peek。该切片没有新增、推断或改变任何法律关系；Case Law 与更广 CELLAR predicate 仍属于后续 Phase 2。
 
 ## 22.5 Extended Level 2 / Level 3
 

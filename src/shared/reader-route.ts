@@ -6,7 +6,9 @@ export interface ReaderSelection {
   number: string;
 }
 
-export type RelationshipGraphSelection = ReaderSelection;
+export type RelationshipGraphSelection =
+  | ({ scope: "provision" } & ReaderSelection)
+  | { scope: "document"; slug: string };
 
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
@@ -53,6 +55,10 @@ export function relationshipGraphPath(
   return `/relationships/${encodeURIComponent(slug)}/${collectionId}/${encodeURIComponent(number)}`;
 }
 
+export function documentRelationshipGraphPath(slug: string): string {
+  return `/relationships/${encodeURIComponent(slug)}`;
+}
+
 export function parseRelationshipGraphPath(
   pathname: string,
 ): RelationshipGraphSelection | null {
@@ -60,12 +66,18 @@ export function parseRelationshipGraphPath(
     /^\/relationships\/([^/]+)\/(articles|recitals|annexes|provisions)\/([^/]+)\/?$/u.exec(
       pathname,
     );
-  if (!match) return null;
-  return {
-    slug: decodeURIComponent(match[1]),
-    collectionId: match[2] as CollectionId,
-    number: decodeURIComponent(match[3]).toLowerCase(),
-  };
+  if (match) {
+    return {
+      scope: "provision",
+      slug: decodeURIComponent(match[1]),
+      collectionId: match[2] as CollectionId,
+      number: decodeURIComponent(match[3]).toLowerCase(),
+    };
+  }
+  const documentMatch = /^\/relationships\/([^/]+)\/?$/u.exec(pathname);
+  return documentMatch
+    ? { scope: "document", slug: decodeURIComponent(documentMatch[1]) }
+    : null;
 }
 
 export function parseReaderPath(pathname: string): ReaderSelection | null {
