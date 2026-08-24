@@ -80,7 +80,7 @@ npm run build
 | `npm run cssf:source:verify -- --snapshot <path>` | Recompute CSSF snapshot byte counts and SHA-256 hashes. |
 | `npm run cssf:canonical:inspect -- --snapshot <path>` | Inspect CSSF HTML or tagged-PDF structure and candidate fidelity metrics without publishing. |
 | `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF Canonical artifact after the media-specific quality gate passes. |
-| `npm run test:e2e` | Run browser tests after they are introduced. |
+| `npm run test:e2e` | Run Playwright smoke tests for the DORA Explorer, Reader, Level 2 library, and global search. |
 
 ## Legal Data Operations
 
