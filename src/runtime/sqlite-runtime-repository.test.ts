@@ -162,6 +162,58 @@ describe("SQLite runtime repository", () => {
     ).toBeNull();
   });
 
+  it("keeps reviewed lifecycle edges separate from loaded legal entities", () => {
+    const doraLifecycle =
+      repository?.findDocumentLifecycleRelationships("eu:32022R2554");
+
+    expect(doraLifecycle?.relationships).toHaveLength(14);
+    expect(doraLifecycle?.relationships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "AMENDS",
+          provenance: "OFFICIAL_METADATA",
+          source: expect.objectContaining({
+            entityId: "eu:32022R2554",
+            kind: "document",
+            availability: "loaded",
+            path: "/read/dora/articles/1",
+          }),
+          target: expect.objectContaining({
+            entityId: "eu:32009R1060",
+            celex: "32009R1060",
+            kind: "external-work",
+            availability: "external",
+          }),
+          builder: { method: "cellar-lifecycle", version: "1.0.0" },
+          resolutionStatus: "external",
+        }),
+        expect.objectContaining({
+          relationType: "CORRECTS",
+          target: expect.objectContaining({
+            entityId: "eu:32022R2554",
+            kind: "document",
+          }),
+          source: expect.objectContaining({
+            kind: "external-work",
+            title: null,
+          }),
+        }),
+      ]),
+    );
+    expect(
+      doraLifecycle?.relationships.every(
+        (relationship) =>
+          relationship.source.documentId === "eu:32022R2554" ||
+          relationship.target.documentId === "eu:32022R2554",
+      ),
+    ).toBe(true);
+    expect(repository?.lifecycleRelationshipCount).toBe(65);
+    expect(repository?.externalWorkCount).toBe(64);
+    expect(
+      repository?.findDocumentLifecycleRelationships("eu:unknown"),
+    ).toBeNull();
+  });
+
   it("returns benchmark-gated TF-IDF related recitals with similarity scores", () => {
     const doraArticleTwenty = repository?.findProvisionRelationships(
       "eu:32022R2554",

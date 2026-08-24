@@ -4,6 +4,8 @@ export type RelationshipType =
   | "REFERENCES"
   | "MANDATES"
   | "ADOPTED_UNDER"
+  | "AMENDS"
+  | "CORRECTS"
   | "SUPPLEMENTS"
   | "RELATED_DOCUMENT"
   | "RELATED_RECITAL";

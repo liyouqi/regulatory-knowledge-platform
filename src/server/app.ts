@@ -88,8 +88,15 @@ export function findDocumentRelationshipGraph(slug: string) {
   const relationships = runtimeRepository.findDocumentRelationships(
     document.id,
   );
+  const lifecycleRelationships =
+    runtimeRepository.findDocumentLifecycleRelationships(document.id);
   return relationships
-    ? toDocumentRelationshipGraph(document, documentViews, relationships)
+    ? toDocumentRelationshipGraph(
+        document,
+        documentViews,
+        relationships,
+        lifecycleRelationships,
+      )
     : null;
 }
 
@@ -114,6 +121,8 @@ app.get("/api/health", (_request, response) => {
       definitions: searchService.definitionCount,
       relationships: runtimeRepository.relationshipCount,
       cellarRelationships: runtimeRepository.cellarRelationshipCount,
+      lifecycleRelationships: runtimeRepository.lifecycleRelationshipCount,
+      externalWorks: runtimeRepository.externalWorkCount,
       relatedRecitals: runtimeRepository.relatedRecitalCount,
       versionNodes: runtimeRepository.versionNodeCount,
       versionEdges: runtimeRepository.versionEdgeCount,

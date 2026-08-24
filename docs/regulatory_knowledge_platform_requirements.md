@@ -1856,7 +1856,7 @@ flowchart LR
 
 当前实现：首个 CELLAR focused slice 只查询已加载的 13 个 EU CELEX Work 之间的一跳闭集关系，并只发布经官方 CDM 定义核验的 `resource_legal_based_on_resource_legal` 与 `resource_legal_completes_resource_legal`。前者归一化为 document-level `ADOPTED_UNDER`，后者归一化为 `SUPPLEMENTS`；共 12 条记录，统一使用 `OFFICIAL_METADATA`，保留 source/target CELLAR Work URI、predicate locator、查询版本与 checked timestamp。两端任一文档未加载时不发布。原始 SPARQL response 只保存在 Git ignored snapshot，runtime 只读取人工复核的 normalized dataset。`work_cites_work`、external nodes 与 case-law predicates 不在本切片发布。
 
-第二个 acquisition-only lifecycle slice 已以 `resource_legal_amends_resource_legal` 和 `resource_legal_corrects_resource_legal` 查询同一 13-seed corpus 的开放一跳邻域。2026-08-24 verified snapshot 得到 65 条候选：24 amendment、41 corrigendum；其中 2 条 amendment 指向 seed，22 条由 seed 指向外部 Work，且全部 65 条都至少有一端未加载。query、response、hash manifest 与 normalized candidate 只进入 Git ignored raw snapshot，不写入 reviewed runtime dataset。外部 Work contract 未单独评审前，不创建 placeholder、不发布 relationship，也不改变当前 12 条 CELLAR runtime 计数。
+第二个 lifecycle slice 以 `resource_legal_amends_resource_legal` 和 `resource_legal_corrects_resource_legal` 查询同一 13-seed corpus 的开放一跳邻域。2026-08-24 verified snapshot 得到 65 条候选：24 amendment、41 corrigendum；其中 2 条 amendment 指向 seed，22 条由 seed 指向外部 Work，且全部 65 条都至少有一端未加载。query、response 与 hash manifest 继续只进入 Git ignored raw snapshot；人工复核后的 normalized records 独立发布到 `data/official-metadata/cellar-lifecycle-relations.json`。SQLite `4.4.0` 以 CELEX 生成 stable Work ID，使用独立 `legal_works` / `lifecycle_relationships` 表，不放松现有 `relationships → legal_entities` 外键，也不创建可进入 Reader 的伪 Document。外部节点只在 Document Graph 显示官方 metadata link。
 
 ## 22.2 Amendment & Version Chain
 
@@ -1884,7 +1884,7 @@ Article 页面在能够稳定映射时，进一步显示当前文本所属版本
 - consolidated text link；
 - snapshot comparison entry point。
 
-当前实现：SQLite `4.3.0` 已发布首个有界切片。仅对具备已核验 `sourceStatus` 的文档生成规范化 version chain，并在 Reader/API 中区分 loaded snapshot、外部 current EUR-Lex record 与官方 corrigendum。当前唯一发布实例为 DORA Register of Information ITS 2024/2956；其原始 OJ snapshot、current-version link 与 2025-09-19 corrigendum 均保持各自官方 URL。尚无核验 amendment mapping，因此不生成 amending-act 节点或 `AMENDED_BY` 边；完整 consolidated lineage、Article-level provenance 与 snapshot comparison 仍未完成。
+当前实现：SQLite `4.4.0` 保留首个有界 version-chain 切片。仅对具备已核验 `sourceStatus` 的文档生成规范化 version chain，并在 Reader/API 中区分 loaded snapshot、外部 current EUR-Lex record 与官方 corrigendum。当前唯一 version-chain 实例为 DORA Register of Information ITS 2024/2956；其原始 OJ snapshot、current-version link 与 2025-09-19 corrigendum 均保持各自官方 URL。另有 65 条 Work-level `AMENDS` / `CORRECTS` 官方 metadata 边进入 Document Graph，但不表示 amendment/corrigendum 已应用到本地文本，也不生成 Article-level provenance；完整 consolidated lineage、Article-level provenance 与 snapshot comparison 仍未完成。
 
 ## 22.3 CJEU Case Law
 
@@ -1964,7 +1964,7 @@ Graph view 的目标是辅助理解，不替代 Reader。
 
 Graph node 必须可回到同一 canonical entity 的 Reader，并可选择 `Locate in Explorer`。Phase 2 的关系增强不得产生与 Explorer/Reader 分离的第二套实体标识。
 
-当前实现：已发布 Article 与 Document 两种 focused neighborhood。Reader 关系面板提供 Article graph route，严格只投影真正以当前 root provision 为 endpoint 的关系；Explorer 提供 Document graph route，把所有跨文档边按 stable document ID 聚合，展示正文引用、reviewed Level 2 mapping 与已发布 CELLAR official metadata，并排除折叠后只剩同一文档的 self-edge。两种视图复用同一 read-only Relationship Repository，支持 relation type 开关、可自由拖动的节点、pan/zoom、provenance 图例，以及按需加载官方来源 Side Peek。该切片没有新增、推断或改变任何法律关系；Case Law 与更广 CELLAR predicate 仍属于后续 Phase 2。
+当前实现：已发布 Article 与 Document 两种 focused neighborhood。Reader 关系面板提供 Article graph route，严格只投影真正以当前 root provision 为 endpoint 的关系；Explorer 提供 Document graph route，把 resolved 跨文档边按 stable document ID 聚合，并合并独立 Work lifecycle response，展示正文引用、reviewed Level 2 mapping、CELLAR structural metadata 以及 `AMENDS` / `CORRECTS`。外部 Work 节点使用相同 CELEX-derived stable identity，但没有本地 Reader/Explorer path，Side Peek 只提供官方 CELLAR metadata。两种视图复用同一 read-only runtime artifact，支持 relation type 开关、可自由拖动的节点、pan/zoom、provenance 图例，并排除折叠后只剩同一文档的 self-edge。Article Graph 不接收 Work-level lifecycle 边；Case Law 与更广 CELLAR predicate 仍属于后续 Phase 2。
 
 ## 22.5 Extended Level 2 / Level 3
 
@@ -3127,7 +3127,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - TF-IDF benchmark；
 - benchmark 通过时启用 Related Recitals，否则保持关闭。
 
-当前状态：Release 0.5 已完成。official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18、ITS 2024/2956 的 Article 28(9)，以及重大 ICT 事件报告 RTS 2025/301 / ITS 2025/302 的 Article 20 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 均已完成。DORA/GDPR/AI Act 的 8-case TF-IDF benchmark 已以 Top 5 100% hit rate 通过，Related Recitals 已作为带 score 和 `TFIDF` provenance 的 build-time enrichment 发布。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda；SQLite `4.3.0` 进一步把这组已核验状态投影为独立 version-chain API/Reader history，但尚未发布 amendment edges 或完整 amendment/version graph。更多核验 Level 2 measures 归入无界的后续 backlog；Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
+当前状态：Release 0.5 已完成。official mapping builder、首批 DORA/MiCA 完整 Level 2 Document、DORA 2024/1773 的 Article 28(10)、DORA 2024/1772 的 Article 18、ITS 2024/2956 的 Article 28(9)，以及重大 ICT 事件报告 RTS 2025/301 / ITS 2025/302 的 Article 20 核验映射、双向关系 API/Reader 展示、family-level RTS/ITS library 与 Level 1 summary count 均已完成。DORA/GDPR/AI Act 的 8-case TF-IDF benchmark 已以 Top 5 100% hit rate 通过，Related Recitals 已作为带 score 和 `TFIDF` provenance 的 build-time enrichment 发布。Reader/Library 已能区分 original OJ text、text-as-of、current EUR-Lex version 与已知 corrigenda；当前 SQLite `4.4.0` 保留独立 version-chain API/Reader history，并在 Document Graph 发布经过复核的 Work-level amendment/corrigendum metadata，但尚未形成完整 amendment/version graph。更多核验 Level 2 measures 归入无界的后续 backlog；Library 仅查询 runtime SQLite 的 `documents`、`relationships` 与 `legal_entities`，不直接读取 curated mapping input。
 
 ## Release 0.6 — CSSF & Product Hardening
 
@@ -3142,7 +3142,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - performance、accessibility、visual refinement、cross-browser testing；
 - production artifact atomic publish / rollback runbook。
 
-当前状态：已核验、结构化并接入首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。Tagged-PDF incident-reporting profile 已在 25/893 上恢复 introduction、4 个 chapter、连续 points 1–15、字母/数字嵌套 point 与 footnote，签名 table 作为非正文内容显式排除。独立 consolidated-governance profile 已在 12/552 上恢复 4 个 Part、82 个 Part/Chapter/Sub-chapter/Section/Sub-section 节点、Part I points 1–3 及 19 个 definition entry、Part II points 1–186、Part III points 1–51、Part IV timeline 与 Annex I–II；实质性无编号段落和 tagged table 保留为正文，仅 page 83 contact footer 显式排除。两种 PDF profile 均以 page/structure/provision/point count、warning ceiling 和跨段正文 hash 固化 fidelity gate；Part 内重复 point 编号只在 route token 中稳定消歧，official label 不变。三份 CSSF 文档均通过当前 SQLite `4.3.0` 继承的独立 local-ID contract 接入 catalog、full-text search、Explorer 与 Reader，不伪造 CELEX 或 Article 语义。Reader、Explorer 与 Level 2 Library 现提供共享的 dark/light theme toggle，并只在浏览器保存该偏好。运行时 artifact 现可在 staging path 构建，以 `runtime:verify` 经只读 Search/Reader service 验证，再通过 `REGULATORY_RUNTIME_DATABASE_PATH` promote；runbook 明确保留 previous artifact 并在 health/build ID 不符时回退。
+当前状态：已核验、结构化并接入首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。Tagged-PDF incident-reporting profile 已在 25/893 上恢复 introduction、4 个 chapter、连续 points 1–15、字母/数字嵌套 point 与 footnote，签名 table 作为非正文内容显式排除。独立 consolidated-governance profile 已在 12/552 上恢复 4 个 Part、82 个 Part/Chapter/Sub-chapter/Section/Sub-section 节点、Part I points 1–3 及 19 个 definition entry、Part II points 1–186、Part III points 1–51、Part IV timeline 与 Annex I–II；实质性无编号段落和 tagged table 保留为正文，仅 page 83 contact footer 显式排除。两种 PDF profile 均以 page/structure/provision/point count、warning ceiling 和跨段正文 hash 固化 fidelity gate；Part 内重复 point 编号只在 route token 中稳定消歧，official label 不变。三份 CSSF 文档均通过当前 SQLite `4.4.0` 继承的独立 local-ID contract 接入 catalog、full-text search、Explorer 与 Reader，不伪造 CELEX 或 Article 语义。Reader、Explorer 与 Level 2 Library 现提供共享的 dark/light theme toggle，并只在浏览器保存该偏好。运行时 artifact 现可在 staging path 构建，以 `runtime:verify` 经只读 Search/Reader service 验证，再通过 `REGULATORY_RUNTIME_DATABASE_PATH` promote；runbook 明确保留 previous artifact 并在 health/build ID 不符时回退。
 
 ## Phase 2 Sequence
 

@@ -24,6 +24,8 @@ console.table({
   definitions: manifest.definitionCount,
   relationships: manifest.relationshipCount,
   cellarRelationships: manifest.cellarRelationshipCount,
+  lifecycleRelationships: manifest.lifecycleRelationshipCount,
+  externalWorks: manifest.externalWorkCount,
   relatedRecitals: manifest.relatedRecitalCount,
   versionNodes: manifest.versionNodeCount,
   versionEdges: manifest.versionEdgeCount,

@@ -432,6 +432,8 @@ Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（orig
 
 SQLite `4.3.0` 在不修改 Canonical `1.0.0` 的前提下，增加 `document_version_chains`、`document_versions`、`document_version_edges` 三张规范化只读表，并由 `document-version-chain@1.0.0` 在 build time 从已核验 `sourceStatus` 投影。当前只允许发布 loaded original/consolidated snapshot、外部 current-version link 和官方 corrigendum 节点，以及 `CURRENT_VERSION_LINK` / `HAS_CORRIGENDUM` 两种 `OFFICIAL_METADATA` 边。外部节点不代表其正文已载入 Reader；没有核验输入时不生成 chain，且当前不生成 `AMENDED_BY`。builder version 进入 runtime identity，节点/边数量进入 manifest，并通过独立 API 与 Reader version history 读取。它是第 22.2 节的首个有界切片，不是完整 amendment/version graph；后续修订法案、consolidated lineage、Article-level provenance 和 snapshot comparison 仍需独立核验输入。
 
+当前 SQLite `4.4.0` 在该 version-chain contract 之外增加独立 `legal_works` 与 `lifecycle_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。`AMENDS` / `CORRECTS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document。reviewed dataset、builder version、65 条边和 64 个 external Work count 均进入 runtime identity/manifest。
+
 ## 7.2 LegalViz reuse strategy
 
 LegalViz 已验证：
@@ -575,7 +577,7 @@ Phase 2 首个 `cellar-focused-relations@1.0.0` 使用固定 CELEX `VALUES` 和 
 
 `work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship。Document Graph 单独查询所有跨文档 relationship，并只在 UI-owned projection 中把 Article/body-block endpoints 折叠到其 stable document entity；原始 relationship endpoints、evidence 与 provenance 不变，同文档 self-edge 不进入 Document Graph。
 
-独立 `cellar-lifecycle@1.0.0` acquisition adapter 使用开放一跳查询，只允许 `resource_legal_amends_resource_legal` 与 `resource_legal_corrects_resource_legal`，并校验每条结果至少一端属于 seed CELEX。它支持 URL-encoded corrigendum CELEX（例如 `32024R2956R(01)`），同样固定官方 host、response size、query/response SHA-256 与 immutable ignored snapshot。2026-08-24 的 65 条 verified candidate 全部涉及 external Work，因此该 adapter 没有 runtime builder；在 external-work entity/storage/delivery contract 独立评审前，不能绕过 `documents` / `legal_entities` foreign-key boundary。
+独立 `cellar-lifecycle@1.0.0` adapter 使用开放一跳查询，只允许 `resource_legal_amends_resource_legal` 与 `resource_legal_corrects_resource_legal`，并校验每条结果至少一端属于 seed CELEX。它支持 URL-encoded corrigendum CELEX（例如 `32024R2956R(01)`），固定官方 host、response size、query/response SHA-256 与 immutable ignored snapshot。2026-08-24 的 65 条 verified candidate 全部涉及 external Work；人工复核后的 normalized dataset 才由同版本 runtime builder 消费。builder 输出 24 条 `AMENDS`、41 条 `CORRECTS` 和 64 个 metadata-only external Works，写入独立表并只投影到 Document Graph。external endpoint 没有 Reader path；若同一 CELEX 日后作为正式 Document 载入，其 stable Work ID 与 Document ID 收敛，而不是迁移到第二套身份。
 
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
@@ -765,6 +767,7 @@ Release 0.3 先采用最小化 runtime schema，以现有稳定 API DTO 作为 m
 | definitions | normalized, traceable definitions |
 | search_records_fts / definitions_fts | FTS5 virtual tables |
 | legal_entities / relationships | stable entity JOIN、explicit references、reverse cited-by、official Level 2 mappings |
+| legal_works / lifecycle_relationships | loaded/external CELEX Work identity、reviewed amendment/corrigendum metadata |
 
 `document_views` 是有意的 build-time denormalization：Reader / Explorer 一次主键查询即可返回现有 DTO，不在每次请求中用多表 JOIN 重建递归树。它与全文记录、Definitions 都由同一次 Canonical → SQLite build 生成，不存在人工双写。
 
@@ -1085,9 +1088,9 @@ Seed Documents / CELEX
 
 不让 Reader 直接向 CELLAR 查询。
 
-当前边界：SPARQL 只在显式 fetch 命令中运行，不在 `runtime:build`、server startup 或 Web request 中运行。fetch 产生 ignored raw snapshot 和 normalized candidate；reviewed dataset、builder method/version 与内容共同参与 runtime build ID。当前闭集为 13 个已加载 EU CELEX works，发布 12 条 legal-basis/completion edge；不创建 external entity placeholder，也不把 RDF/XML 作为 UI 输入。
+当前边界：SPARQL 只在显式 fetch 命令中运行，不在 `runtime:build`、server startup 或 Web request 中运行。fetch 产生 ignored raw snapshot 和 normalized candidate；reviewed dataset、builder method/version 与内容共同参与 runtime build ID。闭集关系仍只在两端 loaded `legal_entities` 时发布 12 条 legal-basis/completion edge；开放 lifecycle 邻域则通过独立 Work contract 发布，不把 RDF/XML 作为 UI 输入。
 
-生命周期 discovery 使用单独命令和 ignored snapshot，允许查询 seed 的 external amendment/corrigendum 邻居，但仍不由 runtime 消费。这样可以先量化、复核外部关系，再决定 external Work contract，而不会为追求图密度破坏当前 Canonical/SQLite 边界。
+生命周期 discovery 使用单独命令和 ignored snapshot 查询 seed 的 external amendment/corrigendum 邻居。runtime 只消费人工复核后的 `data/official-metadata/cellar-lifecycle-relations.json`，并写入 `legal_works` / `lifecycle_relationships`；这条路径不修改 Canonical Document，也不放松 `relationships → legal_entities` 边界。
 
 ## 21.2 Amendment / Version
 
@@ -1124,7 +1127,7 @@ Relationship Repository
 
 Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenance 和 evidence；不包含 React Flow position/node type 等 vendor state。Web 层负责确定性布局、筛选和 React Flow 类型转换，因此未来更换图形组件不改变 Repository、relationship contract 或内部 endpoint。Graph route 继续只读 SQLite runtime artifact，不读取 Canonical JSON、raw source 或 curated mapping 文件。
 
-当前 delivery 提供两种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 使用独立 document relationship response 查询 source/target document 命中的跨文档边，并在投影阶段聚合为 Document nodes。二者共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 CELLAR document metadata 伪装成 Article 关系。
+当前 delivery 提供两种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 查询 source/target document 命中的 resolved 跨文档边，在投影阶段聚合为 Document nodes，并合并当前 Document 的独立 lifecycle response。loaded endpoint 继续使用 Document node；external Work node 只有 stable ID、CELEX label 和官方 CELLAR URL，不请求 relationship preview，也没有 Reader/Explorer route。两种 projection 共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 Work-level metadata 伪装成 Article 关系。
 
 ## 21.5 Phase 4 External Adapters（预留）
 

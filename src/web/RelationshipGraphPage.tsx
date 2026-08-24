@@ -52,6 +52,8 @@ const relationDetails = {
   SUPPLEMENTS: { label: "Supplements", color: "#ff7f96" },
   RELATED_DOCUMENT: { label: "Related document", color: "#8f9bad" },
   RELATED_RECITAL: { label: "Related recital", color: "#9acf78" },
+  AMENDS: { label: "Amends", color: "#f4c95d" },
+  CORRECTS: { label: "Corrects", color: "#ff9f6e" },
 } as const;
 
 const provenanceLabels: Record<RelationshipGraphEdge["provenance"], string> = {
@@ -71,6 +73,12 @@ type GraphNodeData = {
 };
 
 type GraphFlowNode = Node<GraphNodeData, "relationship">;
+
+function isExternalGraphNode(
+  node: RelationshipGraphNode,
+): node is Extract<RelationshipGraphNode, { sourceUrl: string }> {
+  return "sourceUrl" in node;
+}
 
 function RelationshipNode({ data, selected }: NodeProps<GraphFlowNode>) {
   const node = data.graphNode;
@@ -261,11 +269,13 @@ function GraphPeek({
 }) {
   const [preview, setPreview] = useState<RelationshipPreview | null>(null);
   const [error, setError] = useState("");
+  const external = isExternalGraphNode(node);
 
   useEffect(() => {
     const controller = new AbortController();
     setPreview(null);
     setError("");
+    if (external) return () => controller.abort();
     void fetch(
       `/api/relationship-previews/${encodeURIComponent(node.entityId)}`,
       { signal: controller.signal },
@@ -283,7 +293,7 @@ function GraphPeek({
         }
       });
     return () => controller.abort();
-  }, [node.entityId]);
+  }, [external, node.entityId]);
 
   return (
     <aside aria-label="Relationship details" className="graph-peek">
@@ -300,16 +310,28 @@ function GraphPeek({
       <span>{node.documentShortName}</span>
       <h2>{node.label}</h2>
       {node.title ? <h3>{node.title}</h3> : null}
+      {external ? (
+        <p className="graph-peek-status">
+          This Work is present as reviewed CELLAR metadata; its legal text is
+          not loaded in this runtime.
+        </p>
+      ) : null}
       {preview?.excerpt ? <blockquote>{preview.excerpt}</blockquote> : null}
-      {!preview && !error ? (
+      {!external && !preview && !error ? (
         <p className="graph-peek-status">Loading source text…</p>
       ) : null}
       {error ? <p className="graph-peek-status">{error}</p> : null}
       <div className="graph-peek-actions">
-        <Link to={preview?.path ?? node.path}>
-          {node.kind === "document" ? "Open in Explorer" : "Open in Reader"}{" "}
-          <ArrowRight aria-hidden="true" size={15} />
-        </Link>
+        {external ? (
+          <a href={node.sourceUrl} rel="noreferrer" target="_blank">
+            Official metadata <ArrowUpRight aria-hidden="true" size={14} />
+          </a>
+        ) : (
+          <Link to={preview?.path ?? node.path}>
+            {node.kind === "document" ? "Open in Explorer" : "Open in Reader"}{" "}
+            <ArrowRight aria-hidden="true" size={15} />
+          </Link>
+        )}
         {preview ? (
           <a href={preview.sourceUrl} rel="noreferrer" target="_blank">
             Official source <ArrowUpRight aria-hidden="true" size={14} />
@@ -393,6 +415,8 @@ export function RelationshipGraphPage({
     [graph],
   );
   const center = graph?.nodes.find((node) => node.role === "center");
+  const centerExplorerAnchor =
+    center && !isExternalGraphNode(center) ? center.explorerAnchor : undefined;
   const returnPath =
     selection.scope === "document"
       ? explorerPath(selection.slug)
@@ -470,7 +494,7 @@ export function RelationshipGraphPage({
             </Link>
           ) : null}
           <Link
-            to={`${explorerPath(selection.slug)}#${center.explorerAnchor ?? "document-outline"}`}
+            to={`${explorerPath(selection.slug)}#${centerExplorerAnchor ?? "document-outline"}`}
           >
             Act Explorer
           </Link>
@@ -526,7 +550,7 @@ export function RelationshipGraphPage({
           visibleEdges={visibleGraphEdges}
         />
         <p className="graph-canvas-hint">
-          Drag to explore · scroll to zoom · select a node for source text
+          Drag to explore · scroll to zoom · select a node for source details
         </p>
         {selectedNode ? (
           <GraphPeek

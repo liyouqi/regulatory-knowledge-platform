@@ -6,6 +6,10 @@ import type {
   ProvisionView,
   RelationshipEndpoint,
 } from "../shared/legal";
+import type {
+  DocumentLifecycleRelationshipsResponse,
+  LifecycleEndpoint,
+} from "../shared/lifecycle";
 import { explorerPath } from "../shared/reader-route";
 import {
   type DocumentRelationshipGraphResponse,
@@ -19,6 +23,14 @@ import {
 type RelationshipGroup = {
   direction: "incoming" | "outgoing";
   relationships: ProvisionRelationship[];
+};
+
+type GraphRelationship = {
+  id: string;
+  relationType: RelationshipGraphEdge["relationType"];
+  provenance: RelationshipGraphEdge["provenance"];
+  evidence: { text: string; sourceUrl: string };
+  score?: number;
 };
 
 function graphNodeId(endpoint: RelationshipEndpoint): string {
@@ -71,7 +83,7 @@ function documentNode(
 function edgeKey(
   source: string,
   target: string,
-  relationship: ProvisionRelationship,
+  relationship: GraphRelationship,
 ) {
   return [
     source,
@@ -85,7 +97,7 @@ function addEdge(
   edges: Map<string, RelationshipGraphEdge>,
   source: string,
   target: string,
-  relationship: ProvisionRelationship,
+  relationship: GraphRelationship,
 ) {
   const key = edgeKey(source, target, relationship);
   const existing = edges.get(key);
@@ -179,6 +191,7 @@ export function toDocumentRelationshipGraph(
   document: DocumentView,
   documents: DocumentView[],
   response: DocumentRelationshipsResponse,
+  lifecycleResponse?: DocumentLifecycleRelationshipsResponse | null,
 ): DocumentRelationshipGraphResponse {
   const center = documentNode(document, "center");
   const documentsById = new Map(
@@ -217,6 +230,40 @@ export function toDocumentRelationshipGraph(
         ? { ...relationship, relationType: "CITED_BY" as const }
         : relationship;
     addEdge(edges, source.entityId, target.entityId, projectedRelationship);
+  }
+
+  function lifecycleNode(endpoint: LifecycleEndpoint): RelationshipGraphNode {
+    const loadedDocument = documentsById.get(endpoint.documentId);
+    if (endpoint.kind === "document" && loadedDocument) {
+      return documentNode(
+        loadedDocument,
+        loadedDocument.id === document.id ? "center" : "neighbor",
+      );
+    }
+    return {
+      entityId: endpoint.entityId,
+      documentId: endpoint.documentId,
+      documentShortName: endpoint.documentShortName,
+      kind: "external-work",
+      label: endpoint.label,
+      title: null,
+      sourceUrl: endpoint.sourceUrl,
+      role: "neighbor",
+    };
+  }
+
+  for (const relationship of lifecycleResponse?.relationships ?? []) {
+    const source = lifecycleNode(relationship.source);
+    const target = lifecycleNode(relationship.target);
+    if (
+      source.entityId !== center.entityId &&
+      target.entityId !== center.entityId
+    ) {
+      continue;
+    }
+    nodes.set(source.entityId, source);
+    nodes.set(target.entityId, target);
+    addEdge(edges, source.entityId, target.entityId, relationship);
   }
 
   return documentRelationshipGraphResponseSchema.parse({

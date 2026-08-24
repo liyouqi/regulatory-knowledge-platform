@@ -1350,6 +1350,14 @@ kbd {
   background: #9acf78;
 }
 
+.relationship-graph-node[data-relation="amends"]::before {
+  background: #f4c95d;
+}
+
+.relationship-graph-node[data-relation="corrects"]::before {
+  background: #ff9f6e;
+}
+
 .relationship-graph-node:hover,
 .relationship-graph-node.selected {
   border-color: #8ca06e;

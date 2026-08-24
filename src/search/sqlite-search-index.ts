@@ -11,6 +11,12 @@ import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import type { SourceDefinition } from "../ingestion/source-registry";
 import {
+  CELLAR_LIFECYCLE_BUILDER,
+  CELLAR_LIFECYCLE_BUILDER_VERSION,
+  buildCellarLifecycle,
+  loadCellarLifecycleRelations,
+} from "../relationships/cellar-lifecycle";
+import {
   CELLAR_RELATIONSHIP_BUILDER,
   CELLAR_RELATIONSHIP_BUILDER_VERSION,
   buildCellarOfficialRelations,
@@ -48,7 +54,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.3.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.4.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -63,6 +69,8 @@ export interface RuntimeDatabaseManifest {
   definitionCount: number;
   relationshipCount: number;
   cellarRelationshipCount: number;
+  lifecycleRelationshipCount: number;
+  externalWorkCount: number;
   relatedRecitalCount: number;
   versionNodeCount: number;
   versionEdgeCount: number;
@@ -217,6 +225,7 @@ function runtimeBuildId(
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
   cellarRelations: ReturnType<typeof loadCellarOfficialRelations>,
+  lifecycleRelations: ReturnType<typeof loadCellarLifecycleRelations>,
   relatedRecitalBenchmark: ReturnType<typeof loadRelatedRecitalBenchmark>,
 ): string {
   const input = documents
@@ -232,6 +241,8 @@ function runtimeBuildId(
         JSON.stringify(officialMappings),
         `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
         JSON.stringify(cellarRelations),
+        `${CELLAR_LIFECYCLE_BUILDER}@${CELLAR_LIFECYCLE_BUILDER_VERSION}`,
+        JSON.stringify(lifecycleRelations),
         `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
         JSON.stringify(relatedRecitalBenchmark),
         `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
@@ -296,6 +307,9 @@ export function buildRuntimeDatabase(
     ),
   );
   const registeredCelex = new Set(sourceByCelex.keys());
+  const loadedCelex = new Set(
+    documents.flatMap((document) => (document.celex ? [document.celex] : [])),
+  );
   const officialMappings = loadOfficialMappings().filter(
     (mapping) =>
       registeredCelex.has(mapping.level1.celex) &&
@@ -328,6 +342,12 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     cellarRelations,
   );
+  const lifecycleRelations = loadCellarLifecycleRelations().filter(
+    (record) =>
+      loadedCelex.has(record.sourceCelex) ||
+      loadedCelex.has(record.targetCelex),
+  );
+  const lifecycleBuild = buildCellarLifecycle(documents, lifecycleRelations);
   const relatedRecitalBenchmark = loadRelatedRecitalBenchmark();
   const loadedDocumentIds = new Set(documents.map((document) => document.id));
   const benchmarkDocumentIds = new Set(
@@ -349,6 +369,7 @@ export function buildRuntimeDatabase(
     documents,
     officialMappings,
     cellarRelations,
+    lifecycleRelations,
     relatedRecitalBenchmark,
   );
   const builtAt = new Date().toISOString();
@@ -435,6 +456,43 @@ export function buildRuntimeDatabase(
         PRIMARY KEY (document_id, alias)
       ) STRICT;
       CREATE INDEX document_aliases_normalized ON document_aliases(normalized_alias);
+      CREATE TABLE legal_works (
+        id TEXT PRIMARY KEY,
+        celex TEXT NOT NULL UNIQUE,
+        cellar_work_uri TEXT NOT NULL UNIQUE,
+        loaded_document_id TEXT UNIQUE REFERENCES documents(id),
+        label TEXT NOT NULL,
+        title TEXT,
+        source_url TEXT NOT NULL,
+        availability TEXT NOT NULL CHECK (availability IN ('loaded', 'external')),
+        CHECK (
+          (availability = 'loaded' AND loaded_document_id IS NOT NULL) OR
+          (availability = 'external' AND loaded_document_id IS NULL)
+        )
+      ) STRICT;
+      CREATE INDEX legal_works_loaded_document_id ON legal_works(loaded_document_id);
+      CREATE TABLE lifecycle_relationships (
+        relationship_id TEXT PRIMARY KEY,
+        source_work_id TEXT NOT NULL REFERENCES legal_works(id),
+        relation_type TEXT NOT NULL CHECK (relation_type IN ('AMENDS', 'CORRECTS')),
+        target_work_id TEXT NOT NULL REFERENCES legal_works(id),
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_METADATA'),
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        source_ref TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        resolution_status TEXT NOT NULL CHECK (resolution_status IN ('resolved', 'external')),
+        build_id TEXT NOT NULL,
+        UNIQUE (
+          source_work_id, relation_type, target_work_id,
+          provenance, evidence_locator
+        )
+      ) STRICT;
+      CREATE INDEX lifecycle_relationships_source_work_id
+        ON lifecycle_relationships(source_work_id);
+      CREATE INDEX lifecycle_relationships_target_work_id
+        ON lifecycle_relationships(target_work_id);
       CREATE TABLE legal_entities (
         id TEXT PRIMARY KEY,
         document_id TEXT NOT NULL REFERENCES documents(id),
@@ -603,6 +661,26 @@ export function buildRuntimeDatabase(
         @kind, @label, @title, @path
       )
     `);
+    const insertLegalWork = database.prepare(`
+      INSERT INTO legal_works (
+        id, celex, cellar_work_uri, loaded_document_id, label, title,
+        source_url, availability
+      ) VALUES (
+        @id, @celex, @cellarWorkUri, @loadedDocumentId, @label, @title,
+        @sourceUrl, @availability
+      )
+    `);
+    const insertLifecycleRelationship = database.prepare(`
+      INSERT INTO lifecycle_relationships (
+        relationship_id, source_work_id, relation_type, target_work_id,
+        provenance, evidence_text, evidence_locator, source_ref,
+        builder_method, builder_version, resolution_status, build_id
+      ) VALUES (
+        @id, @sourceWorkId, @relationType, @targetWorkId,
+        @provenance, @evidenceText, @evidenceLocator, @sourceRef,
+        @builderMethod, @builderVersion, @resolutionStatus, @buildId
+      )
+    `);
     const insertRelationship = database.prepare(`
       INSERT INTO relationships (
         relationship_id, source_entity_id, relation_type, target_entity_id,
@@ -690,6 +768,12 @@ export function buildRuntimeDatabase(
       for (const entity of relationshipBuild.entities) {
         insertEntity.run(entity);
       }
+      for (const work of lifecycleBuild.works) {
+        insertLegalWork.run(work);
+      }
+      for (const relationship of lifecycleBuild.relationships) {
+        insertLifecycleRelationship.run({ ...relationship, buildId });
+      }
       for (const relationship of relationships) {
         insertRelationship.run({
           ...relationship,
@@ -706,6 +790,12 @@ export function buildRuntimeDatabase(
         definitionCount: String(definitions.length),
         relationshipCount: String(relationships.length),
         cellarRelationshipCount: String(cellarRelationships.length),
+        lifecycleRelationshipCount: String(lifecycleBuild.relationships.length),
+        externalWorkCount: String(
+          lifecycleBuild.works.filter(
+            (work) => work.availability === "external",
+          ).length,
+        ),
         relatedRecitalCount: String(
           relatedRecitalBuild?.relationships.length ?? 0,
         ),
@@ -720,6 +810,11 @@ export function buildRuntimeDatabase(
           ...(cellarRelationships.length > 0
             ? [
                 `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
+              ]
+            : []),
+          ...(lifecycleBuild.relationships.length > 0
+            ? [
+                `${CELLAR_LIFECYCLE_BUILDER}@${CELLAR_LIFECYCLE_BUILDER_VERSION}`,
               ]
             : []),
           ...(relatedRecitalBuild
@@ -781,6 +876,10 @@ export function buildRuntimeDatabase(
     definitionCount: definitions.length,
     relationshipCount: relationships.length,
     cellarRelationshipCount: cellarRelationships.length,
+    lifecycleRelationshipCount: lifecycleBuild.relationships.length,
+    externalWorkCount: lifecycleBuild.works.filter(
+      (work) => work.availability === "external",
+    ).length,
     relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
     versionNodeCount: versionNodes.length,
     versionEdgeCount: versionEdges.length,

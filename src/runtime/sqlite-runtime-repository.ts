@@ -29,6 +29,11 @@ import {
   provisionRelationshipsResponseSchema,
   relationshipPreviewSchema,
 } from "../shared/legal";
+import {
+  type DocumentLifecycleRelationshipsResponse,
+  type LifecycleRelationship,
+  documentLifecycleRelationshipsResponseSchema,
+} from "../shared/lifecycle";
 import { explorerPath } from "../shared/reader-route";
 import { sourceStatusSchema } from "../shared/source-status";
 
@@ -100,6 +105,36 @@ interface RelationshipRow {
   targetLabel: string;
   targetTitle: string | null;
   targetPath: string;
+}
+
+interface LifecycleRelationshipRow {
+  id: string;
+  relationType: LifecycleRelationship["relationType"];
+  provenance: LifecycleRelationship["provenance"];
+  evidenceText: string;
+  evidenceLocator: string;
+  sourceRef: string;
+  builderMethod: string;
+  builderVersion: string;
+  resolutionStatus: LifecycleRelationship["resolutionStatus"];
+  sourceEntityId: string;
+  sourceCelex: string;
+  sourceDocumentId: string | null;
+  sourceDocumentShortName: string;
+  sourceLabel: string;
+  sourceTitle: string | null;
+  sourcePath: string | null;
+  sourceUrl: string;
+  sourceAvailability: "loaded" | "external";
+  targetEntityId: string;
+  targetCelex: string;
+  targetDocumentId: string | null;
+  targetDocumentShortName: string;
+  targetLabel: string;
+  targetTitle: string | null;
+  targetPath: string | null;
+  targetUrl: string;
+  targetAvailability: "loaded" | "external";
 }
 
 interface EntityPreviewRow {
@@ -176,6 +211,42 @@ const RELATIONSHIP_SELECT = `
   JOIN documents td ON td.id = te.document_id
 `;
 
+const LIFECYCLE_RELATIONSHIP_SELECT = `
+  SELECT
+    lr.relationship_id AS id,
+    lr.relation_type AS relationType,
+    lr.provenance,
+    lr.evidence_text AS evidenceText,
+    lr.evidence_locator AS evidenceLocator,
+    lr.source_ref AS sourceRef,
+    lr.builder_method AS builderMethod,
+    lr.builder_version AS builderVersion,
+    lr.resolution_status AS resolutionStatus,
+    sw.id AS sourceEntityId,
+    sw.celex AS sourceCelex,
+    sw.loaded_document_id AS sourceDocumentId,
+    COALESCE(sd.short_name, 'CELEX ' || sw.celex) AS sourceDocumentShortName,
+    sw.label AS sourceLabel,
+    sw.title AS sourceTitle,
+    sd.default_path AS sourcePath,
+    sw.source_url AS sourceUrl,
+    sw.availability AS sourceAvailability,
+    tw.id AS targetEntityId,
+    tw.celex AS targetCelex,
+    tw.loaded_document_id AS targetDocumentId,
+    COALESCE(td.short_name, 'CELEX ' || tw.celex) AS targetDocumentShortName,
+    tw.label AS targetLabel,
+    tw.title AS targetTitle,
+    td.default_path AS targetPath,
+    tw.source_url AS targetUrl,
+    tw.availability AS targetAvailability
+  FROM lifecycle_relationships lr
+  JOIN legal_works sw ON sw.id = lr.source_work_id
+  LEFT JOIN documents sd ON sd.id = sw.loaded_document_id
+  JOIN legal_works tw ON tw.id = lr.target_work_id
+  LEFT JOIN documents td ON td.id = tw.loaded_document_id
+`;
+
 function toProvisionRelationship(
   row: RelationshipRow,
   relationType = row.relationType,
@@ -214,6 +285,61 @@ function toProvisionRelationship(
       version: row.builderVersion,
     },
     score: row.score ?? undefined,
+    resolutionStatus: row.resolutionStatus,
+  };
+}
+
+function toLifecycleRelationship(
+  row: LifecycleRelationshipRow,
+): LifecycleRelationship {
+  const endpoint = (
+    side: "source" | "target",
+  ): LifecycleRelationship["source"] => {
+    const documentId = row[`${side}DocumentId`];
+    const availability = row[`${side}Availability`];
+    const path = row[`${side}Path`];
+    const common = {
+      entityId: row[`${side}EntityId`],
+      celex: row[`${side}Celex`],
+      documentId: documentId ?? row[`${side}EntityId`],
+      documentShortName: row[`${side}DocumentShortName`],
+      label: row[`${side}Label`],
+      title: row[`${side}Title`],
+      sourceUrl: side === "source" ? row.sourceUrl : row.targetUrl,
+    };
+    if (availability === "loaded") {
+      if (!documentId || !path) {
+        throw new Error(`Loaded lifecycle Work is incomplete: ${common.celex}`);
+      }
+      return {
+        ...common,
+        documentId,
+        kind: "document",
+        path,
+        availability,
+      };
+    }
+    return {
+      ...common,
+      kind: "external-work",
+      availability,
+    };
+  };
+  return {
+    id: row.id,
+    relationType: row.relationType,
+    provenance: row.provenance,
+    source: endpoint("source"),
+    target: endpoint("target"),
+    evidence: {
+      text: row.evidenceText,
+      locator: row.evidenceLocator,
+      sourceUrl: row.sourceRef,
+    },
+    builder: {
+      method: row.builderMethod,
+      version: row.builderVersion,
+    },
     resolutionStatus: row.resolutionStatus,
   };
 }
@@ -259,6 +385,8 @@ export class SqliteRuntimeRepository {
   readonly buildId: string;
   readonly relationshipCount: number;
   readonly cellarRelationshipCount: number;
+  readonly lifecycleRelationshipCount: number;
+  readonly externalWorkCount: number;
   readonly relatedRecitalCount: number;
   readonly versionNodeCount: number;
   readonly versionEdgeCount: number;
@@ -289,6 +417,14 @@ export class SqliteRuntimeRepository {
       );
       this.cellarRelationshipCount = Number.parseInt(
         manifestValue(this.database, "cellarRelationshipCount"),
+        10,
+      );
+      this.lifecycleRelationshipCount = Number.parseInt(
+        manifestValue(this.database, "lifecycleRelationshipCount"),
+        10,
+      );
+      this.externalWorkCount = Number.parseInt(
+        manifestValue(this.database, "externalWorkCount"),
         10,
       );
       this.relatedRecitalCount = Number.parseInt(
@@ -682,6 +818,34 @@ export class SqliteRuntimeRepository {
       documentId,
       buildId: this.buildId,
       relationships: rows.map((row) => toProvisionRelationship(row)),
+    });
+  }
+
+  findDocumentLifecycleRelationships(
+    documentId: string,
+  ): DocumentLifecycleRelationshipsResponse | null {
+    const work = this.database
+      .prepare("SELECT id FROM legal_works WHERE loaded_document_id = ?")
+      .get(documentId);
+    if (!work) return null;
+
+    const rows = this.database
+      .prepare(`
+        ${LIFECYCLE_RELATIONSHIP_SELECT}
+        WHERE sw.loaded_document_id = @documentId
+          OR tw.loaded_document_id = @documentId
+        ORDER BY
+          relationType ASC,
+          sourceCelex ASC,
+          targetCelex ASC,
+          id ASC
+      `)
+      .all({ documentId }) as LifecycleRelationshipRow[];
+
+    return documentLifecycleRelationshipsResponseSchema.parse({
+      documentId,
+      buildId: this.buildId,
+      relationships: rows.map(toLifecycleRelationship),
     });
   }
 

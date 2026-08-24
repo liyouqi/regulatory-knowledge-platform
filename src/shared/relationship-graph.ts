@@ -5,10 +5,31 @@ import {
   relationshipProvenanceSchema,
 } from "./legal";
 
-export const relationshipGraphNodeSchema = relationshipEndpointSchema.extend({
+const loadedRelationshipGraphNodeSchema = relationshipEndpointSchema.extend({
+  kind: relationshipEndpointSchema.shape.kind.refine(
+    (kind) => kind !== "external-work",
+  ),
   role: z.enum(["center", "neighbor"]),
   explorerAnchor: z.string().min(1).optional(),
 });
+
+const externalRelationshipGraphNodeSchema = z
+  .object({
+    entityId: z.string().min(1),
+    documentId: z.string().min(1),
+    documentShortName: z.string().min(1),
+    kind: z.literal("external-work"),
+    label: z.string().min(1),
+    title: z.null(),
+    sourceUrl: z.string().url(),
+    role: z.literal("neighbor"),
+  })
+  .strict();
+
+export const relationshipGraphNodeSchema = z.union([
+  loadedRelationshipGraphNodeSchema,
+  externalRelationshipGraphNodeSchema,
+]);
 
 export const relationshipGraphEvidenceSchema = z.object({
   text: z.string().min(1),

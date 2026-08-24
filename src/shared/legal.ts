@@ -374,6 +374,8 @@ export const provisionRelationshipSchema = z.object({
     "CITED_BY",
     "MANDATES",
     "ADOPTED_UNDER",
+    "AMENDS",
+    "CORRECTS",
     "SUPPLEMENTS",
     "RELATED_DOCUMENT",
     "RELATED_RECITAL",

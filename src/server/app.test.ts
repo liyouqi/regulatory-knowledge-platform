@@ -186,6 +186,12 @@ describe("Document lookup", () => {
         provenance: "OFFICIAL_MAPPING",
       }),
     );
+    expect(graph?.edges).not.toContainEqual(
+      expect.objectContaining({ relationType: "AMENDS" }),
+    );
+    expect(graph?.edges).not.toContainEqual(
+      expect.objectContaining({ relationType: "CORRECTS" }),
+    );
   });
 
   it("projects reviewed cross-document relations into a document graph", () => {
@@ -204,6 +210,14 @@ describe("Document lookup", () => {
           kind: "document",
           role: "neighbor",
         }),
+        expect.objectContaining({
+          entityId: "eu:32009R1060",
+          kind: "external-work",
+          role: "neighbor",
+          sourceUrl: expect.stringContaining(
+            "https://publications.europa.eu/resource/cellar/",
+          ),
+        }),
       ]),
       edges: expect.arrayContaining([
         expect.objectContaining({
@@ -214,9 +228,19 @@ describe("Document lookup", () => {
           relationType: "MANDATES",
           provenance: "OFFICIAL_MAPPING",
         }),
+        expect.objectContaining({
+          relationType: "AMENDS",
+          provenance: "OFFICIAL_METADATA",
+        }),
+        expect.objectContaining({
+          relationType: "CORRECTS",
+          provenance: "OFFICIAL_METADATA",
+        }),
       ]),
     });
-    expect(graph?.nodes.every((node) => node.kind === "document")).toBe(true);
+    expect(
+      graph?.nodes.find((node) => node.entityId === "eu:32009R1060"),
+    ).not.toHaveProperty("path");
     expect(graph?.edges.some((edge) => edge.source === edge.target)).toBe(
       false,
     );
