@@ -55,3 +55,47 @@ test("global law search opens DORA Article 28", async ({ page }) => {
     page.locator("#main-content").getByText("Article 28", { exact: true }),
   ).toBeVisible();
 });
+
+test("global search opens an official definition in Reader", async ({
+  page,
+}) => {
+  await page.goto("/explore/dora");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+  await page.keyboard.press("Meta+k");
+
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  await search.getByRole("tab", { name: "Definitions" }).click();
+  const input = search.getByRole("textbox", {
+    name: "Search legal definitions",
+  });
+  await input.fill("digital operational resilience");
+  await expect(
+    search.locator(".definition-search-result").first(),
+  ).toBeVisible();
+  await search.locator(".definition-search-result").first().click();
+
+  await expect(page).toHaveURL(/\/read\/dora\/articles\/\d+(?:#.+)?$/);
+  await expect(page.locator("#main-content")).toBeVisible();
+});
+
+test("full-text search opens the matching paragraph anchor", async ({
+  page,
+}) => {
+  await page.goto("/explore/dora");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+  await page.keyboard.press("Meta+k");
+
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  await search.getByRole("tab", { name: "Full text" }).click();
+  const input = search.getByRole("textbox", {
+    name: "Search full text across loaded laws",
+  });
+  await input.fill("operational risk");
+  await expect(
+    search.locator(".full-text-search-result").first(),
+  ).toBeVisible();
+  await search.locator(".full-text-search-result").first().click();
+
+  await expect(page).toHaveURL(/\/read\/.+#.+/);
+  await expect(page.locator(".deep-link-target")).toBeVisible();
+});
