@@ -605,7 +605,11 @@ export function GlobalLawSearch({
         </div>
 
         <div className="law-search-results" id="law-search-results">
-          {error ? <p className="search-empty error-state">{error}</p> : null}
+          {error ? (
+            <p className="search-empty error-state" role="alert">
+              {error}
+            </p>
+          ) : null}
 
           {!error && mode === "fulltext" && query.trim().length < 2 ? (
             <div className="search-empty full-text-intro">

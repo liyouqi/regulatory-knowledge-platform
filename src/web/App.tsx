@@ -267,9 +267,13 @@ function ReferencePeek({
       {preview?.excerpt ? (
         <blockquote>{preview.excerpt}</blockquote>
       ) : error ? (
-        <p className="reference-peek-status error-state">{error}</p>
+        <p className="reference-peek-status error-state" role="alert">
+          {error}
+        </p>
       ) : (
-        <p className="reference-peek-status">Loading official excerpt…</p>
+        <p aria-live="polite" className="reference-peek-status">
+          Loading official excerpt…
+        </p>
       )}
       <div className="reference-peek-actions">
         <Link onClick={onClose} to={relationship.target.path}>
@@ -386,10 +390,14 @@ function RelationshipList({
     <section className={`relationships-panel ${className}`.trim()}>
       <p className="eyebrow">RELATIONSHIPS</p>
       {loading ? (
-        <p className="relationships-status">Loading references…</p>
+        <p aria-live="polite" className="relationships-status">
+          Loading references…
+        </p>
       ) : null}
       {error ? (
-        <p className="relationships-status error-state">{error}</p>
+        <p className="relationships-status error-state" role="alert">
+          {error}
+        </p>
       ) : null}
       {!loading && !error && relationshipCount === 0 ? (
         <p className="relationships-status">
@@ -818,9 +826,17 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
   }, [activeProvision]);
 
   if (loadError)
-    return <main className="loading error-state">{loadError}</main>;
+    return (
+      <main className="loading error-state" role="alert">
+        {loadError}
+      </main>
+    );
   if (!legalDocument || !activeProvision) {
-    return <main className="loading">Loading regulatory reader…</main>;
+    return (
+      <main aria-busy="true" aria-live="polite" className="loading">
+        Loading regulatory reader…
+      </main>
+    );
   }
 
   const provisions = new Map(

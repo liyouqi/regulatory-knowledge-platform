@@ -66,9 +66,17 @@ export function Level2LibraryPage({
   );
 
   if (loadError)
-    return <main className="loading error-state">{loadError}</main>;
+    return (
+      <main className="loading error-state" role="alert">
+        {loadError}
+      </main>
+    );
   if (!library)
-    return <main className="loading">Loading Level 2 library…</main>;
+    return (
+      <main aria-busy="true" aria-live="polite" className="loading">
+        Loading Level 2 library…
+      </main>
+    );
 
   return (
     <main className="level2-library-shell">

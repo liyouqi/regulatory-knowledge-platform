@@ -183,8 +183,17 @@ export function ExplorerPage({
   );
 
   if (loadError)
-    return <main className="loading error-state">{loadError}</main>;
-  if (!document) return <main className="loading">Loading Act Explorer…</main>;
+    return (
+      <main className="loading error-state" role="alert">
+        {loadError}
+      </main>
+    );
+  if (!document)
+    return (
+      <main aria-busy="true" aria-live="polite" className="loading">
+        Loading Act Explorer…
+      </main>
+    );
 
   return (
     <main className="explorer-shell">
