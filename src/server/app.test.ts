@@ -8,6 +8,7 @@ import {
   findFamilyLevel2,
   findLaws,
   findProvisionRelationships,
+  findRelationshipGraph,
   findRelationshipPreview,
   listDocumentDefinitions,
 } from "./app";
@@ -130,6 +131,40 @@ describe("Document lookup", () => {
         score: expect.any(Number),
       }),
     );
+  });
+
+  it("projects existing relationships into a UI-owned focused graph", () => {
+    const graph = findRelationshipGraph("dora", "articles", "20");
+
+    expect(graph).toMatchObject({
+      documentId: "eu:32022R2554",
+      provisionId: "eu:32022R2554:article:20",
+      nodes: expect.arrayContaining([
+        expect.objectContaining({
+          entityId: "eu:32022R2554:article:20",
+          role: "center",
+        }),
+        expect.objectContaining({
+          entityId: "eu:32025R0301",
+          role: "neighbor",
+        }),
+        expect.objectContaining({
+          entityId: "eu:32025R0302",
+          role: "neighbor",
+        }),
+      ]),
+      edges: expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+        }),
+        expect.objectContaining({
+          relationType: "RELATED_RECITAL",
+          provenance: "TFIDF",
+        }),
+      ]),
+    });
+    expect(graph?.nodes[0]).not.toHaveProperty("position");
   });
 
   it("serves a target preview on demand for Side Peek", () => {

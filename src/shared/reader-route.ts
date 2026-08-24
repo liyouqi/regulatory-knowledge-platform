@@ -6,6 +6,8 @@ export interface ReaderSelection {
   number: string;
 }
 
+export type RelationshipGraphSelection = ReaderSelection;
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }
@@ -41,6 +43,29 @@ export function provisionPath(
   number: string,
 ): string {
   return `/read/${encodeURIComponent(slug)}/${collectionId}/${encodeURIComponent(number)}`;
+}
+
+export function relationshipGraphPath(
+  slug: string,
+  collectionId: CollectionId,
+  number: string,
+): string {
+  return `/relationships/${encodeURIComponent(slug)}/${collectionId}/${encodeURIComponent(number)}`;
+}
+
+export function parseRelationshipGraphPath(
+  pathname: string,
+): RelationshipGraphSelection | null {
+  const match =
+    /^\/relationships\/([^/]+)\/(articles|recitals|annexes|provisions)\/([^/]+)\/?$/u.exec(
+      pathname,
+    );
+  if (!match) return null;
+  return {
+    slug: decodeURIComponent(match[1]),
+    collectionId: match[2] as CollectionId,
+    number: decodeURIComponent(match[3]).toLowerCase(),
+  };
 }
 
 export function parseReaderPath(pathname: string): ReaderSelection | null {

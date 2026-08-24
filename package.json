@@ -39,6 +39,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@xyflow/react": "^12.11.3",
     "better-sqlite3": "^13.0.3",
     "express": "^5.1.0",
     "fast-xml-parser": "5.11.0",

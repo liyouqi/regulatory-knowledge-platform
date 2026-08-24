@@ -1096,7 +1096,20 @@ Phase 2 增加 document-level version relationships 即可。
 
 仍进入同一 Relationship Repository。
 
-## 21.4 Phase 4 External Adapters（预留）
+## 21.4 Relationship Graph Delivery
+
+首个 Graph 切片保持为 Web delivery concern：
+
+```text
+Relationship Repository
+  → existing provision relationship response
+  → UI-owned focused Graph DTO
+  → lazy-loaded React Flow route
+```
+
+Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenance 和 evidence；不包含 React Flow position/node type 等 vendor state。Web 层负责确定性布局、筛选和 React Flow 类型转换，因此未来更换图形组件不改变 Repository、relationship contract 或内部 endpoint。Graph route 继续只读 SQLite runtime artifact，不读取 Canonical JSON、raw source 或 curated mapping 文件。
+
+## 21.5 Phase 4 External Adapters（预留）
 
 Public API 和 MCP 都是 Service Adapter，不拥有业务逻辑。Phase 2 只需继续形成清晰的内部 service outputs；外部版本兼容、认证、限流和 transport implementation 延后到 Phase 4。
 

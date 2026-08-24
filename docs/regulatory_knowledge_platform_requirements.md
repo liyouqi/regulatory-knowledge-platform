@@ -1960,6 +1960,8 @@ Graph view 的目标是辅助理解，不替代 Reader。
 
 Graph node 必须可回到同一 canonical entity 的 Reader，并可选择 `Locate in Explorer`。Phase 2 的关系增强不得产生与 Explorer/Reader 分离的第二套实体标识。
 
+当前实现：已发布 Article focused neighborhood 的首个产品切片。Reader 关系面板提供独立 graph route；Graph 复用同一 read-only Relationship Repository 和 stable entity IDs，展示 References、Cited By、Mandates、Related Recitals 等当前已发布关系，支持 relation type 开关、pan/zoom/drag，以及按需加载官方来源 Side Peek。该切片没有新增或推断法律关系；Document 入口、Case Law 和 CELLAR 官方关系仍属于后续 Phase 2。
+
 ## 22.5 Extended Level 2 / Level 3
 
 Phase 2 将 DORA/MiCA regulatory family 扩展为更完整体系：

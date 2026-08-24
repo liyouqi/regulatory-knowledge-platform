@@ -7,6 +7,7 @@ import {
   Copy,
   Link2,
   Map as MapIcon,
+  Network,
   Search,
   Undo2,
   X,
@@ -14,6 +15,8 @@ import {
 import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
+  Suspense,
+  lazy,
   useEffect,
   useMemo,
   useRef,
@@ -49,6 +52,8 @@ import {
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
+  parseRelationshipGraphPath,
+  relationshipGraphPath,
 } from "../shared/reader-route";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
@@ -58,6 +63,12 @@ import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
+
+const RelationshipGraphPage = lazy(() =>
+  import("./RelationshipGraphPage").then((module) => ({
+    default: module.RelationshipGraphPage,
+  })),
+);
 
 function containsProvision(node: TocNode, provisionId: string): boolean {
   return (
@@ -474,11 +485,13 @@ function RelationshipList({
   loading,
   error,
   className = "",
+  graphPath,
 }: {
   relationships: ProvisionRelationshipsResponse | null;
   loading: boolean;
   error: string;
   className?: string;
+  graphPath?: string;
 }) {
   const references = uniqueRelationships(
     relationships?.references ?? [],
@@ -549,6 +562,13 @@ function RelationshipList({
   return (
     <section className={`relationships-panel ${className}`.trim()}>
       <p className="eyebrow">RELATIONSHIPS</p>
+      {!loading && !error && relationshipCount > 0 && graphPath ? (
+        <Link className="relationship-graph-link" to={graphPath}>
+          <Network aria-hidden="true" size={14} />
+          View relationship graph
+          <ArrowRight aria-hidden="true" size={14} />
+        </Link>
+      ) : null}
       {loading ? (
         <p aria-live="polite" className="relationships-status">
           Loading references…
@@ -1188,6 +1208,11 @@ function ReaderPage({
         <RelationshipList
           className="mobile-relationships"
           error={relationshipsError}
+          graphPath={relationshipGraphPath(
+            legalDocument.slug,
+            activeProvision.collectionId,
+            activeProvision.number,
+          )}
           loading={relationshipsLoading}
           relationships={relationships}
         />
@@ -1230,6 +1255,11 @@ function ReaderPage({
         <div className="context-divider" />
         <RelationshipList
           error={relationshipsError}
+          graphPath={relationshipGraphPath(
+            legalDocument.slug,
+            activeProvision.collectionId,
+            activeProvision.number,
+          )}
           loading={relationshipsLoading}
           relationships={relationships}
         />
@@ -1296,6 +1326,7 @@ export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
+  const relationshipGraph = parseRelationshipGraphPath(location.pathname);
   const [searchOpen, setSearchOpen] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>(() => {
     try {
@@ -1334,7 +1365,22 @@ export function App() {
 
   return (
     <>
-      {level2Library ? (
+      {relationshipGraph ? (
+        <Suspense
+          fallback={
+            <main aria-busy="true" className="loading">
+              Loading relationship graph…
+            </main>
+          }
+        >
+          <RelationshipGraphPage
+            onOpenSearch={() => setSearchOpen(true)}
+            onToggleTheme={toggleTheme}
+            selection={relationshipGraph}
+            theme={theme}
+          />
+        </Suspense>
+      ) : level2Library ? (
         <Level2LibraryPage
           familySlug={level2Library.familySlug}
           measureType={level2Library.measureType}

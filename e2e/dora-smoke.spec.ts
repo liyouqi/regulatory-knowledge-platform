@@ -212,6 +212,48 @@ test("DORA Article 28 opens a mapped RTS measure", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("DORA Article 20 opens an interactive focused relationship graph", async ({
+  page,
+}) => {
+  await page.goto("/read/dora/articles/20");
+  await page
+    .locator(".context-panel")
+    .getByRole("link", { name: "View relationship graph" })
+    .click();
+
+  await expect(page).toHaveURL("/relationships/dora/articles/20");
+  await expect(
+    page.getByRole("heading", { name: "Article 20 relationships" }),
+  ).toBeVisible();
+  await expect(page.locator(".react-flow")).toBeVisible();
+  await expect(
+    page.locator(".relationship-graph-node", {
+      hasText: "DORA RTS Incident Reporting",
+    }),
+  ).toBeVisible();
+
+  const recitalFilter = page.getByRole("button", { name: "Related recital" });
+  await expect(recitalFilter).toHaveAttribute("aria-pressed", "true");
+  await recitalFilter.click();
+  await expect(recitalFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(
+    page.locator(".relationship-graph-node", { hasText: "Recital 53" }),
+  ).toHaveCount(0);
+
+  await page
+    .locator(".relationship-graph-node", {
+      hasText: "DORA RTS Incident Reporting",
+    })
+    .click();
+  const details = page.getByRole("complementary", {
+    name: "Relationship details",
+  });
+  await expect(details).toBeVisible();
+  await expect(
+    details.getByRole("link", { name: "Open in Reader" }),
+  ).toBeVisible();
+});
+
 test("Reader distinguishes the loaded OJ snapshot from external version records", async ({
   page,
 }) => {

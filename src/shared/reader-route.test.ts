@@ -6,7 +6,9 @@ import {
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
+  parseRelationshipGraphPath,
   provisionPath,
+  relationshipGraphPath,
 } from "./reader-route";
 
 describe("Reader routes", () => {
@@ -29,6 +31,20 @@ describe("Reader routes", () => {
       collectionId: "provisions",
       number: "section-1",
     });
+  });
+
+  it("builds and parses a focused relationship graph route", () => {
+    const path = relationshipGraphPath("dora", "articles", "20");
+
+    expect(path).toBe("/relationships/dora/articles/20");
+    expect(parseRelationshipGraphPath(path)).toEqual({
+      slug: "dora",
+      collectionId: "articles",
+      number: "20",
+    });
+    expect(
+      parseRelationshipGraphPath("/relationships/dora/chapters/2"),
+    ).toBeNull();
   });
 
   it.each([

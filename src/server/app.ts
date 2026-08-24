@@ -1,4 +1,5 @@
 import express from "express";
+import { toRelationshipGraph } from "../relationships/relationship-graph";
 import { runtimeDatabasePath } from "../runtime/runtime-database-path";
 import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
@@ -58,6 +59,24 @@ export function findProvisionRelationships(
 
 export function findRelationshipPreview(entityId: string) {
   return runtimeRepository.findRelationshipPreview(entityId);
+}
+
+export function findRelationshipGraph(
+  slug: string,
+  collectionId: "articles" | "recitals" | "annexes" | "provisions",
+  number: string,
+) {
+  const document = findDocumentBySlug(slug);
+  const provision = document?.provisions.find(
+    (candidate) =>
+      candidate.collectionId === collectionId &&
+      candidate.number.toLowerCase() === number.toLowerCase(),
+  );
+  if (!document || !provision) return null;
+  const relationships = findProvisionRelationships(document.id, provision.id);
+  return relationships
+    ? toRelationshipGraph(document, provision, relationships)
+    : null;
 }
 
 export function findFamilyLevel2(
@@ -202,6 +221,32 @@ app.get("/api/relationship-previews/:entityId", (request, response) => {
   }
   response.json(preview);
 });
+
+app.get(
+  "/api/relationship-graphs/:slug/:collectionId/:number",
+  (request, response) => {
+    const collectionId = request.params.collectionId;
+    if (
+      collectionId !== "articles" &&
+      collectionId !== "recitals" &&
+      collectionId !== "annexes" &&
+      collectionId !== "provisions"
+    ) {
+      response.status(404).json({ error: "Provision collection not found" });
+      return;
+    }
+    const graph = findRelationshipGraph(
+      request.params.slug,
+      collectionId,
+      request.params.number,
+    );
+    if (!graph) {
+      response.status(404).json({ error: "Relationship graph not found" });
+      return;
+    }
+    response.json(graph);
+  },
+);
 
 app.get("/api/documents/:documentId/version-chain", (request, response) => {
   const chain = findDocumentVersionChain(request.params.documentId);
