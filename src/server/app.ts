@@ -99,6 +99,7 @@ app.get("/api/health", (_request, response) => {
       records: searchService.recordCount,
       definitions: searchService.definitionCount,
       relationships: runtimeRepository.relationshipCount,
+      cellarRelationships: runtimeRepository.cellarRelationshipCount,
       relatedRecitals: runtimeRepository.relatedRecitalCount,
       versionNodes: runtimeRepository.versionNodeCount,
       versionEdges: runtimeRepository.versionEdgeCount,

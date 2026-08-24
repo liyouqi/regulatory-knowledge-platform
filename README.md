@@ -77,6 +77,8 @@ npm run build
 | `npm run runtime:verify` | Validate a built runtime SQLite artifact through the read-only Reader and Search services. |
 | `npm run release:verify` | Rebuild and verify raw snapshots, registry IDs, Canonical views, and runtime SQLite as one corpus. |
 | `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
+| `npm run cellar:relations:fetch` | Fetch a bounded official CELLAR SPARQL snapshot for the loaded EU CELEX corpus without publishing it. |
+| `npm run cellar:relations:verify -- --snapshot <path>` | Verify the ignored CELLAR response/query hashes and its normalized candidate. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
 | `npm run cssf:source:fetch -- --id <ID>` | Save an immutable official CSSF HTML/PDF snapshot under ignored raw data. |
@@ -382,6 +384,12 @@ In the Reader, an inline citation becomes clickable only when the builder suppli
 
 Run `npm run relationships:benchmark` before publishing TF-IDF relationship changes. The version-controlled benchmark checks eight reviewed DORA, GDPR, and AI Act Article ↔ Recital cases at Top 5 and currently requires a 100% case hit rate. The runtime builder publishes scored `RELATED_RECITAL` edges only when the complete benchmark corpus is loaded and the gate passes; partial test corpora publish none. These edges use provenance `TFIDF` and remain textual-relevance suggestions, not legal authority or legal-confidence scores.
 
+### CELLAR focused official relations
+
+The first CELLAR SPARQL slice is deliberately closed over the 13 loaded EU CELEX works and publishes only two reviewed CDM predicates: `resource_legal_based_on_resource_legal` becomes document-level `ADOPTED_UNDER`, and `resource_legal_completes_resource_legal` becomes `SUPPLEMENTS`. The normalized, version-controlled dataset contains 12 official Work-to-Work records: seven legal-basis edges and five completion edges. Every published edge uses `OFFICIAL_METADATA`, retains both CELLAR Work URIs and the exact predicate locator, and is emitted only when both CELEX documents exist as local document entities.
+
+`npm run cellar:relations:fetch` writes the query, raw SPARQL response, hashes, and a normalized candidate under ignored `data/raw/cellar-relations/`; it never changes published data. After verification and human review, the candidate can update `data/official-metadata/cellar-focused-relations.json`. Runtime builds consume only that reviewed file. `work_cites_work` is intentionally excluded from this slice because the platform already has more precise Article/body-block `REFERENCES`; it remains a separate citation-enrichment decision. Article graphs also exclude document-scoped edges rather than visually misrepresenting them as Article-scoped relationships. The Reader relationship panel may show them as document context; a future Document graph can display them at their exact scope.
+
 ## Current Release Status
 
 Release 0.1 has a complete local multi-law Reader foundation:
@@ -460,4 +468,6 @@ Release 0.5 is complete and includes:
 
 The family-level RTS/ITS library and Level 1 summary counts are now implemented from the runtime SQLite data: `/library/dora`, `/library/mica`, and their `/rts` or `/its` filters list official measures, mandate Articles, Reader/Explorer links, source status, and official sources without duplicating the curated mapping input. The DORA incident-reporting RTS/ITS pair is complete. The reviewed DORA/GDPR/AI Act TF-IDF benchmark passes 8/8 at Top 5, so build-time Related Recitals are enabled for those three laws with explicit `TFIDF` provenance and retained similarity scores. Additional Level 2 measures are an explicitly unbounded Phase 2 backlog, not a Release 0.5 completion condition.
 
-Phase 2 is now in progress. Its first product slice is a focused Article relationship graph at `/relationships/:slug/:collection/:number`, linked from the existing Reader panel. It projects the current read-only relationship response into a UI-owned nodes/edges DTO, supports relation-type filters, pan/zoom/drag navigation, and an on-demand source Side Peek, while preserving the same stable entity IDs and Reader paths. The graph UI is route-lazy-loaded, so the visualization dependency does not increase the Reader/Explorer initial JavaScript bundle. No canonical contract, relationship semantics, runtime schema, or legal source data changed in this slice. The next legal-semantic Phase 2 milestone remains reviewed CELLAR focused relations and requires Sol High.
+Phase 2 is now in progress. Its first product slice is a focused Article relationship graph at `/relationships/:slug/:collection/:number`, linked from the existing Reader panel. It projects the current read-only relationship response into a UI-owned nodes/edges DTO, supports relation-type filters, pan/zoom/drag navigation, and an on-demand source Side Peek, while preserving the same stable entity IDs and Reader paths. The graph UI is route-lazy-loaded, so the visualization dependency does not increase the Reader/Explorer initial JavaScript bundle.
+
+The second Phase 2 slice publishes the 12 reviewed closed-corpus CELLAR structural relations described above without changing the Canonical contract or SQLite schema. Runtime schema `4.3.0` now reports 3,542 relationships, including 12 `OFFICIAL_METADATA` CELLAR edges and 1,374 benchmark-gated Related Recitals. Broader CELLAR predicates, external nodes, amendment lineage, document-level graph delivery, and CJEU remain unpublished until separately reviewed.

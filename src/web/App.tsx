@@ -629,7 +629,11 @@ function RelationshipList({
                     >
                       {relationship.provenance === "OFFICIAL_MAPPING"
                         ? "Official mapping"
-                        : "Official text"}{" "}
+                        : relationship.provenance === "OFFICIAL_METADATA"
+                          ? "Official metadata"
+                          : relationship.provenance === "TFIDF"
+                            ? "Text relevance"
+                            : "Official text"}{" "}
                       <ArrowUpRight aria-hidden="true" size={11} />
                     </a>
                   </div>

@@ -125,6 +125,13 @@ export function toRelationshipGraph(
 
   for (const group of groups) {
     for (const relationship of group.relationships) {
+      const relationshipSource = graphNodeId(relationship.source);
+      const relationshipTarget = graphNodeId(relationship.target);
+      const isCentered =
+        group.direction === "incoming"
+          ? relationshipTarget === center.entityId
+          : relationshipSource === center.entityId;
+      if (!isCentered) continue;
       const endpoint =
         group.direction === "incoming"
           ? relationship.source

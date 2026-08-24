@@ -240,7 +240,8 @@ function GraphPeek({
       {error ? <p className="graph-peek-status">{error}</p> : null}
       <div className="graph-peek-actions">
         <Link to={preview?.path ?? node.path}>
-          Open in Reader <ArrowRight aria-hidden="true" size={15} />
+          {node.kind === "document" ? "Open in Explorer" : "Open in Reader"}{" "}
+          <ArrowRight aria-hidden="true" size={15} />
         </Link>
         {preview ? (
           <a href={preview.sourceUrl} rel="noreferrer" target="_blank">

@@ -167,6 +167,26 @@ describe("Document lookup", () => {
     expect(graph?.nodes[0]).not.toHaveProperty("position");
   });
 
+  it("does not misstate document-scoped metadata as an Article graph edge", () => {
+    const graph = findRelationshipGraph(
+      "dora-rts-ict-risk-management",
+      "articles",
+      "1",
+    );
+
+    expect(
+      graph?.edges.filter(
+        (relationship) => relationship.provenance === "OFFICIAL_METADATA",
+      ),
+    ).toEqual([]);
+    expect(graph?.edges).not.toContainEqual(
+      expect.objectContaining({
+        relationType: "ADOPTED_UNDER",
+        provenance: "OFFICIAL_MAPPING",
+      }),
+    );
+  });
+
   it("serves a target preview on demand for Side Peek", () => {
     expect(findRelationshipPreview("eu:32022L2555:article:3")).toMatchObject({
       documentShortName: "NIS2",

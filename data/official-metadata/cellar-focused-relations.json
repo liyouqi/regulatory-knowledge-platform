@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.0.0",
+  "queryVersion": "1.0.0",
+  "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+  "checkedAt": "2026-08-24T18:00:37Z",
+  "records": [
+    {
+      "sourceCelex": "32024R1772",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/fa35ec94-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R1772",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/fa35ec94-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_completes_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R1773",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/67edcd9e-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R1773",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/67edcd9e-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_completes_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R1774",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/dc25b21e-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R1774",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/dc25b21e-328d-11ef-a61b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_completes_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32024R2956",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/504165c2-b050-11ef-acb1-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32025R0301",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/36795cde-ef2b-11ef-981b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32025R0301",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/36795cde-ef2b-11ef-981b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_completes_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32025R0302",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/e91f75d5-ef2b-11ef-981b-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32022R2554",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/0caf473a-85bd-11ed-9887-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32025R0305",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/1aa03934-0dcd-11f0-b1a3-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_based_on_resource_legal",
+      "targetCelex": "32023R1114",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/01d55833-0660-11ee-b12e-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32025R0305",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/1aa03934-0dcd-11f0-b1a3-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_completes_resource_legal",
+      "targetCelex": "32023R1114",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/01d55833-0660-11ee-b12e-01aa75ed71a1"
+    }
+  ]
+}

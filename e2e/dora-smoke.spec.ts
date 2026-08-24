@@ -212,6 +212,19 @@ test("DORA Article 28 opens a mapped RTS measure", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("a Level 2 Reader exposes reviewed CELLAR document context", async ({
+  page,
+}) => {
+  await page.goto("/read/dora-rts-ict-risk-management/articles/1");
+
+  const relationships = page.locator(".context-panel .relationships-panel");
+  await expect(relationships.getByText("Adopted under")).toBeVisible();
+  await expect(relationships.getByText("Supplements")).toBeVisible();
+  await expect(
+    relationships.getByRole("link", { name: /Official metadata/ }).first(),
+  ).toBeVisible();
+});
+
 test("DORA Article 20 opens an interactive focused relationship graph", async ({
   page,
 }) => {
@@ -250,7 +263,7 @@ test("DORA Article 20 opens an interactive focused relationship graph", async ({
   });
   await expect(details).toBeVisible();
   await expect(
-    details.getByRole("link", { name: "Open in Reader" }),
+    details.getByRole("link", { name: "Open in Explorer" }),
   ).toBeVisible();
 });
 

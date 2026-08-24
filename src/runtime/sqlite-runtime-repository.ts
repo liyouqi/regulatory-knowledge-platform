@@ -256,6 +256,7 @@ function manifestValue(database: Database.Database, key: string): string {
 export class SqliteRuntimeRepository {
   readonly buildId: string;
   readonly relationshipCount: number;
+  readonly cellarRelationshipCount: number;
   readonly relatedRecitalCount: number;
   readonly versionNodeCount: number;
   readonly versionEdgeCount: number;
@@ -282,6 +283,10 @@ export class SqliteRuntimeRepository {
       this.buildId = manifestValue(this.database, "buildId");
       this.relationshipCount = Number.parseInt(
         manifestValue(this.database, "relationshipCount"),
+        10,
+      );
+      this.cellarRelationshipCount = Number.parseInt(
+        manifestValue(this.database, "cellarRelationshipCount"),
         10,
       );
       this.relatedRecitalCount = Number.parseInt(

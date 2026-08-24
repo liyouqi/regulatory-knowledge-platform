@@ -11,6 +11,12 @@ import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import type { SourceDefinition } from "../ingestion/source-registry";
 import {
+  CELLAR_RELATIONSHIP_BUILDER,
+  CELLAR_RELATIONSHIP_BUILDER_VERSION,
+  buildCellarOfficialRelations,
+  loadCellarOfficialRelations,
+} from "../relationships/cellar-official-relations";
+import {
   EXPLICIT_REFERENCE_BUILDER,
   EXPLICIT_REFERENCE_BUILDER_VERSION,
   buildExplicitReferences,
@@ -56,6 +62,7 @@ export interface RuntimeDatabaseManifest {
   recordCount: number;
   definitionCount: number;
   relationshipCount: number;
+  cellarRelationshipCount: number;
   relatedRecitalCount: number;
   versionNodeCount: number;
   versionEdgeCount: number;
@@ -209,6 +216,7 @@ function indexRows(documents: DocumentView[]): IndexRow[] {
 function runtimeBuildId(
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
+  cellarRelations: ReturnType<typeof loadCellarOfficialRelations>,
   relatedRecitalBenchmark: ReturnType<typeof loadRelatedRecitalBenchmark>,
 ): string {
   const input = documents
@@ -222,6 +230,8 @@ function runtimeBuildId(
         `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
         `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
         JSON.stringify(officialMappings),
+        `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
+        JSON.stringify(cellarRelations),
         `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
         JSON.stringify(relatedRecitalBenchmark),
         `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
@@ -308,6 +318,16 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     officialMappings,
   );
+  const cellarRelations = loadCellarOfficialRelations().filter(
+    (record) =>
+      registeredCelex.has(record.sourceCelex) &&
+      registeredCelex.has(record.targetCelex),
+  );
+  const cellarRelationships = buildCellarOfficialRelations(
+    documents,
+    relationshipBuild.entities,
+    cellarRelations,
+  );
   const relatedRecitalBenchmark = loadRelatedRecitalBenchmark();
   const loadedDocumentIds = new Set(documents.map((document) => document.id));
   const benchmarkDocumentIds = new Set(
@@ -322,11 +342,13 @@ export function buildRuntimeDatabase(
   const relationships = [
     ...relationshipBuild.relationships,
     ...officialRelationships,
+    ...cellarRelationships,
     ...(relatedRecitalBuild?.relationships ?? []),
   ];
   const buildId = runtimeBuildId(
     documents,
     officialMappings,
+    cellarRelations,
     relatedRecitalBenchmark,
   );
   const builtAt = new Date().toISOString();
@@ -683,6 +705,7 @@ export function buildRuntimeDatabase(
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
         relationshipCount: String(relationships.length),
+        cellarRelationshipCount: String(cellarRelationships.length),
         relatedRecitalCount: String(
           relatedRecitalBuild?.relationships.length ?? 0,
         ),
@@ -694,6 +717,11 @@ export function buildRuntimeDatabase(
         relationshipBuilders: JSON.stringify([
           `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
           `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
+          ...(cellarRelationships.length > 0
+            ? [
+                `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
+              ]
+            : []),
           ...(relatedRecitalBuild
             ? [
                 `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
@@ -752,6 +780,7 @@ export function buildRuntimeDatabase(
     recordCount: rows.length,
     definitionCount: definitions.length,
     relationshipCount: relationships.length,
+    cellarRelationshipCount: cellarRelationships.length,
     relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
     versionNodeCount: versionNodes.length,
     versionEdgeCount: versionEdges.length,

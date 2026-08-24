@@ -149,6 +149,7 @@ describe("SQLite runtime repository", () => {
       }),
     );
     expect(repository?.relationshipCount).toBeGreaterThan(1_000);
+    expect(repository?.cellarRelationshipCount).toBe(12);
     expect(repository?.unresolvedReferenceCount).toBeGreaterThan(0);
   });
 
@@ -219,6 +220,31 @@ describe("SQLite runtime repository", () => {
           }),
         }),
       ]),
+    );
+    expect(doraRts?.adoptedUnder).toContainEqual(
+      expect.objectContaining({
+        relationType: "ADOPTED_UNDER",
+        provenance: "OFFICIAL_METADATA",
+        target: expect.objectContaining({
+          entityId: "eu:32022R2554",
+        }),
+        evidence: expect.objectContaining({
+          text: "Legal resource is based on legal resource",
+        }),
+        builder: {
+          method: "cellar-focused-relations",
+          version: "1.0.0",
+        },
+      }),
+    );
+    expect(doraRts?.supplements).toContainEqual(
+      expect.objectContaining({
+        relationType: "SUPPLEMENTS",
+        provenance: "OFFICIAL_METADATA",
+        target: expect.objectContaining({
+          entityId: "eu:32022R2554",
+        }),
+      }),
     );
 
     const micaMandate = repository?.findProvisionRelationships(

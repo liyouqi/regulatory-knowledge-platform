@@ -566,6 +566,15 @@ CaseCitationBuilder              # Phase 2
 
 Release 0.5 的 `official-mapping@1.0.0` 读取版本控制且经 schema 校验的 `data/official-mappings/level2.json`。Level 2 法规本身先走相同 official snapshot → Canonical → Document/Entity 流水线，因此 mapping 不引入 external-node 旁路或第二份正文。builder 验证两端文档、Article endpoint、Canonical official title 以及 mandate evidence 是否真实存在于 Level 1 正文，再为每条核验记录输出 `MANDATES` 与 `ADOPTED_UNDER` 两条有向边。mapping 内容和 builder version 均参与 runtime build ID。
 
+Phase 2 首个 `cellar-focused-relations@1.0.0` 使用固定 CELEX `VALUES` 和 predicate 白名单查询官方 SPARQL endpoint。fetch 结果、query 与 SHA-256 manifest 进入 ignored raw snapshot；只有人工复核后的 `data/official-metadata/cellar-focused-relations.json` 参与 runtime build。builder 只接受官方 Publications Office CELEX / CELLAR URI，并只在两端 document entity 均存在时输出 `OFFICIAL_METADATA` edge。当前 predicate 映射为：
+
+| CDM predicate | Relationship type | Scope |
+|---|---|---|
+| `resource_legal_based_on_resource_legal` | `ADOPTED_UNDER` | Document → Document |
+| `resource_legal_completes_resource_legal` | `SUPPLEMENTS` | Document → Document |
+
+`work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship；Document-scoped edge 留给 Document Graph 精确展示。
+
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 
 当前问题可以由简单 builder + resolver 完成：
@@ -1073,6 +1082,8 @@ Seed Documents / CELEX
 ```
 
 不让 Reader 直接向 CELLAR 查询。
+
+当前边界：SPARQL 只在显式 fetch 命令中运行，不在 `runtime:build`、server startup 或 Web request 中运行。fetch 产生 ignored raw snapshot 和 normalized candidate；reviewed dataset、builder method/version 与内容共同参与 runtime build ID。当前闭集为 13 个已加载 EU CELEX works，发布 12 条 legal-basis/completion edge；不创建 external entity placeholder，也不把 RDF/XML 作为 UI 输入。
 
 ## 21.2 Amendment / Version
 

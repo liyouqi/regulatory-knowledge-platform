@@ -23,6 +23,7 @@ console.table({
   records: manifest.recordCount,
   definitions: manifest.definitionCount,
   relationships: manifest.relationshipCount,
+  cellarRelationships: manifest.cellarRelationshipCount,
   relatedRecitals: manifest.relatedRecitalCount,
   versionNodes: manifest.versionNodeCount,
   versionEdges: manifest.versionEdgeCount,
