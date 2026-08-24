@@ -4,6 +4,7 @@ import Database from "better-sqlite3";
 import type {
   DefinitionSearchResponse,
   DefinitionSearchResult,
+  DocumentDefinitionsResponse,
   FullTextSearchResponse,
   FullTextSearchResult,
   SearchSnippetSegment,
@@ -48,6 +49,7 @@ interface DefinitionRow {
   normalizedTerm: string;
   definitionText: string;
   definitionType: DefinitionSearchResult["definitionType"];
+  sourceUrl: string;
   provisionId: string;
   label: string;
   title: string | null;
@@ -57,6 +59,28 @@ interface DefinitionRow {
 
 const START_HIGHLIGHT = "\u0001";
 const END_HIGHLIGHT = "\u0002";
+
+function toDefinitionSearchResult(row: DefinitionRow): DefinitionSearchResult {
+  return {
+    id: row.id,
+    documentId: row.documentId,
+    jurisdiction: row.jurisdiction,
+    slug: row.slug,
+    shortName: row.shortName,
+    celex: row.celex ?? undefined,
+    localId: row.localId ?? undefined,
+    term: row.term,
+    normalizedTerm: row.normalizedTerm,
+    definitionText: row.definitionText,
+    definitionType: row.definitionType,
+    sourceUrl: row.sourceUrl,
+    provisionId: row.provisionId,
+    label: row.label,
+    title: row.title ?? undefined,
+    marker: row.marker ?? undefined,
+    path: row.path,
+  };
+}
 
 export function parseFullTextQuery(
   rawQuery: string,
@@ -310,6 +334,7 @@ export class SearchService {
           df.normalized_term AS normalizedTerm,
           df.definition_text AS definitionText,
           df.definition_type AS definitionType,
+          d.source_url AS sourceUrl,
           df.provision_id AS provisionId,
           df.label AS label,
           df.title AS title,
@@ -341,26 +366,52 @@ export class SearchService {
       query,
       normalizedQuery: parsed.normalizedQuery,
       indexBuildId: this.buildId,
-      results: rows.map(
-        (row): DefinitionSearchResult => ({
-          id: row.id,
-          documentId: row.documentId,
-          jurisdiction: row.jurisdiction,
-          slug: row.slug,
-          shortName: row.shortName,
-          celex: row.celex ?? undefined,
-          localId: row.localId ?? undefined,
-          term: row.term,
-          normalizedTerm: row.normalizedTerm,
-          definitionText: row.definitionText,
-          definitionType: row.definitionType,
-          provisionId: row.provisionId,
-          label: row.label,
-          title: row.title ?? undefined,
-          marker: row.marker ?? undefined,
-          path: row.path,
-        }),
-      ),
+      results: rows.map(toDefinitionSearchResult),
+    };
+  }
+
+  listDocumentDefinitions(
+    documentId: string,
+  ): DocumentDefinitionsResponse | null {
+    const documentExists = this.database
+      .prepare("SELECT 1 FROM documents WHERE id = ?")
+      .get(documentId);
+    if (!documentExists) return null;
+
+    const rows = this.database
+      .prepare(`
+        SELECT
+          df.definition_id AS id,
+          df.document_id AS documentId,
+          d.jurisdiction AS jurisdiction,
+          d.slug AS slug,
+          d.short_name AS shortName,
+          d.celex AS celex,
+          d.local_id AS localId,
+          df.term AS term,
+          df.normalized_term AS normalizedTerm,
+          df.definition_text AS definitionText,
+          df.definition_type AS definitionType,
+          d.source_url AS sourceUrl,
+          df.provision_id AS provisionId,
+          df.label AS label,
+          df.title AS title,
+          df.marker AS marker,
+          df.path AS path
+        FROM definitions df
+        JOIN documents d ON d.id = df.document_id
+        WHERE df.document_id = ?
+        ORDER BY
+          length(df.normalized_term) DESC,
+          df.normalized_term ASC,
+          df.rowid ASC
+      `)
+      .all(documentId) as DefinitionRow[];
+
+    return {
+      documentId,
+      indexBuildId: this.buildId,
+      definitions: rows.map(toDefinitionSearchResult),
     };
   }
 

@@ -3133,6 +3133,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - defined-term hover / peek；
 - unresolved reference report 与人工抽样质量检查。
 
+当前状态：explicit references、cross-law resolver、References/Cited By、Side Peek 与 document-scoped defined-term hover/peek 已实现。defined-term 标注仅消费 build-time SQLite Definition records，并要求同一文档内定义唯一、原词精确匹配、完整词边界且不与 explicit-reference span 重叠；不做 stemming、同义词或跨法规推断，定义所在 provision 自身不标注。
+
 ## Release 0.5 — Regulatory Families & Relationship Enrichment
 
 先完成官方或人工核验关系，再加入算法关系：

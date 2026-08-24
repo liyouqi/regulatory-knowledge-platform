@@ -629,6 +629,73 @@ kbd {
   outline: 0;
 }
 
+.inline-definition-wrapper {
+  display: inline;
+  position: relative;
+}
+
+.inline-definition {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dotted #73864b;
+  color: inherit;
+  cursor: help;
+  font: inherit;
+  padding: 0 1px;
+  text-align: inherit;
+}
+
+.inline-definition dfn {
+  font-style: inherit;
+}
+
+.inline-definition:hover,
+.inline-definition:focus-visible {
+  background: #e5ead3;
+  border-bottom-color: #4f622c;
+  color: #263418;
+  outline: 0;
+}
+
+.inline-definition-tooltip {
+  background: #1d211a;
+  border: 1px solid #525c44;
+  border-radius: 8px;
+  bottom: calc(100% + 0.6rem);
+  box-shadow: 0 14px 36px rgb(0 0 0 / 28%);
+  color: #d9ddd2;
+  display: grid;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  gap: 5px;
+  left: 50%;
+  line-height: 1.45;
+  max-width: min(320px, 76vw);
+  opacity: 0;
+  padding: 10px 11px;
+  pointer-events: none;
+  position: absolute;
+  text-align: left;
+  transform: translate(-50%, 4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+  visibility: hidden;
+  width: max-content;
+  z-index: 18;
+}
+
+.inline-definition-tooltip strong {
+  color: #dbe6b5;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.inline-definition-wrapper:hover .inline-definition-tooltip,
+.inline-definition-wrapper:focus-within .inline-definition-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
+}
+
 .reference-peek {
   background: #1d211a;
   border: 1px solid #525c44;
@@ -703,6 +770,16 @@ kbd {
   line-height: 1.5;
   margin: 21px 0 0;
   padding-top: 16px;
+}
+
+.definition-peek-source {
+  border-top: 1px solid #394232;
+  color: #aeb7a3;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 21px 0 0;
+  padding-top: 16px;
+  text-transform: uppercase;
 }
 
 .reference-peek blockquote {
@@ -1951,6 +2028,10 @@ kbd {
 }
 
 @media (max-width: 700px) {
+  .inline-definition-tooltip {
+    display: none;
+  }
+
   .reader-shell {
     display: block;
     height: auto;

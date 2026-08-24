@@ -324,7 +324,9 @@ crypto asset
 data holder
 ```
 
-The endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`. Definitions are derived during `npm run runtime:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. The six Level 1 acts still produce 294/294 structurally matching definition points; the current 13-document runtime contains 297 definitions after including three additional structurally matching points from the DORA register ITS.
+The global endpoint is `/api/search/definitions?q=<term>&limit=<1-50>`, while `/api/documents/:documentId/definitions` provides the same traceable records for Reader annotation. Definitions are derived during `npm run runtime:build`; the browser never parses legal prose into definitions. The current strict rule only accepts point records inside an Article titled `Definitions` whose official text starts with `<term> means`. The six Level 1 acts still produce 294/294 structurally matching definition points; the current 16-document runtime contains 297 definitions after including three additional structurally matching points from the DORA register ITS.
+
+Reader body text marks a defined term only when the same document has one unique extracted definition and the official term appears with exact case-insensitive text and complete word boundaries. It does not apply stemming, synonyms, or cross-document inference, does not annotate the defining provision itself, and never overlaps an explicit legal-reference span. Hover/focus shows an exact-text excerpt; click opens a Side Peek with the complete official definition, source provision, definition type, and official source link.
 
 When a definition explicitly says `as defined in`, it is stored as `incorporated`; otherwise it is `direct`. Exact direct definitions rank before incorporated references, while every result retains its own official source text and point link. For example, `personal data` returns the direct GDPR definition first, followed by incorporated MiCA, Data Act, and AI Act definitions.
 
@@ -433,7 +435,7 @@ Release 0.4 is now in progress and additionally includes:
 - browser verification of DORA Article 1 → NIS2 Article 3 navigation, the reverse Cited By view, and AI Act Article 11 → Annex IV on a 390px viewport;
 - evidence-span-only inline citations and an on-demand, URL-preserving Side Peek with an official target excerpt.
 
-The explicit-reference portion of Release 0.4 is complete locally.
+The explicit-reference portion of Release 0.4 is complete locally. Exact, document-scoped defined-term hover/focus and official-definition Side Peek are also implemented from the normalized SQLite definition records; ambiguous terms and inferred variants remain unlinked.
 
 Release 0.5 is complete and includes:
 

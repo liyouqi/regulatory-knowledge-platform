@@ -45,6 +45,10 @@ export function searchDefinitions(query: string, limit?: number) {
   return searchService.searchDefinitions(query, limit);
 }
 
+export function listDocumentDefinitions(documentId: string) {
+  return searchService.listDocumentDefinitions(documentId);
+}
+
 export function findProvisionRelationships(
   documentId: string,
   provisionId: string,
@@ -206,6 +210,15 @@ app.get("/api/documents/:documentId/version-chain", (request, response) => {
     return;
   }
   response.json(chain);
+});
+
+app.get("/api/documents/:documentId/definitions", (request, response) => {
+  const definitions = listDocumentDefinitions(request.params.documentId);
+  if (!definitions) {
+    response.status(404).json({ error: "Document not found" });
+    return;
+  }
+  response.json(definitions);
 });
 
 app.get("/api/documents/:documentId", (request, response) => {

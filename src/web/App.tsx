@@ -28,6 +28,7 @@ import {
 import type {
   BodyBlock,
   ContentCollection,
+  DefinitionSearchResult,
   DocumentSummary,
   DocumentView,
   ProvisionRelationship,
@@ -38,6 +39,7 @@ import type {
 } from "../shared/legal";
 import {
   documentCatalogSchema,
+  documentDefinitionsResponseSchema,
   provisionRelationshipsResponseSchema,
   relationshipPreviewSchema,
 } from "../shared/legal";
@@ -52,6 +54,7 @@ import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { Level2LibraryPage } from "./Level2LibraryPage";
+import { definedTermRanges } from "./defined-terms";
 import { inlineReferenceRanges } from "./inline-references";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -124,13 +127,17 @@ function TocTree({
 
 function LegalBlock({
   block,
+  definitions,
   provisionPath,
   relationships,
+  onDefinitionPreview,
   onPreview,
 }: {
   block: BodyBlock;
+  definitions: DefinitionSearchResult[];
   provisionPath: string;
   relationships: ProvisionRelationship[];
+  onDefinitionPreview: (definition: DefinitionSearchResult) => void;
   onPreview: (relationship: ProvisionRelationship) => void;
 }) {
   return (
@@ -144,7 +151,9 @@ function LegalBlock({
         </a>
         {block.text ? (
           <p>
-            <InlineReferenceText
+            <AnnotatedLegalText
+              definitions={definitions}
+              onDefinitionPreview={onDefinitionPreview}
               onPreview={onPreview}
               relationships={relationships}
               sourceEntityId={block.id}
@@ -158,7 +167,9 @@ function LegalBlock({
           {block.children.map((child) => (
             <LegalBlock
               block={child}
+              definitions={definitions}
               key={child.id}
+              onDefinitionPreview={onDefinitionPreview}
               onPreview={onPreview}
               provisionPath={provisionPath}
               relationships={relationships}
@@ -170,18 +181,40 @@ function LegalBlock({
   );
 }
 
-function InlineReferenceText({
+function definitionExcerpt(definition: DefinitionSearchResult): string {
+  return definition.definitionText.length <= 260
+    ? definition.definitionText
+    : `${definition.definitionText.slice(0, 257).trimEnd()}…`;
+}
+
+function AnnotatedLegalText({
   text,
   sourceEntityId,
   relationships,
+  definitions,
+  onDefinitionPreview,
   onPreview,
 }: {
   text: string;
   sourceEntityId: string;
   relationships: ProvisionRelationship[];
+  definitions: DefinitionSearchResult[];
+  onDefinitionPreview: (definition: DefinitionSearchResult) => void;
   onPreview: (relationship: ProvisionRelationship) => void;
 }) {
-  const ranges = inlineReferenceRanges(text, sourceEntityId, relationships);
+  const referenceRanges = inlineReferenceRanges(
+    text,
+    sourceEntityId,
+    relationships,
+  );
+  const termRanges = definedTermRanges(text, definitions, referenceRanges);
+  const ranges = [
+    ...referenceRanges.map((range) => ({
+      ...range,
+      kind: "reference" as const,
+    })),
+    ...termRanges.map((range) => ({ ...range, kind: "definition" as const })),
+  ].sort((left, right) => left.start - right.start || left.end - right.end);
   if (ranges.length === 0) return text;
 
   let cursor = 0;
@@ -189,6 +222,31 @@ function InlineReferenceText({
     .flatMap((range) => {
       const before = text.slice(cursor, range.start);
       cursor = range.end;
+      if (range.kind === "definition") {
+        const tooltipId = `definition-tooltip:${sourceEntityId}:${range.start}`;
+        return [
+          before,
+          <span className="inline-definition-wrapper" key={tooltipId}>
+            <button
+              aria-describedby={tooltipId}
+              aria-label={`View definition of ${range.definition.term}`}
+              className="inline-definition"
+              onClick={() => onDefinitionPreview(range.definition)}
+              type="button"
+            >
+              <dfn>{text.slice(range.start, range.end)}</dfn>
+            </button>
+            <span
+              className="inline-definition-tooltip"
+              id={tooltipId}
+              role="tooltip"
+            >
+              <strong>{range.definition.term}</strong>
+              {definitionExcerpt(range.definition)}
+            </span>
+          </span>,
+        ];
+      }
       return [
         before,
         <button
@@ -285,6 +343,51 @@ function ReferencePeek({
             Official source <ArrowUpRight aria-hidden="true" size={14} />
           </a>
         ) : null}
+      </div>
+    </dialog>
+  );
+}
+
+function DefinitionPeek({
+  definition,
+  onClose,
+}: {
+  definition: DefinitionSearchResult;
+  onClose: () => void;
+}) {
+  return (
+    <dialog
+      aria-label="Definition preview"
+      className="reference-peek definition-peek"
+      onCancel={onClose}
+      open
+    >
+      <header>
+        <p className="eyebrow">OFFICIAL DEFINITION</p>
+        <button
+          aria-label="Close definition preview"
+          onClick={onClose}
+          type="button"
+        >
+          <X aria-hidden="true" size={17} />
+        </button>
+      </header>
+      <p className="reference-peek-law">{definition.shortName}</p>
+      <h2>“{definition.term}”</h2>
+      <p className="definition-peek-source">
+        {definition.label}
+        {definition.marker ? ` · ${definition.marker}` : ""} ·{" "}
+        {definition.definitionType}
+      </p>
+      <blockquote>{definition.definitionText}</blockquote>
+      <div className="reference-peek-actions">
+        <Link onClick={onClose} to={definition.path}>
+          Open source provision
+          <ArrowRight aria-hidden="true" size={15} />
+        </Link>
+        <a href={definition.sourceUrl} rel="noreferrer" target="_blank">
+          Official source <ArrowUpRight aria-hidden="true" size={14} />
+        </a>
       </div>
     </dialog>
   );
@@ -680,6 +783,9 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
   const [relationshipsError, setRelationshipsError] = useState("");
   const [previewRelationship, setPreviewRelationship] =
     useState<ProvisionRelationship | null>(null);
+  const [definitions, setDefinitions] = useState<DefinitionSearchResult[]>([]);
+  const [previewDefinition, setPreviewDefinition] =
+    useState<DefinitionSearchResult | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -721,6 +827,27 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
     return () => controller.abort();
   }, [requestedSlug]);
 
+  useEffect(() => {
+    if (!legalDocument) return;
+    const controller = new AbortController();
+    setDefinitions([]);
+    setPreviewDefinition(null);
+    void fetch(
+      `/api/documents/${encodeURIComponent(legalDocument.id)}/definitions`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok)
+          throw new Error("Unable to load document definitions");
+        return documentDefinitionsResponseSchema.parse(await response.json());
+      })
+      .then((response) => setDefinitions(response.definitions))
+      .catch((caught: unknown) => {
+        if ((caught as DOMException).name !== "AbortError") setDefinitions([]);
+      });
+    return () => controller.abort();
+  }, [legalDocument]);
+
   const activeProvision = useMemo(() => {
     if (!legalDocument || !selection || selection.slug !== legalDocument.slug) {
       return null;
@@ -733,6 +860,15 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
       ) ?? null
     );
   }, [legalDocument, selection]);
+  const inlineDefinitions = useMemo(
+    () =>
+      activeProvision
+        ? definitions.filter(
+            (definition) => definition.provisionId !== activeProvision.id,
+          )
+        : [],
+    [activeProvision, definitions],
+  );
 
   useEffect(() => {
     if (!legalDocument || activeProvision) return;
@@ -974,7 +1110,9 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
           {activeProvision.blocks.map((block) => (
             <LegalBlock
               block={block}
+              definitions={inlineDefinitions}
               key={block.id}
+              onDefinitionPreview={setPreviewDefinition}
               onPreview={setPreviewRelationship}
               provisionPath={activeProvision.path}
               relationships={relationships?.references ?? []}
@@ -1076,6 +1214,12 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         <ReferencePeek
           onClose={() => setPreviewRelationship(null)}
           relationship={previewRelationship}
+        />
+      ) : null}
+      {previewDefinition ? (
+        <DefinitionPeek
+          definition={previewDefinition}
+          onClose={() => setPreviewDefinition(null)}
         />
       ) : null}
     </main>

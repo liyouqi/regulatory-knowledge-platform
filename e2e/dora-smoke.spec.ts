@@ -78,6 +78,40 @@ test("global search opens an official definition in Reader", async ({
   await expect(page.locator("#main-content")).toBeVisible();
 });
 
+test("an exact defined term opens its official definition Side Peek", async ({
+  page,
+}) => {
+  await page.goto("/read/dora/articles/1");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+
+  const term = page
+    .getByRole("button", {
+      name: "View definition of digital operational resilience",
+    })
+    .first();
+  await expect(term).toBeVisible();
+  await term.hover();
+  await expect(page.getByRole("tooltip").first()).toContainText(
+    "digital operational resilience means",
+  );
+
+  await term.click();
+  const preview = page.getByRole("dialog", { name: "Definition preview" });
+  await expect(preview).toBeVisible();
+  await expect(
+    preview.getByRole("heading", {
+      name: "“digital operational resilience”",
+    }),
+  ).toBeVisible();
+  await expect(preview.locator("blockquote")).toContainText(
+    "digital operational resilience means",
+  );
+  await preview.getByRole("link", { name: /Open source provision/ }).click();
+  await expect(page).toHaveURL(
+    /\/read\/dora\/articles\/3#subparagraph-1-point-1$/,
+  );
+});
+
 test("full-text search opens the matching paragraph anchor", async ({
   page,
 }) => {

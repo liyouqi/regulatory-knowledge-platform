@@ -853,6 +853,7 @@ Phase 1 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边界�
 /api/search/laws
 /api/search/fulltext
 /api/search/definitions
+/api/documents/:documentId/definitions
 /api/resolve
 ```
 

@@ -125,6 +125,7 @@ describe("SQLite FTS5 search artifact", () => {
       label: "Article 3",
       marker: "(1)",
       definitionType: "direct",
+      sourceUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
       path: "/read/dora/articles/3#subparagraph-1-point-1",
     });
     expect(exact?.results[0]?.definitionText).toContain(
@@ -136,5 +137,20 @@ describe("SQLite FTS5 search artifact", () => {
     expect(
       service?.searchDefinitions("network and information system").results[0],
     ).toMatchObject({ definitionType: "incorporated" });
+  });
+
+  it("lists a document's exact definitions for Reader annotation", () => {
+    const response = service?.listDocumentDefinitions("eu:32022R2554");
+
+    expect(response?.documentId).toBe("eu:32022R2554");
+    expect(response?.definitions).toHaveLength(65);
+    expect(response?.definitions).toContainEqual(
+      expect.objectContaining({
+        term: "digital operational resilience",
+        sourceUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+        provisionId: "eu:32022R2554:article:3",
+      }),
+    );
+    expect(service?.listDocumentDefinitions("eu:unknown")).toBeNull();
   });
 });

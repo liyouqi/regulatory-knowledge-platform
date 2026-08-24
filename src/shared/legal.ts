@@ -279,6 +279,7 @@ export const definitionSearchResultSchema = z.object({
   normalizedTerm: z.string().min(1),
   definitionText: z.string().min(1),
   definitionType: z.enum(["direct", "incorporated"]),
+  sourceUrl: z.string().url(),
   provisionId: z.string().min(1),
   label: z.string().min(1),
   title: z.string().optional(),
@@ -291,6 +292,12 @@ export const definitionSearchResponseSchema = z.object({
   normalizedQuery: z.string(),
   indexBuildId: z.string().min(1),
   results: z.array(definitionSearchResultSchema),
+});
+
+export const documentDefinitionsResponseSchema = z.object({
+  documentId: z.string().min(1),
+  indexBuildId: z.string().min(1),
+  definitions: z.array(definitionSearchResultSchema),
 });
 
 export const explorerNodeSchema: z.ZodType<ExplorerNode> = z.lazy(() =>
@@ -431,6 +438,9 @@ export type DefinitionSearchResult = z.infer<
 >;
 export type DefinitionSearchResponse = z.infer<
   typeof definitionSearchResponseSchema
+>;
+export type DocumentDefinitionsResponse = z.infer<
+  typeof documentDefinitionsResponseSchema
 >;
 export type RelationshipEndpoint = z.infer<typeof relationshipEndpointSchema>;
 export type ProvisionRelationship = z.infer<typeof provisionRelationshipSchema>;

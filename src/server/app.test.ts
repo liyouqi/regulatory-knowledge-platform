@@ -9,6 +9,7 @@ import {
   findLaws,
   findProvisionRelationships,
   findRelationshipPreview,
+  listDocumentDefinitions,
 } from "./app";
 
 describe("Document lookup", () => {
@@ -137,6 +138,24 @@ describe("Document lookup", () => {
       label: "Article 3",
       excerpt: expect.any(String),
     });
+  });
+
+  it("serves exact document definitions for Reader term previews", () => {
+    const response = listDocumentDefinitions("eu:32022R2554");
+
+    expect(response?.definitions).toContainEqual(
+      expect.objectContaining({
+        term: "digital operational resilience",
+        normalizedTerm: "digital operational resilience",
+        definitionText: expect.stringContaining(
+          "digital operational resilience means",
+        ),
+        sourceUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+        provisionId: "eu:32022R2554:article:3",
+        path: "/read/dora/articles/3#subparagraph-1-point-1",
+      }),
+    );
+    expect(listDocumentDefinitions("eu:unknown")).toBeNull();
   });
 
   it("serves official Level 2 mandates separately from explicit references", () => {
