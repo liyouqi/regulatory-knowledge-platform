@@ -445,16 +445,6 @@ export function GlobalLawSearch({
       onClose();
       return;
     }
-    if (event.key === "Tab") {
-      event.preventDefault();
-      const modes: SearchMode[] = ["laws", "opened", "definitions", "fulltext"];
-      const currentIndex = modes.indexOf(mode);
-      const direction = event.shiftKey ? -1 : 1;
-      selectMode(
-        modes[(currentIndex + direction + modes.length) % modes.length],
-      );
-      return;
-    }
     if (event.key === "ArrowDown") {
       event.preventDefault();
       setSelectedIndex((index) =>
@@ -503,6 +493,7 @@ export function GlobalLawSearch({
       <dialog
         aria-label="Regulatory search"
         aria-modal="true"
+        aria-busy={loading}
         className="global-search"
         open
       >
