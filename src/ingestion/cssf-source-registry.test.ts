@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   cssfDocumentLogicalId,
+  cssfSourceDefinitionSchema,
   loadCssfSourceRegistry,
   officialCssfHttpsUrl,
 } from "./cssf-source-registry";
@@ -47,7 +48,15 @@ describe("CSSF source registry", () => {
       pointCount: 46,
       maximumWarnings: 1,
     });
-    expect(sources[2]?.pdfQuality).toBeUndefined();
+    expect(sources[1]?.pdfProfile).toBe("incident-reporting");
+    expect(sources[2]?.pdfProfile).toBe("consolidated-governance");
+    expect(sources[2]?.pdfQuality).toMatchObject({
+      pageCount: 83,
+      structuralNodeCount: 82,
+      provisionCount: 260,
+      pointCount: 349,
+      maximumWarnings: 1,
+    });
   });
 
   it("uses stable LU logical IDs independent of source URLs", () => {
@@ -57,6 +66,16 @@ describe("CSSF source registry", () => {
     expect(() => cssfDocumentLogicalId("../25-893")).toThrow(
       "Invalid CSSF local identifier",
     );
+  });
+
+  it("requires an explicit parser profile for each PDF source", async () => {
+    const source = (await loadCssfSourceRegistry())[1];
+    expect(
+      cssfSourceDefinitionSchema.safeParse({
+        ...source,
+        pdfProfile: undefined,
+      }).success,
+    ).toBe(false);
   });
 
   it("accepts only official CSSF HTTPS URLs", () => {

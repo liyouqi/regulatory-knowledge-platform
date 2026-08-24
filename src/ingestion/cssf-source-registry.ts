@@ -45,6 +45,9 @@ export const cssfSourceDefinitionSchema = z
     pageUrl: z.string().url(),
     contentUrl: z.string().url(),
     contentMediaType: z.enum(["text/html", "application/pdf"]),
+    pdfProfile: z
+      .enum(["incident-reporting", "consolidated-governance"])
+      .optional(),
     topics: z.array(z.string().min(1)).min(1),
     quality: z
       .object({
@@ -72,6 +75,20 @@ export const cssfSourceDefinitionSchema = z
       .optional(),
   })
   .superRefine((source, context) => {
+    if (source.contentMediaType === "application/pdf" && !source.pdfProfile) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "PDF sources require an explicit parser profile",
+        path: ["pdfProfile"],
+      });
+    }
+    if (source.contentMediaType === "text/html" && source.pdfProfile) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "HTML sources cannot select a PDF parser profile",
+        path: ["pdfProfile"],
+      });
+    }
     for (const [field, value] of [
       ["pageUrl", source.pageUrl],
       ["contentUrl", source.contentUrl],

@@ -54,6 +54,7 @@
     "pageUrl": "https://www.cssf.lu/en/Document/circular-cssf-25-893/",
     "contentUrl": "https://www.cssf.lu/wp-content/uploads/cssf25_893eng.pdf",
     "contentMediaType": "application/pdf",
+    "pdfProfile": "incident-reporting",
     "topics": [
       "DORA",
       "major ICT-related incidents",
@@ -92,6 +93,21 @@
     "pageUrl": "https://www.cssf.lu/en/Document/circular-cssf-12-552/",
     "contentUrl": "https://www.cssf.lu/wp-content/uploads/cssf12_552eng.pdf",
     "contentMediaType": "application/pdf",
-    "topics": ["internal governance", "risk management", "ICT", "outsourcing"]
+    "pdfProfile": "consolidated-governance",
+    "topics": ["internal governance", "risk management", "ICT", "outsourcing"],
+    "pdfQuality": {
+      "pageCount": 83,
+      "structuralNodeCount": 82,
+      "provisionCount": 260,
+      "pointCount": 349,
+      "maximumWarnings": 1,
+      "textHashes": {
+        "lu:cssf:circular-12-552:provision:introduction:block:1": "sha256:bbef2c1d0a132db0aa1ee7a4724057f7eb2544ea381b067e96aaf0fbbe7ec491",
+        "lu:cssf:circular-12-552:part:i:provision:point-1:definition:1": "sha256:217a586c12c0cd740728df47b47fc8200ac96eb6317e5e8e4cebe519a3bbfe76",
+        "lu:cssf:circular-12-552:part:ii:provision:point-186": "sha256:0219f703956ecf7f0ec9535d1a39e2e09a50ae0c1190058abbffa988b3702195",
+        "lu:cssf:circular-12-552:part:iii:provision:point-51": "sha256:7a88ee60954440d0fcedf853a5b585eca83fa4b3ac2b12cf6c33aefc9a6c0d04",
+        "lu:cssf:circular-12-552:annex:ii:point:2:bullet:4": "sha256:f7f11d3c01369f95b0dee1479e71235cc80ab4cd8ce2cf8e855dfbf98b18793d"
+      }
+    }
   }
 ]

@@ -2,13 +2,14 @@ import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { CANONICAL_SCHEMA_VERSION } from "../canonical/schema";
 import type { CanonicalDocument, Provision } from "../canonical/schema";
 import { sha256, validateCanonicalDocument } from "../canonical/validate";
+import { buildCssfConsolidatedCircularFromSemanticEvents } from "./cssf-consolidated-pdf-parser";
 import type { CssfSourceSnapshot } from "./cssf-snapshot";
 import {
   type CssfSourceDefinition,
   cssfDocumentLogicalId,
 } from "./cssf-source-registry";
 
-export const CSSF_PDF_PARSER_VERSION = "1.0.1";
+export const CSSF_PDF_PARSER_VERSION = "1.1.1";
 
 interface PdfStructContent {
   type: string;
@@ -179,7 +180,7 @@ export async function extractCssfPdfSemanticEvents(
   bytes: Uint8Array,
 ): Promise<{ pageCount: number; events: CssfPdfSemanticEvent[] }> {
   const loadingTask = getDocument({
-    data: bytes.slice(),
+    data: new Uint8Array(bytes),
     useSystemFonts: true,
   });
   try {
@@ -596,6 +597,15 @@ export async function parseCssfPdf(
     throw new Error("CSSF PDF input does not match snapshot content hash");
   }
   const { pageCount, events } = await extractCssfPdfSemanticEvents(bytes);
+  if (source.pdfProfile === "consolidated-governance") {
+    return buildCssfConsolidatedCircularFromSemanticEvents(
+      events,
+      pageCount,
+      snapshot,
+      source,
+      CSSF_PDF_PARSER_VERSION,
+    );
+  }
   return buildCssfCircularFromSemanticEvents(
     events,
     pageCount,

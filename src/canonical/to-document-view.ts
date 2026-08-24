@@ -196,6 +196,17 @@ export function toDocumentView(
         kindOrder[right.kind as keyof typeof kindOrder];
       return kindDifference || left.displayOrder - right.displayOrder;
     });
+  const routeKeyCounts = new Map<string, number>();
+  for (const provision of topLevel) {
+    const kind = ["article", "recital", "annex"].includes(provision.kind)
+      ? (provision.kind as "article" | "recital" | "annex")
+      : "other";
+    const collectionId = collectionForKind[kind];
+    const number =
+      provision.numberNormalized ?? provision.numberRaw ?? provision.label;
+    const key = `${collectionId}:${number.toLowerCase()}`;
+    routeKeyCounts.set(key, (routeKeyCounts.get(key) ?? 0) + 1);
+  }
   const provisions: ProvisionView[] = topLevel.map((provision) => {
     const kind = ["article", "recital", "annex"].includes(provision.kind)
       ? (provision.kind as "article" | "recital" | "annex")
@@ -204,19 +215,21 @@ export function toDocumentView(
     const directChildren = children.get(provision.logicalId) ?? [];
     const blockSources =
       directChildren.length > 0 ? directChildren : [provision];
+    const sourceNumber =
+      provision.numberNormalized ?? provision.numberRaw ?? provision.label;
+    const routeKey = `${collectionId}:${sourceNumber.toLowerCase()}`;
+    const number =
+      (routeKeyCounts.get(routeKey) ?? 0) > 1
+        ? relativeProvisionAnchor(document.logicalId, provision.logicalId)
+        : sourceNumber;
     return {
       id: provision.logicalId,
       kind,
       collectionId,
-      number:
-        provision.numberNormalized ?? provision.numberRaw ?? provision.label,
+      number,
       label: provision.label,
       title: provision.title,
-      path: provisionPath(
-        slug,
-        collectionId,
-        provision.numberNormalized ?? provision.numberRaw ?? provision.label,
-      ),
+      path: provisionPath(slug, collectionId, number),
       explorerAnchor: relativeProvisionAnchor(
         document.logicalId,
         provision.logicalId,
