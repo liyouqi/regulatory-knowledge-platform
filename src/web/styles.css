@@ -39,6 +39,37 @@ summary {
   width: 1px;
 }
 
+.skip-link {
+  background: #eef0e8;
+  border-radius: 0 0 7px 7px;
+  color: #182015;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  left: 16px;
+  padding: 9px 12px;
+  position: fixed;
+  text-decoration: none;
+  top: 0;
+  transform: translateY(-120%);
+  transition: transform 120ms ease-out;
+  z-index: 100;
+}
+
+.skip-link:focus-visible {
+  outline: 3px solid #b6ce68;
+  outline-offset: 3px;
+  transform: translateY(0);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #b6ce68;
+  outline-offset: 3px;
+}
+
 .loading {
   display: grid;
   min-height: 100vh;

@@ -188,6 +188,9 @@ export function ExplorerPage({
 
   return (
     <main className="explorer-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to Explorer content
+      </a>
       <header className="topbar explorer-topbar">
         <Link className="brand" to={explorerPath(document.slug)}>
           <BookOpen aria-hidden="true" size={18} />
@@ -292,7 +295,7 @@ export function ExplorerPage({
             ))}
           </nav>
         </aside>
-        <article className="explorer-map">
+        <article className="explorer-map" id="main-content" tabIndex={-1}>
           <ExplorerTree nodes={document.roots} slug={document.slug} />
         </article>
       </div>

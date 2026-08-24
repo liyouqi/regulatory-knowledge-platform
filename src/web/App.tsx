@@ -844,6 +844,9 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
 
   return (
     <main className="reader-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to legal text
+      </a>
       <header className="topbar">
         <Link className="brand" to={activeProvision.path}>
           <BookOpen aria-hidden="true" size={18} />
@@ -930,7 +933,12 @@ function ReaderPage({ onOpenSearch }: { onOpenSearch: () => void }) {
         </nav>
       </aside>
 
-      <article className="legal-text" aria-labelledby="provision-title">
+      <article
+        aria-labelledby="provision-title"
+        className="legal-text"
+        id="main-content"
+        tabIndex={-1}
+      >
         <div className="breadcrumb">
           <span>{legalDocument.shortName}</span>
           {activeProvision.breadcrumbs.map((entry) => (

@@ -72,6 +72,9 @@ export function Level2LibraryPage({
 
   return (
     <main className="level2-library-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to Level 2 measures
+      </a>
       <header className="topbar explorer-topbar">
         <Link className="brand" to={explorerPath(familySlug)}>
           <BookOpen aria-hidden="true" size={18} />
@@ -125,7 +128,7 @@ export function Level2LibraryPage({
           ))}
         </nav>
       </section>
-      <section className="level2-library-list">
+      <section className="level2-library-list" id="main-content" tabIndex={-1}>
         {library.measures.length === 0 ? (
           <p className="level2-empty">
             No loaded {measureType ? typeLabels[measureType] : "Level 2"}{" "}
