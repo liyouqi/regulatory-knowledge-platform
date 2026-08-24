@@ -48,6 +48,9 @@ const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
   "title-terms": "Title terms",
 };
 
+const incompleteProvisionSuffix =
+  /(?:^|\s)(?:articles?|art|recitals?|rec|annex(?:es)?|ann)$/u;
+
 function identifierLabel(result: { celex?: string; localId?: string }): string {
   return result.celex
     ? `CELEX ${result.celex}`
@@ -292,6 +295,9 @@ export function GlobalLawSearch({
   const [error, setError] = useState("");
 
   const lawResults = lawResponse?.results ?? [];
+  const hasIncompleteProvisionSearch = Boolean(
+    lawResponse && incompleteProvisionSuffix.test(lawResponse.normalizedQuery),
+  );
   const fullTextResults = fullTextResponse?.results ?? [];
   const definitionResults = definitionResponse?.results ?? [];
   const openedResults = resolveOpenedLaws(openedLaws, catalog).filter(
@@ -703,6 +709,12 @@ export function GlobalLawSearch({
 
           {mode === "laws" && lawResults.length > 0 ? (
             <>
+              {hasIncompleteProvisionSearch ? (
+                <p className="search-query-hint">
+                  Add a provision number, for example{" "}
+                  <strong>Article 28</strong>, to open it directly.
+                </p>
+              ) : null}
               <p className="search-section-label">
                 {lawResponse?.normalizedQuery ? "BEST MATCH" : "AVAILABLE LAWS"}
               </p>

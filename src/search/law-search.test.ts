@@ -167,6 +167,13 @@ describe("Find Laws deterministic ranking", () => {
     expect(response.bestMatch).not.toHaveProperty("provisions");
   });
 
+  it("keeps the law result visible while a provision citation is incomplete", () => {
+    const response = searchLaws(records, "DORA article");
+
+    expect(response.bestMatch).toMatchObject({ slug: "dora" });
+    expect(response.bestMatch?.target).toBeUndefined();
+  });
+
   it("fails closed when a compound query names no existing provision", () => {
     expect(searchLaws(records, "DORA article 999").results).toHaveLength(0);
     expect(searchLaws(records, "article 3").results).toHaveLength(0);

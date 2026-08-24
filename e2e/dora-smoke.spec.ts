@@ -37,8 +37,17 @@ test("global law search opens DORA Article 28", async ({ page }) => {
   const input = search.getByRole("textbox", {
     name: "Find laws by name, CELEX, or citation",
   });
-  await input.pressSequentially("DORA Article 28");
-  await expect(input).toHaveValue("DORA Article 28");
+  await input.pressSequentially("DORA article");
+  await expect(input).toHaveValue("DORA article");
+  await expect(
+    search.getByText("Add a provision number", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    search.getByRole("button", { name: /DORA/ }).first(),
+  ).toBeVisible();
+
+  await input.pressSequentially(" 28");
+  await expect(input).toHaveValue("DORA article 28");
   await search.getByRole("button", { name: /DORA · Article 28/ }).click();
 
   await expect(page).toHaveURL(/\/read\/dora\/articles\/28$/);

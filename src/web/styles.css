@@ -1616,6 +1616,20 @@ kbd {
   margin: 7px 10px 8px;
 }
 
+.search-query-hint {
+  background: #272c23;
+  border: 1px solid #3c4634;
+  color: #bcc4b2;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 10px;
+  padding: 8px 10px;
+}
+
+.search-query-hint strong {
+  color: #e0e6d8;
+}
+
 .search-section-label.secondary {
   border-top: 1px solid #343a2f;
   margin-top: 12px;

@@ -115,6 +115,12 @@ function parseProvisionIntent(query: string) {
   return { lawQuery: match[1], kind, number: match[3] } as const;
 }
 
+function parseIncompleteProvisionIntent(query: string) {
+  const match =
+    /^(.*?)\s+(articles?|art|recitals?|rec|annex(?:es)?|ann)$/u.exec(query);
+  return match?.[1] ? { lawQuery: match[1] } : null;
+}
+
 function toResult(
   record: LawSearchRecord,
   rank: Pick<LawSearchResult, "matchReason" | "score">,
@@ -180,7 +186,12 @@ export function searchLaws(
   const query = rawQuery.trim();
   const normalizedQuery = normalizeLawQuery(query);
   const provisionIntent = parseProvisionIntent(normalizedQuery);
-  const lawQuery = provisionIntent?.lawQuery ?? normalizedQuery;
+  const incompleteProvisionIntent =
+    parseIncompleteProvisionIntent(normalizedQuery);
+  const lawQuery =
+    provisionIntent?.lawQuery ??
+    incompleteProvisionIntent?.lawQuery ??
+    normalizedQuery;
   const results = normalizedQuery
     ? records
         .flatMap((record) => {
