@@ -40,6 +40,14 @@ describe("CSSF source registry", () => {
     expect(
       sources.slice(1).every((source) => source.quality === undefined),
     ).toBe(true);
+    expect(sources[1]?.pdfQuality).toMatchObject({
+      pageCount: 8,
+      structuralNodeCount: 4,
+      provisionCount: 16,
+      pointCount: 46,
+      maximumWarnings: 1,
+    });
+    expect(sources[2]?.pdfQuality).toBeUndefined();
   });
 
   it("uses stable LU logical IDs independent of source URLs", () => {

@@ -77,8 +77,8 @@ npm run build
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
 | `npm run cssf:source:fetch -- --id <ID>` | Save an immutable official CSSF HTML/PDF snapshot under ignored raw data. |
 | `npm run cssf:source:verify -- --snapshot <path>` | Recompute CSSF snapshot byte counts and SHA-256 hashes. |
-| `npm run cssf:canonical:inspect -- --snapshot <path>` | Inspect CSSF HTML structure and candidate fidelity metrics without publishing. |
-| `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF HTML Canonical artifact after its quality gate passes. |
+| `npm run cssf:canonical:inspect -- --snapshot <path>` | Inspect CSSF HTML or tagged-PDF structure and candidate fidelity metrics without publishing. |
+| `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF Canonical artifact after the media-specific quality gate passes. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
 ## Legal Data Operations
@@ -103,11 +103,13 @@ npm run cssf:source:fetch -- --id circular-25-893
 npm run cssf:source:verify -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
 npm run cssf:canonical:inspect -- --snapshot data/raw/cssf/communication-2025-04-09-ict-risk-updates/<snapshot-directory>
 npm run cssf:canonical:build -- --snapshot data/raw/cssf/communication-2025-04-09-ict-risk-updates/<snapshot-directory>
+npm run cssf:canonical:inspect -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+npm run cssf:canonical:build -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
 ```
 
-The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. The independent HTML adapter preserves headings, paragraphs, nested lists, footnotes, source locators, and stable `lu:cssf:*` IDs; unsupported substantive images and excluded related-document cards remain explicit parser warnings. Its reviewed quality gate fixes the expected section/block counts, warning ceiling, and official-text anchor hashes. Raw source snapshots and parser output remain distinct. The representative HTML communiqué can now produce a validated Canonical artifact, while downloaded PDFs are not considered Canonical until the PDF adapter passes its own fixtures and fidelity gate.
+The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. The independent HTML adapter preserves headings, paragraphs, nested lists, footnotes, source locators, and stable `lu:cssf:*` IDs; unsupported substantive images and excluded related-document cards remain explicit parser warnings. Its reviewed quality gate fixes the expected section/block counts, warning ceiling, and official-text anchor hashes. The tagged-PDF adapter combines the PDF's semantic structure with explicit numbering markers, preserves page evidence, and fails closed on structural gaps. Circular CSSF 25/893 now passes its page, chapter, provision, point, warning, and official-text hash gates. Its introduction, four chapters, points 1–15, nested letter/number points, and footnotes are available through the common Canonical contract; the non-body signature table is excluded with an explicit warning. Raw source snapshots and parser output remain distinct.
 
-Runtime schema `4.2.0` keeps CELEX and CSSF local identifiers in separate nullable columns with an at-least-one constraint. When the validated communiqué artifact is present, `runtime:build` loads it into the same catalog, full-text search, Explorer, and Reader contracts under a generic `Provisions` collection; no CELEX value or Article semantics are invented.
+Runtime schema `4.2.0` keeps CELEX and CSSF local identifiers in separate nullable columns with an at-least-one constraint. When validated CSSF artifacts are present, `runtime:build` loads the communiqué and Circular CSSF 25/893 into the same catalog, full-text search, Explorer, and Reader contracts under a generic `Provisions` collection; no CELEX value or Article semantics are invented. Circular CSSF 12/552 remains the next bounded PDF scope because its Parts reset local numbering and contain a deeper bookmark hierarchy, tables, and annexes; it requires a dedicated parser extension and fidelity gate rather than weakening 25/893's rules.
 
 ### Download an official immutable snapshot
 

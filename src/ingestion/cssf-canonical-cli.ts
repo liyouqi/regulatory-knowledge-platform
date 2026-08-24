@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { CSSF_HTML_PARSER_VERSION, parseCssfHtml } from "./cssf-html-parser";
+import { CSSF_PDF_PARSER_VERSION, parseCssfPdf } from "./cssf-pdf-parser";
 import { readVerifiedCssfSourceSnapshot } from "./cssf-snapshot";
 import { findCssfSource } from "./cssf-source-registry";
 
@@ -37,28 +38,34 @@ async function buildCssfCanonicalDocument(): Promise<void> {
   }
   const verified = await readVerifiedCssfSourceSnapshot(snapshotPath);
   const source = await findCssfSource(verified.snapshot.localId);
-  if (source.contentMediaType !== "text/html") {
-    throw new Error(
-      `CSSF canonical HTML build cannot parse ${source.localId}; ${source.contentMediaType} requires the PDF adapter`,
-    );
-  }
   const inspectOnly = process.argv.includes("--inspect");
-  if (!inspectOnly && !source.quality) {
+  const quality =
+    source.contentMediaType === "text/html"
+      ? source.quality
+      : source.pdfQuality;
+  if (!inspectOnly && !quality) {
     throw new Error(
       `CSSF source ${source.localId} has no canonical quality baseline; run cssf:canonical:inspect first`,
     );
   }
-  const { document, report } = parseCssfHtml(
-    new TextDecoder().decode(verified.contentBytes),
-    verified.snapshot,
-    source,
-  );
+  const parserVersion =
+    source.contentMediaType === "text/html"
+      ? `html-${CSSF_HTML_PARSER_VERSION}`
+      : `pdf-${CSSF_PDF_PARSER_VERSION}`;
+  const { document, report } =
+    source.contentMediaType === "text/html"
+      ? parseCssfHtml(
+          new TextDecoder().decode(verified.contentBytes),
+          verified.snapshot,
+          source,
+        )
+      : await parseCssfPdf(verified.contentBytes, verified.snapshot, source);
   const buildReport = {
     ...report,
     documentId: document.logicalId,
     sourceSnapshotId: document.sourceSnapshotId,
     sourceFiles: [verified.snapshot.content.file],
-    parserVersion: CSSF_HTML_PARSER_VERSION,
+    parserVersion,
     canonicalFile: "document.json",
   };
 
@@ -67,14 +74,27 @@ async function buildCssfCanonicalDocument(): Promise<void> {
     console.log(
       JSON.stringify(
         {
-          sectionCount: report.sectionCount,
-          blockCount: report.blockCount,
+          ...report,
           maximumWarnings: report.warningCount,
           textHashes: Object.fromEntries(
             document.provisions
               .filter((provision) => provision.parentLogicalId)
               .slice(0, 1)
               .concat(
+                document.provisions
+                  .filter((provision) => provision.parentLogicalId)
+                  .slice(
+                    Math.floor(
+                      document.provisions.filter(
+                        (provision) => provision.parentLogicalId,
+                      ).length / 2,
+                    ),
+                    Math.floor(
+                      document.provisions.filter(
+                        (provision) => provision.parentLogicalId,
+                      ).length / 2,
+                    ) + 1,
+                  ),
                 document.provisions
                   .filter((provision) => provision.parentLogicalId)
                   .slice(-1),
@@ -97,7 +117,7 @@ async function buildCssfCanonicalDocument(): Promise<void> {
   const outputDirectory = resolve(
     process.cwd(),
     argument("--output") ??
-      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}-parser-cssf-html-${CSSF_HTML_PARSER_VERSION}`,
+      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}-parser-cssf-${parserVersion}`,
   );
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([

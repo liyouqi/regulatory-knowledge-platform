@@ -5,6 +5,7 @@ import { toDocumentView } from "../canonical/to-document-view";
 import { validateCanonicalDocument } from "../canonical/validate";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
+import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
 import { type DocumentView, documentViewSchema } from "../shared/legal";
 import { doraCanonicalFixture } from "./dora-fixture";
 
@@ -19,7 +20,10 @@ function officialCandidates(artifactRoot: string, identifier: string) {
       (entry) =>
         entry.isDirectory() &&
         (entry.name.endsWith(`-parser-${FORMEX_PARSER_VERSION}`) ||
-          entry.name.endsWith(`-parser-cssf-html-${CSSF_HTML_PARSER_VERSION}`)),
+          entry.name.endsWith(
+            `-parser-cssf-html-${CSSF_HTML_PARSER_VERSION}`,
+          ) ||
+          entry.name.endsWith(`-parser-cssf-pdf-${CSSF_PDF_PARSER_VERSION}`)),
     )
     .map((entry) => resolve(directory, entry.name, "document.json"))
     .filter(existsSync)
@@ -37,8 +41,12 @@ function officialCandidates(artifactRoot: string, identifier: string) {
         left.source.retrievedAt,
       );
       if (retrievalOrder !== 0) return retrievalOrder;
-      return (right.source.sourceStatus?.checkedAt ?? "").localeCompare(
-        left.source.sourceStatus?.checkedAt ?? "",
+      const statusOrder = (
+        right.source.sourceStatus?.checkedAt ?? ""
+      ).localeCompare(left.source.sourceStatus?.checkedAt ?? "");
+      if (statusOrder !== 0) return statusOrder;
+      return right.source.sourceVersion.localeCompare(
+        left.source.sourceVersion,
       );
     });
 }
@@ -52,8 +60,9 @@ function documentBuildId(
         .digest("hex")
         .slice(0, 12)}`
     : "";
-  const parserToken =
-    document.source.sourceSystem === "cssf"
+  const parserToken = document.source.sourceVersion.startsWith("cssf-pdf-")
+    ? `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`
+    : document.source.sourceSystem === "cssf"
       ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
       : FORMEX_PARSER_VERSION;
   return `canonical-${document.schemaVersion}-parser-${parserToken}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;

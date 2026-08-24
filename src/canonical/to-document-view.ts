@@ -109,9 +109,10 @@ function articleRange(nodes: TocNode[], byId: Map<string, ProvisionView>) {
     : `Art. ${numbers[0]}–${numbers.at(-1)}`;
 }
 
-function articleToc(
+function structuredToc(
   document: CanonicalDocument,
   provisions: ProvisionView[],
+  provisionKind: "article" | "other",
 ): TocNode[] {
   const byId = new Map(
     provisions.map((provision) => [provision.id, provision]),
@@ -130,15 +131,15 @@ function articleToc(
     structuralByParent.set(parentId, siblings);
   }
 
-  const articlesByParent = new Map<string, ProvisionView[]>();
+  const provisionsByParent = new Map<string, ProvisionView[]>();
   for (const provision of provisions.filter(
-    (candidate) => candidate.kind === "article",
+    (candidate) => candidate.kind === provisionKind,
   )) {
     const parentId =
       canonicalById.get(provision.id)?.parentLogicalId ?? document.logicalId;
-    const siblings = articlesByParent.get(parentId) ?? [];
+    const siblings = provisionsByParent.get(parentId) ?? [];
     siblings.push(provision);
-    articlesByParent.set(parentId, siblings);
+    provisionsByParent.set(parentId, siblings);
   }
 
   function childrenOf(parentId: string): TocNode[] {
@@ -155,13 +156,13 @@ function articleToc(
         displayOrder: node.displayOrder,
       };
     });
-    const articles = (articlesByParent.get(parentId) ?? []).map(
+    const directProvisions = (provisionsByParent.get(parentId) ?? []).map(
       (provision) => ({
         ...provisionTocNode(provision),
         displayOrder: canonicalById.get(provision.id)?.displayOrder ?? 0,
       }),
     );
-    return [...groups, ...articles]
+    return [...groups, ...directProvisions]
       .filter((node) => node.type === "provision" || node.children.length > 0)
       .sort((left, right) => left.displayOrder - right.displayOrder)
       .map(({ displayOrder: _displayOrder, ...node }) => node);
@@ -179,11 +180,14 @@ export function toDocumentView(
   const structuralById = new Map(
     document.structuralNodes.map((node) => [node.logicalId, node]),
   );
+  const structuralIds = new Set(structuralById.keys());
   const topLevel = document.provisions
     .filter(
       (provision) =>
         ["article", "recital", "annex"].includes(provision.kind) ||
-        (provision.kind === "other" && !provision.parentLogicalId),
+        (provision.kind === "other" &&
+          (!provision.parentLogicalId ||
+            structuralIds.has(provision.parentLogicalId))),
     )
     .sort((left, right) => {
       const kindOrder = { article: 0, recital: 1, annex: 2, other: 3 } as const;
@@ -264,8 +268,10 @@ export function toDocumentView(
         count: inCollection.length,
         roots:
           id === "articles"
-            ? articleToc(document, provisions)
-            : inCollection.map(provisionTocNode),
+            ? structuredToc(document, provisions, "article")
+            : id === "provisions"
+              ? structuredToc(document, provisions, "other")
+              : inCollection.map(provisionTocNode),
       };
     })
     .filter((collection) => collection.count > 0);

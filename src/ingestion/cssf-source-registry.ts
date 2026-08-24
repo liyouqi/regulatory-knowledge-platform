@@ -57,6 +57,19 @@ export const cssfSourceDefinitionSchema = z
         ),
       })
       .optional(),
+    pdfQuality: z
+      .object({
+        pageCount: z.number().int().positive(),
+        structuralNodeCount: z.number().int().positive(),
+        provisionCount: z.number().int().positive(),
+        pointCount: z.number().int().nonnegative(),
+        maximumWarnings: z.number().int().nonnegative(),
+        textHashes: z.record(
+          z.string().min(1),
+          z.string().regex(/^sha256:[a-f0-9]{64}$/),
+        ),
+      })
+      .optional(),
   })
   .superRefine((source, context) => {
     for (const [field, value] of [

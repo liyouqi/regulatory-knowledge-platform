@@ -59,7 +59,19 @@
       "major ICT-related incidents",
       "significant cyber threats",
       "incident reporting"
-    ]
+    ],
+    "pdfQuality": {
+      "pageCount": 8,
+      "structuralNodeCount": 4,
+      "provisionCount": 16,
+      "pointCount": 46,
+      "maximumWarnings": 1,
+      "textHashes": {
+        "lu:cssf:circular-25-893:provision:introduction:block:1": "sha256:9c5c40789f6a6e45d441229a50c2aa0d0384f00be3ab5ece272c08a753438fe9",
+        "lu:cssf:circular-25-893:provision:point-5:point:a:subpoint:1": "sha256:7d29ef5ccb2c56d9584e7799b605a2eb77feea7cfa59f6d3be2ca4f1f84c9d79",
+        "lu:cssf:circular-25-893:provision:point-15": "sha256:5677e7e93b2fba09c63073aed116d5e0a27254361317863f9a175b845a69ea8f"
+      }
+    }
   },
   {
     "localId": "circular-12-552",
