@@ -22,7 +22,17 @@
       "ICT risk management",
       "ICT third-party risk",
       "outsourcing"
-    ]
+    ],
+    "quality": {
+      "sectionCount": 3,
+      "blockCount": 21,
+      "maximumWarnings": 3,
+      "textHashes": {
+        "lu:cssf:communication-2025-04-09-ict-risk-updates:provision:introduction:block:introduction-1": "sha256:e9c76ccb00928b57008df03e07200ef48c1e63d1a061cc7fa57c2b638511763a",
+        "lu:cssf:communication-2025-04-09-ict-risk-updates:provision:section-1:block:section-1-1": "sha256:3c317f1a5e5c46b434210082841a03f372533cc88bafd4b43f6e5cb15f277d25",
+        "lu:cssf:communication-2025-04-09-ict-risk-updates:provision:section-2:block:section-2-11": "sha256:384fb5ed8ed77575a0fd5d8e5817270c1ab426d3e051da4787d6a92c47a6e35c"
+      }
+    }
   },
   {
     "localId": "circular-25-893",

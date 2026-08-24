@@ -25,6 +25,14 @@ describe("CSSF source registry", () => {
         source.topics.some((topic) => /ICT|DORA/iu.test(topic)),
       ),
     ).toBe(true);
+    expect(sources[0]?.quality).toMatchObject({
+      sectionCount: 3,
+      blockCount: 21,
+      maximumWarnings: 3,
+    });
+    expect(
+      sources.slice(1).every((source) => source.quality === undefined),
+    ).toBe(true);
   });
 
   it("uses stable LU logical IDs independent of source URLs", () => {

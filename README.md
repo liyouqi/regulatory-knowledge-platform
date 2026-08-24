@@ -77,6 +77,8 @@ npm run build
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
 | `npm run cssf:source:fetch -- --id <ID>` | Save an immutable official CSSF HTML/PDF snapshot under ignored raw data. |
 | `npm run cssf:source:verify -- --snapshot <path>` | Recompute CSSF snapshot byte counts and SHA-256 hashes. |
+| `npm run cssf:canonical:inspect -- --snapshot <path>` | Inspect CSSF HTML structure and candidate fidelity metrics without publishing. |
+| `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF HTML Canonical artifact after its quality gate passes. |
 | `npm run test:e2e` | Run browser tests after they are introduced. |
 
 ## Legal Data Operations
@@ -99,9 +101,11 @@ CSSF uses a separate source adapter and registry so that CSSF HTML/PDF handling 
 npm run cssf:source:list
 npm run cssf:source:fetch -- --id circular-25-893
 npm run cssf:source:verify -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+npm run cssf:canonical:inspect -- --snapshot data/raw/cssf/communication-2025-04-09-ict-risk-updates/<snapshot-directory>
+npm run cssf:canonical:build -- --snapshot data/raw/cssf/communication-2025-04-09-ict-risk-updates/<snapshot-directory>
 ```
 
-The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. Raw source snapshots and future parser output remain distinct; a downloaded PDF is not considered Canonical until a dedicated structural adapter passes its fixtures and fidelity gates.
+The CSSF registry stores the official heading and subject separately when CSSF publishes them as separate fields. The independent HTML adapter preserves headings, paragraphs, nested lists, footnotes, source locators, and stable `lu:cssf:*` IDs; unsupported substantive images and excluded related-document cards remain explicit parser warnings. Its reviewed quality gate fixes the expected section/block counts, warning ceiling, and official-text anchor hashes. Raw source snapshots and parser output remain distinct. The representative HTML communiqué can now produce a validated Canonical artifact, while downloaded PDFs are not considered Canonical until the PDF adapter passes its own fixtures and fidelity gate.
 
 ### Download an official immutable snapshot
 

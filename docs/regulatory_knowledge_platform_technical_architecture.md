@@ -493,7 +493,7 @@ CSSF 必须作为独立 source adapter，不污染 EUR-Lex parser。
 
 CSSF 可以出现 Part / Chapter / Section / Subsection / Paragraph 等不同层级。Parser 只负责忠实恢复层级，Universal Explorer / Reader 不写 CSSF 特例页面。
 
-Release 0.6 的首批 source contract 使用独立 `data/cssf-source-registry.json` 与 `data/raw/cssf` snapshot namespace，不扩展 CELEX registry，也不让 CSSF URL/HTML/PDF 规则进入 Cellar adapter。首批代表集包含一份完整 HTML communiqué 与两份 PDF Circular；snapshot 统一记录官方 landing page、content URL/media type、ETag/Last-Modified（存在时）、byte count、SHA-256 和 `lu:cssf:<local-id>`。HTML/PDF 只有通过各自 structural fixtures 与 fidelity gate 后才能成为 Canonical Document。
+Release 0.6 的首批 source contract 使用独立 `data/cssf-source-registry.json` 与 `data/raw/cssf` snapshot namespace，不扩展 CELEX registry，也不让 CSSF URL/HTML/PDF 规则进入 Cellar adapter。首批代表集包含一份完整 HTML communiqué 与两份 PDF Circular；snapshot 统一记录官方 landing page、content URL/media type、ETag/Last-Modified（存在时）、byte count、SHA-256 和 `lu:cssf:<local-id>`。HTML adapter 已通过 heading、paragraph、nested list、footnote、entity、source locator 与 stable-ID fixtures，并以 section/block count、warning ceiling 和正文 anchor hash 作为 fidelity gate；无法表达的正文图片与排除的 related-document collections 必须形成显式 warning。PDF 仍须通过独立 structural fixtures 与 fidelity gate 后才能成为 Canonical Document。
 
 ---
 

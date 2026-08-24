@@ -3157,7 +3157,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 - performance、accessibility、visual refinement、cross-browser testing；
 - production artifact atomic publish / rollback runbook。
 
-当前状态：已核验并登记首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git，也不会在 structural adapter 通过前进入 Canonical/Reader。该样本证明 CSSF 文档页 HTML 主要承载 metadata，而 Circular 正文仍需 PDF fallback。
+当前状态：已核验并登记首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。该 HTML communiqué 已可生成独立 Canonical artifact，但尚未接入 runtime/Explorer/Reader；两份 Circular 正文仍需 PDF fallback adapter。
 
 ## Phase 2 Sequence
 

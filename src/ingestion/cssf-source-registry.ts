@@ -44,6 +44,17 @@ export const cssfSourceDefinitionSchema = z
     contentUrl: z.string().url(),
     contentMediaType: z.enum(["text/html", "application/pdf"]),
     topics: z.array(z.string().min(1)).min(1),
+    quality: z
+      .object({
+        sectionCount: z.number().int().positive(),
+        blockCount: z.number().int().positive(),
+        maximumWarnings: z.number().int().nonnegative(),
+        textHashes: z.record(
+          z.string().min(1),
+          z.string().regex(/^sha256:[a-f0-9]{64}$/),
+        ),
+      })
+      .optional(),
   })
   .superRefine((source, context) => {
     for (const [field, value] of [
