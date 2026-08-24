@@ -122,6 +122,9 @@ test("an exact defined term opens its official definition Side Peek", async ({
   const preview = page.getByRole("dialog", { name: "Definition preview" });
   await expect(preview).toBeVisible();
   await expect(
+    preview.getByRole("button", { name: "Close definition preview" }),
+  ).toBeFocused();
+  await expect(
     preview.getByRole("heading", {
       name: "“digital operational resilience”",
     }),
@@ -279,6 +282,9 @@ test("search shortcut focuses the query and Escape closes it", async ({
   const input = search.getByRole("textbox", {
     name: "Find laws by name, CELEX, or citation",
   });
+  await expect(
+    search.evaluate((dialog) => dialog.matches(":modal")),
+  ).resolves.toBe(true);
   await expect(input).toBeFocused();
 
   await page.keyboard.press("Escape");

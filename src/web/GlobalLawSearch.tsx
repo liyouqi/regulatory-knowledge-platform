@@ -278,6 +278,7 @@ export function GlobalLawSearch({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<SearchMode>("laws");
   const [query, setQuery] = useState("");
@@ -318,6 +319,16 @@ export function GlobalLawSearch({
         : mode === "definitions"
           ? definitionResults.length
           : fullTextResults.length;
+
+  useEffect(() => {
+    if (!open) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    return () => {
+      if (dialog.open) dialog.close();
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -509,7 +520,11 @@ export function GlobalLawSearch({
         aria-modal="true"
         aria-busy={loading}
         className="global-search"
-        open
+        onCancel={(event) => {
+          event.preventDefault();
+          onClose();
+        }}
+        ref={dialogRef}
       >
         <header className="global-search-input">
           {loading ? (

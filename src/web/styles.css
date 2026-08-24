@@ -1715,7 +1715,6 @@ kbd {
 
 .search-backdrop {
   align-items: flex-start;
-  background: rgb(8 10 7 / 76%);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -1734,11 +1733,15 @@ kbd {
   flex-direction: column;
   font-family: ui-sans-serif, system-ui, sans-serif;
   max-height: min(720px, 78vh);
-  margin: 0;
+  margin: min(14vh, 120px) auto 0;
   overflow: hidden;
   padding: 0;
   position: relative;
   width: min(720px, 100%);
+}
+
+.global-search::backdrop {
+  background: rgb(8 10 7 / 76%);
 }
 
 .global-search-input {

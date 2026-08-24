@@ -295,6 +295,26 @@ function AnnotatedLegalText({
     .concat(text.slice(cursor));
 }
 
+function useSidePeekFocus() {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    return () => {
+      if (previouslyFocusedRef.current?.isConnected) {
+        previouslyFocusedRef.current.focus();
+      }
+    };
+  }, []);
+
+  return dialogRef;
+}
+
 function ReferencePeek({
   relationship,
   onClose,
@@ -304,6 +324,7 @@ function ReferencePeek({
 }) {
   const [preview, setPreview] = useState<RelationshipPreview | null>(null);
   const [error, setError] = useState("");
+  const dialogRef = useSidePeekFocus();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -337,6 +358,7 @@ function ReferencePeek({
       className="reference-peek"
       onCancel={onClose}
       open
+      ref={dialogRef}
     >
       <header>
         <p className="eyebrow">REFERENCE PREVIEW</p>
@@ -387,12 +409,15 @@ function DefinitionPeek({
   definition: DefinitionSearchResult;
   onClose: () => void;
 }) {
+  const dialogRef = useSidePeekFocus();
+
   return (
     <dialog
       aria-label="Definition preview"
       className="reference-peek definition-peek"
       onCancel={onClose}
       open
+      ref={dialogRef}
     >
       <header>
         <p className="eyebrow">OFFICIAL DEFINITION</p>
