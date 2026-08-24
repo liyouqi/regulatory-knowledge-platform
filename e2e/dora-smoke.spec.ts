@@ -130,3 +130,37 @@ test("DORA Article 28 opens a mapped RTS measure", async ({ page }) => {
     page.getByRole("heading", { name: "DORA RTS ICT Third-Party Policy" }),
   ).toBeVisible();
 });
+
+test("Reader, Explorer, and search remain usable on a narrow viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/read/dora/articles/28");
+
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+  await expect(page.locator(".toc")).toBeVisible();
+  await expect(page.locator(".context-panel")).toBeHidden();
+  await expect(
+    page
+      .locator("html")
+      .evaluate((element) => element.scrollWidth <= globalThis.innerWidth),
+  ).resolves.toBe(true);
+
+  await page.getByRole("button", { name: /Find laws/ }).click();
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  await expect(search).toBeVisible();
+  await expect(
+    search.getByRole("textbox", {
+      name: "Find laws by name, CELEX, or citation",
+    }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Close search" }).click();
+  await page.goto("/explore/dora");
+  await expect(page.getByRole("heading", { name: "DORA" })).toBeVisible();
+  await expect(
+    page
+      .locator("html")
+      .evaluate((element) => element.scrollWidth <= globalThis.innerWidth),
+  ).resolves.toBe(true);
+});
