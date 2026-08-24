@@ -75,6 +75,7 @@ npm run build
 | `npm run build` | Verify the production web build. |
 | `npm run runtime:build` | Atomically rebuild the read-only runtime SQLite from validated Canonical artifacts. |
 | `npm run runtime:verify` | Validate a built runtime SQLite artifact through the read-only Reader and Search services. |
+| `npm run release:verify` | Rebuild and verify raw snapshots, registry IDs, Canonical views, and runtime SQLite as one corpus. |
 | `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
 | `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |

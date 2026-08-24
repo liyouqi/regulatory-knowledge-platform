@@ -29,6 +29,7 @@
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
     "runtime:build": "node --import tsx src/search/build-search-index.ts",
     "runtime:verify": "node --import tsx src/runtime/verify-runtime-artifact.ts",
+    "release:verify": "npm run runtime:build && node --import tsx src/release/verify-corpus.ts",
     "relationships:benchmark": "node --import tsx src/relationships/benchmark-related-recitals.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",
