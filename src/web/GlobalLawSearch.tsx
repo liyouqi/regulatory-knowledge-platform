@@ -42,10 +42,12 @@ const reasonLabels: Record<LawSearchResult["matchReason"], string> = {
   "exact-celex": "Exact CELEX",
   "exact-local-id": "Exact local ID",
   "exact-alias": "Exact name",
+  "typo-alias": "Did you mean",
   "exact-citation": "Exact citation",
   "exact-title": "Exact title",
   "title-prefix": "Title prefix",
   "title-terms": "Title terms",
+  "law-anchor": "Law and locator",
 };
 
 const incompleteProvisionSuffix =
@@ -727,9 +729,16 @@ export function GlobalLawSearch({
           mode === "laws" &&
           lawResponse &&
           lawResults.length === 0 ? (
-            <p className="search-empty">
-              No available law matches “{lawResponse.query}”.
-            </p>
+            <div className="search-empty search-fallback">
+              <strong>No law identity matches “{lawResponse.query}”.</strong>
+              <span>
+                Try a law name, CELEX, or Article locator—or search the legal
+                text instead.
+              </span>
+              <button onClick={() => selectMode("fulltext")} type="button">
+                <FileSearch aria-hidden="true" size={14} /> Search legal text
+              </button>
+            </div>
           ) : null}
 
           {!error &&

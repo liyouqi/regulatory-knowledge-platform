@@ -196,10 +196,12 @@ export const lawSearchMatchReasonSchema = z.enum([
   "exact-celex",
   "exact-local-id",
   "exact-alias",
+  "typo-alias",
   "exact-citation",
   "exact-title",
   "title-prefix",
   "title-terms",
+  "law-anchor",
 ]);
 
 export const lawSearchTargetSchema = z.object({

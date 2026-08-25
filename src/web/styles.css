@@ -2500,6 +2500,36 @@ kbd {
   text-align: center;
 }
 
+.search-fallback {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.search-fallback strong {
+  color: #e8eadf;
+  font-size: 13px;
+}
+
+.search-fallback button {
+  align-items: center;
+  background: #2d3329;
+  border: 1px solid #58644a;
+  border-radius: 5px;
+  color: #d9e4ad;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 11px;
+  gap: 6px;
+  padding: 7px 9px;
+}
+
+.search-fallback button:hover {
+  background: #394230;
+}
+
 .full-text-intro {
   align-items: center;
   display: flex;
@@ -2831,6 +2861,16 @@ kbd {
 :root[data-theme="light"] .definition-text,
 :root[data-theme="light"] .full-text-snippet {
   color: #656b60;
+}
+
+:root[data-theme="light"] .search-fallback strong {
+  color: #252820;
+}
+
+:root[data-theme="light"] .search-fallback button {
+  background: #e7ead8;
+  border-color: #bdc5a2;
+  color: #46562e;
 }
 
 :root[data-theme="light"] .search-mode-tabs button.active {

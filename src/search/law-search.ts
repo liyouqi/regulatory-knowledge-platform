@@ -55,6 +55,48 @@ function isExactCitation(query: string, record: LawSearchRecord): boolean {
   ]).has(query);
 }
 
+function hasEditDistanceAtMostOne(left: string, right: string): boolean {
+  if (Math.abs(left.length - right.length) > 1) return false;
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let differences = 0;
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (left[leftIndex] === right[rightIndex]) {
+      leftIndex += 1;
+      rightIndex += 1;
+      continue;
+    }
+    differences += 1;
+    if (differences > 1) return false;
+    if (left.length > right.length) leftIndex += 1;
+    else if (right.length > left.length) rightIndex += 1;
+    else {
+      leftIndex += 1;
+      rightIndex += 1;
+    }
+  }
+  return true;
+}
+
+function normalizedAliases(record: LawSearchRecord): string[] {
+  return [record.shortName, ...record.aliases].map(normalizeLawQuery);
+}
+
+function typoAliasRank(
+  record: LawSearchRecord,
+  query: string,
+): Pick<LawSearchResult, "matchReason" | "score"> | null {
+  if (!/^[a-z0-9]+$/u.test(query) || query.length < 4) return null;
+  return normalizedAliases(record).some(
+    (alias) =>
+      /^[a-z0-9]+$/u.test(alias) &&
+      alias.length >= 4 &&
+      hasEditDistanceAtMostOne(query, alias),
+  )
+    ? { matchReason: "typo-alias", score: 450 }
+    : null;
+}
+
 function rankRecord(
   record: LawSearchRecord,
   query: string,
@@ -67,7 +109,7 @@ function rankRecord(
     return { matchReason: "exact-local-id", score: 1000 };
   }
 
-  const aliases = [record.shortName, ...record.aliases].map(normalizeLawQuery);
+  const aliases = normalizedAliases(record);
   if (aliases.includes(query)) {
     return { matchReason: "exact-alias", score: 900 };
   }
@@ -97,7 +139,21 @@ function rankRecord(
   if (terms.length > 0 && terms.every(hasTerm)) {
     return { matchReason: "title-terms", score: 500 + terms.length };
   }
-  return null;
+  return typoAliasRank(record, query);
+}
+
+function rankLawAnchor(
+  record: LawSearchRecord,
+  lawQuery: string,
+): Pick<LawSearchResult, "matchReason" | "score"> | null {
+  const directRank = rankRecord(record, lawQuery);
+  if (directRank) return directRank;
+  const paddedQuery = ` ${lawQuery} `;
+  return normalizedAliases(record).some((alias) =>
+    paddedQuery.includes(` ${alias} `),
+  )
+    ? { matchReason: "law-anchor", score: 850 }
+    : null;
 }
 
 function parseProvisionIntent(query: string) {
@@ -195,7 +251,9 @@ export function searchLaws(
   const results = normalizedQuery
     ? records
         .flatMap((record) => {
-          const rank = rankRecord(record, lawQuery);
+          const rank = provisionIntent
+            ? rankLawAnchor(record, lawQuery)
+            : rankRecord(record, lawQuery);
           if (!rank) return [];
           if (!provisionIntent) return [toResult(record, rank)];
           const provision = record.provisions.find(

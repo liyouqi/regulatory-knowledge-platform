@@ -137,6 +137,16 @@ describe("Find Laws deterministic ranking", () => {
     expect(searchLaws(records, "Regulation 2022/2555").results).toHaveLength(0);
   });
 
+  it.each(["doora", "doraa"])(
+    "suggests DORA for the one-character typo %s",
+    (query) => {
+      expect(searchLaws(records, query).bestMatch).toMatchObject({
+        slug: "dora",
+        matchReason: "typo-alias",
+      });
+    },
+  );
+
   it("matches a CSSF local ID without manufacturing a CELEX identifier", () => {
     const result = searchLaws(
       [...records, cssfRecord],
@@ -165,6 +175,22 @@ describe("Find Laws deterministic ranking", () => {
     const response = searchLaws(records, query);
     expect(response.bestMatch?.target).toMatchObject({ kind, path });
     expect(response.bestMatch).not.toHaveProperty("provisions");
+  });
+
+  it("keeps a known law anchor when extra descriptive words precede a locator", () => {
+    expect(searchLaws(records, "dora risk article 3").bestMatch).toMatchObject({
+      slug: "dora",
+      matchReason: "law-anchor",
+      target: { path: "/read/dora/articles/3" },
+    });
+  });
+
+  it("resolves a one-character law-name typo before an existing locator", () => {
+    expect(searchLaws(records, "doora article 3").bestMatch).toMatchObject({
+      slug: "dora",
+      matchReason: "typo-alias",
+      target: { path: "/read/dora/articles/3" },
+    });
   });
 
   it("keeps the law result visible while a provision citation is incomplete", () => {

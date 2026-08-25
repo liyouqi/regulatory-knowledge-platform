@@ -378,7 +378,7 @@ After `npm run dev`, manually check one legacy single-XML act and one modern pac
 
 Use `Cmd+K` on macOS or `Ctrl+K` elsewhere from either Reader or Explorer to open the global Find Laws panel. Search is live; `↑`/`↓` changes the active result, `Enter` opens its Explorer, and `Esc` closes the panel.
 
-The deterministic server endpoint is `/api/search/laws?q=<query>`. It ranks exact legal identity ahead of lexical title matches in this order: CELEX, reviewed name/alias, structured year/number citation, exact title, title prefix, then whole-term matches. Useful checks include:
+The deterministic server endpoint is `/api/search/laws?q=<query>`. It ranks exact legal identity ahead of lexical title matches in this order: CELEX, reviewed name/alias, structured year/number citation, exact title, title prefix, then whole-term matches. A one-character typo fallback applies only to a concise reviewed law name or alias (for example `doora` → DORA); it never alters official legal text. Compound law-and-locator input preserves a recognised law anchor even when descriptive words occur before the locator (for example `dora risk article 3` → DORA Article 3). When no law identity matches, the dialog offers a direct switch to Full text instead of an empty result area. Useful checks include:
 
 ```text
 DORA
