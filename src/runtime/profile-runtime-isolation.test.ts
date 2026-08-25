@@ -50,8 +50,20 @@ describe("banking-default runtime isolation", () => {
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 14,
+      documentCount: 15,
     });
+  });
+
+  it("includes the CRD pilot source across Reader and Search", () => {
+    expect(repository?.findDocumentBySlug("crd-iv")?.id).toBe("eu:32013L0036");
+    expect(
+      search
+        ?.search("internal governance")
+        .results.some((result) => result.documentId === "eu:32013L0036"),
+    ).toBe(true);
+    expect(
+      search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
+    ).toHaveLength(68);
   });
 
   it("makes excluded Reader, Explorer, Library, and relationship lookups unavailable", () => {

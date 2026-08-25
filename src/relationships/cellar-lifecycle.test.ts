@@ -15,10 +15,10 @@ describe("CELLAR lifecycle runtime builder", () => {
     expect(build.works).toHaveLength(74);
     expect(
       build.works.filter((work) => work.availability === "loaded"),
-    ).toHaveLength(10);
+    ).toHaveLength(11);
     expect(
       build.works.filter((work) => work.availability === "external"),
-    ).toHaveLength(64);
+    ).toHaveLength(63);
     expect(
       build.relationships.filter((item) => item.relationType === "AMENDS"),
     ).toHaveLength(24);
@@ -26,8 +26,29 @@ describe("CELLAR lifecycle runtime builder", () => {
       build.relationships.filter((item) => item.relationType === "CORRECTS"),
     ).toHaveLength(41);
     expect(
-      build.relationships.every((item) => item.resolutionStatus === "external"),
-    ).toBe(true);
+      build.relationships.filter(
+        (item) => item.resolutionStatus === "external",
+      ),
+    ).toHaveLength(64);
+    expect(
+      build.relationships.filter(
+        (item) => item.resolutionStatus === "resolved",
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        sourceWorkId: "eu:32023R1114",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32013L0036",
+      }),
+    ]);
+    expect(build.works).toContainEqual(
+      expect.objectContaining({
+        id: "eu:32013L0036",
+        loadedDocumentId: "eu:32013L0036",
+        label: "CRD IV",
+        availability: "loaded",
+      }),
+    );
     expect(build.works).toContainEqual(
       expect.objectContaining({
         id: "eu:32024R2956",

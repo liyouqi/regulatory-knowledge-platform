@@ -64,6 +64,8 @@ npm run source:verify -- --snapshot data/raw/eur-lex/<CELEX>/<snapshot-directory
 
 Keep the printed snapshot identifier and SHA-256 values. `data/raw/` is ignored by Git and must not be edited.
 
+Cellar may expose an older act as one multi-item FMX4 manifestation instead of one downloadable ZIP. The acquisition layer must preserve all byte-exact official ACT/ANNEX/DOC XML items and their individual response metadata/hashes in snapshot schema `1.1.0`; it may assemble only a deterministic transport ZIP at the raw boundary. Do not choose the first XML item by response order, because legacy manifests can list an Annex before the ACT. `source:verify` checks both the assembled package hash and every recorded upstream item before Canonical parsing.
+
 ### 3. Inspect before publication
 
 ```bash

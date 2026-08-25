@@ -1894,7 +1894,7 @@ flowchart LR
 
 当前实现：首个 CELLAR focused slice 只查询已加载的 13 个 EU CELEX Work 之间的一跳闭集关系，并只发布经官方 CDM 定义核验的 `resource_legal_based_on_resource_legal` 与 `resource_legal_completes_resource_legal`。前者归一化为 document-level `ADOPTED_UNDER`，后者归一化为 `SUPPLEMENTS`；共 12 条记录，统一使用 `OFFICIAL_METADATA`，保留 source/target CELLAR Work URI、predicate locator、查询版本与 checked timestamp。两端任一文档未加载时不发布。原始 SPARQL response 只保存在 Git ignored snapshot，runtime 只读取人工复核的 normalized dataset。`work_cites_work`、external nodes 与 case-law predicates 不在本切片发布。
 
-第二个 lifecycle slice 以 `resource_legal_amends_resource_legal` 和 `resource_legal_corrects_resource_legal` 查询同一 13-seed corpus 的开放一跳邻域。2026-08-24 verified snapshot 得到 65 条候选：24 amendment、41 corrigendum；其中 2 条 amendment 指向 seed，22 条由 seed 指向外部 Work，且全部 65 条都至少有一端未加载。query、response 与 hash manifest 继续只进入 Git ignored raw snapshot；人工复核后的 normalized records 独立发布到 `data/official-metadata/cellar-lifecycle-relations.json`。SQLite `4.6.0` 以 CELEX 生成 stable Work ID，使用独立 `legal_works` / `lifecycle_relationships` 表，不放松现有 `relationships → legal_entities` 外键，也不创建可进入 Reader 的伪 Document。外部节点只在 Document Graph 显示官方 metadata link。
+第二个 lifecycle slice 以 `resource_legal_amends_resource_legal` 和 `resource_legal_corrects_resource_legal` 查询当时 13-seed corpus 的开放一跳邻域。2026-08-24 verified snapshot 得到 65 条候选：24 amendment、41 corrigendum；当时 2 条 amendment 指向 seed，22 条由 seed 指向外部 Work，全部 65 条至少有一端未加载。Phase 3 将 CRD 加载为第 14 个 EU Document 后，既有已审核 `MiCA → AMENDS → CRD` record 自动变为两端 loaded，另 64 条仍有 external endpoint；该变化只来自 endpoint availability，不新增或推断 lifecycle 关系。query、response 与 hash manifest 继续只进入 Git ignored raw snapshot；人工复核后的 normalized records 独立发布到 `data/official-metadata/cellar-lifecycle-relations.json`。SQLite `4.6.0` 以 CELEX 生成 stable Work ID，使用独立 `legal_works` / `lifecycle_relationships` 表，不放松现有 `relationships → legal_entities` 外键，也不创建可进入 Reader 的伪 Document。外部节点只在 Document Graph 显示官方 metadata link。
 
 ## 22.2 Amendment & Version Chain
 
@@ -2056,7 +2056,7 @@ Phase 2 提供一个 `banking-default` representative Profile，验证同一 mas
 
 Phase 2 不实现任意 API 请求动态选择 Profile、多租户、Profile 权限或跨 Profile 聚合；这些属于 Phase 4 external delivery。
 
-当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU 与 Graph 数据。`banking-default` 当前允许 DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work 不会作为 external node 回流。Runtime schema `4.6.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph 无旁路。
+当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU 与 Graph 数据。`banking-default` 当前允许 CRD、DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work 不会作为 external node 回流。Runtime schema `4.6.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、CRD 进入 banking corpus、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph 无旁路。
 
 ---
 
@@ -3259,6 +3259,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 
 当前状态：已核验、结构化并接入首批三份代表性 CSSF 官方来源：一份具有 heading/list 结构的 HTML communiqué，以及 Circular CSSF 25/893 与 Circular CSSF 12/552 两份 PDF。独立 CSSF acquisition 只接受 CSSF 官方 HTTPS host，保存 landing page、正文媒体类型、byte count、SHA-256、retrieval time 和 content-derived snapshot ID；raw snapshot 不进入 Git。HTML structural adapter 已在官方快照上恢复 3 个 section、21 个正文 block，并以 warning ceiling 与三处正文 hash 固化 fidelity gate；正文图片与 related-document card 的排除均显式告警。Tagged-PDF incident-reporting profile 已在 25/893 上恢复 introduction、4 个 chapter、连续 points 1–15、字母/数字嵌套 point 与 footnote，签名 table 作为非正文内容显式排除。独立 consolidated-governance profile 已在 12/552 上恢复 4 个 Part、82 个 Part/Chapter/Sub-chapter/Section/Sub-section 节点、Part I points 1–3 及 19 个 definition entry、Part II points 1–186、Part III points 1–51、Part IV timeline 与 Annex I–II；实质性无编号段落和 tagged table 保留为正文，仅 page 83 contact footer 显式排除。两种 PDF profile 均以 page/structure/provision/point count、warning ceiling 和跨段正文 hash 固化 fidelity gate；Part 内重复 point 编号只在 route token 中稳定消歧，official label 不变。三份 CSSF 文档均通过当前 SQLite `4.6.0` 继承的独立 local-ID contract 接入 catalog、full-text search、Explorer 与 Reader，不伪造 CELEX 或 Article 语义。Reader、Explorer 与 Level 2 Library 现提供共享的 dark/light theme toggle，并只在浏览器保存该偏好。运行时 artifact 现可在 staging path 构建，以 `runtime:verify` 经只读 Search/Reader service 验证，再通过 `REGULATORY_RUNTIME_DATABASE_PATH` promote；runbook 明确保留 previous artifact 并在 health/build ID 不符时回退。
 
+Phase 3 Banking Governance pilot 当前已完成第一项 source onboarding：Directive 2013/36/EU（CRD IV）的完整 English original-OJ Formex 主文与 Annexes I–II 通过统一 manifest workflow 接入，质量基线固定为 165 Articles、107 Recitals、550 paragraph/subparagraph、595 point/subpoint、41 structural nodes、2 Annexes 和零 warning。Registry 明确记录该 snapshot 是 2013-06-27 original OJ，并链接外部 current version 与 2013、2017 corrigenda；Reader 不得将其表示为已载入 2026 consolidated text。CRD 自动进入 `full-corpus` 与 `banking-default` 的 Reader、Explorer、Search、Definitions 和现有 Graph pipeline。EBA/GL/2021/05、Provision-level Domain assignment、Authority entity 与 EU → Luxembourg relation 尚未发布，仍是本 pilot 后续独立 review gate。
+
 ## Phase 2 Sequence
 
 1. CELLAR focused relations；
@@ -3275,7 +3277,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 ## Phase 3 Sequence
 
 1. manifest-driven corpus orchestration（已完成）；raw snapshot remote retention（archive gate 已完成，外部存储待配置）；
-2. Banking Governance & Internal Control pilot；
+2. Banking Governance & Internal Control pilot（进行中：CRD official source onboarding 已完成）；
 3. provision-level taxonomy/topics and Authority entities；
 4. EU → Luxembourg legal relations；
 5. Agent/RAG internal retrieval context；

@@ -9,6 +9,10 @@ export interface FmxDiscovery {
   manifestationUri: string;
   contentUrl: string;
   streamName: string;
+  contentItems: Array<{
+    contentUrl: string;
+    streamName: string;
+  }>;
 }
 
 function asRecord(value: unknown, context: string): XmlRecord {
@@ -132,16 +136,32 @@ export function discoverEnglishFmx(
   );
   const streamNameOf = (candidate: XmlRecord) =>
     textValue(asRecord(candidate.TECHMD, "TECHMD").STREAM_NAME);
+  const zipItem = items.find((candidate) =>
+    streamNameOf(candidate)?.toLowerCase().endsWith(".zip"),
+  );
+  const xmlItems = items.filter((candidate) =>
+    streamNameOf(candidate)?.toLowerCase().endsWith(".xml"),
+  );
+  const metadataBases = new Set(
+    xmlItems
+      .map((candidate) => streamNameOf(candidate))
+      .filter(
+        (name): name is string =>
+          typeof name === "string" && name.toLowerCase().endsWith(".doc.xml"),
+      )
+      .map((name) => `${name.slice(0, -".doc.xml".length)}.xml`),
+  );
+  const legalXmlItems = xmlItems.filter((candidate) => {
+    const name = streamNameOf(candidate)?.toLowerCase();
+    return !name?.endsWith(".doc.xml") && !name?.endsWith(".toc.xml");
+  });
+  const actItem =
+    legalXmlItems.find((candidate) =>
+      metadataBases.has(streamNameOf(candidate) ?? ""),
+    ) ?? legalXmlItems[0];
   const item =
-    items.find((candidate) => {
-      const name = streamNameOf(candidate)?.toLowerCase();
-      return (
-        name?.endsWith(".zip") ||
-        (name?.endsWith(".xml") &&
-          !name.endsWith(".doc.xml") &&
-          !name.endsWith(".toc.xml"))
-      );
-    }) ??
+    zipItem ??
+    actItem ??
     items.find((candidate) => textValue(candidate.IDENTIFIER) === "DOC_1") ??
     asRecord(items[0], "MANIFESTATION_HAS_ITEM");
   const contentUrl = uriOf(item);
@@ -152,12 +172,41 @@ export function discoverEnglishFmx(
     throw new Error(`Incomplete FMX4 content metadata for CELEX ${celex}.ENG`);
   }
 
+  const selectedItems = zipItem
+    ? [zipItem]
+    : actItem
+      ? [actItem, ...xmlItems.filter((candidate) => candidate !== actItem)]
+      : [item];
+  const contentItems = selectedItems.map((candidate) => {
+    const candidateUrl = uriOf(candidate);
+    const candidateStreamName = streamNameOf(candidate);
+    if (!candidateUrl || !candidateStreamName) {
+      throw new Error(`Incomplete FMX4 item metadata for CELEX ${celex}.ENG`);
+    }
+    if (!/^[a-zA-Z0-9._-]+$/u.test(candidateStreamName)) {
+      throw new Error(
+        `Unsafe FMX4 stream name for CELEX ${celex}.ENG: ${candidateStreamName}`,
+      );
+    }
+    return {
+      contentUrl: officialCellarHttpsUrl(candidateUrl),
+      streamName: candidateStreamName,
+    };
+  });
+  if (
+    new Set(contentItems.map(({ streamName: name }) => name)).size !==
+    contentItems.length
+  ) {
+    throw new Error(`Duplicate FMX4 stream name for CELEX ${celex}.ENG`);
+  }
+
   return {
     workUri: officialCellarHttpsUrl(workUri),
     expressionUri: officialCellarHttpsUrl(expressionUri),
     manifestationUri: officialCellarHttpsUrl(manifestationUri),
     contentUrl: officialCellarHttpsUrl(contentUrl),
     streamName,
+    contentItems,
   };
 }
 

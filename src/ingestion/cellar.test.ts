@@ -89,6 +89,13 @@ describe("Cellar tree notice discovery", () => {
       contentUrl:
         "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
       streamName: "DORA_ENG.fmx4.zip",
+      contentItems: [
+        {
+          contentUrl:
+            "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
+          streamName: "DORA_ENG.fmx4.zip",
+        },
+      ],
     });
   });
 
@@ -103,6 +110,13 @@ describe("Cellar tree notice discovery", () => {
         contentUrl:
           "https://publications.europa.eu/resource/cellar/ai-fmx/DOC_1",
         streamName: "AI_ACT_ENG.fmx4.zip",
+        contentItems: [
+          {
+            contentUrl:
+              "https://publications.europa.eu/resource/cellar/ai-fmx/DOC_1",
+            streamName: "AI_ACT_ENG.fmx4.zip",
+          },
+        ],
       },
     );
   });
@@ -115,6 +129,20 @@ describe("Cellar tree notice discovery", () => {
         "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
       streamName: "LEGACY.01000101.xml",
     });
+    expect(
+      discoverEnglishFmx(legacyMultiItemTreeNotice, "32022R2554").contentItems,
+    ).toEqual([
+      {
+        contentUrl:
+          "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
+        streamName: "LEGACY.01000101.xml",
+      },
+      {
+        contentUrl:
+          "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
+        streamName: "LEGACY.doc.xml",
+      },
+    ]);
   });
 
   it("fails closed when the English expression is absent", () => {

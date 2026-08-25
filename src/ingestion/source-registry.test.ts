@@ -5,15 +5,16 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(13);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(13);
-    expect(sources.slice(0, 6).map((source) => source.shortName)).toEqual([
+    expect(sources).toHaveLength(14);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(14);
+    expect(sources.slice(0, 7).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
       "AI Act",
       "MiCA",
       "NIS2",
       "Data Act",
+      "CRD IV",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
     expect(
@@ -30,6 +31,21 @@ describe("EU source registry", () => {
       textAsOf: "2024-12-02",
       checkedAt: "2026-08-23T23:37:57.439Z",
       corrections: [{ date: "2025-09-19" }],
+    });
+    expect(
+      sources.find((source) => source.celex === "32013L0036"),
+    ).toMatchObject({
+      familyId: "family:crd",
+      quality: {
+        articleCount: 165,
+        annexCount: 2,
+        maximumWarnings: 0,
+      },
+      sourceStatus: {
+        basis: "original-oj",
+        textAsOf: "2013-06-27",
+        corrections: [{ date: "2013-08-02" }, { date: "2017-01-25" }],
+      },
     });
     expect(
       sources

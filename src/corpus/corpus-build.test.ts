@@ -11,11 +11,24 @@ describe("corpus build manifest", () => {
     const manifest = loadCorpusBuildManifest();
     const sources = await resolveCorpusBuildSources(manifest);
 
-    expect(sources).toHaveLength(16);
+    expect(sources).toHaveLength(manifest.sources.length);
+    expect(sources).toHaveLength(17);
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eur-lex",
+          identifier: "32013L0036",
+          snapshotId:
+            "snapshot:cellar:32013L0036:5084ee4c2cd50794ed4e3ac789ff1cda44613e701cfdba35e2c89439110710af",
+        }),
+      }),
+    );
     expect(sources.every((source) => source.parserVersion !== "pending")).toBe(
       true,
     );
-    expect(new Set(sources.map((source) => source.snapshotPath)).size).toBe(16);
+    expect(new Set(sources.map((source) => source.snapshotPath)).size).toBe(
+      sources.length,
+    );
   });
 
   it("derives a stable identity from the validated manifest", () => {

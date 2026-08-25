@@ -286,7 +286,13 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      16,
+      17,
+    );
+    expect(graph.nodes).toContainEqual(
+      expect.objectContaining({
+        entityId: "eu:32013L0036",
+        kind: "document",
+      }),
     );
     expect(
       graph.nodes.filter((node) => node.kind === "external-work").length,

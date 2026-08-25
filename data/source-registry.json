@@ -173,6 +173,54 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng"
   },
   {
+    "familyId": "family:crd",
+    "shortName": "CRD IV",
+    "aliases": [
+      "Capital Requirements Directive",
+      "Capital Requirements Directive IV",
+      "Directive 2013/36/EU"
+    ],
+    "celex": "32013L0036",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2013-06-27",
+    "quality": {
+      "articleCount": 165,
+      "recitalCount": 107,
+      "annexCount": 2,
+      "paragraphCount": 550,
+      "pointCount": 595,
+      "structuralNodeCount": 41,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32013L0036:recital:1": "sha256:e703d0536f7d7bf2ee9c4a7e343d91cdcbae633da23b5ca97b163901981953c1",
+        "eu:32013L0036:article:1:subparagraph:1": "sha256:189e1046928fd096de5004e0cec3b5492f926d0aa3e1a4f18004136c06c1cd21",
+        "eu:32013L0036:article:165:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32013L0036:annex:i": "sha256:bbc0d04b31cc5af2ca5fa0acab3d1422af37dbb6b540804fbaaf47ba2bf76d86",
+        "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2013-06-27",
+      "checkedAt": "2026-08-25T18:00:14Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2013/36",
+      "corrections": [
+        {
+          "date": "2013-08-02",
+          "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2013-08-02/oj/eng"
+        },
+        {
+          "date": "2017-01-25",
+          "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2017-01-25/oj/eng"
+        }
+      ]
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng"
+  },
+  {
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Risk Management",
     "aliases": [

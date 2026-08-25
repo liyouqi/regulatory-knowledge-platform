@@ -76,6 +76,7 @@ describe("SQLite runtime repository", () => {
 
   it("returns a bounded, normalized version chain only for reviewed status", () => {
     const chain = repository?.findDocumentVersionChain("eu:32024R2956");
+    const crdChain = repository?.findDocumentVersionChain("eu:32013L0036");
 
     expect(chain).toMatchObject({
       documentId: "eu:32024R2956",
@@ -107,10 +108,36 @@ describe("SQLite runtime repository", () => {
       "CURRENT_VERSION_LINK",
       "HAS_CORRIGENDUM",
     ]);
+    expect(crdChain).toMatchObject({
+      documentId: "eu:32013L0036",
+      coverage: "source-status-only",
+      checkedAt: "2026-08-25T18:00:14Z",
+      loadedVersionId: "version:eu:32013L0036:original-oj:2013-06-27",
+    });
+    expect(crdChain?.nodes).toHaveLength(4);
+    expect(crdChain?.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "current-version-link",
+          availability: "external",
+        }),
+        expect.objectContaining({ kind: "corrigendum", date: "2013-08-02" }),
+        expect.objectContaining({ kind: "corrigendum", date: "2017-01-25" }),
+      ]),
+    );
+    expect(crdChain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+      "HAS_CORRIGENDUM",
+      "HAS_CORRIGENDUM",
+    ]);
     expect(repository?.findDocumentVersionChain(dora.id)).toBeNull();
     expect(repository?.findDocumentVersionChain("eu:unknown")).toBeNull();
-    expect(repository?.versionNodeCount).toBe(chain?.nodes.length);
-    expect(repository?.versionEdgeCount).toBe(chain?.edges.length);
+    expect(repository?.versionNodeCount).toBe(
+      (chain?.nodes.length ?? 0) + (crdChain?.nodes.length ?? 0),
+    );
+    expect(repository?.versionEdgeCount).toBe(
+      (chain?.edges.length ?? 0) + (crdChain?.edges.length ?? 0),
+    );
   });
 
   it("returns explicit references and derives cited-by without duplicate edges", () => {
@@ -208,7 +235,7 @@ describe("SQLite runtime repository", () => {
       ),
     ).toBe(true);
     expect(repository?.lifecycleRelationshipCount).toBe(65);
-    expect(repository?.externalWorkCount).toBe(64);
+    expect(repository?.externalWorkCount).toBe(63);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

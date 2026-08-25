@@ -41,11 +41,13 @@ Representative scope:
 
 This pilot validates the workflow and data contracts. It does not attempt simultaneous full coverage of CRR/CRD, AML, payments, credit, markets, funds, insurance, prudential reporting, ESG, or national implementations.
 
+Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. Provision-level governance classification, EBA/GL/2021/05, Authority entities, and the reviewed EU → Luxembourg relation remain the next bounded slices.
+
 ## Financial-domain 1→100 queues
 
 | Domain | Representative next slice | Scale-out after validation | Status |
 |---|---|---|---|
-| Banking governance | CRD/EBA/CSSF pilot | governance, remuneration, fit-and-proper, internal control | planned |
+| Banking governance | CRD/EBA/CSSF pilot | governance, remuneration, fit-and-proper, internal control | in-progress |
 | Prudential | one bounded CRR topic | capital, liquidity, leverage, reporting | deferred |
 | Payments | four reviewed core laws/materials using the corpus orchestrator | PSD/PSR, payment security, EBA guidance, national material | deferred |
 | AML/KYC | one EU package + one authority/national chain | AML package, EBA guidance, FIU/national implementation | deferred |

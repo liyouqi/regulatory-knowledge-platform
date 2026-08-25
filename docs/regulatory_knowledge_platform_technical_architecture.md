@@ -1249,9 +1249,11 @@ raw source → canonical master corpus → profile compilation → relationships
 
 当前实现以 `REGULATORY_RUNTIME_DATABASE_PATH` 指向运行时只读 SQLite artifact；未设置时仍使用 repository 内的开发默认路径。`npm run runtime:verify -- --input <sqlite-path>` 必须在 promote 前通过，验证 SQLite integrity、FTS5、schema/build manifest 与 Reader/Search read model 一致性。具体 staging、promote、health check 与 rollback 步骤见 `docs/runtime-operation-runbook.md`。
 
-当前 `data/corpus-build-manifest.json` schema `1.0.0` 将两个 source registry 的 16 个条目逐一绑定到 exact snapshot ID、content SHA-256 与 retention status。`npm run corpus:build -- --profile <profileId>` 要求 manifest 与 registries 完全集合一致，验证本地 snapshot、quality baseline 和 required reviewed inputs 后，通过独立子进程调用既有 EUR-Lex/CSSF Canonical builders，再从 staging Canonical root 调用同一 Profile/Relationship/Search Runtime builder，并以只读 Runtime service 验证 staging SQLite。Staging Canonical 集合必须与 manifest 完全一致且全部为 official，fixture fallback 不得通过发布门禁。输出目录由 manifest、Profile、reviewed-input hashes 和 parser versions 的 build-request hash 确定，保存 ignored Canonical artifacts、Runtime SQLite 与 machine-readable report；promotion 仍是独立操作。编排层不复制 parser、relationship 或 search 业务逻辑。
+当前 `data/corpus-build-manifest.json` schema `1.0.0` 将两个 source registry 的 17 个条目逐一绑定到 exact snapshot ID、content SHA-256 与 retention status。`npm run corpus:build -- --profile <profileId>` 要求 manifest 与 registries 完全集合一致，验证本地 snapshot、quality baseline 和 required reviewed inputs 后，通过独立子进程调用既有 EUR-Lex/CSSF Canonical builders，再从 staging Canonical root 调用同一 Profile/Relationship/Search Runtime builder，并以只读 Runtime service 验证 staging SQLite。Staging Canonical 集合必须与 manifest 完全一致且全部为 official，fixture fallback 不得通过发布门禁。输出目录由 manifest、Profile、reviewed-input hashes 和 parser versions 的 build-request hash 确定，保存 ignored Canonical artifacts、Runtime SQLite 与 machine-readable report；promotion 仍是独立操作。编排层不复制 parser、relationship 或 search 业务逻辑。
 
-Snapshot retention 与 build orchestration 分开：当前 16 个条目均为 `local-only`，普通本地重建如实记录该状态；`--require-archived` 要求每项具有 reviewed `gs://`、`s3://` 或 HTTPS archive URI，否则 fail closed。上传、凭据、bucket versioning/retention policy 不进入应用代码；选定外部 object storage 后再把精确 locator 写回 manifest。
+Snapshot retention 与 build orchestration 分开：当前 17 个条目均为 `local-only`，普通本地重建如实记录该状态；`--require-archived` 要求每项具有 reviewed `gs://`、`s3://` 或 HTTPS archive URI，否则 fail closed。上传、凭据、bucket versioning/retention policy 不进入应用代码；选定外部 object storage 后再把精确 locator 写回 manifest。
+
+Phase 3 首个 CRD source 暴露了 legacy Cellar multi-item manifestation：同一 English FMX4 manifestation 将 `DOC` metadata、`ACT` 与两个 `ANNEX` 分成独立 item，且 item 顺序不保证主文优先。Acquisition 通过 `.doc.xml` metadata 与同 basename legal XML 识别主文，下载 manifestation 的 byte-exact XML items，并仅在 raw snapshot boundary 组装 deterministic ZIP；snapshot schema `1.1.0` 逐项保留 official URL、media type、ETag/Last-Modified、byte count 与 SHA-256，verification 同时核验 package 和每个上游 item。Canonical parser 仍只接收通用 Formex package，不增加 CRD 专用解析分支；CRD 的 165 Articles、107 Recitals、Annexes I–II 和零 warning 由既有 quality gate 发布。
 
 同一代码库可以把不同 Profile 编译成 `banking.sqlite`、`digital-assets.sqlite` 等独立 artifact。每个生产 deployment 默认固定一个 artifact/Profile；Phase 4 如开放 `profileId`，只能在授权的 artifact/service 范围内选择，不能让客户端绕过 corpus policy。
 
@@ -1501,7 +1503,7 @@ CI 不下载完整 bulk dump；CI 使用 fixtures。
 - runtime verify 同时核验 `profileId` 和 corpus counts；
 - 不因为普通 UI PR 每次重复跑完整数据。
 
-当前 `npm run corpus:build -- --profile <profileId>` 已作为已有 snapshot verification、Canonical、relationship、search 和 Runtime builders 的薄 orchestrator 落地。对 `full-corpus` 与 `banking-default` 的完整重建分别复现现有 16/14 文档 Runtime build ID。新增 source 仍须先按 `docs/corpus-onboarding-runbook.md` 完成 fetch、inspect、quality baseline 与 legal-semantic review，再更新 exact-snapshot manifest；编排命令不替代这些人工门禁。
+当前 `npm run corpus:build -- --profile <profileId>` 已作为已有 snapshot verification、Canonical、relationship、search 和 Runtime builders 的薄 orchestrator 落地。加入 CRD 后，对 `full-corpus` 与 `banking-default` 的完整重建分别复现 17/15 文档 Runtime build ID。新增 source 仍须先按 `docs/corpus-onboarding-runbook.md` 完成 fetch、inspect、quality baseline 与 legal-semantic review，再更新 exact-snapshot manifest；编排命令不替代这些人工门禁。
 
 ---
 

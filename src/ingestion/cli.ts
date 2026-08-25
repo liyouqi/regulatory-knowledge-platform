@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { zipSync } from "fflate";
 import {
   cellarTreeNoticeUrl,
   discoverEnglishFmx,
@@ -15,6 +16,7 @@ import { findSource, loadSourceRegistry } from "./source-registry";
 
 const MAX_TREE_NOTICE_BYTES = 10 * 1024 * 1024;
 const MAX_FMX_CONTENT_BYTES = 50 * 1024 * 1024;
+const MAX_FMX_PACKAGE_BYTES = 100 * 1024 * 1024;
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -132,16 +134,40 @@ async function fetchSource(): Promise<void> {
   const treeBytes = await readResponse(treeResponse, MAX_TREE_NOTICE_BYTES);
   const treeXml = new TextDecoder().decode(treeBytes);
   const discovery = discoverEnglishFmx(treeXml, source.celex);
-  const contentIsXml = discovery.streamName.toLowerCase().endsWith(".xml");
-  const contentResponse = await fetchOfficial(
-    discovery.contentUrl,
-    contentIsXml ? "application/xml;type=fmx4" : "application/zip",
+  const responses = await Promise.all(
+    discovery.contentItems.map(async (item) => {
+      const isXml = item.streamName.toLowerCase().endsWith(".xml");
+      const response = await fetchOfficial(
+        item.contentUrl,
+        isXml ? "application/xml;type=fmx4" : "application/zip",
+      );
+      assertMediaType(response, isXml ? "xml" : "application/zip");
+      const bytes = await readResponse(response, MAX_FMX_CONTENT_BYTES);
+      return { item, response, bytes };
+    }),
   );
-  assertMediaType(contentResponse, contentIsXml ? "xml" : "application/zip");
-  const contentBytes = await readResponse(
-    contentResponse,
-    MAX_FMX_CONTENT_BYTES,
+  const isMultiItem = responses.length > 1;
+  const upstreamBytes = responses.reduce(
+    (total, { bytes }) => total + bytes.byteLength,
+    0,
   );
+  if (upstreamBytes > MAX_FMX_PACKAGE_BYTES) {
+    throw new Error(
+      `Formex manifestation items exceed ${MAX_FMX_PACKAGE_BYTES} bytes`,
+    );
+  }
+  const contentBytes = isMultiItem
+    ? zipSync(
+        Object.fromEntries(
+          responses.map(({ item, bytes }) => [item.streamName, bytes]),
+        ),
+        { level: 0 },
+      )
+    : responses[0].bytes;
+  if (contentBytes.byteLength > MAX_FMX_PACKAGE_BYTES) {
+    throw new Error(`Formex package exceeds ${MAX_FMX_PACKAGE_BYTES} bytes`);
+  }
+  const primaryResponse = responses[0].response;
   const contentSha256 = hash(contentBytes);
   const treeSha256 = hash(treeBytes);
   const snapshotId = `snapshot:cellar:${source.celex}:${contentSha256}`;
@@ -152,11 +178,13 @@ async function fetchSource(): Promise<void> {
     source.celex,
     directoryName,
   );
+  const contentIsXml =
+    !isMultiItem && discovery.streamName.toLowerCase().endsWith(".xml");
   const contentFile = contentIsXml ? "source.fmx4.xml" : "source.fmx4.zip";
   await mkdir(outputDirectory, { recursive: true });
 
   const snapshot: OfficialSourceSnapshot = officialSourceSnapshotSchema.parse({
-    schemaVersion: "1.0.0",
+    schemaVersion: isMultiItem ? "1.1.0" : "1.0.0",
     snapshotId,
     provenance: "official",
     sourceSystem: "cellar",
@@ -177,14 +205,35 @@ async function fetchSource(): Promise<void> {
       file: "tree-notice.xml",
     },
     content: {
-      url: discovery.contentUrl,
-      mediaType: contentResponse.headers.get("content-type"),
-      etag: contentResponse.headers.get("etag"),
-      lastModified: contentResponse.headers.get("last-modified"),
+      url: isMultiItem ? discovery.manifestationUri : discovery.contentUrl,
+      mediaType: isMultiItem
+        ? "application/zip"
+        : primaryResponse.headers.get("content-type"),
+      etag: isMultiItem ? null : primaryResponse.headers.get("etag"),
+      lastModified: isMultiItem
+        ? null
+        : primaryResponse.headers.get("last-modified"),
       sha256: `sha256:${contentSha256}`,
       bytes: contentBytes.byteLength,
-      upstreamStreamName: discovery.streamName,
+      upstreamStreamName: isMultiItem
+        ? `${source.celex}.fmx4.zip`
+        : discovery.streamName,
       file: contentFile,
+      ...(isMultiItem
+        ? {
+            assembly: "cellar-manifestation-items" as const,
+            upstreamItems: responses.map(({ item, response, bytes }) => ({
+              url: item.contentUrl,
+              mediaType: response.headers.get("content-type"),
+              etag: response.headers.get("etag"),
+              lastModified: response.headers.get("last-modified"),
+              sha256: `sha256:${hash(bytes)}`,
+              bytes: bytes.byteLength,
+              file: item.streamName,
+              upstreamStreamName: item.streamName,
+            })),
+          }
+        : {}),
     },
   });
 
