@@ -122,21 +122,36 @@ docker build -t regulatory-knowledge-platform:local .
 docker run --rm -p 8080:8080 -e PORT=8080 regulatory-knowledge-platform:local
 ```
 
-Then verify `http://localhost:8080/api/health` and `http://localhost:8080/`. To publish a verified image to Cloud Run, authenticate `gcloud`, select the intended project and region, then use a project-specific Artifact Registry image name:
+Then verify `http://localhost:8080/api/health` and `http://localhost:8080/`. This runtime makes no external data request: Reader, Explorer, Search, Library, and Relationship Graph all use the bundled read-only SQLite artifact. Network access is only needed to update source snapshots, open an official-source link, or serve the public deployment.
+
+To publish a verified image to Cloud Run, create or select a billed GCP project, install the Google Cloud CLI, and choose a region. The commands below use `europe-west1` and an Artifact Registry repository named `regulatory`. Enable the APIs and create the repository once per project:
 
 ```bash
 gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com
+gcloud artifacts repositories create regulatory \
+  --repository-format=docker \
+  --location=europe-west1
 gcloud auth configure-docker europe-west1-docker.pkg.dev
-docker tag regulatory-knowledge-platform:local europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID
-docker push europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID
-gcloud run deploy regulatory-knowledge-platform \
-  --image europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID \
-  --region europe-west1 \
-  --allow-unauthenticated
 ```
 
-Keep the deployed image tag and the `/api/health` `buildId` with the release record. A new verified SQLite artifact is promoted by building and deploying a new immutable image, then routing traffic to the new Cloud Run revision; retain the preceding image for rollback. The service honours Cloud Run's injected `PORT` variable.
+For every release, use a new immutable tag. On Apple Silicon, Cloud Run requires an image containing `linux/amd64`, so build and push it with Buildx rather than tagging the locally tested native image:
+
+```bash
+RELEASE_ID="$(git rev-parse --short HEAD)"
+IMAGE="europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:${RELEASE_ID}"
+docker buildx build --platform linux/amd64 --tag "$IMAGE" --push .
+gcloud run deploy regulatory-knowledge-platform \
+  --image "$IMAGE" \
+  --region europe-west1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --memory 1Gi \
+  --max-instances 1
+```
+
+After deployment, obtain the service URL from the command output and check `<service-url>/api/health`. Keep the deployed image tag and the response's `runtimeDatabase.buildId` with the release record. A new verified SQLite artifact is promoted by building and deploying a new immutable image, then routing traffic to the new Cloud Run revision; retain the preceding image for rollback. The service honours Cloud Run's injected `PORT` variable.
 
 ## Legal Data Operations
 
