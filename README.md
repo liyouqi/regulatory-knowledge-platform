@@ -136,6 +136,27 @@ gcloud artifacts repositories create regulatory \
 gcloud auth configure-docker europe-west1-docker.pkg.dev
 ```
 
+### Registry authentication troubleshooting
+
+Before the first push, confirm that `gcloud` is using the intended account and project:
+
+```bash
+gcloud version
+gcloud auth list
+gcloud config list
+gcloud projects describe "$(gcloud config get-value project)"
+```
+
+If `docker buildx ... --push` fails with `failed to fetch anonymous token` and `403 Forbidden`, repeat `gcloud auth configure-docker europe-west1-docker.pkg.dev`. If Docker still does not use the credential helper, create a short-lived Docker login from the active `gcloud` account, then rerun the push:
+
+```bash
+gcloud auth print-access-token | docker login \
+  -u oauth2accesstoken \
+  --password-stdin https://europe-west1-docker.pkg.dev
+```
+
+The authenticated account also needs the **Artifact Registry Writer** role for the project or the `regulatory` repository.
+
 For every release, use a new immutable tag. On Apple Silicon, Cloud Run requires an image containing `linux/amd64`, so build and push it with Buildx rather than tagging the locally tested native image:
 
 ```bash
