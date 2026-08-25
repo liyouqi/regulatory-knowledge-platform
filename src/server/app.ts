@@ -1,6 +1,7 @@
 import express from "express";
 import {
   toDocumentRelationshipGraph,
+  toGlobalRelationshipGraph,
   toRelationshipGraph,
 } from "../relationships/relationship-graph";
 import { runtimeDatabasePath } from "../runtime/runtime-database-path";
@@ -101,6 +102,16 @@ export function findDocumentRelationshipGraph(slug: string) {
         caseLawRelationships,
       )
     : null;
+}
+
+export function findGlobalRelationshipGraph() {
+  return toGlobalRelationshipGraph(
+    documentViews,
+    runtimeRepository.listCrossDocumentRelationships(),
+    runtimeRepository.listLifecycleRelationships(),
+    runtimeRepository.listCaseLawRelationships(),
+    runtimeRepository.buildId,
+  );
 }
 
 export function findFamilyLevel2(
@@ -276,6 +287,10 @@ app.get(
     response.json(graph);
   },
 );
+
+app.get("/api/relationship-graphs", (_request, response) => {
+  response.json(findGlobalRelationshipGraph());
+});
 
 app.get("/api/document-relationship-graphs/:slug", (request, response) => {
   const graph = findDocumentRelationshipGraph(request.params.slug);

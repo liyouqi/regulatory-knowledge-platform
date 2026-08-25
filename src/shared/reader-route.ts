@@ -8,7 +8,8 @@ export interface ReaderSelection {
 
 export type RelationshipGraphSelection =
   | ({ scope: "provision" } & ReaderSelection)
-  | { scope: "document"; slug: string };
+  | { scope: "document"; slug: string }
+  | { scope: "global" };
 
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
@@ -59,9 +60,14 @@ export function documentRelationshipGraphPath(slug: string): string {
   return `/relationships/${encodeURIComponent(slug)}`;
 }
 
+export function globalRelationshipGraphPath(): string {
+  return "/relationships";
+}
+
 export function parseRelationshipGraphPath(
   pathname: string,
 ): RelationshipGraphSelection | null {
+  if (/^\/relationships\/?$/u.test(pathname)) return { scope: "global" };
   const match =
     /^\/relationships\/([^/]+)\/(articles|recitals|annexes|provisions)\/([^/]+)\/?$/u.exec(
       pathname,

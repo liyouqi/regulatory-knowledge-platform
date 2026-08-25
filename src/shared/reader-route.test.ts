@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   documentRelationshipGraphPath,
   explorerPath,
+  globalRelationshipGraphPath,
   level2LibraryPath,
   parseExplorerPath,
   parseLevel2LibraryPath,
@@ -56,6 +57,13 @@ describe("Reader routes", () => {
     expect(parseRelationshipGraphPath(path)).toEqual({
       scope: "document",
       slug: "dora",
+    });
+  });
+
+  it("builds and parses the global relationship graph route", () => {
+    expect(globalRelationshipGraphPath()).toBe("/relationships");
+    expect(parseRelationshipGraphPath("/relationships")).toEqual({
+      scope: "global",
     });
   });
 

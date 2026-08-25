@@ -83,6 +83,13 @@ export const documentRelationshipGraphResponseSchema = z.object({
   edges: z.array(relationshipGraphEdgeSchema),
 });
 
+export const globalRelationshipGraphResponseSchema = z.object({
+  scope: z.literal("global"),
+  buildId: z.string().min(1),
+  nodes: z.array(relationshipGraphNodeSchema).min(1),
+  edges: z.array(relationshipGraphEdgeSchema),
+});
+
 export type RelationshipGraphNode = z.infer<typeof relationshipGraphNodeSchema>;
 export type RelationshipGraphEdge = z.infer<typeof relationshipGraphEdgeSchema>;
 export type RelationshipGraphResponse = z.infer<
@@ -91,6 +98,10 @@ export type RelationshipGraphResponse = z.infer<
 export type DocumentRelationshipGraphResponse = z.infer<
   typeof documentRelationshipGraphResponseSchema
 >;
+export type GlobalRelationshipGraphResponse = z.infer<
+  typeof globalRelationshipGraphResponseSchema
+>;
 export type AnyRelationshipGraphResponse =
   | RelationshipGraphResponse
-  | DocumentRelationshipGraphResponse;
+  | DocumentRelationshipGraphResponse
+  | GlobalRelationshipGraphResponse;

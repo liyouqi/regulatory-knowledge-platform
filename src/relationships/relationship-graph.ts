@@ -1,5 +1,6 @@
 import type {
   CaseLawEndpoint,
+  CaseLawRelationship,
   DocumentCaseLawRelationshipsResponse,
 } from "../shared/case-law";
 import type {
@@ -13,14 +14,17 @@ import type {
 import type {
   DocumentLifecycleRelationshipsResponse,
   LifecycleEndpoint,
+  LifecycleRelationship,
 } from "../shared/lifecycle";
 import { explorerPath } from "../shared/reader-route";
 import {
   type DocumentRelationshipGraphResponse,
+  type GlobalRelationshipGraphResponse,
   type RelationshipGraphEdge,
   type RelationshipGraphNode,
   type RelationshipGraphResponse,
   documentRelationshipGraphResponseSchema,
+  globalRelationshipGraphResponseSchema,
   relationshipGraphResponseSchema,
 } from "../shared/relationship-graph";
 
@@ -298,6 +302,98 @@ export function toDocumentRelationshipGraph(
   return documentRelationshipGraphResponseSchema.parse({
     documentId: response.documentId,
     buildId: response.buildId,
+    nodes: [...nodes.values()],
+    edges: [...edges.values()],
+  });
+}
+
+export function toGlobalRelationshipGraph(
+  documents: DocumentView[],
+  relationships: ProvisionRelationship[],
+  lifecycleRelationships: LifecycleRelationship[],
+  caseLawRelationships: CaseLawRelationship[],
+  buildId: string,
+): GlobalRelationshipGraphResponse {
+  const documentsById = new Map(
+    documents.map((document) => [document.id, document]),
+  );
+  const nodes = new Map<string, RelationshipGraphNode>(
+    documents.map((document) => [
+      document.id,
+      documentNode(document, "neighbor"),
+    ]),
+  );
+  const edges = new Map<string, RelationshipGraphEdge>();
+
+  for (const relationship of relationships) {
+    const sourceDocument = documentsById.get(relationship.source.documentId);
+    const targetDocument = documentsById.get(relationship.target.documentId);
+    if (
+      !sourceDocument ||
+      !targetDocument ||
+      sourceDocument.id === targetDocument.id
+    ) {
+      continue;
+    }
+    nodes.set(sourceDocument.id, documentNode(sourceDocument, "neighbor"));
+    nodes.set(targetDocument.id, documentNode(targetDocument, "neighbor"));
+    addEdge(edges, sourceDocument.id, targetDocument.id, relationship);
+  }
+
+  function lifecycleNode(endpoint: LifecycleEndpoint): RelationshipGraphNode {
+    const document = documentsById.get(endpoint.documentId);
+    if (endpoint.kind === "document" && document) {
+      return documentNode(document, "neighbor");
+    }
+    return {
+      entityId: endpoint.entityId,
+      documentId: endpoint.documentId,
+      documentShortName: endpoint.documentShortName,
+      kind: "external-work",
+      label: endpoint.label,
+      title: null,
+      sourceUrl: endpoint.sourceUrl,
+      role: "neighbor",
+    };
+  }
+
+  for (const relationship of lifecycleRelationships) {
+    const source = lifecycleNode(relationship.source);
+    const target = lifecycleNode(relationship.target);
+    nodes.set(source.entityId, source);
+    nodes.set(target.entityId, target);
+    addEdge(edges, source.entityId, target.entityId, relationship);
+  }
+
+  function caseNode(caseEntity: CaseLawEndpoint): RelationshipGraphNode {
+    return {
+      entityId: caseEntity.entityId,
+      documentShortName: "CJEU",
+      kind: "case",
+      label: caseEntity.caseNumber,
+      title: caseEntity.caseName,
+      sourceUrl: caseEntity.sourceUrl,
+      role: "neighbor",
+      caseCelex: caseEntity.caseCelex,
+      ecli: caseEntity.ecli,
+      decisionType: caseEntity.decisionType,
+      decisionDate: caseEntity.decisionDate,
+      officialTitle: caseEntity.officialTitle,
+    };
+  }
+
+  for (const relationship of caseLawRelationships) {
+    const target = documentsById.get(relationship.target.documentId);
+    if (!target) continue;
+    const source = caseNode(relationship.source);
+    nodes.set(source.entityId, source);
+    nodes.set(target.id, documentNode(target, "neighbor"));
+    addEdge(edges, source.entityId, target.id, relationship);
+  }
+
+  return globalRelationshipGraphResponseSchema.parse({
+    scope: "global",
+    buildId,
     nodes: [...nodes.values()],
     edges: [...edges.values()],
   });

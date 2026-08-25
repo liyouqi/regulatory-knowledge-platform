@@ -1966,7 +1966,7 @@ Graph view 的目标是辅助理解，不替代 Reader。
 
 Graph node 必须可回到同一 canonical entity 的 Reader，并可选择 `Locate in Explorer`。Phase 2 的关系增强不得产生与 Explorer/Reader 分离的第二套实体标识。
 
-当前实现：已发布 Article 与 Document 两种 focused neighborhood。Reader 关系面板提供 Article graph route，严格只投影真正以当前 root provision 为 endpoint 的关系；Explorer 提供 Document graph route，把 resolved 跨文档边按 stable document ID 聚合，并合并独立 Work lifecycle response，展示正文引用、reviewed Level 2 mapping、CELLAR structural metadata 以及 `AMENDS` / `CORRECTS`。外部 Work 节点使用相同 CELEX-derived stable identity，但没有本地 Reader/Explorer path，Side Peek 只提供官方 CELLAR metadata。两种视图复用同一 read-only runtime artifact，支持 relation type 开关、可自由拖动的节点、pan/zoom、provenance 图例，并排除折叠后只剩同一文档的 self-edge。Article Graph 不接收 Work-level lifecycle 边；Case Law 与更广 CELLAR predicate 仍属于后续 Phase 2。
+当前实现：已发布 Article 与 Document 两种 focused neighborhood，以及 `/relationships` 的 Global Network。Reader 关系面板提供 Article graph route，严格只投影真正以当前 root provision 为 endpoint 的关系；Explorer 提供 Document graph route，把 resolved 跨文档边按 stable document ID 聚合，并合并独立 Work lifecycle response，展示正文引用、reviewed Level 2 mapping、CELLAR structural metadata 以及 `AMENDS` / `CORRECTS`。Global Network 在同一只读 runtime artifact 上默认展示全部 loaded regulations 及其跨法规边，并把 72 个 CJEU Case 和 external Work 保持为可单独展开的 metadata layer。外部 Work 节点使用相同 CELEX-derived stable identity，但没有本地 Reader/Explorer path，Side Peek 只提供官方 CELLAR metadata；Case 同样只打开官方 metadata。三种视图支持 relation type 开关、可自由拖动的节点、pan/zoom、provenance 图例，并排除折叠后只剩同一文档的 self-edge。Article Graph 不接收 Work-level lifecycle 边；Global Network 不把 Work-level metadata 伪装成 Article 关系，也不改变已有 relationship semantics。
 
 ## 22.5 Extended Level 2 / Level 3
 

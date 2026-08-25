@@ -7,6 +7,7 @@ import {
   findDocumentVersionChain,
   findExplorerBySlug,
   findFamilyLevel2,
+  findGlobalRelationshipGraph,
   findLaws,
   findProvisionRelationships,
   findRelationshipGraph,
@@ -277,6 +278,36 @@ describe("Document lookup", () => {
         (node) => node.kind === "case",
       ),
     ).toBe(false);
+  });
+
+  it("projects one connected global network while retaining metadata-only layers", () => {
+    const graph = findGlobalRelationshipGraph();
+
+    expect(graph.scope).toBe("global");
+    expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
+      16,
+    );
+    expect(
+      graph.nodes.filter((node) => node.kind === "external-work").length,
+    ).toBeGreaterThan(0);
+    expect(graph.nodes.filter((node) => node.kind === "case")).toHaveLength(72);
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+        }),
+        expect.objectContaining({
+          relationType: "AMENDS",
+          provenance: "OFFICIAL_METADATA",
+        }),
+        expect.objectContaining({
+          relationType: "INTERPRETS",
+          provenance: "OFFICIAL_METADATA",
+        }),
+      ]),
+    );
+    expect(graph.edges.some((edge) => edge.source === edge.target)).toBe(false);
   });
 
   it("serves a target preview on demand for Side Peek", () => {

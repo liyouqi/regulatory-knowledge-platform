@@ -31,6 +31,7 @@ import {
   type RelationshipGraphSelection,
   documentRelationshipGraphPath,
   explorerPath,
+  globalRelationshipGraphPath,
   provisionPath,
 } from "../shared/reader-route";
 import type {
@@ -40,6 +41,7 @@ import type {
 } from "../shared/relationship-graph";
 import {
   documentRelationshipGraphResponseSchema,
+  globalRelationshipGraphResponseSchema,
   relationshipGraphResponseSchema,
 } from "../shared/relationship-graph";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
@@ -67,6 +69,7 @@ const provenanceLabels: Record<RelationshipGraphEdge["provenance"], string> = {
 };
 
 type RelationType = keyof typeof relationDetails;
+type OptionalNodeKind = "case" | "external-work";
 
 type GraphNodeData = {
   graphNode: RelationshipGraphNode;
@@ -85,6 +88,14 @@ function isCaseGraphNode(
   node: RelationshipGraphNode,
 ): node is Extract<RelationshipGraphNode, { kind: "case" }> {
   return node.kind === "case";
+}
+
+function optionalNodeKind(
+  node: RelationshipGraphNode | undefined,
+): OptionalNodeKind | null {
+  return node?.kind === "case" || node?.kind === "external-work"
+    ? node.kind
+    : null;
 }
 
 function RelationshipNode({ data, selected }: NodeProps<GraphFlowNode>) {
@@ -145,6 +156,11 @@ function layoutNodes(
   );
   const center = graph.nodes.find((node) => node.role === "center");
   if (center) visibleIds.add(center.entityId);
+  if ("scope" in graph && graph.scope === "global") {
+    for (const node of graph.nodes) {
+      if (node.kind === "document") visibleIds.add(node.entityId);
+    }
+  }
   const neighbors = graph.nodes
     .filter((node) => node.role === "neighbor" && visibleIds.has(node.entityId))
     .sort((left, right) => {
@@ -278,6 +294,10 @@ function GraphPeek({
   const [error, setError] = useState("");
   const external = isExternalGraphNode(node);
   const caseNode = isCaseGraphNode(node);
+  const focusedDocumentGraph =
+    !external && node.kind === "document"
+      ? documentRelationshipGraphPath(node.path.replace(/^\/explore\//u, ""))
+      : null;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -352,6 +372,11 @@ function GraphPeek({
             <ArrowRight aria-hidden="true" size={15} />
           </Link>
         )}
+        {focusedDocumentGraph ? (
+          <Link to={focusedDocumentGraph}>
+            Focused graph <Network aria-hidden="true" size={14} />
+          </Link>
+        ) : null}
         {preview ? (
           <a href={preview.sourceUrl} rel="noreferrer" target="_blank">
             Official source <ArrowUpRight aria-hidden="true" size={14} />
@@ -378,24 +403,39 @@ export function RelationshipGraphPage({
   const [hiddenRelations, setHiddenRelations] = useState<Set<RelationType>>(
     new Set(),
   );
+  const [hiddenNodeKinds, setHiddenNodeKinds] = useState<Set<OptionalNodeKind>>(
+    selection.scope === "global"
+      ? new Set(["case", "external-work"])
+      : new Set(),
+  );
   const [selectedNode, setSelectedNode] =
     useState<RelationshipGraphNode | null>(null);
 
   const requestPath =
-    selection.scope === "document"
-      ? `/api/document-relationship-graphs/${encodeURIComponent(selection.slug)}`
-      : `/api/relationship-graphs/${encodeURIComponent(selection.slug)}/${selection.collectionId}/${encodeURIComponent(selection.number)}`;
+    selection.scope === "global"
+      ? "/api/relationship-graphs"
+      : selection.scope === "document"
+        ? `/api/document-relationship-graphs/${encodeURIComponent(selection.slug)}`
+        : `/api/relationship-graphs/${encodeURIComponent(selection.slug)}/${selection.collectionId}/${encodeURIComponent(selection.number)}`;
 
   useEffect(() => {
     const controller = new AbortController();
     setGraph(null);
     setLoadError("");
     setHiddenRelations(new Set());
+    setHiddenNodeKinds(
+      selection.scope === "global"
+        ? new Set(["case", "external-work"])
+        : new Set(),
+    );
     setSelectedNode(null);
     void fetch(requestPath, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Unable to load relationship graph");
         const payload = await response.json();
+        if (selection.scope === "global") {
+          return globalRelationshipGraphResponseSchema.parse(payload);
+        }
         return selection.scope === "document"
           ? documentRelationshipGraphResponseSchema.parse(payload)
           : relationshipGraphResponseSchema.parse(payload);
@@ -422,13 +462,19 @@ export function RelationshipGraphPage({
         : [],
     [graph],
   );
-  const visibleGraphEdges = useMemo(
-    () =>
-      graph?.edges.filter(
-        (edge) => !hiddenRelations.has(edge.relationType as RelationType),
-      ) ?? [],
-    [graph, hiddenRelations],
-  );
+  const visibleGraphEdges = useMemo(() => {
+    if (!graph) return [];
+    const nodesById = new Map(graph.nodes.map((node) => [node.entityId, node]));
+    return graph.edges.filter((edge) => {
+      const sourceKind = optionalNodeKind(nodesById.get(edge.source));
+      const targetKind = optionalNodeKind(nodesById.get(edge.target));
+      return (
+        !hiddenRelations.has(edge.relationType as RelationType) &&
+        (!sourceKind || !hiddenNodeKinds.has(sourceKind)) &&
+        (!targetKind || !hiddenNodeKinds.has(targetKind))
+      );
+    });
+  }, [graph, hiddenNodeKinds, hiddenRelations]);
   const availableProvenance = useMemo(
     () =>
       graph ? [...new Set(graph.edges.map((edge) => edge.provenance))] : [],
@@ -438,15 +484,30 @@ export function RelationshipGraphPage({
   const centerExplorerAnchor =
     center && !isExternalGraphNode(center) ? center.explorerAnchor : undefined;
   const returnPath =
-    selection.scope === "document"
-      ? explorerPath(selection.slug)
-      : provisionPath(selection.slug, selection.collectionId, selection.number);
+    selection.scope === "global"
+      ? "/"
+      : selection.scope === "document"
+        ? explorerPath(selection.slug)
+        : provisionPath(
+            selection.slug,
+            selection.collectionId,
+            selection.number,
+          );
 
   function toggleRelation(relationType: RelationType) {
     setHiddenRelations((current) => {
       const next = new Set(current);
       if (next.has(relationType)) next.delete(relationType);
       else next.add(relationType);
+      return next;
+    });
+  }
+
+  function toggleNodeKind(kind: OptionalNodeKind) {
+    setHiddenNodeKinds((current) => {
+      const next = new Set(current);
+      if (next.has(kind)) next.delete(kind);
+      else next.add(kind);
       return next;
     });
   }
@@ -458,7 +519,7 @@ export function RelationshipGraphPage({
       </main>
     );
   }
-  if (!graph || !center) {
+  if (!graph || (selection.scope !== "global" && !center)) {
     return (
       <main aria-busy="true" aria-live="polite" className="loading">
         Loading relationship graph…
@@ -480,7 +541,11 @@ export function RelationshipGraphPage({
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
           <Link className="view-switch" to={returnPath}>
             <ArrowLeft aria-hidden="true" size={15} />
-            {selection.scope === "document" ? "Explorer" : "Reader"}
+            {selection.scope === "global"
+              ? "Home"
+              : selection.scope === "document"
+                ? "Explorer"
+                : "Reader"}
           </Link>
           <button
             className="search-button"
@@ -500,12 +565,18 @@ export function RelationshipGraphPage({
             <Network aria-hidden="true" size={13} /> RELATIONSHIP GRAPH
           </p>
           <h1>
-            {center.label}{" "}
-            {selection.scope === "document"
-              ? "legal relationships"
-              : "relationships"}
+            {selection.scope === "global"
+              ? "Global Regulatory Network"
+              : `${center?.label ?? ""} ${selection.scope === "document" ? "legal relationships" : "relationships"}`}
           </h1>
-          {center.title ? <p>{center.title}</p> : null}
+          {selection.scope === "global" ? (
+            <p>
+              Cross-regulation links across the loaded legal corpus. Case law
+              and external Works are available as optional evidence layers.
+            </p>
+          ) : center?.title ? (
+            <p>{center.title}</p>
+          ) : null}
         </div>
         <nav aria-label="Relationship graph views">
           {selection.scope === "provision" ? (
@@ -513,14 +584,21 @@ export function RelationshipGraphPage({
               Document graph
             </Link>
           ) : null}
-          <Link
-            to={`${explorerPath(selection.slug)}#${centerExplorerAnchor ?? "document-outline"}`}
-          >
-            Act Explorer
-          </Link>
+          {selection.scope !== "global" ? (
+            <Link to={globalRelationshipGraphPath()}>Global network</Link>
+          ) : null}
+          {selection.scope !== "global" ? (
+            <Link
+              to={`${explorerPath(selection.slug)}#${centerExplorerAnchor ?? "document-outline"}`}
+            >
+              Act Explorer
+            </Link>
+          ) : null}
           <span>
-            {graph.nodes.length - 1} connected nodes · {graph.edges.length}{" "}
-            evidence-backed edges
+            {selection.scope === "global"
+              ? `${graph.nodes.filter((node) => node.kind === "document").length} loaded regulations`
+              : `${graph.nodes.length - 1} connected nodes`}{" "}
+            · {graph.edges.length} evidence-backed edges
           </span>
         </nav>
       </section>
@@ -548,6 +626,28 @@ export function RelationshipGraphPage({
             </button>
           );
         })}
+        {selection.scope === "global" ? (
+          <>
+            <button
+              aria-pressed={!hiddenNodeKinds.has("case")}
+              onClick={() => toggleNodeKind("case")}
+              style={{ "--relation-color": "#6fb8ff" } as React.CSSProperties}
+              type="button"
+            >
+              <span />
+              CJEU case law
+            </button>
+            <button
+              aria-pressed={!hiddenNodeKinds.has("external-work")}
+              onClick={() => toggleNodeKind("external-work")}
+              style={{ "--relation-color": "#b0b8c6" } as React.CSSProperties}
+              type="button"
+            >
+              <span />
+              External Works
+            </button>
+          </>
+        ) : null}
         <div
           aria-label="Relationship data sources"
           className="relationship-source-legend"

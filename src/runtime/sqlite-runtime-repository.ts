@@ -937,6 +937,23 @@ export class SqliteRuntimeRepository {
     });
   }
 
+  listCrossDocumentRelationships(): ProvisionRelationship[] {
+    const rows = this.database
+      .prepare(`
+        ${RELATIONSHIP_SELECT}
+        WHERE se.document_id != te.document_id
+        ORDER BY
+          sd.display_order ASC,
+          td.display_order ASC,
+          relationType ASC,
+          sourcePath ASC,
+          targetPath ASC,
+          id ASC
+      `)
+      .all() as RelationshipRow[];
+    return rows.map((row) => toProvisionRelationship(row));
+  }
+
   findDocumentLifecycleRelationships(
     documentId: string,
   ): DocumentLifecycleRelationshipsResponse | null {
@@ -965,6 +982,16 @@ export class SqliteRuntimeRepository {
     });
   }
 
+  listLifecycleRelationships(): LifecycleRelationship[] {
+    const rows = this.database
+      .prepare(`
+        ${LIFECYCLE_RELATIONSHIP_SELECT}
+        ORDER BY relationType ASC, sourceCelex ASC, targetCelex ASC, id ASC
+      `)
+      .all() as LifecycleRelationshipRow[];
+    return rows.map(toLifecycleRelationship);
+  }
+
   findDocumentCaseLawRelationships(
     documentId: string,
   ): DocumentCaseLawRelationshipsResponse | null {
@@ -986,6 +1013,16 @@ export class SqliteRuntimeRepository {
       buildId: this.buildId,
       relationships: rows.map(toCaseLawRelationship),
     });
+  }
+
+  listCaseLawRelationships(): CaseLawRelationship[] {
+    const rows = this.database
+      .prepare(`
+        ${CASE_LAW_RELATIONSHIP_SELECT}
+        ORDER BY decisionDate DESC, caseCelex ASC, id ASC
+      `)
+      .all() as CaseLawRelationshipRow[];
+    return rows.map(toCaseLawRelationship);
   }
 
   findRelationshipPreview(entityId: string): RelationshipPreview | null {
