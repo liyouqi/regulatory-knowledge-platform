@@ -91,6 +91,8 @@ npm run build
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
+| `npm run corpus:build -- --profile <profileId>` | Rebuild the exact manifest-pinned raw snapshots through existing Canonical builders into an isolated, verified Runtime artifact and machine-readable report. |
+| `npm run corpus:build -- --profile <profileId> --require-archived` | Apply the production snapshot-retention gate; currently fails until every pinned snapshot has a reviewed remote archive URI. |
 | `npm run runtime:build` | Atomically rebuild the default `full-corpus` read-only runtime SQLite from validated Canonical artifacts. |
 | `npm run runtime:build -- --profile banking-default` | Build the reviewed banking baseline; the current policy excludes the complete MiCA family. |
 | `REGULATORY_EDITION_PROFILE=banking-default npm run dev` | Build and run the local application with the banking baseline through the normal `predev` hook. |
@@ -189,7 +191,7 @@ The implemented deterministic path is:
 
 ```text
 source registry
-→ source fetch and checksum verification
+→ exact snapshot manifest and checksum verification
 → parser inspection and reviewed quality baseline
 → immutable Canonical artifact
 → Edition/Profile compilation
@@ -198,7 +200,7 @@ source registry
 → runtime verification, tests, and release gates
 ```
 
-These stages are real and independently runnable. Edition/Profile compilation is implemented through the version-controlled `data/edition-profiles.json`; the default `full-corpus` and representative `banking-default` Profiles compile independent runtime artifacts. There is not yet a single `corpus:build` command or durable remote archive for release raw snapshots. Before the next new-law batch, add a thin manifest-driven orchestrator over the existing commands and establish content-addressed release-snapshot retention outside Git. The exact current workflow and future orchestration contract are documented in `docs/corpus-onboarding-runbook.md`.
+These stages are real and independently runnable. `data/corpus-build-manifest.json` pins all 16 current registry entries to exact verified snapshot IDs and content hashes. `npm run corpus:build -- --profile <profileId>` verifies those snapshots and reviewed inputs, invokes the existing EUR-Lex/CSSF Canonical builders, compiles the selected Edition/Profile, verifies an isolated Runtime SQLite, and writes an ignored machine-readable build report. Rebuilding both `full-corpus` and `banking-default` reproduces their existing Runtime build IDs. Durable remote snapshot storage is not configured yet: all current entries are honestly marked `local-only`, and `--require-archived` fails closed until reviewed archive URIs are recorded. The workflow is documented in `docs/corpus-onboarding-runbook.md`.
 
 The platform keeps one master Canonical corpus and compiles build-time editions. `banking-default` currently includes DORA, GDPR, AI Act, NIS2, Data Act, and CSSF families while excluding MiCA and its RTS; `full-corpus` remains the explicit default. The compiler constrains Documents, Definitions, Relationships, Search, Reader routes, Libraries, and Graph endpoints together, records Profile identity/hash in Runtime schema `4.6.0`, and prevents an excluded registered law from reappearing as an external graph Work. Dynamic per-request Profile switching, authorization, and public compatibility remain Phase 4 concerns.
 

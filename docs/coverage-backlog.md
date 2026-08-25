@@ -64,8 +64,8 @@ This pilot validates the workflow and data contracts. It does not attempt simult
 - additional version history and consolidated text comparison;
 - deeper CJEU and national case-law evidence;
 - larger search and relationship evaluation sets;
-- durable content-addressed raw snapshot retention;
-- batch orchestration, incremental rebuild, and build reports;
+- durable content-addressed remote raw snapshot storage (manifest/archive gate is implemented);
+- incremental rebuild beyond the implemented full manifest-driven build and build report;
 - public API/MCP authentication, compatibility, rate limiting, and SDKs in Phase 4.
 
 ## Guardrails

@@ -36,6 +36,7 @@
     "cssf:canonical:inspect": "node --import tsx src/ingestion/cssf-canonical-cli.ts --inspect",
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
+    "corpus:build": "node --import tsx src/corpus/corpus-build-cli.ts",
     "runtime:build": "node --import tsx src/search/build-search-index.ts",
     "runtime:verify": "node --import tsx src/runtime/verify-runtime-artifact.ts",
     "release:verify": "npm run runtime:build && node --import tsx src/release/verify-corpus.ts",

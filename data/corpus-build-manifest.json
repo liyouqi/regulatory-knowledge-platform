@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "phase-2-baseline",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "adapter": "eur-lex",
+      "identifier": "32016R0679",
+      "snapshotId": "snapshot:cellar:32016R0679:fce6e6ea8724e66a1c4f98c584cafdc9dfbae26aa83c44b43423b8c7f6aa0295",
+      "contentSha256": "sha256:fce6e6ea8724e66a1c4f98c584cafdc9dfbae26aa83c44b43423b8c7f6aa0295",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32022L2555",
+      "snapshotId": "snapshot:cellar:32022L2555:260e9b24760def5bb3ac7cf8681065572dd8bd537b5ce4ebaaac420259878985",
+      "contentSha256": "sha256:260e9b24760def5bb3ac7cf8681065572dd8bd537b5ce4ebaaac420259878985",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32022R2554",
+      "snapshotId": "snapshot:cellar:32022R2554:39d20d15551b006f2bf20476152c30089730efe761672072419a9d88df15d121",
+      "contentSha256": "sha256:39d20d15551b006f2bf20476152c30089730efe761672072419a9d88df15d121",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32023R1114",
+      "snapshotId": "snapshot:cellar:32023R1114:dfdc2b4800e98af7f766e0953c2c4c082e85bac20990014205234054574595f0",
+      "contentSha256": "sha256:dfdc2b4800e98af7f766e0953c2c4c082e85bac20990014205234054574595f0",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32023R2854",
+      "snapshotId": "snapshot:cellar:32023R2854:5ffe980d37d9077bc44fe5940afefe6cd4afd71e995e76b0c65c14509d16dd8e",
+      "contentSha256": "sha256:5ffe980d37d9077bc44fe5940afefe6cd4afd71e995e76b0c65c14509d16dd8e",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R1689",
+      "snapshotId": "snapshot:cellar:32024R1689:e8625a71f3895c72ed7244465f5222b9f25ea12d71f1a094369aef6ef456fc38",
+      "contentSha256": "sha256:e8625a71f3895c72ed7244465f5222b9f25ea12d71f1a094369aef6ef456fc38",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R1772",
+      "snapshotId": "snapshot:cellar:32024R1772:6f565041442340a4aa5362033297adb6d32fbc0881985c6fdff0605b5056e86b",
+      "contentSha256": "sha256:6f565041442340a4aa5362033297adb6d32fbc0881985c6fdff0605b5056e86b",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R1773",
+      "snapshotId": "snapshot:cellar:32024R1773:3e14b3854dcd72b2016c22726c9ab8a36acd75beadb9ee77c7346046d232bb59",
+      "contentSha256": "sha256:3e14b3854dcd72b2016c22726c9ab8a36acd75beadb9ee77c7346046d232bb59",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R1774",
+      "snapshotId": "snapshot:cellar:32024R1774:f807f53507289a24377503fb861f2b206324cac8ef4d4029bc9c1069aa576c4e",
+      "contentSha256": "sha256:f807f53507289a24377503fb861f2b206324cac8ef4d4029bc9c1069aa576c4e",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R2956",
+      "snapshotId": "snapshot:cellar:32024R2956:b185e1ddb02a1b85165e3e9cfd2720063f872c67163f9fa12d16328c2247ff22",
+      "contentSha256": "sha256:b185e1ddb02a1b85165e3e9cfd2720063f872c67163f9fa12d16328c2247ff22",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32025R0301",
+      "snapshotId": "snapshot:cellar:32025R0301:cfb5dafed10f493ad77fb0d52e7d6fb3232444d674296c0aa573a6dee81fb35e",
+      "contentSha256": "sha256:cfb5dafed10f493ad77fb0d52e7d6fb3232444d674296c0aa573a6dee81fb35e",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32025R0302",
+      "snapshotId": "snapshot:cellar:32025R0302:ecad76089d9d56cda120c344d08d52267db6c60ab368c731ca94093772323d0e",
+      "contentSha256": "sha256:ecad76089d9d56cda120c344d08d52267db6c60ab368c731ca94093772323d0e",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32025R0305",
+      "snapshotId": "snapshot:cellar:32025R0305:1521cbdb1a75bf43ec037e5fae771c6505f0a2b85187b57152f6d53a5f0588ca",
+      "contentSha256": "sha256:1521cbdb1a75bf43ec037e5fae771c6505f0a2b85187b57152f6d53a5f0588ca",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "cssf",
+      "identifier": "circular-12-552",
+      "snapshotId": "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "contentSha256": "sha256:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "cssf",
+      "identifier": "circular-25-893",
+      "snapshotId": "snapshot:cssf:circular-25-893:1b55367a7cbc758eede63fa728b9cf77003acfdad85374cdb1547835c58f8436",
+      "contentSha256": "sha256:1b55367a7cbc758eede63fa728b9cf77003acfdad85374cdb1547835c58f8436",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "cssf",
+      "identifier": "communication-2025-04-09-ict-risk-updates",
+      "snapshotId": "snapshot:cssf:communication-2025-04-09-ict-risk-updates:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
+      "contentSha256": "sha256:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
+      "retention": { "status": "local-only" }
+    }
+  ],
+  "requiredReviewedInputs": [
+    "data/source-registry.json",
+    "data/cssf-source-registry.json",
+    "data/edition-profiles.json",
+    "data/benchmarks/related-recitals.json",
+    "data/official-mappings/level2.json",
+    "data/official-metadata/cellar-case-law.json",
+    "data/official-metadata/cellar-focused-relations.json",
+    "data/official-metadata/cellar-lifecycle-relations.json"
+  ]
+}

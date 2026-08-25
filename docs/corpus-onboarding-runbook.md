@@ -26,9 +26,10 @@ The repository currently provides separate commands for:
 - reviewed CELLAR, lifecycle, case-law, and Level 2 relationship inputs;
 - atomic Runtime SQLite build and read-only verification;
 - validated build-time Edition/Profile compilation with `full-corpus` and `banking-default`;
+- exact-snapshot corpus manifest, end-to-end local orchestration, isolated Runtime artifact, and machine-readable build report;
 - parser, relationship, search, performance, and release gates.
 
-It does not yet provide a single end-to-end `corpus:build` command. Until that orchestrator is implemented, use the explicit steps below. Do not create an unreviewed one-off import script to bypass them.
+The implemented command is `npm run corpus:build -- --profile <profileId>`. The explicit acquisition and inspection steps below still apply when adding or refreshing a source; the orchestrator never fetches mutable current content in place of a missing pinned snapshot and never replaces legal review.
 
 ## Decide whether an adapter already exists
 
@@ -91,15 +92,18 @@ Examples include:
 
 Each relationship type must define direction, allowed endpoint types, provenance, evidence, and review status. Automatic candidates do not become published legal relationships until their gate passes.
 
-### 6. Build and verify the product artifact
+### 6. Pin the reviewed snapshot and build the product artifact
+
+Add the exact `snapshotId`, content SHA-256, adapter, identifier, and retention status to `data/corpus-build-manifest.json`, then run:
 
 ```bash
-npm run runtime:build -- --profile <profileId>
-npm run runtime:verify
+npm run corpus:build -- --profile <profileId>
 npm run check
 npm test
 npm run build
 ```
+
+The command requires the manifest source set to match both source registries exactly, verifies every snapshot and reviewed quality baseline, hashes required reviewed relationship/Profile inputs, rebuilds every Canonical document through its existing builder, and verifies the resulting staging SQLite through the read-only Runtime services. Generated Canonical files, SQLite, and `build-report.json` stay under ignored `data/artifacts/corpus-builds/`; promotion remains separate.
 
 For local application testing, run `REGULATORY_EDITION_PROFILE=<profileId> npm run dev` so the `predev` build uses the intended Profile. Production serves the already verified SQLite artifact and does not compile or switch Profiles at startup.
 
@@ -130,18 +134,18 @@ For a batch such as four payment laws:
 
 The batch is not “four file imports.” Acquisition and parsing are deterministic; legal nature, applicability, taxonomy, and ambiguous relationship semantics remain explicit review gates.
 
-## Target orchestration before the next batch
+## Corpus orchestration
 
-The next corpus expansion must introduce a thin command with the intended interface:
+Use:
 
 ```bash
 npm run corpus:build -- --profile <profileId>
 ```
 
-The orchestrator should:
+The orchestrator:
 
 1. read version-controlled source and Profile manifests;
-2. locate or fetch approved snapshots;
+2. locate the exact approved local snapshots pinned by ID and checksum;
 3. verify checksums;
 4. run existing Canonical builders without duplicating parser logic;
 5. fail on missing quality baselines or review gates;
@@ -151,11 +155,11 @@ The orchestrator should:
 9. write a machine-readable build report;
 10. leave promotion as a separate explicit operation.
 
-The command must be deterministic and runnable without Codex or an LLM. Statistical or model-assisted enrichments remain optional builders with method/model/prompt version provenance and representative evals.
+It deliberately does not auto-fetch when a pinned snapshot is missing: run the source fetch/inspect/review flow and update the manifest explicitly. The command is deterministic and runnable without Codex or an LLM. Statistical or model-assisted enrichments remain optional builders with method/model/prompt version provenance and representative evals.
 
 ## Snapshot retention
 
-Local raw and generated artifacts remain ignored by Git. For a production release, preserve the exact raw snapshots in content-addressed object storage with retention/versioning, and record their locators and checksums in the release record. Without the archived input, a future fetch can rebuild the then-current official content but cannot guarantee byte-for-byte reproduction of a lost historical source response.
+Local raw and generated artifacts remain ignored by Git. Every manifest entry records `retention.status`; all current snapshots are explicitly `local-only`. For a production release, preserve the exact raw snapshots in content-addressed object storage with retention/versioning, change the entry to `archived` with a reviewed `gs://`, `s3://`, or HTTPS locator, and run `npm run corpus:build -- --profile <profileId> --require-archived`. The archive gate fails if even one source remains local-only. The command validates archive declarations but does not upload or download objects; storage credentials and lifecycle policy stay outside the application.
 
 ## Definition of done
 

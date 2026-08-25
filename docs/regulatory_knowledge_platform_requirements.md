@@ -3274,7 +3274,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 
 ## Phase 3 Sequence
 
-1. manifest-driven corpus orchestration and raw snapshot retention；
+1. manifest-driven corpus orchestration（已完成）；raw snapshot remote retention（archive gate 已完成，外部存储待配置）；
 2. Banking Governance & Internal Control pilot；
 3. provision-level taxonomy/topics and Authority entities；
 4. EU → Luxembourg legal relations；

@@ -1249,7 +1249,9 @@ raw source → canonical master corpus → profile compilation → relationships
 
 当前实现以 `REGULATORY_RUNTIME_DATABASE_PATH` 指向运行时只读 SQLite artifact；未设置时仍使用 repository 内的开发默认路径。`npm run runtime:verify -- --input <sqlite-path>` 必须在 promote 前通过，验证 SQLite integrity、FTS5、schema/build manifest 与 Reader/Search read model 一致性。具体 staging、promote、health check 与 rollback 步骤见 `docs/runtime-operation-runbook.md`。
 
-当前 source fetch、verify、canonical inspect/build 与 runtime build/verify 已由独立命令实现；尚未提供一个覆盖所有阶段的 `corpus:build` 编排命令。新增下一批法规前应增加薄编排层，使其按 manifest 运行已有 builders、生成 build report，并在任何 source、quality baseline、review gate 或 runtime verification 失败时整体失败。编排层不得复制 parser、relationship 或 search 业务逻辑。
+当前 `data/corpus-build-manifest.json` schema `1.0.0` 将两个 source registry 的 16 个条目逐一绑定到 exact snapshot ID、content SHA-256 与 retention status。`npm run corpus:build -- --profile <profileId>` 要求 manifest 与 registries 完全集合一致，验证本地 snapshot、quality baseline 和 required reviewed inputs 后，通过独立子进程调用既有 EUR-Lex/CSSF Canonical builders，再从 staging Canonical root 调用同一 Profile/Relationship/Search Runtime builder，并以只读 Runtime service 验证 staging SQLite。Staging Canonical 集合必须与 manifest 完全一致且全部为 official，fixture fallback 不得通过发布门禁。输出目录由 manifest、Profile、reviewed-input hashes 和 parser versions 的 build-request hash 确定，保存 ignored Canonical artifacts、Runtime SQLite 与 machine-readable report；promotion 仍是独立操作。编排层不复制 parser、relationship 或 search 业务逻辑。
+
+Snapshot retention 与 build orchestration 分开：当前 16 个条目均为 `local-only`，普通本地重建如实记录该状态；`--require-archived` 要求每项具有 reviewed `gs://`、`s3://` 或 HTTPS archive URI，否则 fail closed。上传、凭据、bucket versioning/retention policy 不进入应用代码；选定外部 object storage 后再把精确 locator 写回 manifest。
 
 同一代码库可以把不同 Profile 编译成 `banking.sqlite`、`digital-assets.sqlite` 等独立 artifact。每个生产 deployment 默认固定一个 artifact/Profile；Phase 4 如开放 `profileId`，只能在授权的 artifact/service 范围内选择，不能让客户端绕过 corpus policy。
 
@@ -1499,7 +1501,7 @@ CI 不下载完整 bulk dump；CI 使用 fixtures。
 - runtime verify 同时核验 `profileId` 和 corpus counts；
 - 不因为普通 UI PR 每次重复跑完整数据。
 
-当前阶段使用分步命令；目标编排接口为 `npm run corpus:build -- --profile <profileId>`。该接口必须只是已有 acquisition、canonical、relationship、search 和 runtime builders 的薄 orchestrator。命令落地前，操作人员按 `docs/corpus-onboarding-runbook.md` 的显式步骤执行，不以临时脚本替代。
+当前 `npm run corpus:build -- --profile <profileId>` 已作为已有 snapshot verification、Canonical、relationship、search 和 Runtime builders 的薄 orchestrator 落地。对 `full-corpus` 与 `banking-default` 的完整重建分别复现现有 16/14 文档 Runtime build ID。新增 source 仍须先按 `docs/corpus-onboarding-runbook.md` 完成 fetch、inspect、quality baseline 与 legal-semantic review，再更新 exact-snapshot manifest；编排命令不替代这些人工门禁。
 
 ---
 
