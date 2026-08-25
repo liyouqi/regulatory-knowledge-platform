@@ -56,6 +56,20 @@ npm run dev
 
 Then open `http://localhost:5173`. The Vite web app proxies `/api` calls to the Express API at `http://localhost:3000`.
 
+### Quick Navigation
+
+Vite normally uses port `5173`; if that port is occupied, use the port printed by `npm run dev` (for example `5175`) in the same paths below.
+
+| Product surface | Example URL | Purpose |
+| --- | --- | --- |
+| Reader | `http://localhost:5173/read/dora/articles/1` | Read an exact provision with stable navigation and relationship context. |
+| Act Explorer | `http://localhost:5173/explore/dora` | Browse the complete structure of one legal act. |
+| RTS/ITS Library | `http://localhost:5173/library/dora` | Browse a regulatory family's reviewed Level 2 measures; append `/rts` or `/its` to filter. |
+| Document Graph | `http://localhost:5173/relationships/gdpr` | Explore Act-level relationships, including the reviewed GDPR CJEU Case nodes. |
+| Article Graph | `http://localhost:5173/relationships/dora/articles/20` | Explore relationships scoped to one exact provision. |
+
+Press `Cmd+K` on macOS or `Ctrl+K` elsewhere from any product page to open global law, full-text, definition, and opened-law search.
+
 Use the **Light/Dark** control in the top bar to switch the shared Reader, Explorer, and Level 2 Library chrome. Dark is the default; the browser stores the selected theme locally, without storing legal text or changing the runtime artifact.
 
 Before considering a change complete, run:
