@@ -9,6 +9,8 @@ import {
   parseCellarCaseLawResults,
 } from "./cellar-case-law";
 import {
+  CELLAR_CASE_LAW_METADATA_QUERY_VERSION,
+  buildCellarCaseLawMetadataDataset,
   buildCellarCaseLawMetadataQuery,
   probeCellarCaseLawMetadata,
 } from "./cellar-case-law-metadata";
@@ -27,6 +29,24 @@ const snapshotSchema = z.object({
   responseSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
   recordCount: z.number().int().nonnegative(),
   files: z.object({
+    query: z.literal("query.rq"),
+    response: z.literal("response.json"),
+    normalizedCandidate: z.literal("normalized-candidate.json"),
+  }),
+});
+
+const metadataSnapshotSchema = z.object({
+  schemaVersion: z.literal("1.0.0"),
+  queryVersion: z.literal(CELLAR_CASE_LAW_METADATA_QUERY_VERSION),
+  endpoint: z.literal(CELLAR_SPARQL_ENDPOINT),
+  retrievedAt: z.string().datetime(),
+  sourceCandidateSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/u),
+  querySha256: z.string().regex(/^sha256:[a-f0-9]{64}$/u),
+  responseSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/u),
+  recordCount: z.number().int().nonnegative(),
+  unavailableCaseCelexes: z.array(z.string().min(1)),
+  files: z.object({
+    sourceCandidate: z.literal("source-case-law-candidate.json"),
     query: z.literal("query.rq"),
     response: z.literal("response.json"),
     normalizedCandidate: z.literal("normalized-candidate.json"),
@@ -245,14 +265,148 @@ async function probeMetadata(): Promise<void> {
   );
 }
 
+async function fetchMetadata(): Promise<void> {
+  const providedPath = argument("--snapshot");
+  if (!providedPath) {
+    throw new Error(
+      "Usage: npm run cellar:case-law:metadata:fetch -- --snapshot <case-law-snapshot-directory>",
+    );
+  }
+  const sourceDirectory = resolve(providedPath);
+  const sourceCandidateBytes = await readFile(
+    `${sourceDirectory}/normalized-candidate.json`,
+  );
+  const sourceCandidate = cellarCaseLawDatasetSchema.parse(
+    JSON.parse(sourceCandidateBytes.toString("utf8")),
+  );
+  const query = buildCellarCaseLawMetadataQuery(sourceCandidate.records);
+  const responseBytes = await officialSparqlResponse(query);
+  const retrievedAt = new Date().toISOString();
+  const candidate = buildCellarCaseLawMetadataDataset(
+    sourceCandidate.records,
+    JSON.parse(new TextDecoder().decode(responseBytes)),
+    retrievedAt,
+    sha256(sourceCandidateBytes),
+  );
+  const directoryName = `${retrievedAt.replaceAll(/[:.]/gu, "-")}-${sha256(responseBytes).slice(7, 19)}`;
+  const outputDirectory = resolve(
+    process.cwd(),
+    "data/raw/cellar-case-law-metadata",
+    directoryName,
+  );
+  await mkdir(outputDirectory, { recursive: true });
+  const snapshot = metadataSnapshotSchema.parse({
+    schemaVersion: "1.0.0",
+    queryVersion: CELLAR_CASE_LAW_METADATA_QUERY_VERSION,
+    endpoint: CELLAR_SPARQL_ENDPOINT,
+    retrievedAt,
+    sourceCandidateSha256: sha256(sourceCandidateBytes),
+    querySha256: sha256(query),
+    responseSha256: sha256(responseBytes),
+    recordCount: candidate.records.length,
+    unavailableCaseCelexes: candidate.unavailableCaseCelexes,
+    files: {
+      sourceCandidate: "source-case-law-candidate.json",
+      query: "query.rq",
+      response: "response.json",
+      normalizedCandidate: "normalized-candidate.json",
+    },
+  });
+  const pendingSuffix = `.pending-${process.pid}`;
+  const files = [
+    ["source-case-law-candidate.json", sourceCandidateBytes],
+    ["query.rq", `${query}\n`],
+    ["response.json", responseBytes],
+    ["normalized-candidate.json", `${JSON.stringify(candidate, null, 2)}\n`],
+    ["snapshot.json", `${JSON.stringify(snapshot, null, 2)}\n`],
+  ] as const;
+  await Promise.all(
+    files.map(([name, content]) =>
+      writeFile(`${outputDirectory}/${name}${pendingSuffix}`, content),
+    ),
+  );
+  await Promise.all(
+    files.map(([name]) =>
+      rename(
+        `${outputDirectory}/${name}${pendingSuffix}`,
+        `${outputDirectory}/${name}`,
+      ),
+    ),
+  );
+  console.log(
+    `Saved immutable CELLAR case metadata snapshot: ${outputDirectory}`,
+  );
+  console.table({
+    complete: candidate.records.length,
+    unavailable: candidate.unavailableCaseCelexes.length,
+  });
+}
+
+async function verifyMetadata(): Promise<void> {
+  const providedPath = argument("--snapshot");
+  if (!providedPath) {
+    throw new Error(
+      "Usage: npm run cellar:case-law:metadata:verify -- --snapshot <metadata-snapshot-directory>",
+    );
+  }
+  const directory = resolve(providedPath);
+  const snapshot = metadataSnapshotSchema.parse(
+    JSON.parse(await readFile(`${directory}/snapshot.json`, "utf8")),
+  );
+  const sourceCandidateBytes = await readFile(
+    `${directory}/${snapshot.files.sourceCandidate}`,
+  );
+  const sourceCandidate = cellarCaseLawDatasetSchema.parse(
+    JSON.parse(sourceCandidateBytes.toString("utf8")),
+  );
+  const query = await readFile(`${directory}/${snapshot.files.query}`, "utf8");
+  const responseBytes = await readFile(
+    `${directory}/${snapshot.files.response}`,
+  );
+  const candidateText = await readFile(
+    `${directory}/${snapshot.files.normalizedCandidate}`,
+    "utf8",
+  );
+  const expectedQuery = `${buildCellarCaseLawMetadataQuery(sourceCandidate.records)}\n`;
+  if (
+    sha256(sourceCandidateBytes) !== snapshot.sourceCandidateSha256 ||
+    query !== expectedQuery ||
+    sha256(query.trimEnd()) !== snapshot.querySha256 ||
+    sha256(responseBytes) !== snapshot.responseSha256
+  ) {
+    throw new Error("CELLAR case-law metadata snapshot hash mismatch");
+  }
+  const rebuilt = buildCellarCaseLawMetadataDataset(
+    sourceCandidate.records,
+    JSON.parse(responseBytes.toString("utf8")),
+    snapshot.retrievedAt,
+    snapshot.sourceCandidateSha256,
+  );
+  if (
+    `${JSON.stringify(rebuilt, null, 2)}\n` !== candidateText ||
+    rebuilt.records.length !== snapshot.recordCount ||
+    JSON.stringify(rebuilt.unavailableCaseCelexes) !==
+      JSON.stringify(snapshot.unavailableCaseCelexes)
+  ) {
+    throw new Error("CELLAR case-law metadata normalized candidate mismatch");
+  }
+  console.log(
+    `Verified CELLAR case-law metadata snapshot: ${snapshot.recordCount} complete, ${snapshot.unavailableCaseCelexes.length} unavailable`,
+  );
+}
+
 const command = process.argv[2];
 
 try {
   if (command === "fetch") await fetchCaseLaw();
   else if (command === "verify") await verifyCaseLaw();
+  else if (command === "metadata:fetch") await fetchMetadata();
+  else if (command === "metadata:verify") await verifyMetadata();
   else if (command === "metadata:probe") await probeMetadata();
   else
-    throw new Error("Usage: CELLAR case-law CLI <fetch|verify|metadata:probe>");
+    throw new Error(
+      "Usage: CELLAR case-law CLI <fetch|verify|metadata:fetch|metadata:verify|metadata:probe>",
+    );
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;

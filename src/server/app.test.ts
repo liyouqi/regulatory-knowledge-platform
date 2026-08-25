@@ -247,6 +247,38 @@ describe("Document lookup", () => {
     expect(findDocumentRelationshipGraph("unknown-law")).toBeNull();
   });
 
+  it("projects reviewed CJEU cases only into the Act-level GDPR graph", () => {
+    const graph = findDocumentRelationshipGraph("gdpr");
+
+    expect(graph?.nodes.filter((node) => node.kind === "case")).toHaveLength(
+      72,
+    );
+    expect(graph?.nodes).toContainEqual(
+      expect.objectContaining({
+        entityId: "case:eu:62017CJ0496",
+        kind: "case",
+        label: "Case C-496/17.",
+        title: "Deutsche Post AG v Hauptzollamt Köln.",
+        ecli: "ECLI:EU:C:2019:26",
+        decisionType: "judgment",
+        role: "neighbor",
+      }),
+    );
+    expect(graph?.edges).toContainEqual(
+      expect.objectContaining({
+        source: "case:eu:62017CJ0496",
+        target: "eu:32016R0679",
+        relationType: "INTERPRETS",
+        provenance: "OFFICIAL_METADATA",
+      }),
+    );
+    expect(
+      findDocumentRelationshipGraph("dora")?.nodes.some(
+        (node) => node.kind === "case",
+      ),
+    ).toBe(false);
+  });
+
   it("serves a target preview on demand for Side Peek", () => {
     expect(findRelationshipPreview("eu:32022L2555:article:3")).toMatchObject({
       documentShortName: "NIS2",

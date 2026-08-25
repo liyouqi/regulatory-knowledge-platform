@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  caseLogicalId,
   documentLogicalId,
   normalizeLegalNumber,
   provisionLogicalId,
@@ -9,6 +10,14 @@ import {
 describe("stable legal identifiers", () => {
   it("uses the CELEX work identifier for EU documents", () => {
     expect(documentLogicalId(" 32022r2554 ")).toBe("eu:32022R2554");
+  });
+
+  it("keeps CJEU cases in a separate stable identity namespace", () => {
+    expect(caseLogicalId("62017cj0496")).toBe("case:eu:62017CJ0496");
+    expect(caseLogicalId("62021CJ0340_1")).toBe("case:eu:62021CJ0340_1");
+    expect(() => caseLogicalId("32016R0679")).toThrow(
+      "Invalid EU case CELEX identifier",
+    );
   });
 
   it.each([

@@ -90,12 +90,15 @@ export function findDocumentRelationshipGraph(slug: string) {
   );
   const lifecycleRelationships =
     runtimeRepository.findDocumentLifecycleRelationships(document.id);
+  const caseLawRelationships =
+    runtimeRepository.findDocumentCaseLawRelationships(document.id);
   return relationships
     ? toDocumentRelationshipGraph(
         document,
         documentViews,
         relationships,
         lifecycleRelationships,
+        caseLawRelationships,
       )
     : null;
 }
@@ -123,6 +126,8 @@ app.get("/api/health", (_request, response) => {
       cellarRelationships: runtimeRepository.cellarRelationshipCount,
       lifecycleRelationships: runtimeRepository.lifecycleRelationshipCount,
       externalWorks: runtimeRepository.externalWorkCount,
+      cases: runtimeRepository.caseCount,
+      caseLawRelationships: runtimeRepository.caseLawRelationshipCount,
       relatedRecitals: runtimeRepository.relatedRecitalCount,
       versionNodes: runtimeRepository.versionNodeCount,
       versionEdges: runtimeRepository.versionEdgeCount,

@@ -14,6 +14,8 @@ export interface RuntimeArtifactVerification {
   cellarRelationships: number;
   lifecycleRelationships: number;
   externalWorks: number;
+  cases: number;
+  caseLawRelationships: number;
   relatedRecitals: number;
   versionNodes: number;
   versionEdges: number;
@@ -54,6 +56,8 @@ export function verifyRuntimeArtifact(
       cellarRelationships: repository.cellarRelationshipCount,
       lifecycleRelationships: repository.lifecycleRelationshipCount,
       externalWorks: repository.externalWorkCount,
+      cases: repository.caseCount,
+      caseLawRelationships: repository.caseLawRelationshipCount,
       relatedRecitals: repository.relatedRecitalCount,
       versionNodes: repository.versionNodeCount,
       versionEdges: repository.versionEdgeCount,

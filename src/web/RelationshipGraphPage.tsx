@@ -54,6 +54,7 @@ const relationDetails = {
   RELATED_RECITAL: { label: "Related recital", color: "#9acf78" },
   AMENDS: { label: "Amends", color: "#f4c95d" },
   CORRECTS: { label: "Corrects", color: "#ff9f6e" },
+  INTERPRETS: { label: "Interprets", color: "#6fb8ff" },
 } as const;
 
 const provenanceLabels: Record<RelationshipGraphEdge["provenance"], string> = {
@@ -78,6 +79,12 @@ function isExternalGraphNode(
   node: RelationshipGraphNode,
 ): node is Extract<RelationshipGraphNode, { sourceUrl: string }> {
   return "sourceUrl" in node;
+}
+
+function isCaseGraphNode(
+  node: RelationshipGraphNode,
+): node is Extract<RelationshipGraphNode, { kind: "case" }> {
+  return node.kind === "case";
 }
 
 function RelationshipNode({ data, selected }: NodeProps<GraphFlowNode>) {
@@ -270,6 +277,7 @@ function GraphPeek({
   const [preview, setPreview] = useState<RelationshipPreview | null>(null);
   const [error, setError] = useState("");
   const external = isExternalGraphNode(node);
+  const caseNode = isCaseGraphNode(node);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -310,7 +318,18 @@ function GraphPeek({
       <span>{node.documentShortName}</span>
       <h2>{node.label}</h2>
       {node.title ? <h3>{node.title}</h3> : null}
-      {external ? (
+      {caseNode ? (
+        <p className="graph-peek-status">
+          {node.decisionType === "judgment" ? "Judgment" : "Order"} ·{" "}
+          {node.decisionDate} · {node.ecli}
+        </p>
+      ) : null}
+      {caseNode ? (
+        <p className="graph-peek-status">
+          This CJEU case is present as reviewed CELLAR Work-level metadata;
+          judgment text and Article-level citations are not loaded.
+        </p>
+      ) : external ? (
         <p className="graph-peek-status">
           This Work is present as reviewed CELLAR metadata; its legal text is
           not loaded in this runtime.
@@ -324,7 +343,8 @@ function GraphPeek({
       <div className="graph-peek-actions">
         {external ? (
           <a href={node.sourceUrl} rel="noreferrer" target="_blank">
-            Official metadata <ArrowUpRight aria-hidden="true" size={14} />
+            {caseNode ? "Official case metadata" : "Official metadata"}{" "}
+            <ArrowUpRight aria-hidden="true" size={14} />
           </a>
         ) : (
           <Link to={preview?.path ?? node.path}>

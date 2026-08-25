@@ -57,6 +57,14 @@ export function documentLogicalId(celex: string): string {
   return `eu:${normalizeCelex(celex)}`;
 }
 
+export function caseLogicalId(celex: string): string {
+  const normalized = normalizeCelex(celex);
+  if (!/^6\d{4}[A-Z]{2}\d{4}(?:_\d+)?$/u.test(normalized)) {
+    throw new Error(`Invalid EU case CELEX identifier: ${celex}`);
+  }
+  return `case:eu:${normalized}`;
+}
+
 export function provisionLogicalId(
   parentId: string,
   kind: ProvisionIdKind,

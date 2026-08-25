@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CellarCaseLawRecord } from "./cellar-case-law";
 import {
+  buildCellarCaseLawMetadataDataset,
   buildCellarCaseLawMetadataQuery,
   probeCellarCaseLawMetadata,
 } from "./cellar-case-law-metadata";
@@ -36,28 +37,27 @@ describe("CELLAR CJEU metadata completeness probe", () => {
   });
 
   it("marks absent or incomplete official metadata unavailable without filling it", () => {
-    expect(
-      probeCellarCaseLawMetadata(records, {
-        results: {
-          bindings: [
-            {
-              caseCelexUri: {
-                type: "uri",
-                value:
-                  "http://publications.europa.eu/resource/celex/62017CJ0496",
-              },
-              case: {
-                type: "uri",
-                value: "http://publications.europa.eu/resource/cellar/case-one",
-              },
-              ecli: { type: "literal", value: "ECLI:EU:C:2019:26" },
-              date: { type: "literal", value: "2019-01-16" },
-              title: { type: "literal", value: "Case C-496/17" },
+    const raw = {
+      results: {
+        bindings: [
+          {
+            caseCelexUri: {
+              type: "uri",
+              value: "http://publications.europa.eu/resource/celex/62017CJ0496",
             },
-          ],
-        },
-      }),
-    ).toEqual([
+            case: {
+              type: "uri",
+              value: "http://publications.europa.eu/resource/cellar/case-one",
+            },
+            ecli: { type: "literal", value: "ECLI:EU:C:2019:26" },
+            date: { type: "literal", value: "2019-01-16" },
+            title: { type: "literal", value: "Case C-496/17" },
+          },
+        ],
+      },
+    };
+
+    expect(probeCellarCaseLawMetadata(records, raw)).toEqual([
       {
         caseCelex: "62017CJ0496",
         caseWorkUri: "https://publications.europa.eu/resource/cellar/case-one",
@@ -72,5 +72,23 @@ describe("CELLAR CJEU metadata completeness probe", () => {
         availability: "unavailable",
       },
     ]);
+
+    expect(
+      buildCellarCaseLawMetadataDataset(
+        records,
+        raw,
+        "2026-08-25T08:00:00.000Z",
+        `sha256:${"a".repeat(64)}`,
+      ),
+    ).toMatchObject({
+      records: [
+        {
+          caseCelex: "62017CJ0496",
+          targetCelex: "32016R0679",
+          englishTitle: "Case C-496/17",
+        },
+      ],
+      unavailableCaseCelexes: ["62021CJ0340_1"],
+    });
   });
 });

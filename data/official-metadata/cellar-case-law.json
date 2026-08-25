@@ -1,0 +1,730 @@
+{
+  "schemaVersion": "1.0.0",
+  "queryVersion": "cellar-case-law-metadata@1.0.0",
+  "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+  "checkedAt": "2026-08-25T08:09:23.010Z",
+  "sourceCandidateSha256": "sha256:4c76b8be25efa607277724b2ed51b53d0bd25e5f47592204f4797f9a7973fe07",
+  "records": [
+    {
+      "caseCelex": "62017CJ0496",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c514d86d-1970-11e9-8d04-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2019:26",
+      "decisionDate": "2019-01-16",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 16 January 2019.#Deutsche Post AG v Hauptzollamt Köln.#Request for a preliminary ruling from the Finanzgericht Düsseldorf.#Reference for a preliminary ruling — Customs union — The Union Customs Code — Article 39 — Status of authorised economic operator — Implementing Regulation (EU) 2015/2447 — The second subparagraph of Article 24(1) — Applicant not a natural person — Questionnaire — Collection of personal data — Directive 95/46/EC — Articles 6 and 7 — Regulation (EU) 2016/679 — Articles 5 and 6 — Processing of personal data.#Case C-496/17.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62017CJ0673",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/3d6585b3-e42f-11e9-9c4e-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2019:801",
+      "decisionDate": "2019-10-01",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 1 October 2019.#Bundesverband der Verbraucherzentralen und Verbraucherverbände - Verbraucherzentrale Bundesverband e.V. v Planet49 GmbH.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling — Directive 95/46/EC — Directive 2002/58/EC — Regulation (EU) 2016/679 — Processing of personal data and protection of privacy in the electronic communications sector — Cookies — Concept of consent of the data subject — Declaration of consent by means of a pre-ticked checkbox.#Case C-673/17.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62018CJ0311",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c93f72bb-c749-11ea-adf7-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2020:559",
+      "decisionDate": "2020-07-16",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 16 July 2020.#Data Protection Commissioner v Facebook Ireland Limited and Maximillian Schrems.#Request for a preliminary ruling from the High Court (Ireland).#Reference for a preliminary ruling — Protection of individuals with regard to the processing of personal data — Charter of Fundamental Rights of the European Union — Articles 7, 8 and 47 — Regulation (EU) 2016/679 — Article 2(2) — Scope — Transfers of personal data to third countries for commercial purposes — Article 45 — Commission adequacy decision — Article 46 — Transfers subject to appropriate safeguards — Article 58 — Powers of the supervisory authorities — Processing of the data transferred by the public authorities of a third country for national security purposes — Assessment of the adequacy of the level of protection in the third country — Decision 2010/87/EU — Protective standard clauses on the transfer of personal data to third countries — Suitable safeguards provided by the data controller — Validity — Implementing Decision (EU) 2016/1250 — Adequacy of the protection provided by the EU-US Privacy Shield — Validity — Complaint by a natural person whose data was transferred from the European Union to the United States.#Case C-311/18.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0061",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e0efd353-2402-11eb-b57e-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2020:901",
+      "decisionDate": "2020-11-11",
+      "englishTitle": "Judgment of the Court (Second Chamber) of 11 November 2020.#Orange Romania SA v Autoritatea Naţională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP).#Request for a preliminary ruling from the Tribunalul Bucureşti.#Reference for a preliminary ruling – Directive 95/46/EC – Article 2(h) and Article 7(a) – Regulation (EU) 2016/679 – Article 4(11) and Article 6(1)(a) – Processing of personal data and protection of private life 20220737 – Collection and storage of the copies of identity documents by a provider of mobile telecommunications services – Concept of the data subject’s ‘consent’ – Freely given, specific and informed indication of wishes – Declaration of consent by means of a tick box – Signing of the contract by the data subject – Burden of proof.#Case C-61/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0272",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/34e21855-c1c2-11ea-b3a4-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2020:535",
+      "decisionDate": "2020-07-09",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 9 July 2020.#VQ v Land Hessen.#Request for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling — Article 267 TFEU — Concept of ‘court or tribunal’ — Protection of natural persons with regard to the processing of personal data — Regulation (EU) 2016/679 — Scope — Article 2(2)(a) — Meaning of ‘activity which falls outside the scope of Union law’ — Article 4(7) — Concept of ‘controller’ — Petitions Committee of the parliament of a Federated State of a Member State — Article 15 — Right of access by the data subject.#Case C-272/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0439",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/ad0b4be0-d338-11eb-ac72-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2021:504",
+      "decisionDate": "2021-06-22",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 22 June 2021.#Proceedings brought by B.#Request for a preliminary ruling from the Satversmes tiesa.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Articles 5, 6 and 10 – National legislation providing for public access to personal data relating to penalty points imposed for road traffic offences – Lawfulness – Concept of ‘personal data relating to criminal convictions and offences’ – Disclosure for the purpose of improving road safety – Right of public access to official documents – Freedom of information – Reconciliation with the fundamental rights to respect for private life and to the protection of personal data – Re-use of data – Article 267 TFEU – Temporal effect of a preliminary ruling – Ability of a constitutional court of a Member State to maintain the legal effects of national legislation incompatible with EU law – Principles of primacy of EU law and of legal certainty.#Case C-439/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0597",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/403dbbe7-cf46-11eb-ac72-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2021:492",
+      "decisionDate": "2021-06-17",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 17 June 2021.#Mircom International Content Management & Consulting (M.I.C.M.) Limited v Telenet BVBA.#Request for a preliminary ruling from the Ondernemingsrechtbank Antwerpen.#Reference for a preliminary ruling – Intellectual property – Copyright and related rights – Directive 2001/29/EC – Article 3(1) and (2) – Concept of ‘making available to the public’ – Downloading of a file containing a protected work via a peer-to-peer network and the simultaneous provision for uploading pieces of that file – Directive 2004/48/EC – Article 3(2) – Misuse of measures, procedures and remedies – Article 4 – Persons entitled to apply for the application of measures, procedures and remedies – Article 8 – Right of information – Article 13 – Concept of ‘prejudice’ – Regulation (EU) 2016/679 – Point (f) of the first subparagraph of Article 6(1) – Protection of natural persons with regard to the processing of personal data – Lawfulness of processing – Directive 2002/58/EC – Article 15(1) – Legislative measures to restrict the scope of the rights and obligations – Fundamental rights – Articles 7 and 8, Article 17(2) and the first paragraph of Article 47 of the Charter of Fundamental Rights of the European.#Case C-597/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0645",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/735f92d9-cdb5-11eb-ac72-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2021:483",
+      "decisionDate": "2021-06-15",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 15 June 2021.#Facebook Ireland Ltd and Others v Gegevensbeschermingsautoriteit.#Request for a preliminary ruling from the Hof van beroep te Brussel.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Charter of Fundamental Rights of the European Union – Articles 7, 8 and 47 – Regulation (EU) 2016/679 – Cross-border processing of personal data – ‘One-stop shop’ mechanism – Sincere and effective cooperation between supervisory authorities – Competences and powers – Power to initiate or engage in legal proceedings.#Case C-645/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62019CJ0817",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a4838f22-f147-11ec-a534-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:491",
+      "decisionDate": "2022-06-21",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 21 June 2022.#Ligue des droits humains ASBL v Conseil des ministres.#Request for a preliminary ruling from the Cour constitutionnelle.#Reference for a preliminary ruling – Processing of personal data – Passenger Name Record (PNR) data – Regulation (EU) 2016/679 – Article 2(2)(d) – Scope – Directive (EU) 2016/681 – Use of PNR data of air passengers of flights operated between the European Union and third countries – Power to include data of air passengers of flights operated within the European Union – Automated processing of those data – Retention period – Fight against terrorist offences and serious crime – Validity – Charter of Fundamental Rights of the European Union – Articles 7, 8 and 21 as well as Article 52(1) – National legislation extending the application of the PNR system to other transport operations within the European Union – Freedom of movement within the European Union – Charter of Fundamental Rights – Article 45.#Case C-817/19.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0175",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/7d008f03-9555-11ec-b4e4-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:124",
+      "decisionDate": "2022-02-24",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 24 February 2022.#SIA 'SS' v Valsts ieņēmumu dienests.#Request for a preliminary ruling from the Administratīvā apgabaltiesa.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 2 – Scope – Article 4 – Concept of ‘processing’ – Article 5 – Principles relating to processing – Purpose limitation – Data minimisation – Article 6 – Lawfulness of processing – Processing necessary for the performance of a task carried out in the public interest by the controller – Processing necessary for compliance with a legal obligation to which the controller is subject – Article 23 – Limitations – Processing of data for tax purposes – Request for the disclosure of information relating to vehicle sale advertisements placed online – Proportionality.#Case C-175/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0184",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/73030d0a-117c-11ed-8fa0-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:601",
+      "decisionDate": "2022-08-01",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 1 August 2022.#OT v Vyriausioji tarnybinės etikos komisija.#Request for a preliminary ruling from the Vilniaus apygardos administracinis teismas.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Charter of Fundamental Rights of the European Union – Articles 7, 8 and 52(1) – Directive 95/46/EC – Article 7(c) – Article 8(1) – Regulation (EU) 2016/679 – Point (c) of the first subparagraph of Article 6(1) and the second subparagraph of Article 6(3) – Article 9(1) – Processing necessary for compliance with a legal obligation to which the controller is subject – Objective of public interest – Proportionality – Processing of special categories of personal data – National legislation requiring publication on the internet of data contained in the declarations of private interests of natural persons working in the public service or of heads of associations or establishments receiving public funds – Prevention of conflicts of interest and of corruption in the public sector.#Case C-184/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0245",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/56441e65-ab54-11ec-83e1-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:216",
+      "decisionDate": "2022-03-24",
+      "englishTitle": "Judgment of the Court (First Chamber) of 24 March 2022.#X and Z v Autoriteit Persoonsgegevens.#Request for a preliminary ruling from the Rechtbank Midden-Nederland.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Competence of the supervisory authority – Article 55(3) – Processing operations of courts acting in their judicial capacity – Concept – Making available to a journalist of documents arising from court proceedings containing personal data.#Case C-245/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0319",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/fe826456-c6d3-11ec-b6f4-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:322",
+      "decisionDate": "2022-04-28",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 28 April 2022.#Meta Platforms Ireland Limited v Bundesverband der Verbraucherzentralen und Verbraucherverbände - Verbraucherzentrale Bundesverband eV.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 80 – Representation of the data subjects by a not-for-profit association – Representative action brought by a consumer protection association in the absence of a mandate and independently of the infringement of specific rights of a data subject – Action based on the prohibition of unfair commercial practices, the infringement of a consumer protection law or the prohibition of the use of invalid general terms and conditions.#Case C-319/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0460",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/50a32f70-76ea-11ed-9887-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:962",
+      "decisionDate": "2022-12-08",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 8 December 2022.#TU and RE v Google LLC.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Directive 95/46/EC – Article 12(b) – Point (a) of the first paragraph of Article 14 – Regulation (EU) 2016/679 – Article 17(3)(a) – Operator of an internet search engine – Research carried out on the basis of a person’s name – Displaying a link to articles containing allegedly inaccurate information in the list of search results – Displaying, in the form of thumbnails, photographs illustrating those articles in the list of results of an image search – Request for de-referencing made to the operator of the search engine – Weighing-up of fundamental rights – Articles 7, 8, 11 and 16 of the Charter of Fundamental Rights of the European Union – Obligations and responsibilities of the operator of the search engine in respect of processing a request for de-referencing – Burden of proof on the person requesting de-referencing.#Case C-460/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62020CJ0534",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c68d062b-f202-11ec-a534-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:495",
+      "decisionDate": "2022-06-22",
+      "englishTitle": "Judgment of the Court (First Chamber) of 22 June 2022.#Leistritz AG v LH.#Request for a preliminary ruling from the Bundesarbeitsgericht.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Second sentence of Article 38(3) – Data protection officer – Prohibition of the dismissal, by a controller or processor, of a data protection officer or of the imposition, by a controller or processor, of a penalty on him or her for performing his or her tasks – Legal basis – Article 16 TFEU – Requirement of functional independence – National legislation prohibiting the termination of a data protection officer’s employment contract without just cause.#Case C-534/20.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0034",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/86abb146-ced8-11ed-a05c-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:270",
+      "decisionDate": "2023-03-30",
+      "englishTitle": "Judgment of the Court (First Chamber) of 30 March 2023.#Hauptpersonalrat der Lehrerinnen und Lehrer beim Hessischen Kultusministerium v Minister des Hessischen Kultusministeriums.#Request for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 88(1) and (2) – Processing of data in the employment context – Regional school system – Teaching by videoconference due to the COVID-19 pandemic – Implementation without the express consent of teachers.#Case C-34/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0077",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a324fb78-5057-11ed-92ed-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:805",
+      "decisionDate": "2022-10-20",
+      "englishTitle": "Judgment of the Court (First Chamber) of 20 October 2022.#Digi Távközlési és Szolgáltató Kft. v Nemzeti Adatvédelmi és Információszabadság Hatóság.#Request for a preliminary ruling from the Fővárosi Törvényszék.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5(1)(b) and (e) – Principle of ‘purpose limitation’ – Principle of ‘storage limitation’ – Creation, from an existing database, of a database to carry out tests and correct errors – Further processing of the data – Compatibility of the further processing of those data with the purposes of the initial collection – Retention period in the light of those purposes.#Case C-77/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0129",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/eeeabbdd-55d1-11ed-92ed-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:833",
+      "decisionDate": "2022-10-27",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 27 October 2022.#Proximus NV v Gegevensbeschermingsautoriteit.#Request for a preliminary ruling from the Hof van beroep te Brussel.#Reference for a preliminary ruling – Processing of personal data and protection of privacy in the electronic communications sector – Directive 2002/58/EC – Article 12 – Public telephone directories and directory enquiry services – Subscriber’s consent – Obligations of the provider of directories and of directory enquiry services – Regulation (EU) 2016/679 – Article 17 – Right to erasure (‘right to be forgotten’) – Article 5(2) – Article 24 – Information obligations and responsibility of the controller.#Case C-129/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0132",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/d4056d89-925e-11ed-b508-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:2",
+      "decisionDate": "2023-01-12",
+      "englishTitle": "Judgment of the Court (First Chamber) of 12 January 2023.#BE v Nemzeti Adatvédelmi és Információszabadság Hatóság.#Request for a preliminary ruling from the Fővárosi Törvényszék.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Articles 77 to 79 – Remedies – Parallel exercise – Relationship – Procedural autonomy – Effectiveness of the protection rules established by that regulation – Consistent and homogeneous application of those rules throughout the European Union – Article 47 of the Charter of Fundamental Rights of the European Union.#Case C-132/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0154",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/5fbe0370-925f-11ed-b508-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:3",
+      "decisionDate": "2023-01-12",
+      "englishTitle": "Judgment of the Court (First Chamber) of 12 January 2023.#RW v Österreichische Post AG.#Request for a preliminary ruling from the Oberster Gerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 15(1)(c) – Data subject’s right of access to his or her data – Information about the recipients or categories of recipient to whom the personal data have been or will be disclosed – Restrictions.#Case C-154/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0180",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a0092606-76dc-11ed-9887-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:967",
+      "decisionDate": "2022-12-08",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 8 December 2022.#VS v Inspektor v Inspektorata kam Visshia sadeben savet.#Request for a preliminary ruling from the Administrativen sad - Blagoevgrad.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Articles 2, 4 and 6 – Applicability of Regulation 2016/679 – Concept of ‘legitimate interest’ – Concept of ‘task carried out in the public interest or in the exercise of official authority’ – Directive (EU) 2016/680 – Articles 1, 3, 4, 6 and 9 – Lawfulness of the processing of personal data collected in the course of a criminal investigation – Subsequent processing of data relating to a presumed victim of a criminal offence for the purpose of making a formal accusation in respect of him or her – Concept of purpose ‘other than that for which the personal data are collected’ – Data used by the public prosecutor’s office of a Member State for the purposes of its defence in an action for damages against the State.#Case C-180/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0205",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a1e77aea-9d5b-11ed-b508-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:49",
+      "decisionDate": "2023-01-26",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 26 January 2023.#Criminal proceedings against V.S.#Request for a preliminary ruling from the Spetsializiran nakazatelen sad.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Directive (EU) 2016/680 – Article 4(1)(a) to (c) – Principles relating to processing of personal data – Purpose limitation – Data minimisation – Article 6(a) – Clear distinction between personal data of different categories of data subjects – Article 8 – Lawfulness of processing – Article 10 – Transposition – Processing of biometric data and genetic data – Concept of ‘processing authorised by Member State law’ – Concept of ‘strictly necessary’ – Discretion – Charter of Fundamental Rights of the European Union – Articles 7, 8, 47, 48 and 52 – Right to effective judicial protection – Presumption of innocence – Limitation – Intentional criminal offence subject to public prosecution – Accused persons – Collection of photographic and dactyloscopic data in order for them to be entered in a record and taking of a biological sample for the purpose of creating a DNA profile – Procedure for enforcement of collection – Systematic nature of the collection.#Case C-205/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0252",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/8e2539fb-1a3f-11ee-806b-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:537",
+      "decisionDate": "2023-07-04",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 4 July 2023.#Meta Platforms Inc and Others v Bundeskartellamt.#Request for a preliminary ruling from the Oberlandesgericht Düsseldorf.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Social networks – Abuse of a dominant position by the operator of such a network – Abuse which entails the processing of the personal data of the users of that network as provided for in its general terms of use – Powers of a competition authority of a Member State to find that processing is not consistent with that regulation – Reconciliation with the powers of the national data protection supervisory authorities – Article 4(3) TEU – Principle of sincere cooperation – Points (a) to (f) of the first subparagraph of Article 6(1) of Regulation 2016/679 – Whether the processing is lawful – Article 9(1) and (2) – Processing of special categories of personal data – Article 4(11) – Concept of ‘consent’.#Case C-252/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0268",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/7569b0a6-b8dc-11ed-8912-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:145",
+      "decisionDate": "2023-03-02",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 2 March 2023.#Norra Stockholm Bygg AB v Per Nycander AB.#Request for a preliminary ruling from the Högsta domstolen.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 6(3) and (4) – Lawfulness of processing – Production of a document containing personal data in civil court proceedings – Article 23(1)(f) and (j) – Protection of judicial independence and judicial proceedings – Enforcement of civil law claims – Requirements to be complied with – Having regard to the interests of the data subjects – Balancing of the opposing interests involved – Article 5 – Minimisation of personal data – Charter of Fundamental Rights of the European Union – Article 7 – Right to respect for private life – Article 8 – Right to protection of personal data – Article 47 – Right to effective judicial protection – Principle of proportionality.#Case C-268/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0300",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/b3fcbc6d-ea58-11ed-a05c-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:370",
+      "decisionDate": "2023-05-04",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 4 May 2023.#UI v Österreichische Post AG.#Request for a preliminary ruling from the Oberster Gerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 82(1) – Right to compensation for damage caused by data processing that infringes that regulation – Conditions governing the right to compensation – Mere infringement of that regulation not sufficient – Need for damage caused by that infringement – Compensation for non-material damage resulting from such processing – Incompatibility of a national rule making compensation for such damage subject to the exceeding of a threshold of seriousness – Rules for the determination of damages by national courts.#Case C-300/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0306",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a3f6f179-5057-11ed-92ed-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2022:813",
+      "decisionDate": "2022-10-20",
+      "englishTitle": "Judgment of the Court (Eighth Chamber) of 20 October 2022.#Komisia za zashtita na lichnite danni and Tsentralna izbiratelna komisia v Koalitsia „Demokratichna Bulgaria - Obedinenie“.#Request for a preliminary ruling from the Varhoven administrativen sad.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Scope – Article 2(2)(a) – Concept of ‘activity which falls outside the scope of Union law’ – National and European elections – Article 6(1)(e) – Lawfulness of processing – Article 58 – Measure adopted by the supervisory authorities which limits or, where appropriate, prohibits the video recording of the vote count at polling stations.#Case C-306/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0340",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/4ee050f1-9a62-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:986",
+      "decisionDate": "2023-12-14",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 14 December 2023.#VB v Natsionalna agentsia za prihodite.#Request for a preliminary ruling from the Varhoven administrativen sad.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5 – Principles relating to that processing – Article 24 – Accountability of the controller – Article 32 – Measures implemented to ensure security of processing – Assessment of the appropriateness of such measures – Scope of judicial review – Taking of evidence – Article 82 – Right to compensation and liability – Possible exemption from liability of the controller in the event of infringement by third parties – Claim for compensation for non-material damage based on fear of potential misuse of personal data.#Case C-340/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0446",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/78fbecbf-8238-11ef-a67d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:834",
+      "decisionDate": "2024-10-04",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 4 October 2024.#Maximilian Schrems v Meta Platforms Ireland Limited.#Request for a preliminary ruling from the Oberster Gerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Online social networks – General terms of use relating to contracts concluded between a digital platform and a user – Personalised advertising – Article 5(1)(b) – Principle of purpose limitation – Article 5(1)(c) – Principle of data minimisation – Article 9(1) and (2) – Processing of special categories of personal data – Data concerning sexual orientation – Data which are made public by the data subject.#Case C-446/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0453",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/93889c5b-a85a-11ed-b508-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:79",
+      "decisionDate": "2023-02-09",
+      "englishTitle": "Judgment of the Court (Sixth Chamber) of 9 February 2023.#X-FAB Dresden GmbH & Co. KG v FC.#Request for a preliminary ruling from the Bundesarbeitsgericht.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 38(3) – Data protection officer – Prohibition on dismissing data protection officer for performing his or her tasks – Requirement for functional independence – National legislation prohibiting the dismissal of a data protection officer without just cause – Article 38(6) – Conflict of interests – Criteria.#Case C-453/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0487",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/90065873-ea58-11ed-a05c-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:369",
+      "decisionDate": "2023-05-04",
+      "englishTitle": "Judgment of the Court (First Chamber) of 4 May 2023.#F.F. v Österreichische Datenschutzbehörde and CRIF GmbH.#Request for a preliminary ruling from the Bundesverwaltungsgericht.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Data subject’s right of access to his or her data undergoing processing – Article 15(3) – Provision of a copy of the data – Concept of ‘copy’ – Concept of ‘information’.#Case C-487/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0560",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e8066eaa-a87c-11ed-b508-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:81",
+      "decisionDate": "2023-02-09",
+      "englishTitle": "Judgment of the Court (Sixth Chamber) of 9 February 2023.#ZS v Zweckverband 'Kommunale Informationsverarbeitung Sachsen' KISA, Körperschaft des öffentlichen Rechts.#Request for a preliminary ruling from the Bundesarbeitsgericht.#Case C-560/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0579",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/309fe9a3-10dc-11ee-b12e-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:501",
+      "decisionDate": "2023-06-22",
+      "englishTitle": "Judgment of the Court (First Chamber) of 22 June 2023.#Proceedings brought by J.M.#Request for a preliminary ruling from the Itä-Suomen hallinto-oikeus.#Reference for a preliminary ruling – Processing of personal data – Regulation (EU) 2016/679 – Articles 4 and 15 – Scope of the right of access to information referred to in Article 15 – Information contained in log data – Article 4 – Definition of ‘personal data’ – Definition of ‘recipients’ – Temporal application.#Case C-579/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0634",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/acd82fb9-94e3-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:957",
+      "decisionDate": "2023-12-07",
+      "englishTitle": "Judgment of the Court (First Chamber) of 7 December 2023.#OQ v Land Hessen.#Request for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 22 – Automated individual decision-making – Credit information agencies – Automated establishment of a probability value concerning the ability of a person to meet payment commitments in the future (‘scoring’) – Use of that probability value by third parties.#Case C-634/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0667",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e203c171-9fe8-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:1022",
+      "decisionDate": "2023-12-21",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 21 December 2023.#ZQ v Medizinischer Dienst der Krankenversicherung Nordrhein, Körperschaft des öffentlichen Rechts.#Request for a preliminary ruling from the Bundesarbeitsgericht.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 6(1) – Conditions for lawful processing – Article 9(1) to (3) – Processing of special categories of data – Data concerning health – Assessment of an employee’s working capacity – Health insurance medical service processing data concerning the health of its own employees – Conditions for such processing and whether permissible – Article 82(1) – Right to compensation and liability – Compensation for non-material damage – Compensatory function – Impact of negligence on the part of the data controller.#Case C-667/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0683",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/cb653bc3-9350-11ee-8aa6-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:949",
+      "decisionDate": "2023-12-05",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 5 December 2023.#Nacionalinis visuomenės sveikatos centras prie Sveikatos apsaugos ministerijos v Valstybinė duomenų apsaugos inspekcija.#Request for a preliminary ruling from the Vilniaus apygardos administracinis teismas.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 4(2) and (7) – Concepts of ‘processing’ and ‘controller’ – Development of a mobile IT application – Article 26 – Joint control – Article 83 – Imposition of administrative fines – Conditions – Requirement that the infringement be intentional or negligent – Responsibility and liability of the controller for the processing of personal data carried out by a processor.#Case C-683/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0687",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e58dd598-bb66-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:72",
+      "decisionDate": "2024-01-25",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 25 January 2024.#BL v MediaMarktSaturn Hagen-Iserlohn GmbH.#Request for a preliminary ruling from the Amtsgericht Hagen.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Interpretation of Articles 5, 24, 32 and 82 – Assessment of the validity of Article 82 – Inadmissibility of the request for an assessment of validity – Right to compensation for damage caused by data processing which infringes that regulation – Transmission of data to an unauthorised third party on account of an error made by the employees of the controller – Assessment of the appropriateness of the protection measures implemented by the controller – Compensatory function fulfilled by the right to compensation – Effect of the severity of the infringement – Whether necessary to establish the existence of damage caused by that infringement – Concept of ‘non-material damage’.#Case C-687/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0741",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/bf026a15-f7e2-11ee-a251-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:288",
+      "decisionDate": "2024-04-11",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 11 April 2024.#GP v juris GmbH.#Request for a preliminary ruling from the Landgericht Saarbrücken.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 82 – Right to compensation for damage caused by data processing that infringes that regulation – Concept of ‘non-material damage’ – Impact of the seriousness of the damage suffered – Liability of the controller – Possible exemption in the event of default of a person acting under his or her authority within the meaning of Article 29 – Assessment of the amount of compensation – Inapplicability of the criteria laid down for administrative fines in Article 83 – Assessment in the event of multiple infringements of that regulation.#Case C-741/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0768",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/493d7c0d-7be8-11ef-bbbe-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:785",
+      "decisionDate": "2024-09-26",
+      "englishTitle": "Judgment of the Court (First Chamber) of 26 September 2024.#TR v Land Hessen.#Request for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 57(1)(a) and (f) – Tasks of the supervisory authority – Article 58(2) – Corrective powers – Administrative fine – Discretion of the supervisory authority – Limits.#Case C-768/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62021CJ0807",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/ccaa8d05-9350-11ee-8aa6-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:950",
+      "decisionDate": "2023-12-05",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 5 December 2023.#Deutsche Wohnen SE v Staatsanwaltschaft Berlin.#Request for a preliminary ruling from the Kammergericht Berlin.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 4(7) – Concept of ‘controller’ – Article 58(2) – Powers of supervisory authorities to apply corrective measures – Article 83 – Imposition of administrative fines on a legal person – Conditions – Discretion of the Member States – Requirement that the infringement be intentional or negligent.#Case C-807/21.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0017",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c51d8230-7137-11ef-a8ba-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:738",
+      "decisionDate": "2024-09-12",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 12 September 2024.#HTB Neunte Immobilien Portfolio geschlossene Investment UG & Co. KG and Ökorenta Neue Energien Ökostabil IV geschlossene Investment GmbH & Co. KG v Müller Rechtsanwaltsgesellschaft mbH and Others.#Requests for a preliminary ruling from the Amtsgericht München.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Points (b), (c) and (f) of the first subparagraph of Article 6(1) – Lawfulness of processing – Necessity of processing for the purpose of performing a contract to which the data subject is party – Necessity of processing for the purpose of complying with a legal obligation incumbent on the controller – Necessity of processing for the purposes of the legitimate interests pursued by the controller or by a third party – Investment fund established in the form of a limited partnership offering shares for public subscription – Request of a partner seeking to obtain the contact details of other partners with indirect shareholdings in an investment fund through a trust company.#Joined Cases C-17/22 and C-18/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0026",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/ac233798-94e3-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:958",
+      "decisionDate": "2023-12-07",
+      "englishTitle": "Judgment of the Court (First Chamber) of 7 December 2023.#UF and AB v Land Hessen.#Requests for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5(1)(a) – Principle of ‘lawfulness’ – Point (f) of the first subparagraph of Article 6(1) – Necessity of processing for the purposes of the legitimate interests pursued by the controller or by a third party – Article 17(1)(d) – Right to erasure where personal data have been unlawfully processed – Article 40 – Codes of conduct – Article 78(1) – Right to an effective judicial remedy against a supervisory authority – Decision taken by the supervisory authority on a complaint – Scope of judicial review of that decision – Credit information agencies – Storage of data from a public register relating to the discharge of remaining debts in favour of a person – Storage period.#Joined Cases C-26/22 and C-64/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0033",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/bbc0ddbd-b44b-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:46",
+      "decisionDate": "2024-01-16",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 16 January 2024.#Österreichische Datenschutzbehörde v WK.#Request for a preliminary ruling from the Verwaltungsgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Article 16 TFEU – Regulation (EU) 2016/679 – Article 2(2)(a) – Scope – Exclusions – Activities which fall outside the scope of Union law – Article 4(2) TEU – Activities concerning national security – Committee of inquiry set up by the parliament of a Member State – Article 23(1)(a) and (h), Articles 51 and 55 of Regulation (EU) 2016/679 – Competence of the supervisory authority responsible for data protection – Article 77 – Right to lodge a complaint with a supervisory authority – Direct effect.#Case C-33/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0060",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/b44adc6e-ea58-11ed-a05c-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:373",
+      "decisionDate": "2023-05-04",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 4 May 2023.#UZ v Bundesrepublik Deutschland.#Request for a preliminary ruling from the Verwaltungsgericht Wiesbaden.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5 – Principles relating to processing – Controllership – Article 6 – Lawfulness of processing – Electronic file compiled by an administrative authority relating to an asylum application – Transmission to the competent national court via an electronic mailbox – Infringement of Articles 26 and 30 – No arrangement determining joint responsibility for processing and maintaining the record of processing activities – Consequences – Article 17(1) – Right to erasure (‘right to be forgotten’) – Article 18(1) – Right to restriction of processing – Concept of ‘unlawful processing’ – Taking into account of the electronic file by a national court – Absence of consent of the data subject.#Case C-60/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0182",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/bd5fcd1d-2ee7-11ef-a61b-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:531",
+      "decisionDate": "2024-06-20",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 20 June 2024.#JU and SO v Scalable Capital GmbH.#Request for a preliminary ruling from the Amtsgericht München.#References for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 82 – Right to compensation for damage caused by data processing that infringes that regulation – Concept of ‘non-material damage’ – Compensation of a punitive nature or purely in respect of damages and satisfaction – Minimal or symbolic compensation – Theft of personal data stored on a trading application – Identity theft or fraud.#Joined Cases C-182/22 and C-189/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0203",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/44fa73b1-f4ef-11ef-b7db-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:117",
+      "decisionDate": "2025-02-27",
+      "englishTitle": "Judgment of the Court (First Chamber) of 27 February 2025.#CK v Magistrat der Stadt Wien.#Request for a preliminary ruling from the Verwaltungsgericht Wien.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 15(1)(h) – Automated decision-making, including profiling – Scoring – Assessment of the creditworthiness of a natural person – Access to meaningful information about the logic involved in profiling – Verification of the accuracy of the information provided – Directive (EU) 2016/943 – Point 1 of Article 2 – Trade secret – Personal data of third parties.#Case C-203/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0231",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/b43f8b86-b066-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:7",
+      "decisionDate": "2024-01-11",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 11 January 2024.#État belge v Autorité de protection des données.#Request for a preliminary ruling from the cour d'appel de Bruxelles.#Reference for a preliminary ruling – Approximation of laws – Protection of natural persons with regard to the processing of personal data and free movement of such data (General Data Protection Regulation) – Regulation (EU) 2016/679 – Point 7 of Article 4 – Concept of ‘controller’ – Official journal of a Member State – Obligation to publish as they stand company documents prepared by companies or their legal representatives – Article 5(2) – Successive processing of the personal data contained in such documents by several separate persons or entities – Determination of responsibilities.#Case C-231/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0307",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a4de6610-73d9-11ee-9220-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:811",
+      "decisionDate": "2023-10-26",
+      "englishTitle": "Judgment of the Court (First Chamber) of 26 October 2023.#FT v DW.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling – Processing of personal data – Regulation (EU) 2016/679 – Articles 12, 15 and 23 – Data subject’s right of access to his or her data undergoing processing – Right to obtain a first copy of those data free of charge – Processing of a patient’s data by his or her medical practitioner – Medical records – Reasons for the request for access – Use of data for the purpose of triggering the liability of the person providing treatment – Concept of ‘copy’.#Case C-307/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0456",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/6ebdaa41-9a62-11ee-b164-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:988",
+      "decisionDate": "2023-12-14",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 14 December 2023.#VX and AT v Gemeinde Ummendorf.#Request for a preliminary ruling from the Landgericht Ravensburg.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 82 – Right to compensation and liability – Concept of ‘non-material damage’ – Online publication of the agenda for a municipal council meeting containing personal data – Publication without the consent of the data subjects – Claim of those data subjects seeking compensation for non-material damage.#Case C-456/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0461",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a2b1beef-3f61-11ef-865a-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:607",
+      "decisionDate": "2024-07-11",
+      "englishTitle": "Judgment of the Court (Ninth Chamber) of 11 July 2024.#MK v WB.#Request for a preliminary ruling from the Landgericht Hannover.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 2(2)(c) – Scope – Exclusion – Purely personal or household activity – Article 4(7) – Controller – Former guardian who performed his or her duties in a professional capacity – Article 15 – Access of the person who has been placed under legal guardianship to data collected by that former guardian during the performance of his or her duties.#Case C-461/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0590",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/72688445-2ee7-11ef-a61b-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:536",
+      "decisionDate": "2024-06-20",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 20 June 2024.#AT and BT v PS GbR and Others.#Request for a preliminary ruling from the Amtsgericht Wesel.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 82(1) – Right to compensation for damage caused by data processing which infringes that regulation – Concept of ‘non-material damage’ – Impact of the seriousness of the damage suffered – Assessment of the amount of compensation – Claim for compensation for non-material damage based on fear – Inapplicability of the criteria laid down for administrative fines in Article 83 – Dissuasive function – Assessment where that regulation and national law are infringed simultaneously.#Case C-590/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0604",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e87758fb-dc64-11ee-b9d9-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:214",
+      "decisionDate": "2024-03-07",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 7 March 2024.#IAB Europe v Gegevensbeschermingsautoriteit.#Request for a preliminary ruling from the Hof van beroep te Brussel.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Standard-setting sectoral organisation proposing to its members rules on the processing of users’ consent – Article 4(1) – Concept of ‘personal data’ – String of letters and characters capturing, in a structured and machine-readable manner, the preferences of an internet user relating to the consent of that user to the processing of his or her personal data – Article 4(7) – Concept of ‘controller’ – Article 26(1) – Concept of ‘joint controllers’ – Organisation which does not itself have access to the personal data processed by its members – Responsibility of the organisation extending to the subsequent processing of data carried out by third parties.#Case C-604/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0621",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/99f85461-8239-11ef-a67d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:858",
+      "decisionDate": "2024-10-04",
+      "englishTitle": "Judgment of the Court (Ninth Chamber) of 4 October 2024.#Koninklijke Nederlandse Lawn Tennisbond v Autoriteit Persoonsgegevens.#Request for a preliminary ruling from the Rechtbank Amsterdam.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5(1)(a) – Lawfulness of processing – Point (f) of the first subparagraph of Article 6(1) – Necessity of processing for the purposes of the legitimate interests pursued by the controller or by a third party – Concept of ‘legitimate interests’ – Commercial interest – Sports federation – Disclosure, for consideration, of the personal data of the members of a sports federation to sponsors without the consent of those members.#Case C-621/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0659",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/931574bb-6359-11ee-9220-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2023:745",
+      "decisionDate": "2023-10-05",
+      "englishTitle": "Judgment of the Court (Eighth Chamber) of 5 October 2023.#RK v Ministerstvo zdravotnictví.#Request for a preliminary ruling from the Nejvyšší správní soud.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 4(2) – Concept of ‘processing’ of personal data – Mobile application – Verification of the validity of ‘EU Digital COVID Certificates’ issued pursuant to Regulation (EU) 2021/953.#Case C-659/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0740",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/0b87c9c9-dc65-11ee-b9d9-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:216",
+      "decisionDate": "2024-03-07",
+      "englishTitle": "Judgment of the Court (Sixth Chamber) of 7 March 2024.#Endemol Shine Finland Oy.#Request for a preliminary ruling from the Itä-Suomen hovioikeus.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Articles 2, 4, 6, 10 and 86 – Data held by a court relating to the criminal convictions of a natural person – Oral disclosure of such data to a commercial company on account of a competition organised by that company – Concept of ‘processing of personal data’ – National legislation governing access to those data – Reconciliation between the right of public access to official documents and the protection of personal data.#Case C-740/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62022CJ0757",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/a37e84d1-3f61-11ef-865a-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:598",
+      "decisionDate": "2024-07-11",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 11 July 2024.#Meta Platforms Ireland Limited v Bundesverband der Verbraucherzentralen und Verbraucherverbände - Verbraucherzentrale Bundesverband e.V.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – First sentence of Article 12(1) – Transparency of information – Article 13(1)(c) and (e) – Obligation of the controller to provide information – Article 80(2) – Representation of data subjects by a consumer protection association – Representative action in the absence of a mandate and independently of the infringement of specific rights of a data subject – Action based on infringement by the controller of its obligation to provide information – Concept of ‘infringement of [the rights of a data subject] as a result of the processing’.#Case C-757/22.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0021",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c3c3e732-8238-11ef-a67d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:846",
+      "decisionDate": "2024-10-04",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 4 October 2024.#ND v DR.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Chapter VIII – Remedies – Medicinal products marketed by a pharmacist on an online platform – Action brought before the national civil courts by a competitor of that pharmacist on the basis of the prohibition of unfair commercial practices for infringement by the pharmacist of the obligations laid down by that regulation – Standing to bring proceedings – Article 4(15) and Article 9(1) and (2) – Directive 95/46/EC – Article 8(1) and (2) – Concept of ‘data concerning health’ – Conditions for the processing of those data.#Case C-21/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0046",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/57d10301-e1e5-11ee-8b2b-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:239",
+      "decisionDate": "2024-03-14",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 14 March 2024.#Budapest Főváros IV. Kerület Újpest Önkormányzat Polgármesteri Hivatala v Nemzeti Adatvédelmi és Információszabadság Hatóság.#Request for a preliminary ruling from the Fővárosi Törvényszék.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 58(2)(d) and (g) – Powers of the supervisory authority of a Member State – Paragraph 17(1) – Right to erasure (‘right to be forgotten’) – Erasure of unlawfully processed personal data – Power of the national supervisory authority to order the controller or processor to erase those data without a prior request from the data subject.#Case C-46/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0065",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/fbe07f2e-bdec-11ef-91ed-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:1051",
+      "decisionDate": "2024-12-19",
+      "englishTitle": "Judgment of the Court (Eighth Chamber) of 19 December 2024.#MK v K GmbH.#Request for a preliminary ruling from the Bundesarbeitsgericht.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 88(1) and (2) – Processing in the context of employment – Employees’ personal data – More specific rules provided for by a Member State pursuant to that Article 88 – Obligation to comply with Article 5, Article 6(1) and Article 9(1) and (2) of that regulation – Processing on the basis of a collective agreement – Margin of discretion of the parties to the collective agreement as regards the necessity of the processing of personal data provided for by that agreement – Scope of judicial review.#Case C-65/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0169",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/2e4e60c5-ad72-11ef-acb1-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:988",
+      "decisionDate": "2024-11-28",
+      "englishTitle": "Judgment of the Court (Third Chamber) of 28 November 2024.#Nemzeti Adatvédelmi és Információszabadság Hatóság v UC.#Request for a preliminary ruling from the Kúria.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data and the free movement of such data – Regulation (EU) 2016/679 – Data processed when drawing up a COVID-19 certificate – Data not collected from the data subject – Information to be provided – Exception to the obligation to provide information – Article 14(5)(c) – Data generated by the controller in the context of its own processes – Right to complain – Competence of the supervisory authority – Article 77(1) – Appropriate measures to protect the data subject’s legitimate interests provided for by the Member State law to which the controller is subject – Measures relating to the security of data processing – Article 32.#Case C-169/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0200",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/ef9b2c6c-823b-11ef-a67d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:827",
+      "decisionDate": "2024-10-04",
+      "englishTitle": "Judgment of the Court (First Chamber) of 4 October 2024.#Agentsia po vpisvaniyata v OL.#Request for a preliminary ruling from the Varhoven administrativen sad.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Publication in the commercial register of a company’s constitutive instrument containing personal data – Directive (EU) 2017/1132 – Non-compulsory personal data – Lack of consent of the data subject – Right to erasure – Non-material damage.#Case C-200/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0247",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/3b2ece7d-ffed-11ef-9503-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:172",
+      "decisionDate": "2025-03-13",
+      "englishTitle": "Judgment of the Court (First Chamber) of 13 March 2025.#VP v Országos Idegenrendészeti Főigazgatóság.#Request for a preliminary ruling from the Fővárosi Törvényszék.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5(1)(d) – Principle of accuracy – Article 16 – Right to rectification – Article 23 – Restrictions – Data relating to gender identity – Data incorrect from the time of inclusion in a public register – Means of proof – Administrative practice of requesting proof of gender reassignment surgery.#Case C-247/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0313",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/25c3cc4a-25c1-11f0-829d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:303",
+      "decisionDate": "2025-04-30",
+      "englishTitle": "Judgment of the Court (First Chamber) of 30 April 2025.#Inspektorat kam Visshia sadeben savet.#References for a preliminary ruling – Rule of law – Judicial independence – Second subparagraph of Article 19(1) TEU – Effective legal protection in the fields covered by Union law – Judicial body competent to propose the initiation of disciplinary proceedings against judges, public prosecutors and investigating magistrates, with a view to the imposition of disciplinary penalties – Members of the judicial body remaining in office after the expiry of their term of office – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Data security – Access by a judicial body to data relating to the bank accounts of judges and public prosecutors and of their family members – Judicial authorisation for the purpose of lifting banking secrecy – Court authorising the lifting of banking secrecy – Article 4(7) – Concept of ‘controller’ – Article 51 – Concept of ‘supervisory authority’.#Joined Cases C-313/23, C-316/23 and C-332/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0383",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/525d3ba3-e9ec-11ef-b5e9-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:84",
+      "decisionDate": "2025-02-13",
+      "englishTitle": "Judgment of the Court (Fifth Chamber) of 13 February 2025.#Criminal proceedings against ILVA A/S.#Request for a preliminary ruling from the Vestre Landsret.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 83(4) to (6) and (9) – Concept of an ‘undertaking’ – Parent company and subsidiary – Infringement of that regulation by a subsidiary – Calculation of the amount of the fine – Consideration of the total turnover of the group of which that subsidiary forms part.#Case C-383/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0394",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/c3103eab-ce72-11ef-be2a-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:2",
+      "decisionDate": "2025-01-09",
+      "englishTitle": "Judgment of the Court (First Chamber) of 9 January 2025.#Mousse v Commission nationale de l'informatique et des libertés (CNIL) and SNCF Connect.#Request for a preliminary ruling from the Conseil d'état (France).#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 5(1)(c) – Data minimisation – Article 6(1) – Lawfulness of processing – Data relating to title and gender identity – Online sale of travel documents – Article 21 – Right to object.#Case C-394/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0416",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e6f9351d-ce72-11ef-be2a-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:3",
+      "decisionDate": "2025-01-09",
+      "englishTitle": "Judgment of the Court (First Chamber) of 9 January 2025.#Österreichische Datenschutzbehörde v F R.#Request for a preliminary ruling from the Verwaltungsgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 57(1)(f) and Article 57(4) – Tasks of the supervisory authority – Concepts of a ‘request’ and ‘excessive requests’ – Charging of a reasonable fee or refusal to act on requests in the event of manifestly unfounded or excessive requests – Criteria which may guide the supervisory authority in making its choice – Article 77(1) – Concept of a ‘complaint’.#Case C-416/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0492",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/1a7e56c4-cf61-11f0-8da2-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:935",
+      "decisionDate": "2025-12-02",
+      "englishTitle": "Judgment of the Court (Grand Chamber) of 2 December 2025.#X v Russmedia Digital SRL and Inform Media Press SRL.#Request for a preliminary ruling from the Curtea de Apel Cluj.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 4(7) – Concept of ‘controller’ – Responsibility of the operator of an online marketplace for the publication of personal data contained in advertisements placed on its online marketplace by user advertisers – Article 5(2) – Principle of accountability – Article 26 – Joint control with user advertisers – Article 9(1) and (2)(a) – Advertisements containing sensitive data – Lawfulness of processing – Consent – Articles 24, 25 and 32 – Obligations of the controller – Prior identification of the advertisements containing such data – Prior identification of the identity of the user advertiser – Refusal of publication of unlawful advertisements – Security measures such as to prevent the copying of advertisements and their publication on other websites – Electronic commerce – Directive 2000/31/EC – Articles 12 to 15 – Possibility for such an operator, with regard to an infringement of those obligations, to rely on the exemption from liability of an intermediary information society service provider.#Case C-492/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0507",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/04b17f40-823a-11ef-a67d-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:854",
+      "decisionDate": "2024-10-04",
+      "englishTitle": "Judgment of the Court (Eighth Chamber) of 4 October 2024.#A v Patērētāju tiesību aizsardzības centrs.#Request for a preliminary ruling from the Augstākā tiesa (Senāts).#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Article 82(1) – Right to compensation and liability – Unlawful processing of data – Infringement of the right to protection of personal data – Concept of ‘damage’ – Compensation for non-material damage in the form of apologies – Whether permissible – Principle of effectiveness – Assessment of the form and level of compensation – Whether possible to take into consideration the attitude and motivation of the controller.#Case C-507/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0638",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/b8ef9f2d-f4ee-11ef-b7db-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:127",
+      "decisionDate": "2025-02-27",
+      "englishTitle": "Judgment of the Court (Eighth Chamber) of 27 February 2025.#Amt der Tiroler Landesregierung v Datenschutzbehörde.#Request for a preliminary ruling from the Verwaltungsgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 4(7) – Concept of ‘controller’ – Direct designation of the controller by national law – Auxiliary administrative entity in the service of a regional government – Lack of legal personality – Lack of legal capacity of the entity’s own – Determination of the purposes and means of the processing.#Case C-638/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0655",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/3b686325-896e-11f0-9af8-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:655",
+      "decisionDate": "2025-09-04",
+      "englishTitle": "Judgment of the Court (Fourth Chamber) of 4 September 2025.#IP v Quirin Privatbank AG.#Request for a preliminary ruling from the Bundesgerichtshof.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Rights of the data subject – Article 17 – Right to erasure of data – Article 18 – Right to restriction of processing – Article 79 – Right to an effective judicial remedy – Unlawful processing of personal data – Action seeking an order requiring the controller to refrain from any further unlawful processing in the future – Basis – Conditions – Article 82(1) – Right to compensation – Concept of ‘non-material damage’ – Assessment of the compensation – Possible consideration of the degree of fault on the part of the controller – Possible impact of the grant of a ‘prohibitory injunction’.#Case C-655/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CJ0710",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e49c11ac-1065-11f0-b1a3-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:231",
+      "decisionDate": "2025-04-03",
+      "englishTitle": "Judgment of the Court (First Chamber) of 3 April 2025.#L. H. v Ministerstvo zdravotnictví.#Reference for a preliminary ruling – Protection of natural persons with regard to the processing of personal data – Regulation (EU) 2016/679 – Article 4 – Definitions – Article 6 – Lawfulness of processing – Article 86 – Public access to official documents – Data concerning the representative of a legal person – Case-law of a national court imposing an obligation to inform and consult the data subject prior to disclosure of official documents containing such data.#Case C-710/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62023CO0312",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/e349d656-27b7-11ef-a195-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2024:458",
+      "decisionDate": "2024-05-27",
+      "englishTitle": "Order of the Court (Sixth Chamber) of 27 May 2024.#Addiko Bank d.d. v Agencija za zaštitu osobnih podataka.#Request for a preliminary ruling from the Upravni sud u Zagrebu.#Reference for a preliminary ruling – Article 99 of the Rules of Procedure of the Court of Justice – Questions the answer to which may be clearly deduced from the Court’s existing case-law – Protection of natural persons with regard to the processing of personal data and free movement of such data – Regulation (EU) 2016/679 – Article 15 – Right of access by the data subject to the personal data concerning him or her that are undergoing processing – Right to obtain a copy of those data – Concept of ‘copy’ – Reasons for the request for access to those data – Use of the data to bring legal proceedings.#Case C-312/23.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    },
+    {
+      "caseCelex": "62024CJ0422",
+      "caseWorkUri": "https://publications.europa.eu/resource/cellar/07c982ad-dc01-11f0-8da2-01aa75ed71a1",
+      "ecli": "ECLI:EU:C:2025:980",
+      "decisionDate": "2025-12-18",
+      "englishTitle": "Judgment of the Court (First Chamber) of 18 December 2025.#Integritetsskyddsmyndigheten v AB Storstockholms Lokaltrafik.#Request for a preliminary ruling from the Högsta förvaltningsdomstolen.#Reference for a preliminary ruling – Protection of personal data – Regulation (EU) 2016/679 – Articles 13 and 14 – Scope – Personal data collected by means of body cameras worn by ticket inspectors on public transport – Legal basis for the obligation on the data controller to provide information to the data subject.#Case C-422/24.",
+      "predicate": "http://publications.europa.eu/ontology/cdm#case-law_interpretes_resource_legal",
+      "targetCelex": "32016R0679",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/3e485e15-11bd-11e6-ba9a-01aa75ed71a1"
+    }
+  ],
+  "unavailableCaseCelexes": ["62021CJ0340_1", "62021CJ0667_1"]
+}

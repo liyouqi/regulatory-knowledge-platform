@@ -1,4 +1,8 @@
 import type {
+  CaseLawEndpoint,
+  DocumentCaseLawRelationshipsResponse,
+} from "../shared/case-law";
+import type {
   DocumentRelationshipsResponse,
   DocumentView,
   ProvisionRelationship,
@@ -192,6 +196,7 @@ export function toDocumentRelationshipGraph(
   documents: DocumentView[],
   response: DocumentRelationshipsResponse,
   lifecycleResponse?: DocumentLifecycleRelationshipsResponse | null,
+  caseLawResponse?: DocumentCaseLawRelationshipsResponse | null,
 ): DocumentRelationshipGraphResponse {
   const center = documentNode(document, "center");
   const documentsById = new Map(
@@ -264,6 +269,30 @@ export function toDocumentRelationshipGraph(
     nodes.set(source.entityId, source);
     nodes.set(target.entityId, target);
     addEdge(edges, source.entityId, target.entityId, relationship);
+  }
+
+  function caseNode(caseEntity: CaseLawEndpoint): RelationshipGraphNode {
+    return {
+      entityId: caseEntity.entityId,
+      documentShortName: "CJEU",
+      kind: "case",
+      label: caseEntity.caseNumber,
+      title: caseEntity.caseName,
+      sourceUrl: caseEntity.sourceUrl,
+      role: "neighbor",
+      caseCelex: caseEntity.caseCelex,
+      ecli: caseEntity.ecli,
+      decisionType: caseEntity.decisionType,
+      decisionDate: caseEntity.decisionDate,
+      officialTitle: caseEntity.officialTitle,
+    };
+  }
+
+  for (const relationship of caseLawResponse?.relationships ?? []) {
+    if (relationship.target.documentId !== document.id) continue;
+    const source = caseNode(relationship.source);
+    nodes.set(source.entityId, source);
+    addEdge(edges, source.entityId, center.entityId, relationship);
   }
 
   return documentRelationshipGraphResponseSchema.parse({

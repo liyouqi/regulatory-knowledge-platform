@@ -26,9 +26,27 @@ const externalRelationshipGraphNodeSchema = z
   })
   .strict();
 
+const caseRelationshipGraphNodeSchema = z
+  .object({
+    entityId: z.string().startsWith("case:eu:"),
+    documentShortName: z.literal("CJEU"),
+    kind: z.literal("case"),
+    label: z.string().min(1),
+    title: z.string().min(1),
+    sourceUrl: z.string().url(),
+    role: z.literal("neighbor"),
+    caseCelex: z.string().min(1),
+    ecli: z.string().min(1),
+    decisionType: z.enum(["judgment", "order"]),
+    decisionDate: z.string().date(),
+    officialTitle: z.string().min(1),
+  })
+  .strict();
+
 export const relationshipGraphNodeSchema = z.union([
   loadedRelationshipGraphNodeSchema,
   externalRelationshipGraphNodeSchema,
+  caseRelationshipGraphNodeSchema,
 ]);
 
 export const relationshipGraphEvidenceSchema = z.object({
@@ -40,7 +58,10 @@ export const relationshipGraphEdgeSchema = z.object({
   id: z.string().min(1),
   source: z.string().min(1),
   target: z.string().min(1),
-  relationType: provisionRelationshipSchema.shape.relationType,
+  relationType: z.union([
+    provisionRelationshipSchema.shape.relationType,
+    z.literal("INTERPRETS"),
+  ]),
   provenance: relationshipProvenanceSchema,
   relationshipIds: z.array(z.string().startsWith("relationship:")).min(1),
   evidence: z.array(relationshipGraphEvidenceSchema).min(1),

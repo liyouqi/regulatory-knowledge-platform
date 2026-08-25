@@ -6,6 +6,7 @@ export type RelationshipType =
   | "ADOPTED_UNDER"
   | "AMENDS"
   | "CORRECTS"
+  | "INTERPRETS"
   | "SUPPLEMENTS"
   | "RELATED_DOCUMENT"
   | "RELATED_RECITAL";

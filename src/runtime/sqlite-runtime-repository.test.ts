@@ -214,6 +214,41 @@ describe("SQLite runtime repository", () => {
     ).toBeNull();
   });
 
+  it("returns reviewed CJEU Work-level metadata without claiming Article citations", () => {
+    const gdprCases =
+      repository?.findDocumentCaseLawRelationships("eu:32016R0679");
+
+    expect(gdprCases?.relationships).toHaveLength(72);
+    expect(gdprCases?.relationships).toContainEqual(
+      expect.objectContaining({
+        relationType: "INTERPRETS",
+        provenance: "OFFICIAL_METADATA",
+        source: expect.objectContaining({
+          entityId: "case:eu:62017CJ0496",
+          caseNumber: "Case C-496/17.",
+          ecli: "ECLI:EU:C:2019:26",
+          decisionType: "judgment",
+          availability: "metadata-only",
+        }),
+        target: expect.objectContaining({
+          documentId: "eu:32016R0679",
+          kind: "document",
+          availability: "loaded",
+        }),
+        resolutionStatus: "metadata-only",
+      }),
+    );
+    expect(
+      repository?.findDocumentCaseLawRelationships("eu:32022R2554")
+        ?.relationships,
+    ).toEqual([]);
+    expect(
+      repository?.findDocumentCaseLawRelationships("eu:unknown"),
+    ).toBeNull();
+    expect(repository?.caseCount).toBe(72);
+    expect(repository?.caseLawRelationshipCount).toBe(72);
+  });
+
   it("returns benchmark-gated TF-IDF related recitals with similarity scores", () => {
     const doraArticleTwenty = repository?.findProvisionRelationships(
       "eu:32022R2554",

@@ -26,6 +26,8 @@
     "cellar:lifecycle:verify": "node --import tsx src/ingestion/cellar-lifecycle-relations-cli.ts verify",
     "cellar:case-law:fetch": "node --import tsx src/ingestion/cellar-case-law-cli.ts fetch",
     "cellar:case-law:verify": "node --import tsx src/ingestion/cellar-case-law-cli.ts verify",
+    "cellar:case-law:metadata:fetch": "node --import tsx src/ingestion/cellar-case-law-cli.ts metadata:fetch",
+    "cellar:case-law:metadata:verify": "node --import tsx src/ingestion/cellar-case-law-cli.ts metadata:verify",
     "cellar:case-law:metadata:probe": "node --import tsx src/ingestion/cellar-case-law-cli.ts metadata:probe",
     "cssf:source:list": "node --import tsx src/ingestion/cssf-cli.ts list",
     "cssf:source:fetch": "node --import tsx src/ingestion/cssf-cli.ts fetch",

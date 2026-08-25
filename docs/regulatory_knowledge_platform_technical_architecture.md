@@ -432,7 +432,7 @@ Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（orig
 
 SQLite `4.3.0` 在不修改 Canonical `1.0.0` 的前提下，增加 `document_version_chains`、`document_versions`、`document_version_edges` 三张规范化只读表，并由 `document-version-chain@1.0.0` 在 build time 从已核验 `sourceStatus` 投影。当前只允许发布 loaded original/consolidated snapshot、外部 current-version link 和官方 corrigendum 节点，以及 `CURRENT_VERSION_LINK` / `HAS_CORRIGENDUM` 两种 `OFFICIAL_METADATA` 边。外部节点不代表其正文已载入 Reader；没有核验输入时不生成 chain，且当前不生成 `AMENDED_BY`。builder version 进入 runtime identity，节点/边数量进入 manifest，并通过独立 API 与 Reader version history 读取。它是第 22.2 节的首个有界切片，不是完整 amendment/version graph；后续修订法案、consolidated lineage、Article-level provenance 和 snapshot comparison 仍需独立核验输入。
 
-当前 SQLite `4.4.0` 在该 version-chain contract 之外增加独立 `legal_works` 与 `lifecycle_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。`AMENDS` / `CORRECTS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document。reviewed dataset、builder version、65 条边和 64 个 external Work count 均进入 runtime identity/manifest。
+当前 SQLite `4.5.0` 在该 version-chain contract 之外增加独立 `legal_works` / `lifecycle_relationships` 与 `case_entities` / `case_law_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。Case 使用独立 `case:eu:<CELEX>` namespace，并只以 foreign key 指向 loaded target Document。`AMENDS` / `CORRECTS` / `INTERPRETS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document 或 Judgment。reviewed dataset、builder version、65 条 lifecycle 边、64 个 external Work、72 个 Case 与 72 条 Act-level case edge 均进入 runtime identity/manifest。
 
 ## 7.2 LegalViz reuse strategy
 
@@ -1114,7 +1114,7 @@ Phase 2 增加 document-level version relationships 即可。
 
 仍进入同一 Relationship Repository。
 
-当前先采用 acquisition-only `cellar-case-law@1.0.0`：只允许官方 CDM `case-law_interpretes_resource_legal`，target 必须属于 loaded EU CELEX seeds，case CELEX 必须是 CJEU `6YYYYXXNNNN` 形态（包括 CELLAR 返回的 joined-case suffix）。2026-08-24 snapshot 得到 74 条 GDPR Work-level interpretation candidates，raw response、query、normalized candidate 和 hash manifest 都在 ignored `data/raw/cellar-case-law/`。独立 metadata probe 通过 CELEX `owl:sameAs` 找到 Work，只读 English expression title、ECLI 和 `work_date_document`；72 条完整，两个 joined-case 记录没有完整官方结果并保持 `unavailable`。这一层只证明 CELLAR 的 Work-level metadata；不读取 judgment text、不创建 Case entity、不宣称具体 Article 被引用，也不写入 runtime。
+当前 `cellar-case-law@1.0.0` 只允许官方 CDM `case-law_interpretes_resource_legal`，target 必须属于 loaded EU CELEX seeds，case CELEX 必须是 `6YYYYXXNNNN` 形态（包括 CELLAR 返回的 joined-case suffix）。2026-08-24 discovery snapshot 得到 74 条 GDPR Work-level interpretation candidates；独立 metadata snapshot 通过 CELEX `owl:sameAs` 找到 Work，只读 English expression title、ECLI 和 `work_date_document`，得到 72 条完整记录，两个 joined-case 记录保持 `unavailable`。reviewed dataset 进入独立 `case_entities` / `case_law_relationships`，严格从官方英文 title 提取 case name、Case/Joined Cases number 与 `judgment | order` 类型；当前为 71 judgment、1 order。关系固定为 `Case → INTERPRETS → Act`、provenance `OFFICIAL_METADATA`、resolution `metadata-only`，只在 GDPR Document Graph 投影。它不读取 judgment text、不宣称具体 Article 被引用、不进入 Article Graph，也不修改 Canonical Document 或主 `legal_entities` contract。
 
 ## 21.4 Relationship Graph Delivery
 
@@ -1129,7 +1129,7 @@ Relationship Repository
 
 Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenance 和 evidence；不包含 React Flow position/node type 等 vendor state。Web 层负责确定性布局、筛选和 React Flow 类型转换，因此未来更换图形组件不改变 Repository、relationship contract 或内部 endpoint。Graph route 继续只读 SQLite runtime artifact，不读取 Canonical JSON、raw source 或 curated mapping 文件。
 
-当前 delivery 提供两种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 查询 source/target document 命中的 resolved 跨文档边，在投影阶段聚合为 Document nodes，并合并当前 Document 的独立 lifecycle response。loaded endpoint 继续使用 Document node；external Work node 只有 stable ID、CELEX label 和官方 CELLAR URL，不请求 relationship preview，也没有 Reader/Explorer route。两种 projection 共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 Work-level metadata 伪装成 Article 关系。
+当前 delivery 提供两种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 查询 source/target document 命中的 resolved 跨文档边，在投影阶段聚合为 Document nodes，并合并当前 Document 的独立 lifecycle 与 case-law response。loaded endpoint 继续使用 Document node；external Work node 只有 stable ID、CELEX label 和官方 CELLAR URL；Case node 只显示官方 case number/name、ECLI、date、decision type 与 CELLAR URL。两类 metadata-only node 都不请求正文 preview，也没有 Reader/Explorer route。两种 projection 共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 Work-level metadata 伪装成 Article 关系。
 
 ## 21.5 Phase 4 External Adapters（预留）
 

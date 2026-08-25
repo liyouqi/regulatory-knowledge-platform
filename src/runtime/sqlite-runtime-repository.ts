@@ -7,6 +7,11 @@ import {
   RUNTIME_DATABASE_SCHEMA_VERSION,
 } from "../search/sqlite-search-index";
 import {
+  type CaseLawRelationship,
+  type DocumentCaseLawRelationshipsResponse,
+  documentCaseLawRelationshipsResponseSchema,
+} from "../shared/case-law";
+import {
   type DocumentVersionChain,
   type DocumentVersionEdge,
   type DocumentVersionNode,
@@ -137,6 +142,32 @@ interface LifecycleRelationshipRow {
   targetAvailability: "loaded" | "external";
 }
 
+interface CaseLawRelationshipRow {
+  id: string;
+  relationType: "INTERPRETS";
+  provenance: "OFFICIAL_METADATA";
+  evidenceText: "CELLAR case-law_interpretes_resource_legal";
+  evidenceLocator: string;
+  sourceRef: string;
+  builderMethod: string;
+  builderVersion: string;
+  resolutionStatus: "metadata-only";
+  caseEntityId: string;
+  caseCelex: string;
+  ecli: string;
+  caseNumber: string;
+  caseName: string;
+  decisionType: "judgment" | "order";
+  decisionDate: string;
+  officialTitle: string;
+  caseSourceUrl: string;
+  targetDocumentId: string;
+  targetDocumentShortName: string;
+  targetTitle: string;
+  targetPath: string;
+  targetSourceUrl: string;
+}
+
 interface EntityPreviewRow {
   entityId: string;
   documentId: string;
@@ -247,6 +278,36 @@ const LIFECYCLE_RELATIONSHIP_SELECT = `
   LEFT JOIN documents td ON td.id = tw.loaded_document_id
 `;
 
+const CASE_LAW_RELATIONSHIP_SELECT = `
+  SELECT
+    clr.relationship_id AS id,
+    clr.relation_type AS relationType,
+    clr.provenance,
+    clr.evidence_text AS evidenceText,
+    clr.evidence_locator AS evidenceLocator,
+    clr.source_ref AS sourceRef,
+    clr.builder_method AS builderMethod,
+    clr.builder_version AS builderVersion,
+    clr.resolution_status AS resolutionStatus,
+    c.id AS caseEntityId,
+    c.celex AS caseCelex,
+    c.ecli,
+    c.case_number AS caseNumber,
+    c.case_name AS caseName,
+    c.decision_type AS decisionType,
+    c.decision_date AS decisionDate,
+    c.official_title AS officialTitle,
+    c.source_url AS caseSourceUrl,
+    d.id AS targetDocumentId,
+    d.short_name AS targetDocumentShortName,
+    d.official_title AS targetTitle,
+    d.default_path AS targetPath,
+    d.source_url AS targetSourceUrl
+  FROM case_law_relationships clr
+  JOIN case_entities c ON c.id = clr.case_id
+  JOIN documents d ON d.id = clr.target_document_id
+`;
+
 function toProvisionRelationship(
   row: RelationshipRow,
   relationType = row.relationType,
@@ -344,6 +405,51 @@ function toLifecycleRelationship(
   };
 }
 
+function toCaseLawRelationship(
+  row: CaseLawRelationshipRow,
+): CaseLawRelationship {
+  return {
+    id: row.id,
+    relationType: row.relationType,
+    provenance: row.provenance,
+    source: {
+      entityId: row.caseEntityId,
+      kind: "case",
+      jurisdiction: "EU",
+      caseCelex: row.caseCelex,
+      ecli: row.ecli,
+      caseNumber: row.caseNumber,
+      caseName: row.caseName,
+      decisionType: row.decisionType,
+      decisionDate: row.decisionDate,
+      officialTitle: row.officialTitle,
+      sourceUrl: row.caseSourceUrl,
+      availability: "metadata-only",
+    },
+    target: {
+      entityId: row.targetDocumentId,
+      documentId: row.targetDocumentId,
+      documentShortName: row.targetDocumentShortName,
+      kind: "document",
+      label: row.targetDocumentShortName,
+      title: row.targetTitle,
+      path: row.targetPath,
+      sourceUrl: row.targetSourceUrl,
+      availability: "loaded",
+    },
+    evidence: {
+      text: row.evidenceText,
+      locator: row.evidenceLocator,
+      sourceUrl: row.sourceRef,
+    },
+    builder: {
+      method: row.builderMethod,
+      version: row.builderVersion,
+    },
+    resolutionStatus: row.resolutionStatus,
+  };
+}
+
 function firstExcerpt(
   blocks: DocumentView["provisions"][number]["blocks"],
 ): string | undefined {
@@ -387,6 +493,8 @@ export class SqliteRuntimeRepository {
   readonly cellarRelationshipCount: number;
   readonly lifecycleRelationshipCount: number;
   readonly externalWorkCount: number;
+  readonly caseCount: number;
+  readonly caseLawRelationshipCount: number;
   readonly relatedRecitalCount: number;
   readonly versionNodeCount: number;
   readonly versionEdgeCount: number;
@@ -425,6 +533,14 @@ export class SqliteRuntimeRepository {
       );
       this.externalWorkCount = Number.parseInt(
         manifestValue(this.database, "externalWorkCount"),
+        10,
+      );
+      this.caseCount = Number.parseInt(
+        manifestValue(this.database, "caseCount"),
+        10,
+      );
+      this.caseLawRelationshipCount = Number.parseInt(
+        manifestValue(this.database, "caseLawRelationshipCount"),
         10,
       );
       this.relatedRecitalCount = Number.parseInt(
@@ -846,6 +962,29 @@ export class SqliteRuntimeRepository {
       documentId,
       buildId: this.buildId,
       relationships: rows.map(toLifecycleRelationship),
+    });
+  }
+
+  findDocumentCaseLawRelationships(
+    documentId: string,
+  ): DocumentCaseLawRelationshipsResponse | null {
+    const document = this.database
+      .prepare("SELECT id FROM documents WHERE id = ?")
+      .get(documentId);
+    if (!document) return null;
+
+    const rows = this.database
+      .prepare(`
+        ${CASE_LAW_RELATIONSHIP_SELECT}
+        WHERE clr.target_document_id = @documentId
+        ORDER BY decisionDate DESC, caseCelex ASC, id ASC
+      `)
+      .all({ documentId }) as CaseLawRelationshipRow[];
+
+    return documentCaseLawRelationshipsResponseSchema.parse({
+      documentId,
+      buildId: this.buildId,
+      relationships: rows.map(toCaseLawRelationship),
     });
   }
 
