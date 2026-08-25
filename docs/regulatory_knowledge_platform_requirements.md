@@ -1938,7 +1938,7 @@ CASE LAW  n
 - open official judgment；
 - Side Peek / case detail。
 
-当前实现：首个 CJEU acquisition-only slice 只查询 CDM `case-law_interpretes_resource_legal`。它要求 target 是已加载 EU seed CELEX，case endpoint 是官方 CELEX `6YYYYXXNNNN`（也兼容官方 joined-case 后缀），并保留两个 CELLAR Work URI、predicate 和 query/response hash。2026-08-24 verified snapshot 得到 74 条候选，全部以 GDPR（32016R0679）为 target；DORA、AI Act 和其余当前 seed 没有该 predicate 的候选。snapshot 保持 Git ignored，不抓取 judgment text、不生成 case entity、不推断 Article/paragraph citation，也不改变 runtime、Reader 或 Graph。后续只有在 case metadata、正文证据和 Article mapping 分别核验后，才可设计 Case Law delivery contract。
+当前实现：首个 CJEU acquisition-only slice 只查询 CDM `case-law_interpretes_resource_legal`。它要求 target 是已加载 EU seed CELEX，case endpoint 是官方 CELEX `6YYYYXXNNNN`（也兼容官方 joined-case 后缀），并保留两个 CELLAR Work URI、predicate 和 query/response hash。2026-08-24 verified snapshot 得到 74 条候选，全部以 GDPR（32016R0679）为 target；DORA、AI Act 和其余当前 seed 没有该 predicate 的候选。对同一 snapshot 的独立 metadata probe 只读取英文 expression title、ECLI 和 `work_date_document`：72 条完整，`62021CJ0340_1` 与 `62021CJ0667_1` 没有完整官方结果，明确标为 `unavailable`，不补造 fallback。snapshot 保持 Git ignored，不抓取 judgment text、不生成 case entity、不推断 Article/paragraph citation，也不改变 runtime、Reader 或 Graph。后续只有在 case metadata、正文证据和 Article mapping 分别核验后，才可设计 Case Law delivery contract。
 
 ## 22.4 Relationship Graph View
 

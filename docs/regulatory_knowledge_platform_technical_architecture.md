@@ -1114,7 +1114,7 @@ Phase 2 增加 document-level version relationships 即可。
 
 仍进入同一 Relationship Repository。
 
-当前先采用 acquisition-only `cellar-case-law@1.0.0`：只允许官方 CDM `case-law_interpretes_resource_legal`，target 必须属于 loaded EU CELEX seeds，case CELEX 必须是 CJEU `6YYYYXXNNNN` 形态（包括 CELLAR 返回的 joined-case suffix）。2026-08-24 snapshot 得到 74 条 GDPR Work-level interpretation candidates，raw response、query、normalized candidate 和 hash manifest 都在 ignored `data/raw/cellar-case-law/`。这一层只证明 CELLAR 的 Work-level metadata；不读取 judgment text、不创建 Case entity、不宣称具体 Article 被引用，也不写入 runtime。
+当前先采用 acquisition-only `cellar-case-law@1.0.0`：只允许官方 CDM `case-law_interpretes_resource_legal`，target 必须属于 loaded EU CELEX seeds，case CELEX 必须是 CJEU `6YYYYXXNNNN` 形态（包括 CELLAR 返回的 joined-case suffix）。2026-08-24 snapshot 得到 74 条 GDPR Work-level interpretation candidates，raw response、query、normalized candidate 和 hash manifest 都在 ignored `data/raw/cellar-case-law/`。独立 metadata probe 通过 CELEX `owl:sameAs` 找到 Work，只读 English expression title、ECLI 和 `work_date_document`；72 条完整，两个 joined-case 记录没有完整官方结果并保持 `unavailable`。这一层只证明 CELLAR 的 Work-level metadata；不读取 judgment text、不创建 Case entity、不宣称具体 Article 被引用，也不写入 runtime。
 
 ## 21.4 Relationship Graph Delivery
 

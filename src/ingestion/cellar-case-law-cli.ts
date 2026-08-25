@@ -8,6 +8,10 @@ import {
   cellarCaseLawDatasetSchema,
   parseCellarCaseLawResults,
 } from "./cellar-case-law";
+import {
+  buildCellarCaseLawMetadataQuery,
+  probeCellarCaseLawMetadata,
+} from "./cellar-case-law-metadata";
 import { CELLAR_SPARQL_ENDPOINT } from "./cellar-relations";
 import { loadSourceRegistry } from "./source-registry";
 
@@ -201,12 +205,54 @@ async function verifyCaseLaw(): Promise<void> {
   );
 }
 
+async function probeMetadata(): Promise<void> {
+  const providedPath = argument("--snapshot");
+  if (!providedPath) {
+    throw new Error(
+      "Usage: npm run cellar:case-law:metadata:probe -- --snapshot <case-law-snapshot-directory>",
+    );
+  }
+  const directory = resolve(providedPath);
+  const candidate = cellarCaseLawDatasetSchema.parse(
+    JSON.parse(
+      await readFile(`${directory}/normalized-candidate.json`, "utf8"),
+    ),
+  );
+  const responseBytes = await officialSparqlResponse(
+    buildCellarCaseLawMetadataQuery(candidate.records),
+  );
+  const records = probeCellarCaseLawMetadata(
+    candidate.records,
+    JSON.parse(new TextDecoder().decode(responseBytes)),
+  );
+  const complete = records.filter(
+    (record) => record.availability === "complete",
+  );
+  console.table({
+    candidates: records.length,
+    complete: complete.length,
+    unavailable: records.length - complete.length,
+  });
+  console.table(
+    records
+      .filter((record) => record.availability === "unavailable")
+      .map((record) => ({
+        caseCelex: record.caseCelex,
+        availability: record.availability,
+        ecli: record.ecli ?? "",
+        decisionDate: record.decisionDate ?? "",
+      })),
+  );
+}
+
 const command = process.argv[2];
 
 try {
   if (command === "fetch") await fetchCaseLaw();
   else if (command === "verify") await verifyCaseLaw();
-  else throw new Error("Usage: CELLAR case-law CLI <fetch|verify>");
+  else if (command === "metadata:probe") await probeMetadata();
+  else
+    throw new Error("Usage: CELLAR case-law CLI <fetch|verify|metadata:probe>");
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;
