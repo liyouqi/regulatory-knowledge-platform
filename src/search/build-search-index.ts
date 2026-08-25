@@ -2,23 +2,42 @@ import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
+  findEditionProfile,
+  loadEditionProfileRegistrySync,
+} from "../runtime/edition-profile";
+import {
   DEFAULT_RUNTIME_DATABASE_PATH,
   buildRuntimeDatabase,
 } from "./sqlite-search-index";
 
 const outputIndex = process.argv.indexOf("--output");
 const outputPath = outputIndex >= 0 ? process.argv[outputIndex + 1] : undefined;
-if (outputIndex >= 0 && !outputPath) {
-  throw new Error("Usage: npm run runtime:build -- [--output <sqlite-path>]");
+const profileIndex = process.argv.indexOf("--profile");
+const profileArgument =
+  profileIndex >= 0 ? process.argv[profileIndex + 1] : undefined;
+const environmentProfile = process.env.REGULATORY_EDITION_PROFILE?.trim();
+const profileId = profileArgument || environmentProfile || undefined;
+if (
+  (outputIndex >= 0 && !outputPath) ||
+  (profileIndex >= 0 && !profileArgument)
+) {
+  throw new Error(
+    "Usage: npm run runtime:build -- [--profile <profile-id>] [--output <sqlite-path>]",
+  );
 }
+const profile = findEditionProfile(profileId, loadEditionProfileRegistrySync());
 
 const manifest = buildRuntimeDatabase(
   loadDocumentViews(),
   [...loadSourceRegistrySync(), ...loadCssfSourceRegistrySync()],
   outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
+  profile,
 );
 console.table({
   buildId: manifest.buildId,
+  profileId: manifest.profileId,
+  profileVersion: manifest.profileVersion,
+  profileHash: manifest.profileHash,
   documents: manifest.documentCount,
   records: manifest.recordCount,
   definitions: manifest.definitionCount,

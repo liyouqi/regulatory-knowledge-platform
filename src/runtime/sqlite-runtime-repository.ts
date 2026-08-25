@@ -489,6 +489,10 @@ function manifestValue(database: Database.Database, key: string): string {
 
 export class SqliteRuntimeRepository {
   readonly buildId: string;
+  readonly profileId: string;
+  readonly profileVersion: string;
+  readonly profileDisplayName: string;
+  readonly profileHash: string;
   readonly relationshipCount: number;
   readonly cellarRelationshipCount: number;
   readonly lifecycleRelationshipCount: number;
@@ -519,6 +523,13 @@ export class SqliteRuntimeRepository {
         );
       }
       this.buildId = manifestValue(this.database, "buildId");
+      this.profileId = manifestValue(this.database, "profileId");
+      this.profileVersion = manifestValue(this.database, "profileVersion");
+      this.profileDisplayName = manifestValue(
+        this.database,
+        "profileDisplayName",
+      );
+      this.profileHash = manifestValue(this.database, "profileHash");
       this.relationshipCount = Number.parseInt(
         manifestValue(this.database, "relationshipCount"),
         10,

@@ -166,6 +166,8 @@ function manifestValue(database: Database.Database, key: string): string {
 
 export class SearchService {
   readonly buildId: string;
+  readonly profileId: string;
+  readonly profileHash: string;
   readonly definitionCount: number;
   readonly documentCount: number;
   readonly recordCount: number;
@@ -206,6 +208,8 @@ export class SearchService {
         .prepare("SELECT definition_type FROM definitions LIMIT 1")
         .get();
       this.buildId = manifestValue(this.database, "buildId");
+      this.profileId = manifestValue(this.database, "profileId");
+      this.profileHash = manifestValue(this.database, "profileHash");
       this.documentCount = Number.parseInt(
         manifestValue(this.database, "documentCount"),
         10,

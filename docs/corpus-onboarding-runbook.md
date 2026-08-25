@@ -25,9 +25,10 @@ The repository currently provides separate commands for:
 - parser inspection and quality-gated Canonical publication;
 - reviewed CELLAR, lifecycle, case-law, and Level 2 relationship inputs;
 - atomic Runtime SQLite build and read-only verification;
+- validated build-time Edition/Profile compilation with `full-corpus` and `banking-default`;
 - parser, relationship, search, performance, and release gates.
 
-It does not yet provide a single end-to-end `corpus:build` command or Edition/Profile compiler. Until those are implemented, use the explicit steps below. Do not create an unreviewed one-off import script to bypass them.
+It does not yet provide a single end-to-end `corpus:build` command. Until that orchestrator is implemented, use the explicit steps below. Do not create an unreviewed one-off import script to bypass them.
 
 ## Decide whether an adapter already exists
 
@@ -93,12 +94,14 @@ Each relationship type must define direction, allowed endpoint types, provenance
 ### 6. Build and verify the product artifact
 
 ```bash
-npm run runtime:build
+npm run runtime:build -- --profile <profileId>
 npm run runtime:verify
 npm run check
 npm test
 npm run build
 ```
+
+For local application testing, run `REGULATORY_EDITION_PROFILE=<profileId> npm run dev` so the `predev` build uses the intended Profile. Production serves the already verified SQLite artifact and does not compile or switch Profiles at startup.
 
 Run dedicated parser, relationship, or search fixtures/evals when the corresponding behavior changed. `npm run release:verify` verifies the assembled corpus but does not fetch sources or rebuild every Canonical artifact from raw snapshots.
 

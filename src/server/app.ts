@@ -132,6 +132,10 @@ app.get("/api/health", (_request, response) => {
     runtimeDatabase: {
       available: true,
       buildId: runtimeRepository.buildId,
+      profileId: runtimeRepository.profileId,
+      profileVersion: runtimeRepository.profileVersion,
+      profileDisplayName: runtimeRepository.profileDisplayName,
+      profileHash: runtimeRepository.profileHash,
       documents: searchService.documentCount,
       records: searchService.recordCount,
       definitions: searchService.definitionCount,

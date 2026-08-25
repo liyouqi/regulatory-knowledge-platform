@@ -42,6 +42,8 @@ export interface CorpusVerification {
   canonicalDocuments: number;
   runtimeDocuments: number;
   runtimeBuildId: string;
+  runtimeProfileId: string;
+  runtimeProfileHash: string;
   runtimeRecords: number;
   runtimeRelationships: number;
   unresolvedReferences: number;
@@ -103,6 +105,8 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
     canonicalDocuments: canonicalDocuments.length,
     runtimeDocuments: runtime.documents,
     runtimeBuildId: runtime.buildId,
+    runtimeProfileId: runtime.profileId,
+    runtimeProfileHash: runtime.profileHash,
     runtimeRecords: runtime.records,
     runtimeRelationships: runtime.relationships,
     unresolvedReferences: runtime.unresolvedReferences,

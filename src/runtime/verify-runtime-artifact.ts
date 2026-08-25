@@ -7,6 +7,9 @@ import { SqliteRuntimeRepository } from "./sqlite-runtime-repository";
 
 export interface RuntimeArtifactVerification {
   buildId: string;
+  profileId: string;
+  profileVersion: string;
+  profileHash: string;
   documents: number;
   records: number;
   definitions: number;
@@ -47,8 +50,19 @@ export function verifyRuntimeArtifact(
         `Runtime build ID mismatch: search has ${search.buildId}, Reader has ${repository.buildId}`,
       );
     }
+    if (
+      search.profileId !== repository.profileId ||
+      search.profileHash !== repository.profileHash
+    ) {
+      throw new Error(
+        `Runtime Profile mismatch: search has ${search.profileId}@${search.profileHash}, Reader has ${repository.profileId}@${repository.profileHash}`,
+      );
+    }
     return {
       buildId: search.buildId,
+      profileId: repository.profileId,
+      profileVersion: repository.profileVersion,
+      profileHash: repository.profileHash,
       documents: documents.length,
       records: search.recordCount,
       definitions: search.definitionCount,

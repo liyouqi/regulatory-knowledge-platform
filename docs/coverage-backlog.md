@@ -19,7 +19,7 @@ The visible Web product and the Agent/RAG data product consume the same reviewed
 | Version lifecycle | bounded version-chain plus amendment/corrigendum metadata | consolidated lineage, comparison, Article provenance | validated |
 | CJEU | metadata-only Act-level interpretation graph | judgment text and Article/paragraph citations | validated |
 | Level 2 | representative DORA/MiCA RTS/ITS and reporting pair | additional RTS/ITS/Guidelines/Q&A | validated |
-| Edition/Profile | one `banking-default` build-time compilation with route/search/graph isolation | funds, insurance, payments, digital-assets and institution-specific profiles | planned |
+| Edition/Profile | one `banking-default` build-time compilation with route/search/graph isolation | funds, insurance, payments, digital-assets and institution-specific profiles | validated |
 | Structured relation query | one deterministic evidence-bearing query over existing relations | advanced relation-aware search combinations | planned |
 | Deployment closure | immutable Cloud Run release, health/build record, rollback procedure | CI/CD automation and broader operational hardening | in-progress |
 

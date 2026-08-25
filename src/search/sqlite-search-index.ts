@@ -9,7 +9,6 @@ import {
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
-import type { SourceDefinition } from "../ingestion/source-registry";
 import {
   CELLAR_CASE_LAW_BUILDER,
   CELLAR_CASE_LAW_BUILDER_VERSION,
@@ -47,6 +46,12 @@ import {
   loadRelatedRecitalBenchmark,
 } from "../relationships/tfidf-related-recital";
 import {
+  DEFAULT_EDITION_PROFILE,
+  type EditionProfile,
+  type RuntimeSourceDefinition,
+  compileEditionProfile,
+} from "../runtime/edition-profile";
+import {
   type BodyBlock,
   type DocumentView,
   type ProvisionView,
@@ -60,7 +65,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.5.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.6.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -70,6 +75,10 @@ export interface RuntimeDatabaseManifest {
   schemaVersion: typeof RUNTIME_DATABASE_SCHEMA_VERSION;
   buildId: string;
   builtAt: string;
+  profileId: string;
+  profileVersion: string;
+  profileDisplayName: string;
+  profileHash: string;
   documentCount: number;
   recordCount: number;
   definitionCount: number;
@@ -230,6 +239,8 @@ function indexRows(documents: DocumentView[]): IndexRow[] {
 }
 
 function runtimeBuildId(
+  profile: EditionProfile,
+  profileHash: string,
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
   cellarRelations: ReturnType<typeof loadCellarOfficialRelations>,
@@ -245,6 +256,8 @@ function runtimeBuildId(
     .update(
       [
         RUNTIME_DATABASE_SCHEMA_VERSION,
+        `${profile.id}@${profile.version}`,
+        profileHash,
         `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
         `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
         JSON.stringify(officialMappings),
@@ -281,17 +294,19 @@ export function assertFts5(database: Database.Database): void {
 }
 
 export function buildRuntimeDatabase(
-  documents: DocumentView[],
-  sources: Array<
-    Pick<
-      SourceDefinition,
-      "familyId" | "aliases" | "regulatoryLevel" | "measureType"
-    > & { celex?: string; localId?: string }
-  > = [],
+  inputDocuments: DocumentView[],
+  inputSources: RuntimeSourceDefinition[] = [],
   outputPath = DEFAULT_RUNTIME_DATABASE_PATH,
+  profile: EditionProfile = DEFAULT_EDITION_PROFILE,
 ): RuntimeDatabaseManifest {
-  if (documents.length === 0)
+  if (inputDocuments.length === 0)
     throw new Error("Cannot build an empty runtime database");
+  const compilation = compileEditionProfile(
+    profile,
+    inputDocuments,
+    inputSources,
+  );
+  const { documents, sources, profileHash, excludedCelexes } = compilation;
   const resolvedOutput = resolve(outputPath);
   mkdirSync(dirname(resolvedOutput), { recursive: true });
   const temporaryPath = `${resolvedOutput}.${process.pid}.tmp`;
@@ -355,11 +370,15 @@ export function buildRuntimeDatabase(
   );
   const lifecycleRelations = loadCellarLifecycleRelations().filter(
     (record) =>
-      loadedCelex.has(record.sourceCelex) ||
-      loadedCelex.has(record.targetCelex),
+      !excludedCelexes.has(record.sourceCelex) &&
+      !excludedCelexes.has(record.targetCelex) &&
+      (loadedCelex.has(record.sourceCelex) ||
+        loadedCelex.has(record.targetCelex)),
   );
   const lifecycleBuild = buildCellarLifecycle(documents, lifecycleRelations);
-  const caseLawMetadata = loadCellarCaseLawMetadata();
+  const caseLawMetadata = loadCellarCaseLawMetadata().filter((record) =>
+    loadedCelex.has(record.targetCelex),
+  );
   const caseLawBuild = buildCellarCaseLaw(documents, caseLawMetadata);
   const relatedRecitalBenchmark = loadRelatedRecitalBenchmark();
   const loadedDocumentIds = new Set(documents.map((document) => document.id));
@@ -379,6 +398,8 @@ export function buildRuntimeDatabase(
     ...(relatedRecitalBuild?.relationships ?? []),
   ];
   const buildId = runtimeBuildId(
+    compilation.profile,
+    profileHash,
     documents,
     officialMappings,
     cellarRelations,
@@ -857,6 +878,10 @@ export function buildRuntimeDatabase(
         schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
         buildId,
         builtAt,
+        profileId: compilation.profile.id,
+        profileVersion: compilation.profile.version,
+        profileDisplayName: compilation.profile.displayName,
+        profileHash,
         documentCount: String(documents.length),
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
@@ -948,6 +973,10 @@ export function buildRuntimeDatabase(
     schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
     buildId,
     builtAt,
+    profileId: compilation.profile.id,
+    profileVersion: compilation.profile.version,
+    profileDisplayName: compilation.profile.displayName,
+    profileHash,
     documentCount: documents.length,
     recordCount: rows.length,
     definitionCount: definitions.length,

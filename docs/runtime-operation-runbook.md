@@ -7,13 +7,13 @@ The runtime SQLite file is derived data. It is not a Canonical legal source and 
 Build to a new release directory, never directly over the active production file:
 
 ```bash
-npm run runtime:build -- --output /srv/regulatory/releases/<release-id>/regulatory.sqlite
+npm run runtime:build -- --profile <profile-id> --output /srv/regulatory/releases/<release-id>/regulatory.sqlite
 npm run runtime:verify -- --input /srv/regulatory/releases/<release-id>/regulatory.sqlite
 ```
 
-`runtime:verify` opens the artifact through the same read-only Search and Reader services used by the API. It verifies SQLite integrity, FTS5 availability, the schema version, manifest counts, Reader payload validation, and one shared build ID.
+`runtime:verify` opens the artifact through the same read-only Search and Reader services used by the API. It verifies SQLite integrity, FTS5 availability, the schema version, manifest counts, Reader payload validation, one shared build ID, and matching Profile identity/hash.
 
-Keep the command output, including `buildId`, with the deployment record. Do not promote an artifact if verification fails.
+Keep the command output, including `buildId`, `profileId`, `profileVersion`, and `profileHash`, with the deployment record. Do not promote an artifact if verification fails.
 
 ## Promote
 
@@ -25,7 +25,7 @@ mv -f /srv/regulatory/.runtime-next.sqlite /srv/regulatory/runtime.sqlite
 REGULATORY_RUNTIME_DATABASE_PATH=/srv/regulatory/runtime.sqlite npm run start
 ```
 
-After the service starts, confirm `/api/health` reports the verified `buildId` and expected corpus counts. The default development path remains `data/artifacts/runtime/regulatory.sqlite` when the environment variable is unset.
+After the service starts, confirm `/api/health` reports the verified `buildId`, Profile identity, and expected corpus counts. The default development path remains `data/artifacts/runtime/regulatory.sqlite` when the environment variable is unset.
 
 ## Roll back
 

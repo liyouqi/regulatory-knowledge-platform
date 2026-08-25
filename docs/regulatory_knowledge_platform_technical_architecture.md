@@ -1,8 +1,8 @@
 # Regulatory Knowledge Platform — 技术架构与开发实施文档
 
-> 文档版本：v1.3 Profile and Reproducible Corpus Baseline
+> 文档版本：v1.4 Profile Compilation Implemented
 > 日期：2026-08-25
-> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.4 Financial Platform and Reproducible Corpus Baseline`
+> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.5 Profile Compilation Implemented`
 > 产品语言：English  
 > 技术文档语言：中文  
 > 目标：把最终版产品需求落实为一套**简单、可落地、可逐步扩展、适合 Codex 协作开发**的工程架构。
@@ -330,6 +330,8 @@ Profile Compilation 是 Canonical 与 Runtime 之间的确定性选择步骤，�
 - 无 Profile 参数时使用显式的默认 Profile，不允许代码各处形成隐式默认值；
 - Profile 表达产品 corpus 范围，不替代 provision-level applicability 判断。
 
+当前实现使用 `data/edition-profiles.json` schema `1.0.0`，默认 `full-corpus`，并提供 `banking-default` allowlist。`src/runtime/edition-profile.ts` 负责 schema validation、profile/config hash、known family/document fail-closed validation 与 document/source compilation；Runtime builder 仍是唯一的 Definitions、Relationships、Search 与 SQLite 发布边界。SQLite `4.6.0` manifest 保存 Profile ID/version/display name/hash，Search 与 Repository 启动时读取同一 identity，`runtime:verify` 要求两者匹配。Profile 不允许的已注册 CELEX endpoint 在 lifecycle input gate 被删除，不能降级为 external Work 绕过 corpus policy。
+
 ### Runtime Artifact
 
 网站运行时使用的 compact SQLite + static frontend build。
@@ -457,7 +459,7 @@ Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（orig
 
 SQLite `4.3.0` 在不修改 Canonical `1.0.0` 的前提下，增加 `document_version_chains`、`document_versions`、`document_version_edges` 三张规范化只读表，并由 `document-version-chain@1.0.0` 在 build time 从已核验 `sourceStatus` 投影。当前只允许发布 loaded original/consolidated snapshot、外部 current-version link 和官方 corrigendum 节点，以及 `CURRENT_VERSION_LINK` / `HAS_CORRIGENDUM` 两种 `OFFICIAL_METADATA` 边。外部节点不代表其正文已载入 Reader；没有核验输入时不生成 chain，且当前不生成 `AMENDED_BY`。builder version 进入 runtime identity，节点/边数量进入 manifest，并通过独立 API 与 Reader version history 读取。它是第 22.2 节的首个有界切片，不是完整 amendment/version graph；后续修订法案、consolidated lineage、Article-level provenance 和 snapshot comparison 仍需独立核验输入。
 
-当前 SQLite `4.5.0` 在该 version-chain contract 之外增加独立 `legal_works` / `lifecycle_relationships` 与 `case_entities` / `case_law_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。Case 使用独立 `case:eu:<CELEX>` namespace，并只以 foreign key 指向 loaded target Document。`AMENDS` / `CORRECTS` / `INTERPRETS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document 或 Judgment。reviewed dataset、builder version、65 条 lifecycle 边、64 个 external Work、72 个 Case 与 72 条 Act-level case edge 均进入 runtime identity/manifest。
+当前 SQLite `4.6.0` 在该 version-chain contract 之外增加独立 `legal_works` / `lifecycle_relationships` 与 `case_entities` / `case_law_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。Case 使用独立 `case:eu:<CELEX>` namespace，并只以 foreign key 指向 loaded target Document。`AMENDS` / `CORRECTS` / `INTERPRETS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document 或 Judgment。reviewed dataset、builder version、65 条 lifecycle 边、64 个 external Work、72 个 Case 与 72 条 Act-level case edge 均进入 runtime identity/manifest。
 
 ## 7.2 LegalViz reuse strategy
 
@@ -1264,7 +1266,7 @@ Phase 1 不要求生产服务器自己下载 bulk dump。
 | environment | `NODE_ENV` |
 | source | EUR-Lex/CSSF endpoint base URL |
 | build | TF-IDF top-N、fixtures、strict mode |
-| edition | default profile ID、profile config path |
+| edition | `REGULATORY_EDITION_PROFILE`（build/dev only）、profile config path |
 
 配置必须集中读取和验证，不能在代码各处直接 `process.env.X`。
 

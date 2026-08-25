@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "defaultProfileId": "full-corpus",
+  "profiles": [
+    {
+      "id": "full-corpus",
+      "version": "1.0.0",
+      "displayName": "Full Regulatory Corpus",
+      "description": "All validated documents available to the current runtime build.",
+      "selection": {
+        "mode": "all"
+      }
+    },
+    {
+      "id": "banking-default",
+      "version": "1.0.0",
+      "displayName": "Banking Default",
+      "description": "Cross-sector and banking-relevant baseline corpus; MiCA is excluded by default and can be included in a future activity-specific profile.",
+      "selection": {
+        "mode": "allowlist",
+        "familyIds": [
+          "family:dora",
+          "family:gdpr",
+          "family:ai-act",
+          "family:nis2",
+          "family:data-act",
+          "family:cssf"
+        ],
+        "documentIds": []
+      }
+    }
+  ]
+}

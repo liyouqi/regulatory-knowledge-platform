@@ -311,6 +311,8 @@ try {
   const health = (await (await fetch(`${apiOrigin}/api/health`)).json()) as {
     runtimeDatabase: {
       buildId: string;
+      profileId: string;
+      profileHash: string;
       documents: number;
       records: number;
       definitions: number;

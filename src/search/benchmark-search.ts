@@ -117,6 +117,8 @@ try {
         },
         corpus: {
           buildId: service.buildId,
+          profileId: service.profileId,
+          profileHash: service.profileHash,
           documentCount: service.documentCount,
           recordCount: service.recordCount,
           definitionCount: service.definitionCount,

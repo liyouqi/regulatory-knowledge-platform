@@ -20,6 +20,9 @@ afterAll(() => {
 describe("runtime artifact verification", () => {
   it("validates the read-only runtime services against one manifest", () => {
     expect(verifyRuntimeArtifact(databasePath)).toMatchObject({
+      profileId: "full-corpus",
+      profileVersion: "1.0.0",
+      profileHash: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
       documents: 1,
       records: expect.any(Number),
       definitions: 65,
