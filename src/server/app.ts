@@ -10,6 +10,7 @@ import { runtimeDatabasePath } from "../runtime/runtime-database-path";
 import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
+import { level2MandateQueryResponseSchema } from "../shared/legal";
 
 export const app = express();
 const runtimePath = runtimeDatabasePath();
@@ -61,6 +62,18 @@ export function findProvisionRelationships(
   provisionId: string,
 ) {
   return runtimeRepository.findProvisionRelationships(documentId, provisionId);
+}
+
+export function findLevel2Mandates(documentId: string, provisionId: string) {
+  const relationships = findProvisionRelationships(documentId, provisionId);
+  return relationships
+    ? level2MandateQueryResponseSchema.parse({
+        documentId,
+        provisionId,
+        buildId: relationships.buildId,
+        relationships: relationships.mandates,
+      })
+    : null;
 }
 
 export function findRelationshipPreview(entityId: string) {
@@ -257,6 +270,23 @@ app.get("/api/relationships/:documentId/:provisionId", (request, response) => {
     return;
   }
   response.json(relationships);
+});
+
+app.get("/api/relationship-queries/level-2-mandates", (request, response) => {
+  const documentId =
+    typeof request.query.documentId === "string"
+      ? request.query.documentId.slice(0, 160)
+      : "";
+  const provisionId =
+    typeof request.query.provisionId === "string"
+      ? request.query.provisionId.slice(0, 220)
+      : "";
+  const result = findLevel2Mandates(documentId, provisionId);
+  if (!result) {
+    response.status(404).json({ error: "Provision not found" });
+    return;
+  }
+  response.json(result);
 });
 
 app.get("/api/relationship-previews/:entityId", (request, response) => {

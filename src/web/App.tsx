@@ -48,6 +48,7 @@ import {
 } from "../shared/legal";
 import {
   explorerPath,
+  isLevel2MandateQueryPath,
   parseExplorerPath,
   parseLevel2LibraryPath,
   parseQuickGo,
@@ -59,6 +60,7 @@ import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { Level2LibraryPage } from "./Level2LibraryPage";
+import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
 import { inlineReferenceRanges } from "./inline-references";
@@ -1331,6 +1333,7 @@ export function App() {
   const explorer = parseExplorerPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const relationshipGraph = parseRelationshipGraphPath(location.pathname);
+  const level2MandateQuery = isLevel2MandateQueryPath(location.pathname);
   const [searchOpen, setSearchOpen] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>(() => {
     try {
@@ -1369,7 +1372,13 @@ export function App() {
 
   return (
     <>
-      {relationshipGraph ? (
+      {level2MandateQuery ? (
+        <Level2MandateQueryPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          theme={theme}
+        />
+      ) : relationshipGraph ? (
         <Suspense
           fallback={
             <main aria-busy="true" className="loading">

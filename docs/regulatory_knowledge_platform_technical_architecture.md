@@ -894,6 +894,7 @@ Phase 1–3 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边
 /api/documents/:documentId/structure
 /api/provisions/:provisionId
 /api/relationships/:documentId/:provisionId
+/api/relationship-queries/level-2-mandates?documentId=:documentId&provisionId=:provisionId
 /api/search/laws
 /api/search/fulltext
 /api/search/definitions
@@ -902,6 +903,8 @@ Phase 1–3 使用内部 Web API。它遵守 stable ID、错误语义和 DTO 边
 ```
 
 API response 必须返回 stable IDs，不让前端靠标题重新识别实体。
+
+`/api/relationship-queries/level-2-mandates` 是一个有意保持狭窄的 Phase 2 internal adapter：service 先复用 Provision Relationships，再仅投影 `MANDATES` relationship group。它接受 stable document/provision IDs，不接收自然语言，且不会对空结果作法律否定推断。首个 `/relationship-queries/level-2-mandates` UI 仅将其作为 DORA Article → reviewed RTS/ITS 模板展示；DTO 继续携带统一 relationship contract 的 evidence、provenance、builder 与 stable endpoints。新增查询模板必须复用同一 repository/service 数据，不能直接访问 raw 或 curated mapping input。
 
 错误响应要区分：
 

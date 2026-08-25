@@ -32,6 +32,7 @@ import {
   documentRelationshipGraphPath,
   explorerPath,
   globalRelationshipGraphPath,
+  level2MandateQueryPath,
   provisionPath,
 } from "../shared/reader-route";
 import type {
@@ -579,6 +580,7 @@ export function RelationshipGraphPage({
           ) : null}
         </div>
         <nav aria-label="Relationship graph views">
+          <Link to={level2MandateQueryPath()}>Query RTS / ITS mandates</Link>
           {selection.scope === "provision" ? (
             <Link to={documentRelationshipGraphPath(selection.slug)}>
               Document graph

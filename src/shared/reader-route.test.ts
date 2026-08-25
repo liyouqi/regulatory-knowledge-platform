@@ -3,7 +3,9 @@ import {
   documentRelationshipGraphPath,
   explorerPath,
   globalRelationshipGraphPath,
+  isLevel2MandateQueryPath,
   level2LibraryPath,
+  level2MandateQueryPath,
   parseExplorerPath,
   parseLevel2LibraryPath,
   parseQuickGo,
@@ -65,6 +67,14 @@ describe("Reader routes", () => {
     expect(parseRelationshipGraphPath("/relationships")).toEqual({
       scope: "global",
     });
+  });
+
+  it("keeps the deterministic Level 2 mandate query outside graph routes", () => {
+    expect(level2MandateQueryPath()).toBe(
+      "/relationship-queries/level-2-mandates",
+    );
+    expect(isLevel2MandateQueryPath(level2MandateQueryPath())).toBe(true);
+    expect(parseRelationshipGraphPath(level2MandateQueryPath())).toBeNull();
   });
 
   it.each([

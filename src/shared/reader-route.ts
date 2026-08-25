@@ -11,6 +11,13 @@ export type RelationshipGraphSelection =
   | { scope: "document"; slug: string }
   | { scope: "global" };
 
+export const level2MandateQueryPath = () =>
+  "/relationship-queries/level-2-mandates";
+
+export function isLevel2MandateQueryPath(pathname: string): boolean {
+  return /^\/relationship-queries\/level-2-mandates\/?$/u.test(pathname);
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

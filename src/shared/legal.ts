@@ -411,6 +411,15 @@ export const provisionRelationshipsResponseSchema = z.object({
   relatedRecitals: z.array(provisionRelationshipSchema),
 });
 
+// A narrow internal-query DTO. It intentionally exposes only reviewed
+// Article -> Level 2 mandate edges; it is not a natural-language interface.
+export const level2MandateQueryResponseSchema = z.object({
+  documentId: z.string().min(1),
+  provisionId: z.string().min(1),
+  buildId: z.string().min(1),
+  relationships: z.array(provisionRelationshipSchema),
+});
+
 export const documentRelationshipsResponseSchema = z.object({
   documentId: z.string().min(1),
   buildId: z.string().min(1),
@@ -456,6 +465,9 @@ export type RelationshipEndpoint = z.infer<typeof relationshipEndpointSchema>;
 export type ProvisionRelationship = z.infer<typeof provisionRelationshipSchema>;
 export type ProvisionRelationshipsResponse = z.infer<
   typeof provisionRelationshipsResponseSchema
+>;
+export type Level2MandateQueryResponse = z.infer<
+  typeof level2MandateQueryResponseSchema
 >;
 export type DocumentRelationshipsResponse = z.infer<
   typeof documentRelationshipsResponseSchema

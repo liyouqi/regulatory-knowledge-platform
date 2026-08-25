@@ -1847,6 +1847,8 @@ Phase 2 不改变 Phase 1 的核心实体，只扩充 relationship types、servi
 
 Phase 2 的完成标准是证明关系与 corpus selection 能力的首个可用闭环，不是穷举所有法规关系。首个 Profile 必须同时约束 Document、Definition、Relationship、Search、Reader route 和 Graph endpoint；完整判决正文、全部 Article-level case citation、完整 consolidated lineage、更多 CELLAR predicate 与无限 Level 2/3 覆盖进入后续 Coverage Backlog，不作为本阶段的无界完成条件。
 
+当前已完成一个有界的 deterministic structured relation query：`/relationship-queries/level-2-mandates` 和相同内部 service 以 `documentId + provisionId` 查询已发布的 `MANDATES` 边，不读取 curated mapping 文件，也不解析自由文本。首个 UI 模板限定为 DORA Article → reviewed RTS/ITS，默认 Article 28；response 保留 relationship stable ID、source/target stable ID、`OFFICIAL_MAPPING` provenance、exact evidence 与 official URL。空结果只表示当前 artifact 没有经审核发布的 mapping，不能推断“不存在法律关系”。它是 Phase 3 Agent/RAG 将来可调用的确定性数据层，不形成 Phase 4 Public API 兼容承诺；更多模板、任意关系组合与自然语言解释仍在后续 backlog。
+
 ## 22.1 CELLAR SPARQL / RDF Integration
 
 ### 目标
@@ -3266,7 +3268,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 5. graph view；
 6. extended Level 2 / Level 3；
 7. minimal Edition/Profile compilation；
-8. one deterministic structured relation query；
+8. one deterministic structured relation query（已完成：DORA Article → reviewed RTS/ITS）；
 9. deployment/release closure；
 10. advanced relation-aware search 进入后续 backlog。
 

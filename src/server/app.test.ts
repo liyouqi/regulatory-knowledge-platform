@@ -9,6 +9,7 @@ import {
   findFamilyLevel2,
   findGlobalRelationshipGraph,
   findLaws,
+  findLevel2Mandates,
   findProvisionRelationships,
   findRelationshipGraph,
   findRelationshipPreview,
@@ -348,6 +349,39 @@ describe("Document lookup", () => {
         target: expect.objectContaining({ entityId: "eu:32025R0305" }),
       }),
     );
+  });
+
+  it("serves a deterministic Level 2 mandate query from reviewed relationships", () => {
+    const result = findLevel2Mandates(
+      "eu:32022R2554",
+      "eu:32022R2554:article:28",
+    );
+
+    expect(result).toMatchObject({
+      documentId: "eu:32022R2554",
+      provisionId: "eu:32022R2554:article:28",
+    });
+    expect(result?.relationships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+          target: expect.objectContaining({
+            entityId: "eu:32024R1773",
+            documentShortName: "DORA RTS ICT Third-Party Policy",
+          }),
+        }),
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+          target: expect.objectContaining({
+            entityId: "eu:32024R2956",
+            documentShortName: "DORA ITS Register of Information",
+          }),
+        }),
+      ]),
+    );
+    expect(findLevel2Mandates("eu:32022R2554", "eu:unknown")).toBeNull();
   });
 
   it("serves a family Level 2 library without reading curated mapping source data", () => {
