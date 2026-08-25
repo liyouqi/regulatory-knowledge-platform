@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import express from "express";
 import {
   toDocumentRelationshipGraph,
@@ -331,3 +333,15 @@ app.get("/api/documents/:documentId", (request, response) => {
 
   response.json(document);
 });
+
+const staticDirectory = resolve(process.cwd(), "dist");
+if (existsSync(staticDirectory)) {
+  app.use(express.static(staticDirectory, { index: false }));
+  app.get("/{*splat}", (request, response, next) => {
+    if (request.path.startsWith("/api/")) {
+      next();
+      return;
+    }
+    response.sendFile(resolve(staticDirectory, "index.html"));
+  });
+}

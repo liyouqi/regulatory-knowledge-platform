@@ -109,6 +109,35 @@ npm run build
 | `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF Canonical artifact after the media-specific quality gate passes. |
 | `npm run test:e2e` | Run Playwright smoke tests for the DORA Explorer, Reader, Level 2 library, and global search. |
 
+## Deploy to Google Cloud Run
+
+This is one deployable Node application: Express serves `/api/*` and the Vite `dist` frontend from the same container, while SQLite is opened read-only. The Docker image deliberately receives a previously verified runtime artifact; it does not fetch or rebuild legal source data in Cloud Run.
+
+Before building an image, create and verify the artifact locally or in a controlled build environment:
+
+```bash
+npm run runtime:build
+npm run runtime:verify
+docker build -t regulatory-knowledge-platform:local .
+docker run --rm -p 8080:8080 -e PORT=8080 regulatory-knowledge-platform:local
+```
+
+Then verify `http://localhost:8080/api/health` and `http://localhost:8080/`. To publish a verified image to Cloud Run, authenticate `gcloud`, select the intended project and region, then use a project-specific Artifact Registry image name:
+
+```bash
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+docker tag regulatory-knowledge-platform:local europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID
+docker push europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID
+gcloud run deploy regulatory-knowledge-platform \
+  --image europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:RELEASE_ID \
+  --region europe-west1 \
+  --allow-unauthenticated
+```
+
+Keep the deployed image tag and the `/api/health` `buildId` with the release record. A new verified SQLite artifact is promoted by building and deploying a new immutable image, then routing traffic to the new Cloud Run revision; retain the preceding image for rollback. The service honours Cloud Run's injected `PORT` variable.
+
 ## Legal Data Operations
 
 The source pipeline resolves an EU law from its CELEX work to the English expression, the `fmx4` manifestation, and its declared legal-content stream in the Publications Office Cellar. It supports both CELEX expression aliases and the explicit language/work links used by newer Official Journal acts, and it avoids selecting legacy `.doc.xml` metadata when a manifestation exposes multiple items. After a canonical artifact is built, the Reader loads the latest validated artifact automatically. On a new machine with no DORA artifact, it falls back to a clearly labelled DORA fixture.

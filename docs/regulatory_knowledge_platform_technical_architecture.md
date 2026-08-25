@@ -1199,7 +1199,7 @@ single Node process
   └─ static frontend
 ```
 
-一个容器或一台普通 Linux VM 即可。
+一个容器或一台普通 Linux VM 即可。当前 container delivery 使用 multi-stage Docker build：build stage 只生成 Vite `dist`，runtime stage 带入 Node source、`dist` 与此前已经 `runtime:verify` 的 `regulatory.sqlite`。Express 在 API routes 注册后托管 `dist`，并以 SPA fallback 返回 `index.html`；因此 `/api/*` 与 Reader/Explorer/Graph routes 都在同一个 Cloud Run service 中运行。Cloud Run 只负责运行不可变 image，不能在启动时抓取 raw source 或重建法律数据；artifact 更新须按 runbook 验证后发布为新的 image/revision，并保留前一 revision 用于回退。
 
 ## 23.3 Data build 与 Web deploy 分开
 

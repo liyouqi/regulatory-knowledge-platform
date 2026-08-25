@@ -1,0 +1,14 @@
+.git
+.DS_Store
+node_modules
+dist
+coverage
+playwright-report
+test-results
+.env
+.env.*
+data/raw
+data/artifacts/canonical
+data/artifacts/search
+data/artifacts/runtime/*.sqlite-wal
+data/artifacts/runtime/*.sqlite-shm
