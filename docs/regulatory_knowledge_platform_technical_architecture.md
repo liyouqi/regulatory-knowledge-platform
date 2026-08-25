@@ -1,8 +1,8 @@
 # Regulatory Knowledge Platform — 技术架构与开发实施文档
 
-> 文档版本：v1.2 Revised Phase Baseline
-> 日期：2026-08-24
-> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.3 Revised Phase Baseline`
+> 文档版本：v1.3 Profile and Reproducible Corpus Baseline
+> 日期：2026-08-25
+> 对应产品需求：`Regulatory Knowledge Platform — 产品需求规格说明书 v3.4 Financial Platform and Reproducible Corpus Baseline`
 > 产品语言：English  
 > 技术文档语言：中文  
 > 目标：把最终版产品需求落实为一套**简单、可落地、可逐步扩展、适合 Codex 协作开发**的工程架构。
@@ -22,7 +22,8 @@
 - DORA ↔ RTS/ITS；
 - CSSF structural adapter；
 - Phase 2 的 CELLAR / CJEU / Relationship Graph；
-- Phase 3 的 regulatory paths / taxonomy / timeline 等能力。
+- Phase 2 的 Edition/Profile compilation；
+- Phase 3 的 financial-domain expansion、regulatory paths / taxonomy / timeline 与 Agent/RAG internal retrieval；
 - Phase 4 的 Public API / MCP / external integrations。
 
 如果本文与产品需求发生冲突，以产品需求为准；如果产品需求没有规定实现方式，则以本文作为默认工程决策。
@@ -66,6 +67,8 @@ Phase 1 默认技术栈：
 | Container | **Docker 可选但推荐用于部署** |
 | Phase 4 MCP | **实施时稳定的官方 MCP TypeScript SDK，作为 Service adapter** |
 | Phase 2 SPARQL | **HTTP fetch + SPARQL query templates + adapter** |
+| Edition / Profile | **build-time validated configuration，生成独立只读 SQLite artifact** |
+| Corpus expansion | **manifest-driven deterministic pipeline + explicit legal-semantic review gates** |
 
 Phase 1 不需要为了“未来可能用到”预先增加 Redis、Kafka、Kubernetes、Elasticsearch/OpenSearch、GraphQL、复杂 ORM 或分布式服务。未来需要时可替换 repository / adapter，而不是重写 Reader、Explorer 或 Search UI。
 
@@ -84,11 +87,12 @@ flowchart LR
         C[CSSF HTML / PDF] --> D[CSSF Adapter]
         B --> E[Canonical Documents]
         D --> E
-        E --> F[Relationship Builders]
-        E --> G[Search Index Builder]
+        E --> P[Edition / Profile Selector]
+        P --> F[Relationship Builders]
+        P --> G[Search Index Builder]
         F --> H[Relationship Artifact]
         G --> I[SQLite FTS5 Artifact]
-        E --> I
+        P --> I
         H --> I
     end
 
@@ -108,7 +112,8 @@ flowchart LR
 2. **网站运行时不实时计算 TF-IDF**；
 3. **网站运行时不依赖 CELLAR SPARQL 才能打开 Article**；
 4. 所有昂贵、批量、可预计算的工作尽量放在 build-time；
-5. runtime 主要做读取、查询、导航和渲染。
+5. Profile 在 build-time 裁剪完整 corpus，runtime 不按请求动态切换数据库；
+6. runtime 主要做读取、查询、导航和渲染。
 
 这会同时带来简单代码、快响应、可重复构建和良好可追溯性。
 
@@ -118,18 +123,19 @@ flowchart LR
 flowchart TD
     A[Source Adapters] --> B[Parser / Normalizer]
     B --> C[Canonical Data]
-    C --> D[Relationship Builders]
-    C --> E[Search Index Builder]
+    C --> P[Profile Compiler]
+    P --> D[Relationship Builders]
+    P --> E[Search Index Builder]
     D --> F[Relationship Repository]
     E --> G[Search Repository]
-    C --> H[Document Repository]
+    P --> H[Document Repository]
     F --> I[Application Services]
     G --> I
     H --> I
     I --> J[Web]
     I --> K[Internal Web API]
-    I --> P[Public API - Phase 4]
-    P --> L[MCP Adapter - Phase 4]
+    I --> PA[Public API - Phase 4]
+    PA --> L[MCP Adapter - Phase 4]
 ```
 
 **依赖只能向下。**
@@ -139,6 +145,7 @@ flowchart TD
 - Search ranking 不允许写进 React component；
 - CSSF 特例不允许进入 DORA/AI Act 专用 UI；
 - Relationship source 不允许被 UI 猜测。
+- Profile 边界不允许只在 Search 或 React 中过滤。
 
 ---
 
@@ -291,6 +298,8 @@ regulatory-knowledge-platform/
 
 Raw source 不直接供 UI 使用。
 
+开发机的 `data/raw/` 继续由 Git 忽略。参与正式发布的 source snapshot 必须按 content hash 保存到受控、不可变或具备版本保留策略的对象存储，并在 release record 中记录 locator 与 checksum；否则只能声称“可重新获取并重新构建当前版本”，不能声称能够逐字节重现已经丢失的历史构建。对象存储保留策略在扩展下一批金融法规前落地，不把 raw dump 提交到 Git。
+
 ### Canonical Data
 
 Parser / Normalizer 输出的统一法律数据，是平台内部的**消费契约**。官方 source artifact 才是法律文本来源；Canonical Data 是可追溯、可验证、可重建的规范化表达，不声明自身具有独立法律权威。
@@ -307,6 +316,19 @@ Parser / Normalizer 输出的统一法律数据，是平台内部的**消费契�
 - runtime SQLite。
 
 Derived data 必须可重建，不能成为唯一事实来源。
+
+### Profile Compilation
+
+Profile Compilation 是 Canonical 与 Runtime 之间的确定性选择步骤，不是第五份法律事实来源。它读取版本控制并经过 schema validation 的 Edition/Profile 配置，选择允许进入当前 artifact 的 Documents，并据此过滤 Definitions、Relationships、Search records 与 metadata-only external nodes。
+
+约束：
+
+- Profile 不修改 Canonical document 或 stable ID；
+- relationship 只有在端点和 relation policy 都满足当前 Profile 时才能发布；
+- Web route、Search、Graph、Library 与内部 service 读取同一编译结果；
+- `profileId`、配置版本和配置 hash 参与 runtime build ID；
+- 无 Profile 参数时使用显式的默认 Profile，不允许代码各处形成隐式默认值；
+- Profile 表达产品 corpus 范围，不替代 provision-level applicability 判断。
 
 ### Runtime Artifact
 
@@ -328,6 +350,9 @@ Derived data 必须可重建，不能成为唯一事实来源。
 - relationship 数量；
 - search index 数量；
 - 输出 artifact checksum。
+- edition/profile ID、版本与配置 checksum；
+- reviewed mapping/taxonomy dataset checksum；
+- raw source archive locator（正式 release）；
 - previous active build ID；
 - validation result；
 - refresh status / failure summary。
@@ -1155,11 +1180,14 @@ Phase 4 MCP 返回结构化官方数据与 provenance，不在 MCP 内再次生�
 Phase 3 可能增加：
 
 - topic taxonomy；
+- provision-level Regulatory Domain；
+- Authority entity 与 EU → national legal relations；
 - applicability；
 - implementation timeline；
 - decisions；
 - multi-hop regulatory paths；
 - richer relationship persistence / specialized graph querying。
+- Agent/RAG citation-ready context assembly。
 
 当前只要求：
 
@@ -1168,6 +1196,7 @@ Phase 3 可能增加：
 - provenance；
 - repository abstraction；
 - dates / authority / jurisdiction 字段；
+- Edition/Profile identity；
 - Web 与内部 service/API 不依赖 SQLite schema 细节；Phase 4 adapter 复用同一边界。
 
 具体数据库技术到 Phase 3 根据真实查询负载再决定。
@@ -1206,7 +1235,7 @@ single Node process
 Data build 可以在开发机/构建机手动运行：
 
 ```text
-raw source → canonical → relationships → search index → SQLite artifact
+raw source → canonical master corpus → profile compilation → relationships/search → SQLite artifact
 ```
 
 生成经过 validation 的 artifact 后再部署。
@@ -1214,6 +1243,10 @@ raw source → canonical → relationships → search index → SQLite artifact
 发布流程必须使用 staging path 构建和验证，完成后以原子 rename/symlink switch 或等价机制切换 active artifact，并保留至少一个 previous artifact。schema/build ID 不兼容或 health check 失败时立即回退。
 
 当前实现以 `REGULATORY_RUNTIME_DATABASE_PATH` 指向运行时只读 SQLite artifact；未设置时仍使用 repository 内的开发默认路径。`npm run runtime:verify -- --input <sqlite-path>` 必须在 promote 前通过，验证 SQLite integrity、FTS5、schema/build manifest 与 Reader/Search read model 一致性。具体 staging、promote、health check 与 rollback 步骤见 `docs/runtime-operation-runbook.md`。
+
+当前 source fetch、verify、canonical inspect/build 与 runtime build/verify 已由独立命令实现；尚未提供一个覆盖所有阶段的 `corpus:build` 编排命令。新增下一批法规前应增加薄编排层，使其按 manifest 运行已有 builders、生成 build report，并在任何 source、quality baseline、review gate 或 runtime verification 失败时整体失败。编排层不得复制 parser、relationship 或 search 业务逻辑。
+
+同一代码库可以把不同 Profile 编译成 `banking.sqlite`、`digital-assets.sqlite` 等独立 artifact。每个生产 deployment 默认固定一个 artifact/Profile；Phase 4 如开放 `profileId`，只能在授权的 artifact/service 范围内选择，不能让客户端绕过 corpus policy。
 
 Phase 1 不要求生产服务器自己下载 bulk dump。
 
@@ -1231,6 +1264,7 @@ Phase 1 不要求生产服务器自己下载 bulk dump。
 | environment | `NODE_ENV` |
 | source | EUR-Lex/CSSF endpoint base URL |
 | build | TF-IDF top-N、fixtures、strict mode |
+| edition | default profile ID、profile config path |
 
 配置必须集中读取和验证，不能在代码各处直接 `process.env.X`。
 
@@ -1454,7 +1488,13 @@ CI 不下载完整 bulk dump；CI 使用 fixtures。
 
 - 手动触发；
 - 输出 build report；
+- 输入是版本控制的 source/profile manifests 与 reviewed datasets；
+- 正式 release 能通过 archived raw snapshot checksum 定位精确输入；
+- 对每个 Document 记录 adapter/parser/quality-gate 结果；
+- runtime verify 同时核验 `profileId` 和 corpus counts；
 - 不因为普通 UI PR 每次重复跑完整数据。
+
+当前阶段使用分步命令；目标编排接口为 `npm run corpus:build -- --profile <profileId>`。该接口必须只是已有 acquisition、canonical、relationship、search 和 runtime builders 的薄 orchestrator。命令落地前，操作人员按 `docs/corpus-onboarding-runbook.md` 的显式步骤执行，不以临时脚本替代。
 
 ---
 
@@ -1537,6 +1577,8 @@ deterministic batch script
 | ADR-014 | Relationship persistence 与未来专用图技术解耦 | Accepted |
 | ADR-015 | Canonical build 不依赖 LLM | Accepted |
 | ADR-016 | Codex 不进入 canonical runtime/build dependency | Accepted |
+| ADR-017 | One canonical corpus, multiple build-time Edition/Profile artifacts | Accepted |
+| ADR-018 | Corpus expansion uses deterministic orchestration plus explicit review gates; Public API/MCP remains Phase 4 | Accepted |
 
 ---
 
@@ -1807,7 +1849,7 @@ LegalViz 是 Phase 1 的第一 reference implementation。
 
 # 39. 最终技术原则
 
-整个工程长期遵守以下 16 条：
+整个工程长期遵守以下 18 条：
 
 1. **Official data first**；
 2. **Canonical contract first**；
@@ -1824,7 +1866,9 @@ LegalViz 是 Phase 1 的第一 reference implementation。
 13. **Universal Explorer / Reader, never per-law duplicated pages**；
 14. **Script before LLM for data processing**；
 15. **Model choice follows current capability and representative evals**；
-16. **Future-capable contracts, present-simple implementation**。
+16. **Future-capable contracts, present-simple implementation**；
+17. **One canonical corpus, multiple build-time editions**；
+18. **Review decisions live in versioned data, not human or model memory**。
 
 最终目标不是拥有最多的技术，而是让以下链路稳定成立：
 
@@ -1832,6 +1876,8 @@ LegalViz 是 Phase 1 的第一 reference implementation。
 Official Sources
     ↓
 Canonical Legal Data
+    ↓
+Edition / Profile Compilation
     ↓
 Explainable Relationships + Search
     ↓

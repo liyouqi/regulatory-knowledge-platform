@@ -1,12 +1,15 @@
 # Regulatory Knowledge Platform
 
-An English regulatory knowledge reader for EU and Luxembourg law. The product keeps official legal sources, canonical data, relationships, and user-facing views separate.
+An English European financial regulatory knowledge platform for EU and Luxembourg law. The first usable corpus focuses on digital, ICT, cyber, and data regulation; the same canonical pipeline is intended to support banking, payments, funds, insurance, and digital-assets editions without separate codebases.
 
 ## Documents
 
-- `README.md`: setup, commands, and hands-on operational instructions. Keep this as the only runbook.
+- `README.md`: setup, commands, quick navigation, and the operational entry point.
 - `docs/regulatory_knowledge_platform_requirements.md`: product scope, releases, and acceptance criteria.
 - `docs/regulatory_knowledge_platform_technical_architecture.md`: architectural decisions and data contracts.
+- `docs/corpus-onboarding-runbook.md`: repeatable workflow for adding or refreshing legal sources.
+- `docs/coverage-backlog.md`: bounded phase completion and deferred 1→100 corpus work.
+- `docs/runtime-operation-runbook.md`: staging, verification, promotion, and rollback of runtime artifacts.
 - `AGENTS.md`: short, stable instructions for Codex and other coding agents.
 
 ## Development Environment
@@ -177,6 +180,24 @@ After deployment, obtain the service URL from the command output and check `<ser
 ## Legal Data Operations
 
 The source pipeline resolves an EU law from its CELEX work to the English expression, the `fmx4` manifestation, and its declared legal-content stream in the Publications Office Cellar. It supports both CELEX expression aliases and the explicit language/work links used by newer Official Journal acts, and it avoids selecting legacy `.doc.xml` metadata when a manifestation exposes multiple items. After a canonical artifact is built, the Reader loads the latest validated artifact automatically. On a new machine with no DORA artifact, it falls back to a clearly labelled DORA fixture.
+
+### Pipeline status and boundary
+
+The implemented deterministic path is:
+
+```text
+source registry
+→ source fetch and checksum verification
+→ parser inspection and reviewed quality baseline
+→ immutable Canonical artifact
+→ reviewed relationship datasets and builders
+→ atomic runtime SQLite build
+→ runtime verification, tests, and release gates
+```
+
+These stages are real and independently runnable. There is not yet a single `corpus:build` command, Edition/Profile compilation, or durable remote archive for release raw snapshots. Do not describe those planned capabilities as implemented. Before the next new-law batch, add a thin manifest-driven orchestrator over the existing commands and establish content-addressed release-snapshot retention outside Git. The exact current workflow and future orchestration contract are documented in `docs/corpus-onboarding-runbook.md`.
+
+The platform keeps one master Canonical corpus and will compile multiple build-time editions such as `banking-default`, `digital-assets`, `funds`, and `insurance`. A Profile must constrain Documents, Definitions, Relationships, Search, Reader routes, Libraries, and Graph endpoints together; search-only filtering is not a corpus boundary. Dynamic per-request Profile switching, authorization, and public compatibility remain Phase 4 concerns.
 
 ### List the registered laws
 
@@ -480,6 +501,8 @@ The first CELLAR SPARQL slice is deliberately closed over the 13 loaded EU CELEX
 The lifecycle discovery command is a separate open-neighborhood review gate for the official `resource_legal_amends_resource_legal` and `resource_legal_corrects_resource_legal` predicates. The verified 2026-08-24 snapshot found 65 candidates around the 13 loaded EU seeds: 24 amendment edges and 41 corrigenda. Two amendments point into a loaded seed, 22 point from a seed to an external Work, and none of the 65 has both endpoints loaded. The immutable raw snapshot remains ignored; its reviewed normalized records are published separately in `data/official-metadata/cellar-lifecycle-relations.json`. Runtime schema `4.5.0` maps CELEX to stable Work IDs, links loaded Works back to `documents`, keeps external Works metadata-only, and publishes `AMENDS` / `CORRECTS` solely in the Document graph. Selecting an external node opens official CELLAR metadata rather than a local Reader route.
 
 ## Current Release Status
+
+Annotated Git tag `v0.1.0` marks commit `4b485b6` as the first usable product release. The earlier `phase-1.0.0` tag remains the Phase 1 milestone; later Phase 2 work builds on it without rewriting the Phase 1 Canonical contract.
 
 Release 0.1 has a complete local multi-law Reader foundation:
 

@@ -1,7 +1,7 @@
 # Regulatory Knowledge Platform — 产品需求规格说明书
 
-> 文档版本：v3.3 Revised Phase Baseline
-> 日期：2026-08-24
+> 文档版本：v3.4 Financial Platform and Reproducible Corpus Baseline
+> 日期：2026-08-25
 > 产品语言：English  
 > 需求文档语言：中文  
 > 文档用途：作为独立 Git 工程的产品需求、阶段规划与架构约束基线
@@ -10,7 +10,7 @@
 
 ## 0. 文档目标
 
-本文定义一个独立的 **Regulatory Knowledge Platform**。产品以官方 EU / Luxembourg 监管法规为底座，提供高质量 Legal Reader、法规内部与法规之间的关系导航，并逐步演进为可被 MCP、Agent 以及其他外部应用调用的监管知识服务。
+本文定义一个独立的 **European Financial Regulatory Knowledge Platform**。产品以官方 EU / Luxembourg 监管法规为底座，提供高质量 Legal Reader、法规内部与法规之间的关系导航，并逐步演进为可被 MCP、Agent 以及其他外部应用调用的监管知识服务。当前 ICT / cyber / data 语料是第一个可用纵向切片，不是平台最终的金融业务边界。
 
 本文只描述本项目自身要建设的能力，并按照 **Phase 1 / Phase 2 / Phase 3 / Phase 4** 明确演进路径。Phase 1 是完整的产品阶段，但必须拆成可独立运行、可连续发布的 `Release 0.1–0.6`，不能把所有能力绑定成一次性交付。后续阶段的需求在本文中提前定义，是为了保证核心标识和数据来源可演进，而不是要求 Phase 1 提前实现未来抽象。
 
@@ -29,7 +29,8 @@
 产品需要同时满足两组目标：
 
 1. **对用户简单**：打开法规、找到章节、读 Article、点击引用、查看相关 RTS/ITS/Recital/Case，路径直观；
-2. **对架构稳健**：法规结构差异、未来新增数据源、CJEU、CELLAR、MCP、Knowledge Graph 等能力均通过清晰模块扩展，而不是在 UI 中不断增加特例判断。
+2. **对数据消费者可靠**：为其他 Agent / RAG 产品提供结构化、可追溯、可重建的法规数据与检索上下文；
+3. **对架构稳健**：法规结构差异、未来新增数据源、CJEU、CELLAR、MCP、Knowledge Graph 等能力均通过清晰模块扩展，而不是在 UI 中不断增加特例判断。
 
 ---
 
@@ -37,11 +38,11 @@
 
 ## 1.1 一句话定义
 
-**An English regulatory knowledge reader for EU and Luxembourg law, combining authoritative legal text, excellent navigation, and explainable legal relationships.**
+**An English European financial regulatory knowledge platform, combining authoritative legal text, excellent navigation, explainable legal relationships, and reusable structured data.**
 
 中文理解：
 
-> 一个面向 EU 与 Luxembourg 监管法规的英文法规阅读与关系导航平台：既像优秀的 Legal Reader 一样好读，又能让用户沿着 Article、Recital、Annex、RTS/ITS、其他法规和判例之间的关系自然探索。
+> 一个面向 EU 与 Luxembourg 金融监管法规的统一英文知识平台：既像优秀的 Legal Reader 一样好读，又能让用户沿着 Article、Recital、Annex、RTS/ITS、其他法规和判例之间的关系自然探索，并为 Agent / RAG 提供同源、可引用的数据能力。
 
 ## 1.2 产品价值
 
@@ -80,14 +81,15 @@ Phase 4 通过 Public API/MCP 进一步面向：
 
 # 2. 总体产品结构
 
-平台由五个长期稳定的能力层组成：
+平台由六个长期稳定的能力层组成：
 
 ```mermaid
 flowchart TD
     A[Official Sources\nEUR-Lex / CELLAR / CSSF / ESA] --> B[Acquisition Layer]
     B --> C[Canonical Legal Data]
-    C --> D[Relationship Layer]
-    C --> E[Regulatory Services]
+    C --> P[Edition / Profile Compilation]
+    P --> D[Relationship Layer]
+    P --> E[Regulatory Services]
     D --> E
     E --> X[One-page Act Explorer]
     E --> F[Legal Reader]
@@ -104,6 +106,9 @@ flowchart TD
 
 ### Canonical Legal Data
 负责把不同来源、不同法律结构规范化为平台统一可消费的数据模型。
+
+### Edition / Profile Compilation
+从完整 Canonical corpus 中确定性选择一个产品版本允许使用的 Document、Definition、Relationship 与 Search 范围。Profile 不删除或修改 Canonical 数据，也不代表最终法律适用性判断。
 
 ### Relationship Layer
 负责建立、存储和查询法规之间的关系，包括显式引用、反向引用、RTS/ITS mapping、TF-IDF related recitals，以及后续 CELLAR/CJEU 关系。
@@ -177,6 +182,7 @@ Phase 2 建设：
 - 更完整的 RTS / ITS / Guidelines / Q&A 体系；
 - Search relation filters / advanced filters；
 - 关系数据缓存与可重建机制。
+- 最小 Edition/Profile 编译闭环，确保 Reader、Search、Graph 与 Runtime 使用同一 corpus 边界。
 
 ## 3.3 Phase 3 — Regulatory Intelligence Platform
 
@@ -194,6 +200,9 @@ Phase 3 建设：
 - explainable multi-hop regulatory paths；
 - deterministic applicability / compliance navigation；
 - richer cross-regulation comparison and navigation。
+- 从 ICT / digital 横向法规扩展到金融业务法规，以 Banking Governance & Internal Control 作为首个非 IT 纵向切片；
+- provision-level Regulatory Domain、Authority 与 EU → national jurisdiction 关系；
+- 面向 Agent / RAG 的内部结构化检索与 citation-ready context assembly。
 
 ## 3.4 Phase 4 — External Integration Platform
 
@@ -208,9 +217,34 @@ Phase 4 建设：
 - MCP server；
 - structured SDK / client examples；
 - Agent integrations；
+- 受控 Edition/Profile 选择及其授权策略；
 - API/MCP compatibility and deprecation policy。
 
 Phase 2/3 可以持续增加产品内部 API endpoint 和 service capability，但这些接口在 Phase 4 前不构成公开兼容承诺。
+
+## 3.5 One Platform, Multiple Editions
+
+平台只维护一份代码、一套 Canonical Contract 和一条数据生产流水线，不为银行、基金、保险或数字资产复制独立系统。不同产品版本通过 Edition/Profile 生成：
+
+- Banking Edition；
+- Digital Assets / MiCA Edition；
+- Funds / Asset Management Edition；
+- Insurance Edition；
+- Cross-sector Digital / ICT Edition。
+
+每个 Edition 可以拥有不同的默认 corpus、taxonomy、导航和部署名称，但必须复用相同 stable IDs、relationship semantics、services 和 runtime schema。同一代码可以构建多个独立只读 SQLite artifact，并部署为不同服务；当前不建设多租户或运行时任意切库。
+
+Profile 是产品范围配置，不是无条件的法律适用性结论。例如 `banking-default` 可以默认弱化 MiCA，但经营 crypto-asset 业务的银行仍可能需要包含 MiCA。此类差异由后续机构活动与 applicability 规则表达，不应写死在法规分类中。
+
+## 3.6 Build the Capability Before Scaling Coverage
+
+阶段验收采用 **0→1 capability before 1→100 coverage**：
+
+- 每一种新来源先用少量 representative documents 打通 acquisition → canonical → relationships → runtime → delivery；
+- 每一种新关系先用少量经审核样本定义方向、端点、provenance 和 evidence；
+- 能力闭环完成后，后续批量覆盖进入版本控制的 Coverage Backlog，不阻塞当前 Phase；
+- 新增下一批法规时必须使用可重跑流水线，不接受只在本地临时修改生成物的手工导入；
+- 自动构建与法律语义审核必须分开，审核结果以版本控制的数据保存，而不是保存在人员或模型记忆中。
 
 ---
 
@@ -1811,6 +1845,8 @@ Phase 2 的目标是在 Phase 1 已有稳定 Reader / Canonical Data / Relations
 
 Phase 2 不改变 Phase 1 的核心实体，只扩充 relationship types、service capabilities 和 delivery adapters。
 
+Phase 2 的完成标准是证明关系与 corpus selection 能力的首个可用闭环，不是穷举所有法规关系。首个 Profile 必须同时约束 Document、Definition、Relationship、Search、Reader route 和 Graph endpoint；完整判决正文、全部 Article-level case citation、完整 consolidated lineage、更多 CELLAR predicate 与无限 Level 2/3 覆盖进入后续 Coverage Backlog，不作为本阶段的无界完成条件。
+
 ## 22.1 CELLAR SPARQL / RDF Integration
 
 ### 目标
@@ -2001,6 +2037,23 @@ Phase 2 搜索增加：
 - exact legal identifier search；
 - results grouped by document / provision / case / Level 2。
 
+## 22.7 Edition / Profile Compilation
+
+Phase 2 提供一个 `banking-default` representative Profile，验证同一 master Canonical corpus 可以生成范围一致的产品 artifact。
+
+最小验收：
+
+- Profile 配置具有 stable `profileId` 和版本；
+- include/exclude 规则在 build-time 执行；
+- 被排除的文档不会通过 Search、Reader URL、Explorer、Library 或 Graph 旁路出现；
+- Definition 和 Relationship 仅在端点属于选定 corpus 时发布；
+- runtime manifest 与 `/api/health` 报告 `profileId`；
+- Profile 选择参与 runtime build identity；
+- master Canonical artifact 不被删除、复制或改写；
+- 至少一组测试证明同一法规在 full corpus 与受限 Profile 中具有不同可见性，但已有 stable ID 不变。
+
+Phase 2 不实现任意 API 请求动态选择 Profile、多租户、Profile 权限或跨 Profile 聚合；这些属于 Phase 4 external delivery。
+
 ---
 
 # 23. Phase 3 — Regulatory Intelligence Platform
@@ -2161,6 +2214,37 @@ compare_provisions
 ```
 
 这些能力复用 Relationship/Taxonomy/Applicability services，首先服务 Web 产品。Phase 4 MCP 可以薄适配这些 outputs，但不得把业务逻辑移入 transport layer。
+
+## 23.8 Financial Domain Expansion Pilot
+
+Phase 3 以 **Banking Governance & Internal Control** 作为首个非 IT 金融业务切片，优先选择少量 CRD governance provisions、EBA Internal Governance material、现有 CSSF 12/552，并核验至少一条 EU → Luxembourg 的正式法律关系链。
+
+该试点必须建立以下可复用能力，而不是一次性页面：
+
+- Regulatory Domain 是版本化 editorial classification，不能伪装成官方事实；
+- Domain assignment 能落到 Document 和 representative Provision；
+- Authority 是一等实体，可承载 `ISSUED_BY`、`SUPERVISED_BY` 等有向关系；
+- `TRANSPOSES`、`SUPPLEMENTS`、`IMPLEMENTS`、`CLARIFIES` 分别定义允许的端点、方向、evidence 和 provenance；
+- Regulation 不使用 `TRANSPOSES` 描述成员国执行关系；
+- 法规主题、适用机构/业务活动、受影响内部职能是三个独立维度；
+- Guidelines、Q&A、FAQ 明确 legal nature / binding status；
+- 人工分类保留 `EDITORIAL` provenance、review status、版本和审核说明。
+
+支付、AML、Prudential、Funds、Insurance、Investment Services 与 Digital Assets 的大规模覆盖在该试点通过后按相同 workflow 增加，不并行开发独立平台。
+
+## 23.9 Agent / RAG Internal Data Product
+
+Phase 3 在公开 API 之前提供稳定的内部 machine-facing service output，使本项目及受控的其他 Agent / RAG 项目可以获取 citation-ready context。最小输出包括：
+
+- stable document/provision/body-block IDs；
+- exact official text excerpt，不由模型改写；
+- source URL、source snapshot、版本与 build ID；
+- Article/paragraph locator；
+- relationship type、方向、provenance、evidence；
+- `profileId`、jurisdiction、authority、domain 与 legal nature；
+- deterministic ranking / retrieval metadata。
+
+AI orchestration 不进入 Canonical build dependency。模型生成的摘要、分类候选或解释必须是可关闭、可版本化、带 provenance 的 enrichment，不能写回 official text 或覆盖人工审核结论。Phase 4 只把这些已经稳定的 service outputs 适配为 versioned Public API / MCP。
 
 ---
 
@@ -2957,6 +3041,14 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 - graph node 可点击回 Reader，并可定位到 Explorer；
 - graph 与 Relationship Panel 使用同一关系数据。
 
+## 31.5 Edition/Profile and Corpus Operations
+
+- 至少一个 `banking-default` Profile 从 master Canonical corpus 编译独立 Runtime；
+- Search、Reader、Explorer、Library、Definitions 与 Graph 对排除文档保持一致；
+- runtime manifest、health response 与 build ID 能识别 Profile；
+- onboarding runbook 与 Coverage Backlog 进入版本控制；
+- 下一批新法规不得通过只修改生成物的手工导入发布。
+
 ---
 
 # 32. Phase 3 验收标准
@@ -2984,6 +3076,21 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 - 每一跳都有具体关系来源；
 - path 可由 Web 使用，并形成 Phase 4 adapter 可复用的 structured output。
 
+## 32.5 Financial Domain Pilot
+
+- Banking Governance & Internal Control representative corpus 通过统一 onboarding workflow；
+- 至少一个 Domain assignment 落到 representative Provision，并带 `EDITORIAL` provenance、版本和 review status；
+- Authority 作为一等实体进入统一 node/relationship model；
+- 至少一条 EU → Luxembourg 法律关系链具有准确 relation semantics 与 evidence；
+- 新 corpus 自动获得 Reader、Explorer、Search 和适用的 Graph 能力，不增加法规专用页面。
+
+## 32.6 Agent/RAG Internal Retrieval
+
+- 内部 service 能返回 stable ID、exact official excerpt、locator、source/version/build、relationship evidence 和 `profileId`；
+- Web 与 Agent/RAG context assembly 读取同一 Runtime/Service，不复制法规数据库；
+- Canonical build 不依赖 LLM；
+- 模型 enrichment 可关闭、可版本化并与 official/editorial data 分层。
+
 ---
 
 # 33. Phase 4 — External Integration Platform
@@ -2996,6 +3103,7 @@ Public API 能力包括：
 - get document structure / provision / recital / annex；
 - get relationships / Level 2 measures / case law；
 - get version / topic / timeline / applicability / regulatory paths。
+- 在授权范围内选择 Edition/Profile，并按 domain、jurisdiction、authority、document type 与版本过滤。
 
 MCP 不重新实现法律逻辑，只是复用同一 service layer。首批工具建议：
 
@@ -3019,6 +3127,7 @@ Phase 4 验收要求：
 - 常见 MCP client 可连接并获取带 official source / identifiers / provenance 的结构化输出；
 - MCP 不要求加载整部法规才能读取单一 Article；
 - Web、Public API 与 MCP 共用 service/cache，不维护第二套法规或关系数据。
+- `profileId` 不能绕过部署或账号允许的 corpus policy。
 
 ---
 
@@ -3154,17 +3263,21 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 4. citation graph enrichment；
 5. graph view；
 6. extended Level 2 / Level 3；
-7. advanced relation-aware search。
+7. minimal Edition/Profile compilation；
+8. one deterministic structured relation query；
+9. deployment/release closure；
+10. advanced relation-aware search 进入后续 backlog。
 
 ## Phase 3 Sequence
 
-1. taxonomy/topics；
-2. implementation timeline；
-3. supervisory decisions；
-4. applicability navigation；
-5. cross-regulation paths；
-6. focused graph persistence；
-7. structured regulatory path services。
+1. manifest-driven corpus orchestration and raw snapshot retention；
+2. Banking Governance & Internal Control pilot；
+3. provision-level taxonomy/topics and Authority entities；
+4. EU → Luxembourg legal relations；
+5. Agent/RAG internal retrieval context；
+6. implementation timeline and supervisory decisions；
+7. applicability navigation and cross-regulation paths；
+8. focused graph persistence only when query load requires it。
 
 ## Phase 4 Sequence
 
@@ -3173,7 +3286,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 3. MCP adapter；
 4. SDK / client examples；
 5. Agent and third-party integrations；
-6. compatibility / deprecation policy。
+6. authorized Profile selection and query filters；
+7. compatibility / deprecation policy。
 
 # 36. 最终架构原则
 
@@ -3191,6 +3305,7 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 10. **Build-time enrichment before runtime computation where practical**；
 11. **One deployable application first, clear modules inside it**；
 12. **Future API/MCP/Graph capabilities extend services, not rewrite views**。
+13. **One canonical corpus compiles multiple build-time Editions/Profiles**。
 
 整个项目在实施过程中必须持续遵守：
 
@@ -3206,7 +3321,8 @@ RTS/ITS mapping 只采用可追溯官方来源，数据中保留官方依据。
 10. **High cohesion, low coupling**：每个模块只负责一种稳定职责；
 11. **Future-capable, present-simple**：为未来预留 contract，不提前实现未来复杂度；
 12. **Graph serves navigation**：Knowledge Graph 首先服务 Article 阅读、Explorer 定位、关系发现和路径解释，而不是为了展示复杂图形；
-13. **Explorer is a platform capability**：新增结构化法规应自动获得 Explorer，而不是复制页面。
+13. **Explorer is a platform capability**：新增结构化法规应自动获得 Explorer，而不是复制页面；
+14. **Coverage is reproducible**：新增法规通过 manifest、snapshot、quality gate、reviewed data 和 build report 重跑，不依赖人员或模型记忆。
 
 ---
 
@@ -3236,6 +3352,7 @@ Official Relationship Graph
 + Amendment / Version
 + CJEU
 + Focused Graph View
++ Build-time Edition/Profile
 ```
 
 Phase 3 增加：
@@ -3247,6 +3364,8 @@ Topics
 + Applicability
 + Multi-hop Regulatory Paths
 + Explainable Cross-regulation Navigation
++ Financial Domain Expansion
++ Agent/RAG Citation-ready Context
 ```
 
 Phase 4 增加：
