@@ -41,13 +41,13 @@ Representative scope:
 
 This pilot validates the workflow and data contracts. It does not attempt simultaneous full coverage of CRR/CRD, AML, payments, credit, markets, funds, insurance, prudential reporting, ESG, or national implementations.
 
-Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. EBA/GL/2021/05 is now independently acquired and fidelity-gated as 234 numbered guideline paragraphs plus Annex I; report front matter and accompanying material are explicitly excluded from the legal body. Reviewed official mappings publish `CRD Article 74 → MANDATES → EBA/GL/2021/05` and `EBA paragraph 5 → SUPPLEMENTS → CRD Article 74`. The regulatory-context service separately returns versioned editorial Domain assignments, EBA issuer metadata, and a reviewed guideline legal-nature/status record. The first reviewed EU → Luxembourg formal legal relation remains the next bounded slice.
+Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. EBA/GL/2021/05 is now independently acquired and fidelity-gated as 234 numbered guideline paragraphs plus Annex I; report front matter and accompanying material are explicitly excluded from the legal body. Reviewed official mappings publish `CRD Article 74 → MANDATES → EBA/GL/2021/05` and `EBA paragraph 5 → SUPPLEMENTS → CRD Article 74`. The regulatory-context service separately returns versioned editorial Domain assignments, EBA issuer metadata, and a reviewed guideline legal-nature/status record. The first reviewed national relation publishes `Circular CSSF 12/552 Introduction block 7 → IMPLEMENTS → EBA/GL/2021/05` from exact CSSF body evidence, without claiming CRD transposition. The Banking Governance 0→1 pilot is complete; broader provision coverage and further national chains remain 1→100 work.
 
 ## Financial-domain 1→100 queues
 
 | Domain | Representative next slice | Scale-out after validation | Status |
 |---|---|---|---|
-| Banking governance | first EU → Luxembourg formal legal relation | governance, remuneration, fit-and-proper, internal control | in-progress |
+| Banking governance | completed CSSF → EBA implementation relation | governance, remuneration, fit-and-proper, internal control | 0→1 complete |
 | Prudential | one bounded CRR topic | capital, liquidity, leverage, reporting | deferred |
 | Payments | four reviewed core laws/materials using the corpus orchestrator | PSD/PSR, payment security, EBA guidance, national material | deferred |
 | AML/KYC | one EU package + one authority/national chain | AML package, EBA guidance, FIU/national implementation | deferred |

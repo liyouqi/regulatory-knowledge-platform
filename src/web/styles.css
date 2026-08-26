@@ -1549,6 +1549,10 @@ kbd {
   background: #ff7f96;
 }
 
+.relationship-graph-node[data-relation="implements"]::before {
+  background: #4fd1a5;
+}
+
 .relationship-graph-node[data-relation="related_recital"]::before {
   background: #9acf78;
 }

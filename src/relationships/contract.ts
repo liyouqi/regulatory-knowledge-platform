@@ -8,6 +8,7 @@ export type RelationshipType =
   | "CORRECTS"
   | "INTERPRETS"
   | "SUPPLEMENTS"
+  | "IMPLEMENTS"
   | "RELATED_DOCUMENT"
   | "RELATED_RECITAL";
 

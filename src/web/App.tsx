@@ -536,6 +536,12 @@ function RelationshipList({
       ),
     },
     {
+      key: "implements",
+      label: "Implements",
+      direction: "references" as const,
+      items: uniqueRelationships(relationships?.implements ?? [], "references"),
+    },
+    {
       key: "related-documents",
       label: "Related documents",
       direction: "references" as const,

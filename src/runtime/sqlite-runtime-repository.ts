@@ -1195,6 +1195,9 @@ export class SqliteRuntimeRepository {
       supplements: outgoing
         .filter((row) => row.relationType === "SUPPLEMENTS")
         .map((row) => toProvisionRelationship(row)),
+      implements: outgoing
+        .filter((row) => row.relationType === "IMPLEMENTS")
+        .map((row) => toProvisionRelationship(row)),
       relatedDocuments: outgoing
         .filter((row) => row.relationType === "RELATED_DOCUMENT")
         .map((row) => toProvisionRelationship(row)),

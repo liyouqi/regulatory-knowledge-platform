@@ -50,6 +50,12 @@ import {
   loadGuidelineMappings,
 } from "../relationships/guideline-mapping";
 import {
+  NATIONAL_IMPLEMENTATION_BUILDER,
+  NATIONAL_IMPLEMENTATION_BUILDER_VERSION,
+  buildNationalImplementationMappings,
+  loadNationalImplementationMappings,
+} from "../relationships/national-implementation";
+import {
   OFFICIAL_MAPPING_BUILDER,
   OFFICIAL_MAPPING_BUILDER_VERSION,
   buildOfficialMappings,
@@ -82,7 +88,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.8.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.9.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -267,6 +273,9 @@ function runtimeBuildId(
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
   guidelineMappings: ReturnType<typeof loadGuidelineMappings>,
+  nationalImplementationMappings: ReturnType<
+    typeof loadNationalImplementationMappings
+  >,
   cellarRelations: ReturnType<typeof loadCellarOfficialRelations>,
   lifecycleRelations: ReturnType<typeof loadCellarLifecycleRelations>,
   caseLawMetadata: ReturnType<typeof loadCellarCaseLawMetadata>,
@@ -290,6 +299,8 @@ function runtimeBuildId(
         JSON.stringify(officialMappings),
         `${GUIDELINE_MAPPING_BUILDER}@${GUIDELINE_MAPPING_BUILDER_VERSION}`,
         JSON.stringify(guidelineMappings),
+        `${NATIONAL_IMPLEMENTATION_BUILDER}@${NATIONAL_IMPLEMENTATION_BUILDER_VERSION}`,
+        JSON.stringify(nationalImplementationMappings),
         `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
         JSON.stringify(cellarRelations),
         `${CELLAR_LIFECYCLE_BUILDER}@${CELLAR_LIFECYCLE_BUILDER_VERSION}`,
@@ -417,6 +428,18 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     guidelineMappings,
   );
+  const nationalImplementationMappings =
+    loadNationalImplementationMappings().filter(
+      (mapping) =>
+        loadedDocumentIds.has(mapping.implementingDocumentId) &&
+        loadedDocumentIds.has(mapping.implementedDocumentId),
+    );
+  const nationalImplementationRelationships =
+    buildNationalImplementationMappings(
+      documents,
+      relationshipBuild.entities,
+      nationalImplementationMappings,
+    );
   const cellarRelations = loadCellarOfficialRelations().filter(
     (record) =>
       registeredCelex.has(record.sourceCelex) &&
@@ -453,6 +476,7 @@ export function buildRuntimeDatabase(
     ...relationshipBuild.relationships,
     ...officialRelationships,
     ...guidelineRelationships,
+    ...nationalImplementationRelationships,
     ...cellarRelationships,
     ...(relatedRecitalBuild?.relationships ?? []),
   ];
@@ -462,6 +486,7 @@ export function buildRuntimeDatabase(
     documents,
     officialMappings,
     guidelineMappings,
+    nationalImplementationMappings,
     cellarRelations,
     lifecycleRelations,
     caseLawMetadata,
@@ -723,7 +748,7 @@ export function buildRuntimeDatabase(
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
         relation_type TEXT NOT NULL CHECK (relation_type IN (
-          'REFERENCES', 'MANDATES', 'ADOPTED_UNDER', 'SUPPLEMENTS',
+          'REFERENCES', 'MANDATES', 'ADOPTED_UNDER', 'SUPPLEMENTS', 'IMPLEMENTS',
           'RELATED_DOCUMENT', 'RELATED_RECITAL'
         )),
         target_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -1138,6 +1163,16 @@ export function buildRuntimeDatabase(
         relationshipBuilders: JSON.stringify([
           `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
           `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
+          ...(guidelineRelationships.length > 0
+            ? [
+                `${GUIDELINE_MAPPING_BUILDER}@${GUIDELINE_MAPPING_BUILDER_VERSION}`,
+              ]
+            : []),
+          ...(nationalImplementationRelationships.length > 0
+            ? [
+                `${NATIONAL_IMPLEMENTATION_BUILDER}@${NATIONAL_IMPLEMENTATION_BUILDER_VERSION}`,
+              ]
+            : []),
           ...(cellarRelationships.length > 0
             ? [
                 `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,

@@ -139,6 +139,7 @@
     "data/editorial/regulatory-domains.json",
     "data/official-mappings/level2.json",
     "data/official-mappings/guidelines.json",
+    "data/official-mappings/national-implementations.json",
     "data/official-metadata/authorities.json",
     "data/official-metadata/legal-natures.json",
     "data/official-metadata/cellar-case-law.json",

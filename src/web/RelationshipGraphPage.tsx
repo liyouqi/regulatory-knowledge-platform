@@ -53,6 +53,7 @@ const relationDetails = {
   MANDATES: { label: "Mandates", color: "#f0b56d" },
   ADOPTED_UNDER: { label: "Adopted under", color: "#d897ff" },
   SUPPLEMENTS: { label: "Supplements", color: "#ff7f96" },
+  IMPLEMENTS: { label: "Implements", color: "#4fd1a5" },
   RELATED_DOCUMENT: { label: "Related document", color: "#8f9bad" },
   RELATED_RECITAL: { label: "Related recital", color: "#9acf78" },
   AMENDS: { label: "Amends", color: "#f4c95d" },

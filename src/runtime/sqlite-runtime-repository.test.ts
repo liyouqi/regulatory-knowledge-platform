@@ -444,6 +444,35 @@ describe("SQLite runtime repository", () => {
       }),
     );
 
+    const cssfImplementation = repository?.findProvisionRelationships(
+      "lu:cssf:circular-12-552",
+      "lu:cssf:circular-12-552:provision:introduction",
+    );
+    expect(cssfImplementation?.implements).toEqual([
+      expect.objectContaining({
+        relationType: "IMPLEMENTS",
+        provenance: "OFFICIAL_MAPPING",
+        source: expect.objectContaining({
+          entityId: "lu:cssf:circular-12-552:provision:introduction:block:7",
+        }),
+        target: expect.objectContaining({
+          entityId: "eu:eba:gl:2021:05",
+          documentShortName: "EBA/GL/2021/05",
+        }),
+        builder: {
+          method: "national-implementation",
+          version: "1.0.0",
+        },
+      }),
+    ]);
+    expect(
+      repository
+        ?.findDocumentRelationships("lu:cssf:circular-12-552")
+        ?.relationships.some(
+          (relationship) => relationship.relationType === "IMPLEMENTS",
+        ),
+    ).toBe(true);
+
     const micaMandate = repository?.findProvisionRelationships(
       "eu:32023R1114",
       "eu:32023R1114:article:62",

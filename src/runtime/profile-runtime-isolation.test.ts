@@ -75,6 +75,17 @@ describe("banking-default runtime isolation", () => {
         "eu:32013L0036:article:74",
       )?.domainAssignments,
     ).toHaveLength(2);
+    expect(
+      repository?.findProvisionRelationships(
+        "lu:cssf:circular-12-552",
+        "lu:cssf:circular-12-552:provision:introduction",
+      )?.implements,
+    ).toEqual([
+      expect.objectContaining({
+        relationType: "IMPLEMENTS",
+        target: expect.objectContaining({ entityId: "eu:eba:gl:2021:05" }),
+      }),
+    ]);
   });
 
   it("makes excluded Reader, Explorer, Library, and relationship lookups unavailable", () => {

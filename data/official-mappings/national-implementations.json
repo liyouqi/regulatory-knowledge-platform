@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedAt": "2026-08-26",
+  "records": [
+    {
+      "id": "national-implementation:cssf-12-552:eba-gl-2021-05",
+      "jurisdiction": "LU",
+      "implementingDocumentId": "lu:cssf:circular-12-552",
+      "sourceEntityId": "lu:cssf:circular-12-552:provision:introduction:block:7",
+      "implementedDocumentId": "eu:eba:gl:2021:05",
+      "evidence": {
+        "entityId": "lu:cssf:circular-12-552:provision:introduction:block:7",
+        "text": "It reflects the European and international principles, guidelines and recommendations which apply in this respect, translating them, in a proportionate way, in the context of the Luxembourg banking sector. Where, due to the size, the nature and the complexity of the activities and the organisation, the application of the principle of proportionality requires enhanced central administration, internal governance or risk management, the credit institutions shall refer to the principles set out in Chapter 2 of Part I and to the guidelines and recommendations listed in Part IV of this Circular for guidance on this implementation. This concerns especially the European Banking Authority (\u201cEBA\u201d) Guidelines on internal governance, as updated on 2 July 2021 (Guidelines on internal governance, EBA/GL/2021/05)",
+        "sourceUrl": "https://www.cssf.lu/wp-content/uploads/cssf12_552eng.pdf"
+      },
+      "provenance": "OFFICIAL_MAPPING",
+      "reviewStatus": "reviewed"
+    }
+  ]
+}

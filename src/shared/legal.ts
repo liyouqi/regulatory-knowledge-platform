@@ -379,6 +379,7 @@ export const provisionRelationshipSchema = z.object({
     "AMENDS",
     "CORRECTS",
     "SUPPLEMENTS",
+    "IMPLEMENTS",
     "RELATED_DOCUMENT",
     "RELATED_RECITAL",
   ]),
@@ -407,6 +408,7 @@ export const provisionRelationshipsResponseSchema = z.object({
   mandates: z.array(provisionRelationshipSchema),
   adoptedUnder: z.array(provisionRelationshipSchema),
   supplements: z.array(provisionRelationshipSchema),
+  implements: z.array(provisionRelationshipSchema),
   relatedDocuments: z.array(provisionRelationshipSchema),
   relatedRecitals: z.array(provisionRelationshipSchema),
 });

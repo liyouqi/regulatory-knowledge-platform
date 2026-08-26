@@ -6,6 +6,8 @@ import {
   cssfDocumentLogicalId,
   loadCssfSourceRegistry,
 } from "../ingestion/cssf-source-registry";
+import { readVerifiedEbaSourceSnapshot } from "../ingestion/eba-snapshot";
+import { loadEbaSourceRegistry } from "../ingestion/eba-source-registry";
 import { readVerifiedSourceSnapshot } from "../ingestion/snapshot";
 import { loadSourceRegistry } from "../ingestion/source-registry";
 import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
@@ -50,13 +52,15 @@ export interface CorpusVerification {
 }
 
 export async function verifyCorpus(): Promise<CorpusVerification> {
-  const [euSources, cssfSources] = await Promise.all([
+  const [euSources, cssfSources, ebaSources] = await Promise.all([
     loadSourceRegistry(),
     loadCssfSourceRegistry(),
+    loadEbaSourceRegistry(),
   ]);
   const expectedIds = new Set([
     ...euSources.map((source) => `eu:${source.celex}`),
     ...cssfSources.map((source) => cssfDocumentLogicalId(source.localId)),
+    ...ebaSources.map((source) => source.documentId),
   ]);
 
   const euSnapshotDirectories = snapshotDirectories(
@@ -65,13 +69,18 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
   const cssfSnapshotDirectories = snapshotDirectories(
     resolve(process.cwd(), "data/raw/cssf"),
   );
-  const [euSnapshots, cssfSnapshots] = await Promise.all([
+  const ebaSnapshotDirectories = snapshotDirectories(
+    resolve(process.cwd(), "data/raw/eba"),
+  );
+  const [euSnapshots, cssfSnapshots, ebaSnapshots] = await Promise.all([
     Promise.all(euSnapshotDirectories.map(readVerifiedSourceSnapshot)),
     Promise.all(cssfSnapshotDirectories.map(readVerifiedCssfSourceSnapshot)),
+    Promise.all(ebaSnapshotDirectories.map(readVerifiedEbaSourceSnapshot)),
   ]);
   const rawIds = new Set([
     ...euSnapshots.map((snapshot) => `eu:${snapshot.snapshot.celex}`),
     ...cssfSnapshots.map((snapshot) => snapshot.snapshot.documentId),
+    ...ebaSnapshots.map((snapshot) => snapshot.snapshot.documentId),
   ]);
   assertSameIds("Verified raw snapshots", rawIds, expectedIds);
 
@@ -101,7 +110,8 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
 
   return {
     sourceRegistryDocuments: expectedIds.size,
-    verifiedRawSnapshots: euSnapshots.length + cssfSnapshots.length,
+    verifiedRawSnapshots:
+      euSnapshots.length + cssfSnapshots.length + ebaSnapshots.length,
     canonicalDocuments: canonicalDocuments.length,
     runtimeDocuments: runtime.documents,
     runtimeBuildId: runtime.buildId,

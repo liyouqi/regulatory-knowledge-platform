@@ -159,6 +159,7 @@ export function toRelationshipGraph(
     { direction: "outgoing", relationships: response.mandates },
     { direction: "outgoing", relationships: response.adoptedUnder },
     { direction: "outgoing", relationships: response.supplements },
+    { direction: "outgoing", relationships: response.implements },
     { direction: "outgoing", relationships: response.relatedDocuments },
     { direction: "outgoing", relationships: response.relatedRecitals },
   ];
