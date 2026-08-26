@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   BookOpen,
+  CalendarDays,
   ExternalLink,
   ListTree,
   Network,
@@ -20,6 +21,7 @@ import {
 import {
   documentRelationshipGraphPath,
   explorerPath,
+  implementationTimelinePath,
   level2LibraryPath,
 } from "../shared/reader-route";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
@@ -233,6 +235,15 @@ export function ExplorerPage({
             <Network aria-hidden="true" size={15} />
             Relationships
           </Link>
+          {documentSummary?.hasImplementationTimeline ? (
+            <Link
+              className="view-switch"
+              to={implementationTimelinePath(document.slug)}
+            >
+              <CalendarDays aria-hidden="true" size={15} />
+              Timeline
+            </Link>
+          ) : null}
           {provisions[0]?.readerPath ? (
             <Link className="view-switch" to={provisions[0].readerPath}>
               <BookOpen aria-hidden="true" size={15} />

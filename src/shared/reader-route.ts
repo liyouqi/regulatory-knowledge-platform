@@ -18,6 +18,17 @@ export function isLevel2MandateQueryPath(pathname: string): boolean {
   return /^\/relationship-queries\/level-2-mandates\/?$/u.test(pathname);
 }
 
+export function implementationTimelinePath(slug: string): string {
+  return `/timelines/${encodeURIComponent(slug)}`;
+}
+
+export function parseImplementationTimelinePath(
+  pathname: string,
+): { slug: string } | null {
+  const match = /^\/timelines\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { slug: decodeURIComponent(match[1]) } : null;
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
+  CalendarDays,
   Check,
   Copy,
   Link2,
@@ -48,8 +49,10 @@ import {
 } from "../shared/legal";
 import {
   explorerPath,
+  implementationTimelinePath,
   isLevel2MandateQueryPath,
   parseExplorerPath,
+  parseImplementationTimelinePath,
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
@@ -63,6 +66,7 @@ import {
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
+import { ImplementationTimelinePage } from "./ImplementationTimelinePage";
 import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
@@ -1112,6 +1116,9 @@ function ReaderPage({
   const next = activeProvision.nextId
     ? provisions.get(activeProvision.nextId)
     : undefined;
+  const documentSummary = catalog.find(
+    (document) => document.id === legalDocument.id,
+  );
 
   async function copyPermalink() {
     await navigator.clipboard.writeText(globalThis.location.href);
@@ -1138,6 +1145,14 @@ function ReaderPage({
             <MapIcon aria-hidden="true" size={15} />
             Explore
           </Link>
+          {documentSummary?.hasImplementationTimeline ? (
+            <Link
+              className="view-switch"
+              to={implementationTimelinePath(legalDocument.slug)}
+            >
+              <CalendarDays aria-hidden="true" size={15} /> Timeline
+            </Link>
+          ) : null}
           <button
             className="search-button"
             onClick={onOpenSearch}
@@ -1445,6 +1460,9 @@ function ReaderPage({
 export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
+  const implementationTimeline = parseImplementationTimelinePath(
+    location.pathname,
+  );
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const relationshipGraph = parseRelationshipGraphPath(location.pathname);
   const level2MandateQuery = isLevel2MandateQueryPath(location.pathname);
@@ -1490,6 +1508,13 @@ export function App() {
         <Level2MandateQueryPage
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}
+          theme={theme}
+        />
+      ) : implementationTimeline ? (
+        <ImplementationTimelinePage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          slug={implementationTimeline.slug}
           theme={theme}
         />
       ) : relationshipGraph ? (

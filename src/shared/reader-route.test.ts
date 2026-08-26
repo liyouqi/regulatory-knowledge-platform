@@ -3,10 +3,12 @@ import {
   documentRelationshipGraphPath,
   explorerPath,
   globalRelationshipGraphPath,
+  implementationTimelinePath,
   isLevel2MandateQueryPath,
   level2LibraryPath,
   level2MandateQueryPath,
   parseExplorerPath,
+  parseImplementationTimelinePath,
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
@@ -75,6 +77,16 @@ describe("Reader routes", () => {
     );
     expect(isLevel2MandateQueryPath(level2MandateQueryPath())).toBe(true);
     expect(parseRelationshipGraphPath(level2MandateQueryPath())).toBeNull();
+  });
+
+  it("builds and parses generic implementation timeline routes", () => {
+    expect(implementationTimelinePath("ai-act")).toBe("/timelines/ai-act");
+    expect(parseImplementationTimelinePath("/timelines/ai-act")).toEqual({
+      slug: "ai-act",
+    });
+    expect(
+      parseImplementationTimelinePath("/read/ai-act/articles/113"),
+    ).toBeNull();
   });
 
   it.each([

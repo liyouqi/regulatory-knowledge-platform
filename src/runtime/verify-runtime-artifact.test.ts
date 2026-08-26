@@ -29,6 +29,7 @@ describe("runtime artifact verification", () => {
       relationships: expect.any(Number),
       lifecycleRelationships: 14,
       externalWorks: 14,
+      timelineEvents: 0,
       bytes: expect.any(Number),
       input: databasePath,
     });

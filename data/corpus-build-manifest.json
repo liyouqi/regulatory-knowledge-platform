@@ -143,6 +143,7 @@
     "data/official-mappings/national-implementations.json",
     "data/official-metadata/authorities.json",
     "data/official-metadata/legal-natures.json",
+    "data/official-metadata/implementation-timelines.json",
     "data/official-metadata/cellar-case-law.json",
     "data/official-metadata/cellar-focused-relations.json",
     "data/official-metadata/cellar-lifecycle-relations.json"

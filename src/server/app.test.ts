@@ -11,6 +11,7 @@ import {
   findExplorerBySlug,
   findFamilyLevel2,
   findGlobalRelationshipGraph,
+  findImplementationTimeline,
   findLaws,
   findLevel2Mandates,
   findProvisionRelationships,
@@ -445,6 +446,33 @@ describe("Document lookup", () => {
     expect(
       findCitationRetrieval("nonexistentregulatoryphrase").results,
     ).toEqual([]);
+  });
+
+  it("serves the reviewed AI Act implementation timeline", () => {
+    const timeline = findImplementationTimeline("ai-act");
+
+    expect(timeline).toMatchObject({
+      document: { id: "eu:32024R1689", slug: "ai-act" },
+      runtime: { profileId: "full-corpus" },
+      events: expect.arrayContaining([
+        expect.objectContaining({
+          eventType: "publication",
+          date: "2024-07-12",
+        }),
+        expect.objectContaining({
+          eventType: "entry-into-force",
+          date: "2024-08-01",
+        }),
+      ]),
+    });
+    expect(timeline?.events.at(-1)).toMatchObject({
+      eventType: "phased-application",
+      date: "2027-08-02",
+      source: {
+        entityId: "eu:32024R1689:article:113:subparagraph:3:point:c",
+      },
+    });
+    expect(findImplementationTimeline("dora")).toBeNull();
   });
 
   it("serves exact document definitions for Reader term previews", () => {

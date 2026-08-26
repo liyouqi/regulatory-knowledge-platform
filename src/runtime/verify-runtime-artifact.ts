@@ -26,6 +26,7 @@ export interface RuntimeArtifactVerification {
   domainAssignments: number;
   authorities: number;
   authorityRelationships: number;
+  timelineEvents: number;
   unresolvedReferences: number;
   bytes: number;
   input: string;
@@ -83,6 +84,7 @@ export function verifyRuntimeArtifact(
       domainAssignments: repository.domainAssignmentCount,
       authorities: repository.authorityCount,
       authorityRelationships: repository.authorityRelationshipCount,
+      timelineEvents: repository.timelineEventCount,
       unresolvedReferences: repository.unresolvedReferenceCount,
       bytes: statSync(databasePath).size,
       input: databasePath,

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "implementation-timelines",
+  "version": "1.0.0",
+  "reviewedAt": "2026-08-26T14:00:00Z",
+  "timelines": [
+    {
+      "id": "timeline:eu:32024R1689:implementation",
+      "documentId": "eu:32024R1689",
+      "events": [
+        {
+          "id": "timeline-event:eu:32024R1689:publication",
+          "eventType": "publication",
+          "date": "2024-07-12",
+          "label": "Publication",
+          "scopeLabel": "Regulation (EU) 2024/1689",
+          "dateBasis": "official-metadata",
+          "sourceEntityId": "eu:32024R1689",
+          "evidenceText": "2024-07-12",
+          "evidenceLocator": "source-registry:32024R1689:publicationDate",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:entry-into-force",
+          "eventType": "entry-into-force",
+          "date": "2024-08-01",
+          "label": "Entry into force",
+          "scopeLabel": "This Regulation",
+          "dateBasis": "calculated-from-publication",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:1",
+          "evidenceText": "This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+          "derivation": {
+            "method": "calendar-days-after-publication",
+            "baseDate": "2024-07-12",
+            "days": 20
+          }
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:chapters-i-ii-application",
+          "eventType": "phased-application",
+          "date": "2025-02-02",
+          "label": "Application under Article 113(3)(a)",
+          "scopeLabel": "Chapters I and II",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:a",
+          "evidenceText": "Chapters I and II shall apply from 2 February 2025;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:governance-penalties-application",
+          "eventType": "phased-application",
+          "date": "2025-08-02",
+          "label": "Application under Article 113(3)(b)",
+          "scopeLabel": "Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78, with the exception of Article 101",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:b",
+          "evidenceText": "Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78 shall apply from 2 August 2025, with the exception of Article 101;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:general-application",
+          "eventType": "general-application",
+          "date": "2026-08-02",
+          "label": "Application",
+          "scopeLabel": "This Regulation",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:2",
+          "evidenceText": "It shall apply from 2 August 2026.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:article-6-1-application",
+          "eventType": "phased-application",
+          "date": "2027-08-02",
+          "label": "Application under Article 113(3)(c)",
+          "scopeLabel": "Article 6(1) and corresponding obligations",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:c",
+          "evidenceText": "Article 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+        }
+      ]
+    }
+  ]
+}

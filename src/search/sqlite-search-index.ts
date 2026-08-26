@@ -82,13 +82,20 @@ import {
   explorerDocumentSchema,
 } from "../shared/legal";
 import {
+  DEFAULT_IMPLEMENTATION_TIMELINES_PATH,
+  IMPLEMENTATION_TIMELINE_BUILDER,
+  IMPLEMENTATION_TIMELINE_BUILDER_VERSION,
+  buildImplementationTimelineEvents,
+  loadImplementationTimelineDataset,
+} from "../timelines/implementation-timeline";
+import {
   DOCUMENT_VERSION_CHAIN_BUILDER,
   DOCUMENT_VERSION_CHAIN_BUILDER_VERSION,
   buildDocumentVersionChain,
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.0.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.1.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -120,6 +127,7 @@ export interface RuntimeDatabaseManifest {
   domainAssignmentCount: number;
   authorityCount: number;
   authorityRelationshipCount: number;
+  timelineEventCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -283,6 +291,9 @@ function runtimeBuildId(
   regulatoryDomainDataset: ReturnType<typeof loadRegulatoryDomainDataset>,
   authorityDataset: ReturnType<typeof loadAuthorityDataset>,
   legalNatureDataset: ReturnType<typeof loadLegalNatureDataset>,
+  implementationTimelineDataset: ReturnType<
+    typeof loadImplementationTimelineDataset
+  >,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -314,6 +325,8 @@ function runtimeBuildId(
         JSON.stringify(regulatoryDomainDataset),
         JSON.stringify(authorityDataset),
         JSON.stringify(legalNatureDataset),
+        `${IMPLEMENTATION_TIMELINE_BUILDER}@${IMPLEMENTATION_TIMELINE_BUILDER_VERSION}`,
+        JSON.stringify(implementationTimelineDataset),
         input,
       ].join("\n"),
     )
@@ -365,6 +378,13 @@ export function buildRuntimeDatabase(
   const versionNodes = versionChains.flatMap((chain) => chain.nodes);
   const versionEdges = versionChains.flatMap((chain) => chain.edges);
   const relationshipBuild = buildExplicitReferences(documents);
+  const implementationTimelineDataset = loadImplementationTimelineDataset(
+    DEFAULT_IMPLEMENTATION_TIMELINES_PATH,
+  );
+  const implementationTimelineEvents = buildImplementationTimelineEvents(
+    documents,
+    implementationTimelineDataset,
+  );
   const regulatoryDomainDataset = loadRegulatoryDomainDataset(
     DEFAULT_REGULATORY_DOMAINS_PATH,
   );
@@ -494,6 +514,7 @@ export function buildRuntimeDatabase(
     regulatoryDomainDataset,
     authorityDataset,
     legalNatureDataset,
+    implementationTimelineDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -744,6 +765,45 @@ export function buildRuntimeDatabase(
         review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
         reviewed_at TEXT NOT NULL
       ) STRICT;
+      CREATE TABLE implementation_timeline_events (
+        event_id TEXT PRIMARY KEY,
+        timeline_id TEXT NOT NULL,
+        timeline_version TEXT NOT NULL,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        event_type TEXT NOT NULL CHECK (event_type IN (
+          'publication', 'entry-into-force', 'general-application',
+          'phased-application', 'transitional-period', 'measure-milestone'
+        )),
+        event_date TEXT NOT NULL,
+        label TEXT NOT NULL,
+        scope_label TEXT NOT NULL,
+        date_basis TEXT NOT NULL CHECK (date_basis IN (
+          'official-metadata', 'explicit-legal-text',
+          'calculated-from-publication'
+        )),
+        source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        source_label TEXT NOT NULL,
+        source_path TEXT NOT NULL,
+        source_locator_kind TEXT,
+        source_locator_value TEXT,
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        source_url TEXT NOT NULL,
+        derivation_json TEXT,
+        provenance TEXT NOT NULL CHECK (provenance IN (
+          'LEGAL_TEXT', 'OFFICIAL_METADATA', 'DERIVED'
+        )),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        CHECK (
+          (source_locator_kind IS NULL AND source_locator_value IS NULL) OR
+          (source_locator_kind IS NOT NULL AND source_locator_value IS NOT NULL)
+        )
+      ) STRICT;
+      CREATE INDEX implementation_timeline_events_document_date
+        ON implementation_timeline_events(document_id, event_date);
       CREATE TABLE relationships (
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -957,6 +1017,21 @@ export function buildRuntimeDatabase(
         @statusSourceUrl, @provenance, @reviewStatus, @reviewedAt
       )
     `);
+    const insertImplementationTimelineEvent = database.prepare(`
+      INSERT INTO implementation_timeline_events (
+        event_id, timeline_id, timeline_version, document_id, event_type,
+        event_date, label, scope_label, date_basis, source_entity_id,
+        source_label, source_path, source_locator_kind, source_locator_value,
+        evidence_text, evidence_locator, source_url, derivation_json,
+        provenance, review_status, reviewed_at, builder_method, builder_version
+      ) VALUES (
+        @id, @timelineId, @timelineVersion, @documentId, @eventType,
+        @date, @label, @scopeLabel, @dateBasis, @sourceEntityId,
+        @sourceLabel, @sourcePath, @sourceLocatorKind, @sourceLocatorValue,
+        @evidenceText, @evidenceLocator, @sourceUrl, @derivationJson,
+        @provenance, @reviewStatus, @reviewedAt, @builderMethod, @builderVersion
+      )
+    `);
     const insertLegalWork = database.prepare(`
       INSERT INTO legal_works (
         id, celex, cellar_work_uri, loaded_document_id, label, title,
@@ -1102,6 +1177,14 @@ export function buildRuntimeDatabase(
           underReview: legalNature.underReview ? 1 : 0,
         });
       }
+      for (const event of implementationTimelineEvents) {
+        insertImplementationTimelineEvent.run({
+          ...event,
+          derivationJson: event.derivation
+            ? JSON.stringify(event.derivation)
+            : null,
+        });
+      }
       for (const work of lifecycleBuild.works) {
         insertLegalWork.run(work);
       }
@@ -1157,6 +1240,7 @@ export function buildRuntimeDatabase(
         authorityRelationshipCount: String(
           regulatoryContextBuild.authorityRelationships.length,
         ),
+        timelineEventCount: String(implementationTimelineEvents.length),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -1197,6 +1281,9 @@ export function buildRuntimeDatabase(
         ]),
         regulatoryContextBuilders: JSON.stringify([
           `${REGULATORY_CONTEXT_BUILDER}@${REGULATORY_CONTEXT_BUILDER_VERSION}`,
+        ]),
+        timelineBuilders: JSON.stringify([
+          `${IMPLEMENTATION_TIMELINE_BUILDER}@${IMPLEMENTATION_TIMELINE_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -1268,6 +1355,7 @@ export function buildRuntimeDatabase(
     authorityCount: regulatoryContextBuild.authorities.length,
     authorityRelationshipCount:
       regulatoryContextBuild.authorityRelationships.length,
+    timelineEventCount: implementationTimelineEvents.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

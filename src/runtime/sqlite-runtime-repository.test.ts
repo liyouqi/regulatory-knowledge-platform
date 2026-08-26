@@ -57,6 +57,7 @@ describe("SQLite runtime repository", () => {
       shortName: "DORA",
       officialTitle: dora.officialTitle,
       defaultPath: dora.provisions[0].path,
+      hasImplementationTimeline: false,
       provenance: dora.provenance,
       familyId: "family:dora",
       regulatoryLevel: "level-1",
@@ -72,6 +73,36 @@ describe("SQLite runtime repository", () => {
         "Digital Operational Resilience Regulation",
       ],
     });
+  });
+
+  it("returns the reviewed AI Act implementation timeline from Runtime", () => {
+    const timeline = repository?.findImplementationTimelineBySlug("ai-act");
+
+    expect(timeline).toMatchObject({
+      schemaVersion: "1.0.0",
+      id: "timeline:eu:32024R1689:implementation",
+      version: "1.0.0",
+      document: { id: "eu:32024R1689", slug: "ai-act" },
+      runtime: { buildId: repository?.buildId, profileId: "full-corpus" },
+    });
+    expect(timeline?.events).toHaveLength(6);
+    expect(timeline?.events[1]).toMatchObject({
+      date: "2024-08-01",
+      dateBasis: "calculated-from-publication",
+      provenance: "DERIVED",
+      source: {
+        entityId: "eu:32024R1689:article:113:subparagraph:1",
+        sourceLocator: { kind: "xpath" },
+      },
+    });
+    expect(repository?.findImplementationTimelineBySlug("dora")).toBeNull();
+    expect(repository?.findImplementationTimelineBySlug("unknown")).toBeNull();
+    expect(repository).toMatchObject({ timelineEventCount: 6 });
+    expect(
+      repository
+        ?.listDocumentSummaries()
+        .find((document) => document.slug === "ai-act"),
+    ).toMatchObject({ hasImplementationTimeline: true });
   });
 
   it("returns null for unknown document and Explorer identities", () => {

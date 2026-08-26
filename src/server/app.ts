@@ -65,6 +65,10 @@ export function findCitationRetrieval(
   return citationRetrievalService.search(query, options);
 }
 
+export function findImplementationTimeline(slug: string) {
+  return runtimeRepository.findImplementationTimelineBySlug(slug);
+}
+
 export function findExplorerBySlug(slug: string) {
   return runtimeRepository.findExplorerBySlug(slug);
 }
@@ -196,6 +200,7 @@ app.get("/api/health", (_request, response) => {
       domainAssignments: runtimeRepository.domainAssignmentCount,
       authorities: runtimeRepository.authorityCount,
       authorityRelationships: runtimeRepository.authorityRelationshipCount,
+      timelineEvents: runtimeRepository.timelineEventCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -230,6 +235,17 @@ app.get("/api/internal/citation-retrieval", (request, response) => {
       limit: Number.isFinite(requestedLimit) ? requestedLimit : undefined,
     }),
   );
+});
+
+app.get("/api/timelines/:slug", (request, response) => {
+  const timeline = findImplementationTimeline(
+    request.params.slug.slice(0, 100),
+  );
+  if (!timeline) {
+    response.status(404).json({ error: "Implementation timeline not found" });
+    return;
+  }
+  response.json(timeline);
 });
 
 function sendFamilyLevel2(

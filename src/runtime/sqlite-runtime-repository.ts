@@ -18,6 +18,11 @@ import {
   documentVersionChainSchema,
 } from "../shared/document-version-chain";
 import {
+  type ImplementationTimeline,
+  type ImplementationTimelineEvent,
+  implementationTimelineSchema,
+} from "../shared/implementation-timeline";
+import {
   type DocumentRelationshipsResponse,
   type DocumentSummary,
   type DocumentView,
@@ -56,6 +61,43 @@ type LawSearchSource = Pick<
 
 interface DocumentPayloadRow {
   readerPayload: string;
+}
+
+interface DocumentSummaryRow
+  extends Omit<DocumentSummary, "hasImplementationTimeline"> {
+  hasImplementationTimeline: 0 | 1;
+}
+
+interface TimelineEventRow {
+  timelineId: string;
+  timelineVersion: string;
+  eventId: string;
+  documentId: string;
+  documentSlug: string;
+  documentShortName: string;
+  documentOfficialTitle: string;
+  documentSourceUrl: string;
+  documentSourceVersion: string;
+  documentAsOf: string;
+  eventType: ImplementationTimelineEvent["eventType"];
+  eventDate: string;
+  label: string;
+  scopeLabel: string;
+  dateBasis: ImplementationTimelineEvent["dateBasis"];
+  sourceEntityId: string;
+  sourceLabel: string;
+  sourcePath: string;
+  sourceLocatorKind: string | null;
+  sourceLocatorValue: string | null;
+  evidenceText: string;
+  evidenceLocator: string;
+  sourceUrl: string;
+  derivationJson: string | null;
+  provenance: ImplementationTimelineEvent["provenance"];
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+  builderMethod: "implementation-timeline";
+  builderVersion: "1.0.0";
 }
 
 interface ExplorerPayloadRow {
@@ -582,6 +624,7 @@ export class SqliteRuntimeRepository {
   readonly domainAssignmentCount: number;
   readonly authorityCount: number;
   readonly authorityRelationshipCount: number;
+  readonly timelineEventCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -670,6 +713,10 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "authorityRelationshipCount"),
         10,
       );
+      this.timelineEventCount = Number.parseInt(
+        manifestValue(this.database, "timelineEventCount"),
+        10,
+      );
       this.unresolvedReferenceCount = Number.parseInt(
         manifestValue(this.database, "unresolvedReferenceCount"),
         10,
@@ -684,7 +731,7 @@ export class SqliteRuntimeRepository {
   }
 
   listDocumentSummaries(): DocumentSummary[] {
-    return this.database
+    const rows = this.database
       .prepare(`
         SELECT
           id,
@@ -695,11 +742,114 @@ export class SqliteRuntimeRepository {
           provenance,
           family_id AS familyId,
           regulatory_level AS regulatoryLevel,
-          measure_type AS measureType
+          measure_type AS measureType,
+          EXISTS (
+            SELECT 1 FROM implementation_timeline_events timeline
+            WHERE timeline.document_id = documents.id
+          ) AS hasImplementationTimeline
         FROM documents
         ORDER BY display_order ASC
       `)
-      .all() as DocumentSummary[];
+      .all() as DocumentSummaryRow[];
+    return rows.map((row) => ({
+      ...row,
+      hasImplementationTimeline: row.hasImplementationTimeline === 1,
+    }));
+  }
+
+  findImplementationTimelineBySlug(
+    slug: string,
+  ): ImplementationTimeline | null {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          event.timeline_id AS timelineId,
+          event.timeline_version AS timelineVersion,
+          event.event_id AS eventId,
+          document.id AS documentId,
+          document.slug AS documentSlug,
+          document.short_name AS documentShortName,
+          document.official_title AS documentOfficialTitle,
+          document.source_url AS documentSourceUrl,
+          document.source_version AS documentSourceVersion,
+          document.publication_date AS documentAsOf,
+          event.event_type AS eventType,
+          event.event_date AS eventDate,
+          event.label,
+          event.scope_label AS scopeLabel,
+          event.date_basis AS dateBasis,
+          event.source_entity_id AS sourceEntityId,
+          event.source_label AS sourceLabel,
+          event.source_path AS sourcePath,
+          event.source_locator_kind AS sourceLocatorKind,
+          event.source_locator_value AS sourceLocatorValue,
+          event.evidence_text AS evidenceText,
+          event.evidence_locator AS evidenceLocator,
+          event.source_url AS sourceUrl,
+          event.derivation_json AS derivationJson,
+          event.provenance,
+          event.review_status AS reviewStatus,
+          event.reviewed_at AS reviewedAt,
+          event.builder_method AS builderMethod,
+          event.builder_version AS builderVersion
+        FROM implementation_timeline_events event
+        JOIN documents document ON document.id = event.document_id
+        WHERE document.slug = ?
+        ORDER BY event.event_date ASC, event.event_id ASC
+      `)
+      .all(slug) as TimelineEventRow[];
+    const first = rows[0];
+    if (!first) return null;
+    return implementationTimelineSchema.parse({
+      schemaVersion: "1.0.0",
+      id: first.timelineId,
+      version: first.timelineVersion,
+      document: {
+        id: first.documentId,
+        slug: first.documentSlug,
+        shortName: first.documentShortName,
+        officialTitle: first.documentOfficialTitle,
+        sourceUrl: first.documentSourceUrl,
+        sourceVersion: first.documentSourceVersion,
+        asOf: first.documentAsOf,
+      },
+      runtime: {
+        buildId: this.buildId,
+        profileId: this.profileId,
+        profileVersion: this.profileVersion,
+        profileHash: this.profileHash,
+      },
+      events: rows.map((row) => ({
+        id: row.eventId,
+        eventType: row.eventType,
+        date: row.eventDate,
+        label: row.label,
+        scopeLabel: row.scopeLabel,
+        dateBasis: row.dateBasis,
+        source: {
+          entityId: row.sourceEntityId,
+          label: row.sourceLabel,
+          path: row.sourcePath,
+          sourceUrl: row.sourceUrl,
+          sourceLocator:
+            row.sourceLocatorKind && row.sourceLocatorValue
+              ? { kind: row.sourceLocatorKind, value: row.sourceLocatorValue }
+              : undefined,
+          evidenceText: row.evidenceText,
+          evidenceLocator: row.evidenceLocator,
+        },
+        derivation: row.derivationJson
+          ? JSON.parse(row.derivationJson)
+          : undefined,
+        provenance: row.provenance,
+        reviewStatus: row.reviewStatus,
+        reviewedAt: row.reviewedAt,
+        builder: {
+          method: row.builderMethod,
+          version: row.builderVersion,
+        },
+      })),
+    });
   }
 
   listDocumentViews(): DocumentView[] {

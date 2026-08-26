@@ -100,6 +100,14 @@ describe("banking-default runtime isolation", () => {
       runtime: { profileId: "banking-default" },
       document: { id: "lu:cssf:circular-12-552" },
     });
+    expect(
+      repository?.findImplementationTimelineBySlug("ai-act"),
+    ).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      events: expect.arrayContaining([
+        expect.objectContaining({ date: "2026-08-02" }),
+      ]),
+    });
   });
 
   it("makes excluded Reader, Explorer, Library, and relationship lookups unavailable", () => {
