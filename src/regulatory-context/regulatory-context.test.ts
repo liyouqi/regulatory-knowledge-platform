@@ -21,10 +21,10 @@ describe("regulatory context", () => {
 
     expect(context).toMatchObject({
       taxonomyId: "taxonomy:regulatory-domain",
-      taxonomyVersion: "1.0.0",
+      taxonomyVersion: "1.1.0",
     });
     expect(context.domains).toHaveLength(3);
-    expect(context.assignments).toHaveLength(8);
+    expect(context.assignments).toHaveLength(10);
     expect(context.assignments).toContainEqual(
       expect.objectContaining({
         domainId: "domain:banking-governance-internal-control",
@@ -36,7 +36,7 @@ describe("regulatory context", () => {
         reviewStatus: "reviewed",
       }),
     );
-    expect(context.authorities).toHaveLength(3);
+    expect(context.authorities).toHaveLength(4);
     expect(context.authorityRelationships).toContainEqual(
       expect.objectContaining({
         sourceDocumentId: "lu:cssf:circular-12-552",
@@ -45,6 +45,17 @@ describe("regulatory context", () => {
         provenance: "OFFICIAL_METADATA",
         builderMethod: "regulatory-context",
         builderVersion: "1.0.0",
+      }),
+    );
+    expect(context.legalNatures).toContainEqual(
+      expect.objectContaining({
+        documentId: "eu:eba:gl:2021:05",
+        instrumentType: "guideline",
+        complianceExpectation: "make-every-effort-to-comply",
+        currentStatus: "in-force",
+        underReview: true,
+        applicationDate: "2021-12-31",
+        provenance: "OFFICIAL_METADATA",
       }),
     );
   });
@@ -63,8 +74,8 @@ describe("regulatory context", () => {
 
     expect(serialized).not.toContain("lu:cssf:circular-12-552");
     expect(serialized).not.toContain("authority:lu:cssf");
-    expect(context.assignments).toHaveLength(4);
-    expect(context.authorityRelationships).toHaveLength(2);
+    expect(context.assignments).toHaveLength(6);
+    expect(context.authorityRelationships).toHaveLength(3);
   });
 
   it("fails closed when an editorial assignment does not resolve to its declared endpoint kind", () => {

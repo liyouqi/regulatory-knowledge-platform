@@ -44,6 +44,7 @@ import {
   type AuthorityRelationship,
   type DocumentRegulatoryContext,
   type DomainAssignment,
+  type LegalNature,
   documentRegulatoryContextSchema,
 } from "../shared/regulatory-context";
 import { sourceStatusSchema } from "../shared/source-status";
@@ -231,6 +232,26 @@ interface AuthorityRelationshipRow {
   jurisdiction: string;
   authoritySourceUrl: string;
   checkedAt: string;
+}
+
+interface LegalNatureRow {
+  documentId: string;
+  instrumentType: "guideline";
+  complianceExpectation: "make-every-effort-to-comply";
+  currentStatus: "in-force";
+  underReview: 0 | 1;
+  applicationDate: string;
+  statusCheckedAt: string;
+  legalBasisEvidenceText: string;
+  legalBasisEvidenceEntityId: string;
+  legalBasisSourceUrl: string;
+  applicationEvidenceText: string;
+  applicationEvidenceEntityId: string;
+  applicationSourceUrl: string;
+  statusSourceUrl: string;
+  provenance: "OFFICIAL_METADATA";
+  reviewStatus: "reviewed";
+  reviewedAt: string;
 }
 
 interface FamilyPrimaryRow {
@@ -808,6 +829,30 @@ export class SqliteRuntimeRepository {
         ORDER BY a.official_name ASC, ar.relationship_id ASC
       `)
       .all(documentId) as AuthorityRelationshipRow[];
+    const legalNatureRow = this.database
+      .prepare(`
+        SELECT
+          document_id AS documentId,
+          instrument_type AS instrumentType,
+          compliance_expectation AS complianceExpectation,
+          current_status AS currentStatus,
+          under_review AS underReview,
+          application_date AS applicationDate,
+          status_checked_at AS statusCheckedAt,
+          legal_basis_evidence_text AS legalBasisEvidenceText,
+          legal_basis_evidence_entity_id AS legalBasisEvidenceEntityId,
+          legal_basis_source_url AS legalBasisSourceUrl,
+          application_evidence_text AS applicationEvidenceText,
+          application_evidence_entity_id AS applicationEvidenceEntityId,
+          application_source_url AS applicationSourceUrl,
+          status_source_url AS statusSourceUrl,
+          provenance,
+          review_status AS reviewStatus,
+          reviewed_at AS reviewedAt
+        FROM legal_natures
+        WHERE document_id = ?
+      `)
+      .get(documentId) as LegalNatureRow | undefined;
 
     const domainAssignments: DomainAssignment[] = domainRows.map((row) => ({
       id: row.id,
@@ -862,6 +907,9 @@ export class SqliteRuntimeRepository {
         reviewedAt: row.reviewedAt,
       }),
     );
+    const legalNature: LegalNature | null = legalNatureRow
+      ? { ...legalNatureRow, underReview: legalNatureRow.underReview === 1 }
+      : null;
 
     return documentRegulatoryContextSchema.parse({
       documentId,
@@ -872,6 +920,7 @@ export class SqliteRuntimeRepository {
       taxonomyVersion: this.regulatoryDomainTaxonomyVersion,
       domainAssignments,
       authorityRelationships,
+      legalNature,
     });
   }
 

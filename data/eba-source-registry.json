@@ -1,0 +1,43 @@
+[
+  {
+    "localId": "eba-gl-2021-05",
+    "documentId": "eu:eba:gl:2021:05",
+    "familyId": "family:crd",
+    "authority": "EBA",
+    "jurisdiction": "EU",
+    "shortName": "EBA/GL/2021/05",
+    "officialTitle": "Guidelines on internal governance",
+    "aliases": [
+      "EBA Guidelines on internal governance under CRD",
+      "EBA internal governance guidelines"
+    ],
+    "language": "en",
+    "documentType": "guidance",
+    "regulatoryLevel": "level-3",
+    "measureType": "guideline",
+    "publicationDate": "2021-07-02",
+    "checkedAt": "2026-08-26T00:00:00.000Z",
+    "pageUrl": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd",
+    "contentUrl": "https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2021/1016721/Final%20report%20on%20Guidelines%20on%20internal%20governance%20under%20CRD.pdf",
+    "contentMediaType": "application/pdf",
+    "topics": [
+      "CRD",
+      "internal governance",
+      "risk management",
+      "internal control"
+    ],
+    "quality": {
+      "pageCount": 93,
+      "structuralNodeCount": 57,
+      "provisionCount": 235,
+      "blockCount": 470,
+      "maximumWarnings": 2,
+      "textHashes": {
+        "eu:eba:gl:2021:05:paragraph:5": "sha256:9e5735adf6be6b46dcfe8babf6086fa9235af032539298a0160d3a846b894115",
+        "eu:eba:gl:2021:05:paragraph:141": "sha256:c2fc9cbe3627a29fc239577df610e9861509144c34187749c5739d901a5162d4",
+        "eu:eba:gl:2021:05:paragraph:234": "sha256:3a1e96b2fc822bd6f62ca501137aefd7e20d77e91bdd55de52b8fab07bd7786f",
+        "eu:eba:gl:2021:05:annex:i": "sha256:d3681c31154fe3930f2f5cd6f4c6e0a3615a4e8ee402237c3c5cd856c8a4e84b"
+      }
+    }
+  }
+]

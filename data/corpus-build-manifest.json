@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -121,16 +121,26 @@
       "snapshotId": "snapshot:cssf:communication-2025-04-09-ict-risk-updates:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
       "contentSha256": "sha256:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
       "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eba",
+      "identifier": "eba-gl-2021-05",
+      "snapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "contentSha256": "sha256:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "retention": { "status": "local-only" }
     }
   ],
   "requiredReviewedInputs": [
     "data/source-registry.json",
     "data/cssf-source-registry.json",
+    "data/eba-source-registry.json",
     "data/edition-profiles.json",
     "data/benchmarks/related-recitals.json",
     "data/editorial/regulatory-domains.json",
     "data/official-mappings/level2.json",
+    "data/official-mappings/guidelines.json",
     "data/official-metadata/authorities.json",
+    "data/official-metadata/legal-natures.json",
     "data/official-metadata/cellar-case-law.json",
     "data/official-metadata/cellar-focused-relations.json",
     "data/official-metadata/cellar-lifecycle-relations.json"

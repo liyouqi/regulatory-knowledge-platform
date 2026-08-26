@@ -1299,7 +1299,8 @@ function ReaderPage({
         />
         {regulatoryContext &&
         (regulatoryContext.domainAssignments.length > 0 ||
-          regulatoryContext.authorityRelationships.length > 0) ? (
+          regulatoryContext.authorityRelationships.length > 0 ||
+          regulatoryContext.legalNature !== null) ? (
           <>
             <div className="context-divider" />
             <section
@@ -1348,6 +1349,31 @@ function ReaderPage({
                   </ul>
                 </div>
               ) : null}
+              {regulatoryContext.legalNature ? (
+                <div className="regulatory-context-group">
+                  <strong>Legal nature</strong>
+                  <ul>
+                    <li>
+                      <a
+                        href={regulatoryContext.legalNature.statusSourceUrl}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        EBA guideline
+                        <ArrowUpRight aria-hidden="true" size={12} />
+                      </a>
+                      <small>
+                        Make every effort to comply · In force
+                        {regulatoryContext.legalNature.underReview
+                          ? " · Under review"
+                          : ""}
+                        {" · Applies from "}
+                        {regulatoryContext.legalNature.applicationDate}
+                      </small>
+                    </li>
+                  </ul>
+                </div>
+              ) : null}
             </section>
           </>
         ) : null}
@@ -1361,7 +1387,7 @@ function ReaderPage({
             </div>
           ) : legalDocument.localId ? (
             <div>
-              <dt>CSSF ID</dt>
+              <dt>Local ID</dt>
               <dd>{legalDocument.localId}</dd>
             </div>
           ) : null}

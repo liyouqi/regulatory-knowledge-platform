@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "authorities": [
     {
       "id": "authority:eu:european-parliament",
@@ -28,6 +28,15 @@
       "jurisdiction": "LU",
       "sourceUrl": "https://www.cssf.lu/en/about-the-cssf/",
       "checkedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "id": "authority:eu:eba",
+      "officialName": "European Banking Authority",
+      "acronym": "EBA",
+      "authorityType": "supervisory-authority",
+      "jurisdiction": "EU",
+      "sourceUrl": "https://www.eba.europa.eu/about-us",
+      "checkedAt": "2026-08-26T00:00:00.000Z"
     }
   ],
   "relationships": [
@@ -63,6 +72,17 @@
       "sourceRef": "https://www.cssf.lu/en/Document/circular-cssf-12-552/",
       "reviewStatus": "reviewed",
       "reviewedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "sourceDocumentId": "eu:eba:gl:2021:05",
+      "relationType": "ISSUED_BY",
+      "targetAuthorityId": "authority:eu:eba",
+      "provenance": "OFFICIAL_METADATA",
+      "evidenceText": "EBA/GL/2021/05",
+      "evidenceLocator": "official-cover:eba-gl-2021-05",
+      "sourceRef": "https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2021/1016721/Final%20report%20on%20Guidelines%20on%20internal%20governance%20under%20CRD.pdf",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-08-26T00:00:00.000Z"
     }
   ]
 }

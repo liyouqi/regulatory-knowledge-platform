@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import { loadDocumentViews } from "../data/document-repository";
+import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
+import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import { buildRuntimeDatabase } from "../search/sqlite-search-index";
 import { SqliteRuntimeRepository } from "./sqlite-runtime-repository";
@@ -11,7 +13,11 @@ import { SqliteRuntimeRepository } from "./sqlite-runtime-repository";
 const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-runtime-"));
 const databasePath = join(testDirectory, "regulatory.sqlite");
 const documents = loadDocumentViews();
-const sources = loadSourceRegistrySync();
+const sources = [
+  ...loadSourceRegistrySync(),
+  ...loadCssfSourceRegistrySync(),
+  ...loadEbaSourceRegistrySync(),
+];
 const dora = documents.find((document) => document.slug === "dora");
 if (!dora) throw new Error("DORA test document is unavailable");
 let repository: SqliteRuntimeRepository | undefined;
@@ -86,7 +92,7 @@ describe("SQLite runtime repository", () => {
       buildId: repository?.buildId,
       profileId: "full-corpus",
       taxonomyId: "taxonomy:regulatory-domain",
-      taxonomyVersion: "1.0.0",
+      taxonomyVersion: "1.1.0",
     });
     expect(context?.domainAssignments).toHaveLength(2);
     expect(context?.domainAssignments).toEqual(
@@ -112,9 +118,9 @@ describe("SQLite runtime repository", () => {
     });
     expect(repository).toMatchObject({
       domainCount: 3,
-      domainAssignmentCount: 8,
-      authorityCount: 3,
-      authorityRelationshipCount: 3,
+      domainAssignmentCount: 10,
+      authorityCount: 4,
+      authorityRelationshipCount: 4,
     });
     expect(
       repository?.findDocumentRegulatoryContext(
@@ -123,6 +129,32 @@ describe("SQLite runtime repository", () => {
       ),
     ).toBeNull();
     expect(repository?.findDocumentRegulatoryContext("eu:unknown")).toBeNull();
+  });
+
+  it("returns the reviewed EBA legal nature independently from Domain and issuer context", () => {
+    const context = repository?.findDocumentRegulatoryContext(
+      "eu:eba:gl:2021:05",
+      "eu:eba:gl:2021:05:paragraph:5",
+    );
+
+    expect(context?.domainAssignments).toHaveLength(2);
+    expect(context?.authorityRelationships).toContainEqual(
+      expect.objectContaining({
+        relationType: "ISSUED_BY",
+        target: expect.objectContaining({
+          id: "authority:eu:eba",
+          acronym: "EBA",
+        }),
+      }),
+    );
+    expect(context?.legalNature).toMatchObject({
+      instrumentType: "guideline",
+      complianceExpectation: "make-every-effort-to-comply",
+      currentStatus: "in-force",
+      underReview: true,
+      applicationDate: "2021-12-31",
+      provenance: "OFFICIAL_METADATA",
+    });
   });
 
   it("returns a bounded, normalized version chain only for reviewed status", () => {

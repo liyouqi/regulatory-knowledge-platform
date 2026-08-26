@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "taxonomy": {
     "id": "taxonomy:regulatory-domain",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "provenance": "EDITORIAL",
     "reviewStatus": "reviewed",
     "reviewedAt": "2026-08-26T12:00:00Z"
@@ -123,6 +123,30 @@
       "rationale": "Point 11 addresses supervisory-body responsibility for governance and internal-control arrangements.",
       "reviewNote": "Editorial classification of the provision; the official PDF text remains authoritative.",
       "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-11"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05",
+      "targetKind": "document",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T00:00:00.000Z",
+      "rationale": "EBA/GL/2021/05 is the official EBA guideline source on internal governance under CRD.",
+      "reviewNote": "Domain assignment is editorial; legal nature and issuer metadata are recorded separately.",
+      "evidenceLocator": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:5",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T00:00:00.000Z",
+      "rationale": "Paragraph 5 defines the guideline subject matter as internal governance arrangements, processes, and mechanisms under CRD Article 74(1).",
+      "reviewNote": "Editorial classification of the provision; the official PDF text remains authoritative.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:5"
     }
   ]
 }

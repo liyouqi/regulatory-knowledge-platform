@@ -330,7 +330,7 @@ Profile Compilation 是 Canonical 与 Runtime 之间的确定性选择步骤，�
 - 无 Profile 参数时使用显式的默认 Profile，不允许代码各处形成隐式默认值；
 - Profile 表达产品 corpus 范围，不替代 provision-level applicability 判断。
 
-当前实现使用 `data/edition-profiles.json` schema `1.0.0`，默认 `full-corpus`，并提供 `banking-default` allowlist。`src/runtime/edition-profile.ts` 负责 schema validation、profile/config hash、known family/document fail-closed validation 与 document/source compilation；Runtime builder 仍是唯一的 Definitions、Relationships、Search、Regulatory Context 与 SQLite 发布边界。SQLite `4.7.0` manifest 保存 Profile ID/version/display name/hash，Search 与 Repository 启动时读取同一 identity，`runtime:verify` 要求两者匹配。Profile 不允许的已注册 CELEX endpoint 在 lifecycle、Domain assignment 与 Authority relation input gate 被删除，不能降级为 external Work 或 metadata record 绕过 corpus policy。
+当前实现使用 `data/edition-profiles.json` schema `1.0.0`，默认 `full-corpus`，并提供 `banking-default` allowlist。`src/runtime/edition-profile.ts` 负责 schema validation、profile/config hash、known family/document fail-closed validation 与 document/source compilation；Runtime builder 仍是唯一的 Definitions、Relationships、Search、Regulatory Context 与 SQLite 发布边界。SQLite `4.8.0` manifest 保存 Profile ID/version/display name/hash，Search 与 Repository 启动时读取同一 identity，`runtime:verify` 要求两者匹配。Profile 不允许的已注册 endpoint 在 lifecycle、Domain assignment、Authority relation 与 legal-nature input gate 被删除，不能降级为 external Work 或 metadata record 绕过 corpus policy。
 
 ### Runtime Artifact
 
@@ -459,9 +459,11 @@ Release 0.5 增加一个有意受限的 `sourceStatus` contract：`basis`（orig
 
 SQLite `4.3.0` 在不修改 Canonical `1.0.0` 的前提下，增加 `document_version_chains`、`document_versions`、`document_version_edges` 三张规范化只读表，并由 `document-version-chain@1.0.0` 在 build time 从已核验 `sourceStatus` 投影。当前只允许发布 loaded original/consolidated snapshot、外部 current-version link 和官方 corrigendum 节点，以及 `CURRENT_VERSION_LINK` / `HAS_CORRIGENDUM` 两种 `OFFICIAL_METADATA` 边。外部节点不代表其正文已载入 Reader；没有核验输入时不生成 chain，且当前不生成 `AMENDED_BY`。builder version 进入 runtime identity，节点/边数量进入 manifest，并通过独立 API 与 Reader version history 读取。它是第 22.2 节的首个有界切片，不是完整 amendment/version graph；后续修订法案、consolidated lineage、Article-level provenance 和 snapshot comparison 仍需独立核验输入。
 
-当前 SQLite `4.7.0` 在该 version-chain contract 之外保留独立 `legal_works` / `lifecycle_relationships` 与 `case_entities` / `case_law_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。Case 使用独立 `case:eu:<CELEX>` namespace，并只以 foreign key 指向 loaded target Document。`AMENDS` / `CORRECTS` / `INTERPRETS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document 或 Judgment。reviewed dataset、builder version、65 条 lifecycle 边、63 个 external Work、72 个 Case 与 72 条 Act-level case edge 均进入 runtime identity/manifest。
+当前 SQLite `4.8.0` 在该 version-chain contract 之外保留独立 `legal_works` / `lifecycle_relationships` 与 `case_entities` / `case_law_relationships` 表。CELEX-derived Work ID 与 loaded EU Document ID 收敛；loaded Work 通过 nullable foreign key 回到 `documents`，external Work 只保留 CELEX、CELLAR URI、显示标签和官方 URL。Case 使用独立 `case:eu:<CELEX>` namespace，并只以 foreign key 指向 loaded target Document。`AMENDS` / `CORRECTS` / `INTERPRETS` 不进入要求两端均为 loaded `legal_entities` 的主 `relationships` 表，因此不会把 metadata-only endpoint 伪装成正文已载入的 Document 或 Judgment。reviewed dataset、builder version、65 条 lifecycle 边、63 个 external Work、72 个 Case 与 72 条 Act-level case edge 均进入 runtime identity/manifest。
 
-SQLite `4.7.0` 同时加入 `regulatory_domains` / `domain_assignments` 与 `authorities` / `authority_relationships` 两组规范化表。Domain taxonomy/assignment 只接受版本控制且已审核的 `EDITORIAL` 输入，保留 taxonomy/assignment version、review status/date、rationale、review note 和 evidence locator；Authority 与 `Document → ISSUED_BY → Authority` 只接受独立的 `OFFICIAL_METADATA` 输入。两组数据均以 loaded Document/`legal_entities` foreign key 约束 endpoint，并在 Edition compilation 后构建，避免 Profile 之外的数据回流。它们不修改 Canonical `Document`，也不放松主 `relationships` 表的 loaded legal-text endpoint 语义。Repository 通过 `/api/documents/:documentId/regulatory-context?provisionId=<stable-id>` 投影单一 DTO，Reader 与后续 Agent/RAG adapter 不读取 curated JSON 或 SQLite 表细节。
+SQLite `4.8.0` 包含 `regulatory_domains` / `domain_assignments`、`authorities` / `authority_relationships` 与 `legal_natures` 三组规范化 context 表。Domain taxonomy/assignment 只接受版本控制且已审核的 `EDITORIAL` 输入；Authority、`Document → ISSUED_BY → Authority` 和 guideline legal nature/status 只接受独立 `OFFICIAL_METADATA` 输入。EBA guideline 的 instrument type、make-every-effort-to-comply expectation、in-force/under-review 状态、application date 及各自 evidence endpoint/source 分字段存储，不把 editorial classification、issuer、status 或正文关系混为一个标签。所有 endpoint 在 Edition compilation 后由 loaded Document/`legal_entities` foreign key 约束，避免 Profile 外数据回流。Repository 继续通过 `/api/documents/:documentId/regulatory-context?provisionId=<stable-id>` 投影单一 DTO；Reader 与后续 Agent/RAG adapter 不读取 curated JSON 或 SQLite 表细节。
+
+EBA acquisition 使用独立 registry、same-authority HTTPS redirect guard、immutable page/PDF snapshot 和 `eu:eba:gl:<year>:<sequence>` stable Document ID。EBA 与 CSSF parser 只共用 authority-neutral tagged-PDF event extraction；legal-body page boundaries、连续编号、Annex、warning ceiling 和 official-text hashes 属于 EBA parser profile。EBA/GL/2021/05 的 reviewed builder 将 CRD Article 74(3) → EBA Document 发布为 `MANDATES`，将 EBA paragraph 5 → CRD Article 74 发布为 `SUPPLEMENTS`；两条边均保留 `OFFICIAL_MAPPING` provenance、exact excerpt、source URL、builder/version，且不从普通 citation 自动升级。
 
 ## 7.2 LegalViz reuse strategy
 
@@ -1251,9 +1253,9 @@ raw source → canonical master corpus → profile compilation → relationships
 
 当前实现以 `REGULATORY_RUNTIME_DATABASE_PATH` 指向运行时只读 SQLite artifact；未设置时仍使用 repository 内的开发默认路径。`npm run runtime:verify -- --input <sqlite-path>` 必须在 promote 前通过，验证 SQLite integrity、FTS5、schema/build manifest 与 Reader/Search read model 一致性。具体 staging、promote、health check 与 rollback 步骤见 `docs/runtime-operation-runbook.md`。
 
-当前 `data/corpus-build-manifest.json` schema `1.0.0` 将两个 source registry 的 17 个条目逐一绑定到 exact snapshot ID、content SHA-256 与 retention status。`npm run corpus:build -- --profile <profileId>` 要求 manifest 与 registries 完全集合一致，验证本地 snapshot、quality baseline 和 required reviewed inputs 后，通过独立子进程调用既有 EUR-Lex/CSSF Canonical builders，再从 staging Canonical root 调用同一 Profile/Relationship/Search Runtime builder，并以只读 Runtime service 验证 staging SQLite。Staging Canonical 集合必须与 manifest 完全一致且全部为 official，fixture fallback 不得通过发布门禁。输出目录由 manifest、Profile、reviewed-input hashes 和 parser versions 的 build-request hash 确定，保存 ignored Canonical artifacts、Runtime SQLite 与 machine-readable report；promotion 仍是独立操作。编排层不复制 parser、relationship 或 search 业务逻辑。
+当前 `data/corpus-build-manifest.json` schema `1.0.0` 将 EUR-Lex、CSSF、EBA 三个 source registry 的 18 个条目逐一绑定到 exact snapshot ID、content SHA-256 与 retention status。`npm run corpus:build -- --profile <profileId>` 要求 manifest 与 registries 完全集合一致，验证本地 snapshot、quality baseline 和 required reviewed inputs 后，通过独立子进程调用既有 EUR-Lex/CSSF/EBA Canonical builders，再从 staging Canonical root 调用同一 Profile/Relationship/Search Runtime builder，并以只读 Runtime service 验证 staging SQLite。Staging Canonical 集合必须与 manifest 完全一致且全部为 official，fixture fallback 不得通过发布门禁。输出目录由 manifest、Profile、reviewed-input hashes 和 parser versions 的 build-request hash 确定，保存 ignored Canonical artifacts、Runtime SQLite 与 machine-readable report；promotion 仍是独立操作。编排层不复制 parser、relationship 或 search 业务逻辑。
 
-Snapshot retention 与 build orchestration 分开：当前 17 个条目均为 `local-only`，普通本地重建如实记录该状态；`--require-archived` 要求每项具有 reviewed `gs://`、`s3://` 或 HTTPS archive URI，否则 fail closed。上传、凭据、bucket versioning/retention policy 不进入应用代码；选定外部 object storage 后再把精确 locator 写回 manifest。
+Snapshot retention 与 build orchestration 分开：当前 18 个条目均为 `local-only`，普通本地重建如实记录该状态；`--require-archived` 要求每项具有 reviewed `gs://`、`s3://` 或 HTTPS archive URI，否则 fail closed。上传、凭据、bucket versioning/retention policy 不进入应用代码；选定外部 object storage 后再把精确 locator 写回 manifest。
 
 Phase 3 首个 CRD source 暴露了 legacy Cellar multi-item manifestation：同一 English FMX4 manifestation 将 `DOC` metadata、`ACT` 与两个 `ANNEX` 分成独立 item，且 item 顺序不保证主文优先。Acquisition 通过 `.doc.xml` metadata 与同 basename legal XML 识别主文，下载 manifestation 的 byte-exact XML items，并仅在 raw snapshot boundary 组装 deterministic ZIP；snapshot schema `1.1.0` 逐项保留 official URL、media type、ETag/Last-Modified、byte count 与 SHA-256，verification 同时核验 package 和每个上游 item。Canonical parser 仍只接收通用 Formex package，不增加 CRD 专用解析分支；CRD 的 165 Articles、107 Recitals、Annexes I–II 和零 warning 由既有 quality gate 发布。
 
@@ -1273,7 +1275,7 @@ Phase 1 不要求生产服务器自己下载 bulk dump。
 | server | `PORT`, `HOST` |
 | database | `REGULATORY_RUNTIME_DATABASE_PATH` |
 | environment | `NODE_ENV` |
-| source | EUR-Lex/CSSF endpoint base URL |
+| source | EUR-Lex/CSSF/EBA endpoint base URL |
 | build | TF-IDF top-N、fixtures、strict mode |
 | edition | `REGULATORY_EDITION_PROFILE`（build/dev only）、profile config path |
 
@@ -1505,7 +1507,7 @@ CI 不下载完整 bulk dump；CI 使用 fixtures。
 - runtime verify 同时核验 `profileId` 和 corpus counts；
 - 不因为普通 UI PR 每次重复跑完整数据。
 
-当前 `npm run corpus:build -- --profile <profileId>` 已作为已有 snapshot verification、Canonical、relationship、search 和 Runtime builders 的薄 orchestrator 落地。加入 CRD 后，对 `full-corpus` 与 `banking-default` 的完整重建分别复现 17/15 文档 Runtime build ID。新增 source 仍须先按 `docs/corpus-onboarding-runbook.md` 完成 fetch、inspect、quality baseline 与 legal-semantic review，再更新 exact-snapshot manifest；编排命令不替代这些人工门禁。
+当前 `npm run corpus:build -- --profile <profileId>` 已作为已有 snapshot verification、Canonical、relationship、search 和 Runtime builders 的薄 orchestrator 落地。加入 EBA/GL/2021/05 后，对 `full-corpus` 与 `banking-default` 的完整重建分别复现 18/16 文档 Runtime build ID。新增 source 仍须先按 `docs/corpus-onboarding-runbook.md` 完成 fetch、inspect、quality baseline 与 legal-semantic review，再更新 exact-snapshot manifest；编排命令不替代这些人工门禁。
 
 ---
 

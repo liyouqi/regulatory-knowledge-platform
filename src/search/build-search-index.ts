@@ -1,5 +1,6 @@
 import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
+import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   findEditionProfile,
@@ -29,7 +30,11 @@ const profile = findEditionProfile(profileId, loadEditionProfileRegistrySync());
 
 const manifest = buildRuntimeDatabase(
   loadDocumentViews(),
-  [...loadSourceRegistrySync(), ...loadCssfSourceRegistrySync()],
+  [
+    ...loadSourceRegistrySync(),
+    ...loadCssfSourceRegistrySync(),
+    ...loadEbaSourceRegistrySync(),
+  ],
   outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
   profile,
 );

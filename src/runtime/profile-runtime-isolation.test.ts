@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
+import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import { toGlobalRelationshipGraph } from "../relationships/relationship-graph";
 import { SearchService } from "../search/full-text-search";
@@ -27,7 +28,11 @@ beforeAll(() => {
   );
   buildRuntimeDatabase(
     loadDocumentViews(),
-    [...loadSourceRegistrySync(), ...loadCssfSourceRegistrySync()],
+    [
+      ...loadSourceRegistrySync(),
+      ...loadCssfSourceRegistrySync(),
+      ...loadEbaSourceRegistrySync(),
+    ],
     databasePath,
     profile,
   );
@@ -50,7 +55,7 @@ describe("banking-default runtime isolation", () => {
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 15,
+      documentCount: 16,
     });
   });
 

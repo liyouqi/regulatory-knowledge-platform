@@ -22,6 +22,7 @@ The repository currently provides separate commands for:
 
 - EUR-Lex/CELLAR source list, fetch, and verification;
 - CSSF source list, fetch, and verification;
+- EBA source list, fetch, and verification;
 - parser inspection and quality-gated Canonical publication;
 - reviewed CELLAR, lifecycle, case-law, and Level 2 relationship inputs;
 - atomic Runtime SQLite build and read-only verification;
@@ -37,8 +38,9 @@ Before adding a source, classify it:
 
 1. **Existing EUR-Lex Formex structure**: reuse the shared EUR-Lex adapter and parser.
 2. **Existing CSSF HTML/PDF profile**: reuse the matching CSSF adapter and parser profile.
-3. **Known authority, materially different structure**: add a bounded parser profile and fixtures.
-4. **New authority or media type**: add one reusable Source Adapter, snapshot contract, parser fixtures, and quality gate before publishing documents from it.
+3. **Existing EBA Guidelines PDF profile**: reuse the EBA authority adapter and add a bounded, reviewed document-body profile when page boundaries differ.
+4. **Known authority, materially different structure**: add a bounded parser profile and fixtures.
+5. **New authority or media type**: add one reusable Source Adapter, snapshot contract, parser fixtures, and quality gate before publishing documents from it.
 
 A source-specific adapter may preserve source semantics. It must still emit the common Canonical contract. Do not add law-specific parsing or legal data to React components.
 
@@ -105,7 +107,7 @@ npm test
 npm run build
 ```
 
-The command requires the manifest source set to match both source registries exactly, verifies every snapshot and reviewed quality baseline, hashes required reviewed relationship/Profile inputs, rebuilds every Canonical document through its existing builder, and verifies the resulting staging SQLite through the read-only Runtime services. Generated Canonical files, SQLite, and `build-report.json` stay under ignored `data/artifacts/corpus-builds/`; promotion remains separate.
+The command requires the manifest source set to match all three source registries exactly, verifies every snapshot and reviewed quality baseline, hashes required reviewed relationship/Profile inputs, rebuilds every Canonical document through its existing builder, and verifies the resulting staging SQLite through the read-only Runtime services. Generated Canonical files, SQLite, and `build-report.json` stay under ignored `data/artifacts/corpus-builds/`; promotion remains separate.
 
 For local application testing, run `REGULATORY_EDITION_PROFILE=<profileId> npm run dev` so the `predev` build uses the intended Profile. Production serves the already verified SQLite artifact and does not compile or switch Profiles at startup.
 
@@ -136,6 +138,20 @@ For a batch such as four payment laws:
 
 The batch is not “four file imports.” Acquisition and parsing are deterministic; legal nature, applicability, taxonomy, and ambiguous relationship semantics remain explicit review gates.
 
+## Add an EBA guideline using the current commands
+
+Register its official page/PDF, stable `eu:eba:*` Document ID, family, aliases, publication date, and Level 3 measure type in `data/eba-source-registry.json`. Then run:
+
+```bash
+npm run eba:source:list
+npm run eba:source:fetch -- --id <local-id>
+npm run eba:source:verify -- --snapshot data/raw/eba/<local-id>/<snapshot-directory>
+npm run eba:canonical:inspect -- --snapshot data/raw/eba/<local-id>/<snapshot-directory>
+npm run eba:canonical:build -- --snapshot data/raw/eba/<local-id>/<snapshot-directory>
+```
+
+Inspection must identify the exact legal-body page range separately from cover/report/consultation material, preserve numbered provisions and annexes, and publish count/hash gates before the source enters the corpus manifest. Record guideline legal nature and status in reviewed official metadata; record Domain assignments separately as editorial data. A CRD/CRR or other legal-basis relation becomes a published edge only through an evidence-checked reviewed mapping.
+
 ## Corpus orchestration
 
 Use:
@@ -146,7 +162,7 @@ npm run corpus:build -- --profile <profileId>
 
 The orchestrator:
 
-1. read version-controlled source and Profile manifests;
+1. read version-controlled EUR-Lex, CSSF, EBA, and Profile manifests;
 2. locate the exact approved local snapshots pinned by ID and checksum;
 3. verify checksums;
 4. run existing Canonical builders without duplicating parser logic;

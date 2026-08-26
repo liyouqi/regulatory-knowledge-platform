@@ -16,7 +16,9 @@ const versionSchema = z.string().regex(/^\d+\.\d+\.\d+$/u);
 const familyIdSchema = z.string().regex(/^family:[a-z0-9-]+$/u);
 const documentIdSchema = z
   .string()
-  .regex(/^(?:eu:3[0-9]{4}[A-Z][0-9]{4}|lu:cssf:[a-z0-9][a-z0-9-]*)$/u);
+  .regex(
+    /^(?:eu:3[0-9]{4}[A-Z][0-9]{4}|eu:eba:gl:\d{4}:\d{2}|lu:cssf:[a-z0-9][a-z0-9-]*)$/u,
+  );
 
 export const editionProfileSchema = z
   .object({
@@ -100,7 +102,7 @@ export type EditionProfileRegistry = z.infer<
 export type RuntimeSourceDefinition = Pick<
   SourceDefinition,
   "familyId" | "aliases" | "regulatoryLevel" | "measureType"
-> & { celex?: string; localId?: string };
+> & { documentId?: string; celex?: string; localId?: string };
 
 export interface CompiledEditionProfile {
   profile: EditionProfile;
@@ -119,6 +121,7 @@ export const DEFAULT_EDITION_PROFILE: EditionProfile = {
 };
 
 function sourceDocumentId(source: RuntimeSourceDefinition): string | null {
+  if (source.documentId) return source.documentId;
   if (source.celex) return `eu:${source.celex}`;
   if (source.localId) return `lu:cssf:${source.localId}`;
   return null;

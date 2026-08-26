@@ -81,7 +81,7 @@ export const provisionSchema = versionedEntitySchema.extend({
 export const sourceSnapshotSchema = z.object({
   id: z.string().min(1),
   provenance: z.enum(["official", "fixture"]),
-  sourceSystem: z.enum(["cellar", "eur-lex", "cssf", "fixture"]),
+  sourceSystem: z.enum(["cellar", "eur-lex", "cssf", "eba", "fixture"]),
   retrievedAt: z.string().datetime(),
   canonicalUrl: z.string().url(),
   contentUrl: z.string().url(),

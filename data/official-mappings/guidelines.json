@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedAt": "2026-08-26",
+  "records": [
+    {
+      "id": "guideline-mapping:crd:eba-gl-2021-05:article-74",
+      "familyId": "family:crd",
+      "primaryAct": {
+        "documentId": "eu:32013L0036",
+        "articleEntityId": "eu:32013L0036:article:74",
+        "mandateEvidence": {
+          "entityId": "eu:32013L0036:article:74:paragraph:3",
+          "text": "EBA shall issue guidelines on the arrangements, processes and mechanisms referred to in paragraph 1, in accordance with paragraph 2.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng"
+        }
+      },
+      "guideline": {
+        "documentId": "eu:eba:gl:2021:05",
+        "provisionEntityId": "eu:eba:gl:2021:05:paragraph:5",
+        "supplementEvidence": {
+          "entityId": "eu:eba:gl:2021:05:paragraph:5:text",
+          "text": "should implement in accordance with Article 74(1) of Directive 2013/36/EU to ensure their effective and prudent management.",
+          "sourceUrl": "https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2021/1016721/Final%20report%20on%20Guidelines%20on%20internal%20governance%20under%20CRD.pdf"
+        }
+      },
+      "provenance": "OFFICIAL_MAPPING"
+    }
+  ]
+}

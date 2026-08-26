@@ -185,12 +185,18 @@ export function toDocumentView(
     .filter(
       (provision) =>
         ["article", "recital", "annex"].includes(provision.kind) ||
-        (provision.kind === "other" &&
+        (["other", "paragraph"].includes(provision.kind) &&
           (!provision.parentLogicalId ||
             structuralIds.has(provision.parentLogicalId))),
     )
     .sort((left, right) => {
-      const kindOrder = { article: 0, recital: 1, annex: 2, other: 3 } as const;
+      const kindOrder = {
+        article: 0,
+        recital: 1,
+        annex: 2,
+        other: 3,
+        paragraph: 3,
+      } as const;
       const kindDifference =
         kindOrder[left.kind as keyof typeof kindOrder] -
         kindOrder[right.kind as keyof typeof kindOrder];

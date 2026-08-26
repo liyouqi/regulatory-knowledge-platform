@@ -11,11 +11,13 @@ import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import {
   DEFAULT_AUTHORITIES_PATH,
+  DEFAULT_LEGAL_NATURES_PATH,
   DEFAULT_REGULATORY_DOMAINS_PATH,
   REGULATORY_CONTEXT_BUILDER,
   REGULATORY_CONTEXT_BUILDER_VERSION,
   buildRegulatoryContext,
   loadAuthorityDataset,
+  loadLegalNatureDataset,
   loadRegulatoryDomainDataset,
 } from "../regulatory-context/regulatory-context";
 import {
@@ -41,6 +43,12 @@ import {
   EXPLICIT_REFERENCE_BUILDER_VERSION,
   buildExplicitReferences,
 } from "../relationships/explicit-reference";
+import {
+  GUIDELINE_MAPPING_BUILDER,
+  GUIDELINE_MAPPING_BUILDER_VERSION,
+  buildGuidelineMappings,
+  loadGuidelineMappings,
+} from "../relationships/guideline-mapping";
 import {
   OFFICIAL_MAPPING_BUILDER,
   OFFICIAL_MAPPING_BUILDER_VERSION,
@@ -74,7 +82,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.7.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.8.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -258,12 +266,14 @@ function runtimeBuildId(
   profileHash: string,
   documents: DocumentView[],
   officialMappings: ReturnType<typeof loadOfficialMappings>,
+  guidelineMappings: ReturnType<typeof loadGuidelineMappings>,
   cellarRelations: ReturnType<typeof loadCellarOfficialRelations>,
   lifecycleRelations: ReturnType<typeof loadCellarLifecycleRelations>,
   caseLawMetadata: ReturnType<typeof loadCellarCaseLawMetadata>,
   relatedRecitalBenchmark: ReturnType<typeof loadRelatedRecitalBenchmark>,
   regulatoryDomainDataset: ReturnType<typeof loadRegulatoryDomainDataset>,
   authorityDataset: ReturnType<typeof loadAuthorityDataset>,
+  legalNatureDataset: ReturnType<typeof loadLegalNatureDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -278,6 +288,8 @@ function runtimeBuildId(
         `${EXPLICIT_REFERENCE_BUILDER}@${EXPLICIT_REFERENCE_BUILDER_VERSION}`,
         `${OFFICIAL_MAPPING_BUILDER}@${OFFICIAL_MAPPING_BUILDER_VERSION}`,
         JSON.stringify(officialMappings),
+        `${GUIDELINE_MAPPING_BUILDER}@${GUIDELINE_MAPPING_BUILDER_VERSION}`,
+        JSON.stringify(guidelineMappings),
         `${CELLAR_RELATIONSHIP_BUILDER}@${CELLAR_RELATIONSHIP_BUILDER_VERSION}`,
         JSON.stringify(cellarRelations),
         `${CELLAR_LIFECYCLE_BUILDER}@${CELLAR_LIFECYCLE_BUILDER_VERSION}`,
@@ -290,6 +302,7 @@ function runtimeBuildId(
         `${REGULATORY_CONTEXT_BUILDER}@${REGULATORY_CONTEXT_BUILDER_VERSION}`,
         JSON.stringify(regulatoryDomainDataset),
         JSON.stringify(authorityDataset),
+        JSON.stringify(legalNatureDataset),
         input,
       ].join("\n"),
     )
@@ -345,6 +358,7 @@ export function buildRuntimeDatabase(
     DEFAULT_REGULATORY_DOMAINS_PATH,
   );
   const authorityDataset = loadAuthorityDataset(DEFAULT_AUTHORITIES_PATH);
+  const legalNatureDataset = loadLegalNatureDataset(DEFAULT_LEGAL_NATURES_PATH);
   const regulatoryContextBuild = buildRegulatoryContext(
     documents,
     relationshipBuild.entities,
@@ -353,6 +367,7 @@ export function buildRuntimeDatabase(
       : null,
     regulatoryDomainDataset,
     authorityDataset,
+    legalNatureDataset,
   );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -391,6 +406,17 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     officialMappings,
   );
+  const loadedDocumentIds = new Set(documents.map((document) => document.id));
+  const guidelineMappings = loadGuidelineMappings().filter(
+    (mapping) =>
+      loadedDocumentIds.has(mapping.primaryAct.documentId) &&
+      loadedDocumentIds.has(mapping.guideline.documentId),
+  );
+  const guidelineRelationships = buildGuidelineMappings(
+    documents,
+    relationshipBuild.entities,
+    guidelineMappings,
+  );
   const cellarRelations = loadCellarOfficialRelations().filter(
     (record) =>
       registeredCelex.has(record.sourceCelex) &&
@@ -414,7 +440,6 @@ export function buildRuntimeDatabase(
   );
   const caseLawBuild = buildCellarCaseLaw(documents, caseLawMetadata);
   const relatedRecitalBenchmark = loadRelatedRecitalBenchmark();
-  const loadedDocumentIds = new Set(documents.map((document) => document.id));
   const benchmarkDocumentIds = new Set(
     relatedRecitalBenchmark.cases.map((item) => item.documentId),
   );
@@ -427,6 +452,7 @@ export function buildRuntimeDatabase(
   const relationships = [
     ...relationshipBuild.relationships,
     ...officialRelationships,
+    ...guidelineRelationships,
     ...cellarRelationships,
     ...(relatedRecitalBuild?.relationships ?? []),
   ];
@@ -435,12 +461,14 @@ export function buildRuntimeDatabase(
     profileHash,
     documents,
     officialMappings,
+    guidelineMappings,
     cellarRelations,
     lifecycleRelations,
     caseLawMetadata,
     relatedRecitalBenchmark,
     regulatoryDomainDataset,
     authorityDataset,
+    legalNatureDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -670,6 +698,27 @@ export function buildRuntimeDatabase(
       ) STRICT;
       CREATE INDEX authority_relationships_source_document_id
         ON authority_relationships(source_document_id);
+      CREATE TABLE legal_natures (
+        document_id TEXT PRIMARY KEY REFERENCES documents(id),
+        instrument_type TEXT NOT NULL CHECK (instrument_type = 'guideline'),
+        compliance_expectation TEXT NOT NULL CHECK (
+          compliance_expectation = 'make-every-effort-to-comply'
+        ),
+        current_status TEXT NOT NULL CHECK (current_status = 'in-force'),
+        under_review INTEGER NOT NULL CHECK (under_review IN (0, 1)),
+        application_date TEXT NOT NULL,
+        status_checked_at TEXT NOT NULL,
+        legal_basis_evidence_text TEXT NOT NULL,
+        legal_basis_evidence_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        legal_basis_source_url TEXT NOT NULL,
+        application_evidence_text TEXT NOT NULL,
+        application_evidence_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        application_source_url TEXT NOT NULL,
+        status_source_url TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_METADATA'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL
+      ) STRICT;
       CREATE TABLE relationships (
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -866,6 +915,23 @@ export function buildRuntimeDatabase(
         @sourceRef, @builderMethod, @builderVersion, @reviewStatus, @reviewedAt
       )
     `);
+    const insertLegalNature = database.prepare(`
+      INSERT INTO legal_natures (
+        document_id, instrument_type, compliance_expectation, current_status,
+        under_review, application_date, status_checked_at,
+        legal_basis_evidence_text, legal_basis_evidence_entity_id,
+        legal_basis_source_url, application_evidence_text,
+        application_evidence_entity_id, application_source_url,
+        status_source_url, provenance, review_status, reviewed_at
+      ) VALUES (
+        @documentId, @instrumentType, @complianceExpectation, @currentStatus,
+        @underReview, @applicationDate, @statusCheckedAt,
+        @legalBasisEvidenceText, @legalBasisEvidenceEntityId,
+        @legalBasisSourceUrl, @applicationEvidenceText,
+        @applicationEvidenceEntityId, @applicationSourceUrl,
+        @statusSourceUrl, @provenance, @reviewStatus, @reviewedAt
+      )
+    `);
     const insertLegalWork = database.prepare(`
       INSERT INTO legal_works (
         id, celex, cellar_work_uri, loaded_document_id, label, title,
@@ -1004,6 +1070,12 @@ export function buildRuntimeDatabase(
       }
       for (const relationship of regulatoryContextBuild.authorityRelationships) {
         insertAuthorityRelationship.run(relationship);
+      }
+      for (const legalNature of regulatoryContextBuild.legalNatures) {
+        insertLegalNature.run({
+          ...legalNature,
+          underReview: legalNature.underReview ? 1 : 0,
+        });
       }
       for (const work of lifecycleBuild.works) {
         insertLegalWork.run(work);

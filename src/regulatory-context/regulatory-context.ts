@@ -3,8 +3,12 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 import type { LegalEntityRecord } from "../relationships/explicit-reference";
-import type { DocumentView } from "../shared/legal";
-import type { Authority, RegulatoryDomain } from "../shared/regulatory-context";
+import type { BodyBlock, DocumentView } from "../shared/legal";
+import type {
+  Authority,
+  LegalNature,
+  RegulatoryDomain,
+} from "../shared/regulatory-context";
 
 export const REGULATORY_CONTEXT_BUILDER = "regulatory-context";
 export const REGULATORY_CONTEXT_BUILDER_VERSION = "1.0.0";
@@ -15,6 +19,10 @@ export const DEFAULT_REGULATORY_DOMAINS_PATH = resolve(
 export const DEFAULT_AUTHORITIES_PATH = resolve(
   process.cwd(),
   "data/official-metadata/authorities.json",
+);
+export const DEFAULT_LEGAL_NATURES_PATH = resolve(
+  process.cwd(),
+  "data/official-metadata/legal-natures.json",
 );
 
 const reviewedAtSchema = z.string().datetime();
@@ -95,10 +103,44 @@ export const authorityDatasetSchema = z
   })
   .strict();
 
+const legalNatureEvidenceSchema = z
+  .object({
+    entityId: z.string().min(1),
+    text: z.string().min(1),
+    sourceUrl: z.string().url(),
+  })
+  .strict();
+
+export const legalNatureDatasetSchema = z
+  .object({
+    schemaVersion: z.literal("1.0.0"),
+    version: z.string().min(1),
+    records: z.array(
+      z
+        .object({
+          documentId: z.string().min(1),
+          instrumentType: z.literal("guideline"),
+          complianceExpectation: z.literal("make-every-effort-to-comply"),
+          currentStatus: z.literal("in-force"),
+          underReview: z.boolean(),
+          applicationDate: z.string().date(),
+          statusCheckedAt: reviewedAtSchema,
+          legalBasisEvidence: legalNatureEvidenceSchema,
+          applicationEvidence: legalNatureEvidenceSchema,
+          statusSourceUrl: z.string().url(),
+          reviewStatus: z.literal("reviewed"),
+          reviewedAt: reviewedAtSchema,
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
 export type RegulatoryDomainDataset = z.infer<
   typeof regulatoryDomainDatasetSchema
 >;
 export type AuthorityDataset = z.infer<typeof authorityDatasetSchema>;
+export type LegalNatureDataset = z.infer<typeof legalNatureDatasetSchema>;
 
 export interface DomainAssignmentRecord {
   id: string;
@@ -138,6 +180,7 @@ export interface RegulatoryContextBuild {
   assignments: DomainAssignmentRecord[];
   authorities: Authority[];
   authorityRelationships: AuthorityRelationshipRecord[];
+  legalNatures: LegalNature[];
 }
 
 function stableId(prefix: string, parts: string[]): string {
@@ -152,6 +195,15 @@ function assertUnique(values: string[], label: string): void {
   if (new Set(values).size !== values.length) {
     throw new Error(`${label} IDs must be unique`);
   }
+}
+
+function findBlockText(blocks: BodyBlock[], entityId: string): string | null {
+  for (const block of blocks) {
+    if (block.id === entityId) return block.text;
+    const nested = findBlockText(block.children, entityId);
+    if (nested !== null) return nested;
+  }
+  return null;
 }
 
 function validateDomainHierarchy(dataset: RegulatoryDomainDataset): void {
@@ -211,12 +263,26 @@ export function loadAuthorityDataset(
   return dataset;
 }
 
+export function loadLegalNatureDataset(
+  inputPath = DEFAULT_LEGAL_NATURES_PATH,
+): LegalNatureDataset {
+  const dataset = legalNatureDatasetSchema.parse(
+    JSON.parse(readFileSync(inputPath, "utf8")),
+  );
+  assertUnique(
+    dataset.records.map((record) => record.documentId),
+    "Legal nature Document",
+  );
+  return dataset;
+}
+
 export function buildRegulatoryContext(
   documents: DocumentView[],
   entities: LegalEntityRecord[],
   knownDocumentIds: Set<string> | null,
   domainDataset = loadRegulatoryDomainDataset(),
   authorityDataset = loadAuthorityDataset(),
+  legalNatureDataset = loadLegalNatureDataset(),
 ): RegulatoryContextBuild {
   validateDomainHierarchy(domainDataset);
   const selectedDocumentIds = new Set(documents.map((document) => document.id));
@@ -307,6 +373,61 @@ export function buildRegulatoryContext(
       (relationship) => relationship.targetAuthorityId,
     ),
   );
+  const legalNatures = legalNatureDataset.records.flatMap((record) => {
+    if (knownDocumentIds && !knownDocumentIds.has(record.documentId)) {
+      throw new Error(
+        `Legal nature targets unknown Document ${record.documentId}`,
+      );
+    }
+    if (!selectedDocumentIds.has(record.documentId)) return [];
+    for (const evidence of [
+      record.legalBasisEvidence,
+      record.applicationEvidence,
+    ]) {
+      const entity = entitiesById.get(evidence.entityId);
+      if (!entity || entity.documentId !== record.documentId) {
+        throw new Error(
+          `Legal nature has invalid evidence endpoint ${evidence.entityId}`,
+        );
+      }
+      const document = documents.find(
+        (candidate) => candidate.id === record.documentId,
+      );
+      const rootProvisionId = entity.rootProvisionId ?? entity.id;
+      const provision = document?.provisions.find(
+        (candidate) => candidate.id === rootProvisionId,
+      );
+      const text = provision
+        ? findBlockText(provision.blocks, evidence.entityId)
+        : null;
+      if (!text?.includes(evidence.text)) {
+        throw new Error(
+          `Legal nature evidence text mismatch for ${evidence.entityId}`,
+        );
+      }
+    }
+    return [
+      {
+        documentId: record.documentId,
+        instrumentType: record.instrumentType,
+        complianceExpectation: record.complianceExpectation,
+        currentStatus: record.currentStatus,
+        underReview: record.underReview,
+        applicationDate: record.applicationDate,
+        statusCheckedAt: record.statusCheckedAt,
+        legalBasisEvidenceText: record.legalBasisEvidence.text,
+        legalBasisEvidenceEntityId: record.legalBasisEvidence.entityId,
+        legalBasisSourceUrl: record.legalBasisEvidence.sourceUrl,
+        applicationEvidenceText: record.applicationEvidence.text,
+        applicationEvidenceEntityId: record.applicationEvidence.entityId,
+        applicationSourceUrl: record.applicationEvidence.sourceUrl,
+        statusSourceUrl: record.statusSourceUrl,
+        provenance: "OFFICIAL_METADATA" as const,
+        reviewStatus: record.reviewStatus,
+        reviewedAt: record.reviewedAt,
+      },
+    ];
+  });
 
   return {
     taxonomyId: domainDataset.taxonomy.id,
@@ -328,5 +449,6 @@ export function buildRegulatoryContext(
     authorityRelationships: authorityRelationships.sort((left, right) =>
       left.id.localeCompare(right.id),
     ),
+    legalNatures,
   };
 }

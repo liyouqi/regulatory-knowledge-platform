@@ -6,6 +6,7 @@ import { validateCanonicalDocument } from "../canonical/validate";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
 import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
+import { EBA_GUIDELINES_PDF_PARSER_VERSION } from "../ingestion/eba-guidelines-pdf-parser";
 import { type DocumentView, documentViewSchema } from "../shared/legal";
 import { doraCanonicalFixture } from "./dora-fixture";
 
@@ -23,7 +24,10 @@ function officialCandidates(artifactRoot: string, identifier: string) {
           entry.name.endsWith(
             `-parser-cssf-html-${CSSF_HTML_PARSER_VERSION}`,
           ) ||
-          entry.name.endsWith(`-parser-cssf-pdf-${CSSF_PDF_PARSER_VERSION}`)),
+          entry.name.endsWith(`-parser-cssf-pdf-${CSSF_PDF_PARSER_VERSION}`) ||
+          entry.name.endsWith(
+            `-parser-eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`,
+          )),
     )
     .map((entry) => resolve(directory, entry.name, "document.json"))
     .filter(existsSync)
@@ -60,11 +64,14 @@ function documentBuildId(
         .digest("hex")
         .slice(0, 12)}`
     : "";
-  const parserToken = document.source.sourceVersion.startsWith("cssf-pdf-")
-    ? `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`
-    : document.source.sourceSystem === "cssf"
-      ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
-      : FORMEX_PARSER_VERSION;
+  const parserToken =
+    document.source.sourceSystem === "eba"
+      ? `eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`
+      : document.source.sourceVersion.startsWith("cssf-pdf-")
+        ? `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`
+        : document.source.sourceSystem === "cssf"
+          ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
+          : FORMEX_PARSER_VERSION;
   return `canonical-${document.schemaVersion}-parser-${parserToken}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;
 }
 

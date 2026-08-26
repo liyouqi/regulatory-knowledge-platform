@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "records": [
+    {
+      "documentId": "eu:eba:gl:2021:05",
+      "instrumentType": "guideline",
+      "complianceExpectation": "make-every-effort-to-comply",
+      "currentStatus": "in-force",
+      "underReview": true,
+      "applicationDate": "2021-12-31",
+      "statusCheckedAt": "2026-08-26T00:00:00.000Z",
+      "legalBasisEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:1:text",
+        "text": "These guidelines are issued pursuant to Article 16 of Regulation (EU) No 1093/2010",
+        "sourceUrl": "https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2021/1016721/Final%20report%20on%20Guidelines%20on%20internal%20governance%20under%20CRD.pdf"
+      },
+      "applicationEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:14:text",
+        "text": "These updated guidelines apply from 31 December 2021.",
+        "sourceUrl": "https://www.eba.europa.eu/sites/default/files/document_library/Publications/Guidelines/2021/1016721/Final%20report%20on%20Guidelines%20on%20internal%20governance%20under%20CRD.pdf"
+      },
+      "statusSourceUrl": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-08-26T00:00:00.000Z"
+    }
+  ]
+}

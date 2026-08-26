@@ -64,6 +64,28 @@ export const authorityRelationshipSchema = z
   })
   .strict();
 
+export const legalNatureSchema = z
+  .object({
+    documentId: z.string().min(1),
+    instrumentType: z.literal("guideline"),
+    complianceExpectation: z.literal("make-every-effort-to-comply"),
+    currentStatus: z.literal("in-force"),
+    underReview: z.boolean(),
+    applicationDate: z.string().date(),
+    statusCheckedAt: z.string().datetime(),
+    legalBasisEvidenceText: z.string().min(1),
+    legalBasisEvidenceEntityId: z.string().min(1),
+    legalBasisSourceUrl: z.string().url(),
+    applicationEvidenceText: z.string().min(1),
+    applicationEvidenceEntityId: z.string().min(1),
+    applicationSourceUrl: z.string().url(),
+    statusSourceUrl: z.string().url(),
+    provenance: z.literal("OFFICIAL_METADATA"),
+    reviewStatus: z.literal("reviewed"),
+    reviewedAt: z.string().datetime(),
+  })
+  .strict();
+
 export const documentRegulatoryContextSchema = z
   .object({
     documentId: z.string().min(1),
@@ -74,6 +96,7 @@ export const documentRegulatoryContextSchema = z
     taxonomyVersion: z.string().min(1),
     domainAssignments: z.array(domainAssignmentSchema),
     authorityRelationships: z.array(authorityRelationshipSchema),
+    legalNature: legalNatureSchema.nullable(),
   })
   .strict();
 
@@ -81,6 +104,7 @@ export type RegulatoryDomain = z.infer<typeof regulatoryDomainSchema>;
 export type DomainAssignment = z.infer<typeof domainAssignmentSchema>;
 export type Authority = z.infer<typeof authoritySchema>;
 export type AuthorityRelationship = z.infer<typeof authorityRelationshipSchema>;
+export type LegalNature = z.infer<typeof legalNatureSchema>;
 export type DocumentRegulatoryContext = z.infer<
   typeof documentRegulatoryContextSchema
 >;

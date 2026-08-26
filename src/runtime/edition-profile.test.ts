@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
+import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   compileEditionProfile,
@@ -10,7 +11,11 @@ import {
 } from "./edition-profile";
 
 const documents = loadDocumentViews();
-const sources = [...loadSourceRegistrySync(), ...loadCssfSourceRegistrySync()];
+const sources = [
+  ...loadSourceRegistrySync(),
+  ...loadCssfSourceRegistrySync(),
+  ...loadEbaSourceRegistrySync(),
+];
 const registry = loadEditionProfileRegistrySync();
 
 describe("Edition/Profile compilation", () => {
@@ -46,6 +51,9 @@ describe("Edition/Profile compilation", () => {
     );
     expect(banking.documents.map((document) => document.id)).toContain(
       "eu:32013L0036",
+    );
+    expect(banking.documents.map((document) => document.id)).toContain(
+      "eu:eba:gl:2021:05",
     );
     expect(banking.documents.map((document) => document.id)).not.toContain(
       "eu:32023R1114",

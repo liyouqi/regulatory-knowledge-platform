@@ -12,7 +12,16 @@ describe("corpus build manifest", () => {
     const sources = await resolveCorpusBuildSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
-    expect(sources).toHaveLength(17);
+    expect(sources).toHaveLength(18);
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eba",
+          identifier: "eba-gl-2021-05",
+        }),
+        parserVersion: "eba-pdf-1.1.0",
+      }),
+    );
     expect(sources).toContainEqual(
       expect.objectContaining({
         manifest: expect.objectContaining({

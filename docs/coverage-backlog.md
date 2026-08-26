@@ -20,7 +20,7 @@ The visible Web product and the Agent/RAG data product consume the same reviewed
 | CJEU | metadata-only Act-level interpretation graph | judgment text and Article/paragraph citations | validated |
 | Level 2 | representative DORA/MiCA RTS/ITS and reporting pair | additional RTS/ITS/Guidelines/Q&A | validated |
 | Edition/Profile | one `banking-default` build-time compilation with route/search/graph isolation | funds, insurance, payments, digital-assets and institution-specific profiles | validated |
-| Structured relation query | one deterministic evidence-bearing query over existing relations | advanced relation-aware search combinations | planned |
+| Structured relation query | one deterministic evidence-bearing query over existing relations | advanced relation-aware search combinations | validated |
 | Deployment closure | immutable Cloud Run release, health/build record, rollback procedure | CI/CD automation and broader operational hardening | in-progress |
 
 Phase 2 does not wait for every future regulation, case, amendment, or Level 3 document. It completes when the planned 0→1 rows are validated and documented.
@@ -41,13 +41,13 @@ Representative scope:
 
 This pilot validates the workflow and data contracts. It does not attempt simultaneous full coverage of CRR/CRD, AML, payments, credit, markets, funds, insurance, prudential reporting, ESG, or national implementations.
 
-Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. A versioned `Banking governance and internal control` Domain now has reviewed `EDITORIAL` assignments on CRD Articles 74, 76, and 88 plus representative Circular CSSF 12/552 provisions. European Parliament, Council, and CSSF are normalized Authorities with reviewed `ISSUED_BY` official metadata, exposed with the assignments through one internal regulatory-context service output. EBA/GL/2021/05 and a reviewed EU → Luxembourg legal relation remain the next bounded slices.
+Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. EBA/GL/2021/05 is now independently acquired and fidelity-gated as 234 numbered guideline paragraphs plus Annex I; report front matter and accompanying material are explicitly excluded from the legal body. Reviewed official mappings publish `CRD Article 74 → MANDATES → EBA/GL/2021/05` and `EBA paragraph 5 → SUPPLEMENTS → CRD Article 74`. The regulatory-context service separately returns versioned editorial Domain assignments, EBA issuer metadata, and a reviewed guideline legal-nature/status record. The first reviewed EU → Luxembourg formal legal relation remains the next bounded slice.
 
 ## Financial-domain 1→100 queues
 
 | Domain | Representative next slice | Scale-out after validation | Status |
 |---|---|---|---|
-| Banking governance | CRD/EBA/CSSF pilot | governance, remuneration, fit-and-proper, internal control | in-progress |
+| Banking governance | first EU → Luxembourg formal legal relation | governance, remuneration, fit-and-proper, internal control | in-progress |
 | Prudential | one bounded CRR topic | capital, liquidity, leverage, reporting | deferred |
 | Payments | four reviewed core laws/materials using the corpus orchestrator | PSD/PSR, payment security, EBA guidance, national material | deferred |
 | AML/KYC | one EU package + one authority/national chain | AML package, EBA guidance, FIU/national implementation | deferred |
