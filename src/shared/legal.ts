@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sourceLocatorSchema } from "./source-locator";
 import { sourceStatusSchema } from "./source-status";
 
 export const collectionIdSchema = z.enum([
@@ -31,6 +32,7 @@ export const bodyBlockSchema: z.ZodType<BodyBlock> = z.lazy(() =>
     marker: z.string().optional(),
     text: z.string(),
     anchor: z.string().min(1),
+    sourceLocator: sourceLocatorSchema,
     children: z.array(bodyBlockSchema),
   }),
 );
@@ -49,6 +51,7 @@ export interface BodyBlock {
   marker?: string;
   text: string;
   anchor: string;
+  sourceLocator: z.infer<typeof sourceLocatorSchema>;
   children: BodyBlock[];
 }
 
@@ -61,6 +64,7 @@ export const provisionViewSchema = z.object({
   title: z.string().optional(),
   path: z.string().startsWith("/"),
   explorerAnchor: z.string().min(1),
+  sourceLocator: sourceLocatorSchema,
   breadcrumbs: z.array(breadcrumbSchema),
   previousId: z.string().optional(),
   nextId: z.string().optional(),
@@ -115,6 +119,7 @@ export const documentViewSchema = z.object({
     "other",
   ]),
   sourceUrl: z.string().url(),
+  sourceSnapshotId: z.string().min(1),
   asOf: z.string().date(),
   lastChecked: z.string().datetime(),
   sourceVersion: z.string().min(1),

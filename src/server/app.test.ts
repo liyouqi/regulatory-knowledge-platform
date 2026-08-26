@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ExplorerNode } from "../shared/legal";
 import {
+  findCitationContext,
   findDocument,
   findDocumentBySlug,
   findDocumentRegulatoryContext,
@@ -340,6 +341,77 @@ describe("Document lookup", () => {
       }),
     );
     expect(context?.authorityRelationships).toHaveLength(2);
+  });
+
+  it("assembles citation-ready exact text and reviewed context by stable entity ID", () => {
+    const entityId = "lu:cssf:circular-12-552:provision:introduction:block:7";
+    const context = findCitationContext(entityId);
+
+    expect(context).toMatchObject({
+      schemaVersion: "1.0.0",
+      runtime: {
+        profileId: "full-corpus",
+        profileVersion: "1.0.0",
+      },
+      retrieval: {
+        method: "stable-entity-id",
+        requestedEntityId: entityId,
+        resolvedEntityId: entityId,
+        matchType: "exact",
+        rank: 1,
+        score: 1,
+        relationshipScope: "root-provision",
+      },
+      document: {
+        id: "lu:cssf:circular-12-552",
+        jurisdiction: "LU",
+        sourceSnapshotId:
+          "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      },
+      target: {
+        entityId,
+        rootProvisionId: "lu:cssf:circular-12-552:provision:introduction",
+        path: "/read/circular-cssf-12-552/provisions/introduction#block-7",
+        sourceLocator: { kind: "pdf-page", value: "2" },
+      },
+    });
+    expect(context?.textSegments).toEqual([
+      expect.objectContaining({
+        entityId,
+        text: expect.stringContaining("EBA/GL/2021/05"),
+        sourceLocator: { kind: "pdf-page", value: "2" },
+      }),
+    ]);
+    expect(context?.relationships.implements).toEqual([
+      expect.objectContaining({
+        relationType: "IMPLEMENTS",
+        target: expect.objectContaining({ entityId: "eu:eba:gl:2021:05" }),
+      }),
+    ]);
+    expect(context?.regulatoryContext.authorityRelationships).toContainEqual(
+      expect.objectContaining({
+        target: expect.objectContaining({ id: "authority:lu:cssf" }),
+      }),
+    );
+
+    const articleContext = findCitationContext("eu:32013L0036:article:74");
+    expect(articleContext?.target.sourceLocator).toEqual({
+      kind: "xpath",
+      value:
+        "/ACT/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']",
+    });
+    expect(articleContext?.textSegments).toHaveLength(4);
+    expect(articleContext?.textSegments[2]).toMatchObject({
+      entityId: "eu:32013L0036:article:74:paragraph:3",
+      text: expect.stringContaining("EBA shall issue guidelines"),
+    });
+    expect(articleContext?.relationships.mandates).toContainEqual(
+      expect.objectContaining({
+        relationType: "MANDATES",
+        target: expect.objectContaining({ entityId: "eu:eba:gl:2021:05" }),
+      }),
+    );
+    expect(findCitationContext("eu:unknown:article:1")).toBeNull();
   });
 
   it("serves exact document definitions for Reader term previews", () => {

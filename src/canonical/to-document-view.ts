@@ -77,6 +77,7 @@ function toBodyBlock(
         ? (provision.leadText ?? provision.text)
         : provision.text,
     anchor: relativeProvisionAnchor(rootId, provision.logicalId),
+    sourceLocator: provision.sourceLocator,
     children: nested,
   };
 }
@@ -240,6 +241,7 @@ export function toDocumentView(
         document.logicalId,
         provision.logicalId,
       ),
+      sourceLocator: provision.sourceLocator,
       breadcrumbs: provision.structuralPath.map((entry) => ({
         id: entry.logicalId,
         kind: entry.kind,
@@ -305,6 +307,7 @@ export function toDocumentView(
     officialTitle: document.officialTitle,
     documentType: document.documentType,
     sourceUrl: document.source.canonicalUrl,
+    sourceSnapshotId: document.sourceSnapshotId,
     asOf: document.publicationDate,
     lastChecked: document.source.retrievedAt,
     sourceVersion: document.source.sourceVersion,

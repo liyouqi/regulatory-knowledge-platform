@@ -12,6 +12,7 @@ function documentWithStatus(): DocumentView {
     officialTitle: "Test title",
     documentType: "regulation",
     sourceUrl: "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng",
+    sourceSnapshotId: "snapshot:test:32024R2956",
     asOf: "2024-12-02",
     lastChecked: "2026-08-23T23:37:57.439Z",
     sourceVersion: "test-source",

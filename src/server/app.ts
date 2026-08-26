@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import express from "express";
+import { CitationContextService } from "../agent/citation-context-service";
 import {
   toDocumentRelationshipGraph,
   toGlobalRelationshipGraph,
@@ -16,6 +17,10 @@ export const app = express();
 const runtimePath = runtimeDatabasePath();
 const runtimeRepository = new SqliteRuntimeRepository(runtimePath);
 const documentViews = runtimeRepository.listDocumentViews();
+const citationContextService = new CitationContextService(
+  runtimeRepository,
+  documentViews,
+);
 const lawSearchRecords = createLawSearchRecords(
   documentViews,
   runtimeRepository.listLawSearchSources(),
@@ -42,6 +47,10 @@ export function findDocumentRegulatoryContext(
     documentId,
     provisionId,
   );
+}
+
+export function findCitationContext(entityId: string) {
+  return citationContextService.findByEntityId(entityId);
 }
 
 export function findExplorerBySlug(slug: string) {
@@ -182,6 +191,15 @@ app.get("/api/health", (_request, response) => {
 
 app.get("/api/documents", (_request, response) => {
   response.json({ documents: runtimeRepository.listDocumentSummaries() });
+});
+
+app.get("/api/internal/citation-context/:entityId", (request, response) => {
+  const context = findCitationContext(request.params.entityId.slice(0, 300));
+  if (!context) {
+    response.status(404).json({ error: "Citation context entity not found" });
+    return;
+  }
+  response.json(context);
 });
 
 function sendFamilyLevel2(

@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { sourceLocatorSchema } from "../shared/source-locator";
 import { sourceStatusSchema } from "../shared/source-status";
+
+export { sourceLocatorSchema } from "../shared/source-locator";
 
 export const CANONICAL_SCHEMA_VERSION = "1.0.0" as const;
 
@@ -8,11 +11,6 @@ const logicalIdSchema = z
   .min(1)
   .regex(/^[a-z0-9][a-zA-Z0-9:._-]*$/);
 const sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
-
-export const sourceLocatorSchema = z.object({
-  kind: z.enum(["xml-id", "xpath", "css-selector", "pdf-page", "fixture"]),
-  value: z.string().min(1),
-});
 
 export const structuralPathEntrySchema = z.object({
   logicalId: logicalIdSchema,

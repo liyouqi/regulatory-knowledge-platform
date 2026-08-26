@@ -60,6 +60,7 @@ describe("Explorer DTO", () => {
         label: "Introduction",
         path: "/read/cssf-test/provisions/introduction",
         explorerAnchor: "provision-introduction",
+        sourceLocator: { kind: "fixture", value: "introduction" },
         breadcrumbs: [],
         blocks: [],
       },

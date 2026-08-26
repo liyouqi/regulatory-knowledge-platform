@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { CitationContextService } from "../agent/citation-context-service";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
@@ -20,6 +21,7 @@ const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-profile-"));
 const databasePath = join(testDirectory, "banking.sqlite");
 let repository: SqliteRuntimeRepository | undefined;
 let search: SearchService | undefined;
+let citationContext: CitationContextService | undefined;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -38,6 +40,7 @@ beforeAll(() => {
   );
   repository = new SqliteRuntimeRepository(databasePath);
   search = new SearchService(databasePath);
+  citationContext = new CitationContextService(repository);
 });
 
 afterAll(() => {
@@ -86,6 +89,14 @@ describe("banking-default runtime isolation", () => {
         target: expect.objectContaining({ entityId: "eu:eba:gl:2021:05" }),
       }),
     ]);
+    expect(
+      citationContext?.findByEntityId(
+        "lu:cssf:circular-12-552:provision:introduction:block:7",
+      ),
+    ).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      document: { id: "lu:cssf:circular-12-552" },
+    });
   });
 
   it("makes excluded Reader, Explorer, Library, and relationship lookups unavailable", () => {
@@ -105,6 +116,9 @@ describe("banking-default runtime isolation", () => {
     expect(search?.listDocumentDefinitions("eu:32023R1114")).toBeNull();
     expect(
       repository?.findDocumentRegulatoryContext("eu:32023R1114"),
+    ).toBeNull();
+    expect(
+      citationContext?.findByEntityId("eu:32023R1114:article:62"),
     ).toBeNull();
   });
 

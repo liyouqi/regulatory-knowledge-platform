@@ -128,6 +128,16 @@ describe("structured Reader DTO", () => {
     const first = view.provisions[0];
     const second = view.provisions[1];
 
+    expect(view.sourceSnapshotId).toBe(document.sourceSnapshotId);
+    expect(first?.sourceLocator).toEqual({
+      kind: "fixture",
+      value: "article-1",
+    });
+    expect(first?.blocks[0]?.sourceLocator).toEqual({
+      kind: "fixture",
+      value: "article-1-paragraph-1",
+    });
+
     expect(first.path).toBe("/read/dora/articles/1");
     expect(view).toMatchObject({
       jurisdiction: "EU",
