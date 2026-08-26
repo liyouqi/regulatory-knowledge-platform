@@ -49,6 +49,8 @@ export interface CorpusVerification {
   runtimeRecords: number;
   runtimeRelationships: number;
   runtimeTimelineEvents: number;
+  runtimeSupervisoryDecisions: number;
+  runtimeSupervisoryDecisionFindings: number;
   unresolvedReferences: number;
 }
 
@@ -121,6 +123,8 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
     runtimeRecords: runtime.records,
     runtimeRelationships: runtime.relationships,
     runtimeTimelineEvents: runtime.timelineEvents,
+    runtimeSupervisoryDecisions: runtime.supervisoryDecisions,
+    runtimeSupervisoryDecisionFindings: runtime.supervisoryDecisionFindings,
     unresolvedReferences: runtime.unresolvedReferences,
   };
 }

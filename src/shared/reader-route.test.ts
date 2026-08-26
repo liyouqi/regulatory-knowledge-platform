@@ -13,8 +13,10 @@ import {
   parseQuickGo,
   parseReaderPath,
   parseRelationshipGraphPath,
+  parseSupervisoryDecisionsPath,
   provisionPath,
   relationshipGraphPath,
+  supervisoryDecisionsPath,
 } from "./reader-route";
 
 describe("Reader routes", () => {
@@ -87,6 +89,14 @@ describe("Reader routes", () => {
     expect(
       parseImplementationTimelinePath("/read/ai-act/articles/113"),
     ).toBeNull();
+  });
+
+  it("builds and parses supervisory decision routes", () => {
+    expect(supervisoryDecisionsPath("gdpr")).toBe("/decisions/gdpr");
+    expect(parseSupervisoryDecisionsPath("/decisions/gdpr")).toEqual({
+      slug: "gdpr",
+    });
+    expect(parseSupervisoryDecisionsPath("/decisions/gdpr/extra")).toBeNull();
   });
 
   it.each([

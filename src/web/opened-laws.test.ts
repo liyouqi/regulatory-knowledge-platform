@@ -27,6 +27,7 @@ class MemoryStorage implements StorageLike {
 const dora: DocumentSummary = {
   defaultPath: "/read/dora/articles/1",
   hasImplementationTimeline: false,
+  hasSupervisoryDecisions: false,
   id: "eu:32022R2554",
   familyId: "family:dora",
   regulatoryLevel: "level-1",

@@ -65,6 +65,25 @@ export function caseLogicalId(celex: string): string {
   return `case:eu:${normalized}`;
 }
 
+export function decisionLogicalId(
+  authorityId: string,
+  decisionNumber: string,
+): string {
+  const authority = /^authority:([a-z]{2}):([a-z0-9-]+)$/u.exec(authorityId);
+  const number = decisionNumber
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replaceAll("/", "-")
+    .replace(/\s+/gu, "-");
+  if (!authority || !SAFE_SEGMENT_PATTERN.test(number)) {
+    throw new Error(
+      `Invalid supervisory decision identifier: ${authorityId} ${decisionNumber}`,
+    );
+  }
+  return `decision:${authority[1]}:${authority[2]}:${number}`;
+}
+
 export function provisionLogicalId(
   parentId: string,
   kind: ProvisionIdKind,

@@ -60,6 +60,8 @@ console.table({
   authorities: manifest.authorityCount,
   authorityRelationships: manifest.authorityRelationshipCount,
   timelineEvents: manifest.timelineEventCount,
+  supervisoryDecisions: manifest.supervisoryDecisionCount,
+  supervisoryDecisionFindings: manifest.supervisoryDecisionFindingCount,
   tfidfBenchmark: manifest.tfidfBenchmark?.passed
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",

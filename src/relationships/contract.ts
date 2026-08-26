@@ -6,6 +6,7 @@ export type RelationshipType =
   | "ADOPTED_UNDER"
   | "AMENDS"
   | "CORRECTS"
+  | "FINDS_VIOLATION_OF"
   | "INTERPRETS"
   | "SUPPLEMENTS"
   | "IMPLEMENTS"
@@ -17,6 +18,7 @@ export type RelationshipProvenance =
   | "OFFICIAL_METADATA"
   | "OFFICIAL_MAPPING"
   | "CASE_TEXT"
+  | "DECISION_TEXT"
   | "EDITORIAL"
   | "TFIDF";
 

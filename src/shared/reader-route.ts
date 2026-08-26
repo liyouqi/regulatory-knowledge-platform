@@ -29,6 +29,17 @@ export function parseImplementationTimelinePath(
   return match ? { slug: decodeURIComponent(match[1]) } : null;
 }
 
+export function supervisoryDecisionsPath(slug: string): string {
+  return `/decisions/${encodeURIComponent(slug)}`;
+}
+
+export function parseSupervisoryDecisionsPath(
+  pathname: string,
+): { slug: string } | null {
+  const match = /^\/decisions\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { slug: decodeURIComponent(match[1]) } : null;
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

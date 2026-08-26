@@ -53,6 +53,12 @@ import {
   documentRegulatoryContextSchema,
 } from "../shared/regulatory-context";
 import { sourceStatusSchema } from "../shared/source-status";
+import {
+  type DocumentSupervisoryDecisionsResponse,
+  type SupervisoryDecision,
+  type SupervisoryDecisionFinding,
+  documentSupervisoryDecisionsResponseSchema,
+} from "../shared/supervisory-decision";
 
 type LawSearchSource = Pick<
   SourceDefinition,
@@ -64,8 +70,12 @@ interface DocumentPayloadRow {
 }
 
 interface DocumentSummaryRow
-  extends Omit<DocumentSummary, "hasImplementationTimeline"> {
+  extends Omit<
+    DocumentSummary,
+    "hasImplementationTimeline" | "hasSupervisoryDecisions"
+  > {
   hasImplementationTimeline: 0 | 1;
+  hasSupervisoryDecisions: 0 | 1;
 }
 
 interface TimelineEventRow {
@@ -98,6 +108,63 @@ interface TimelineEventRow {
   reviewedAt: string;
   builderMethod: "implementation-timeline";
   builderVersion: "1.0.0";
+}
+
+interface SupervisoryDecisionRow {
+  decisionId: string;
+  decisionSlug: string;
+  jurisdiction: string;
+  decisionNumber: string;
+  decisionDate: string;
+  decisionType:
+    | "administrative-fine"
+    | "corrective-measure"
+    | "fine-and-corrective-measure"
+    | "case-closure";
+  officialTitle: string;
+  subject: string;
+  respondentLabel: string | null;
+  targetDocumentId: string;
+  targetDocumentSlug: string;
+  targetDocumentShortName: string;
+  targetDocumentOfficialTitle: string;
+  sourcePageUrl: string;
+  sourceDocumentUrl: string;
+  sourceDocumentSha256: string;
+  sourceDocumentByteCount: number;
+  sourceDocumentPageCount: number;
+  outcomeKind: SupervisoryDecisionRow["decisionType"];
+  fineAmountMinor: number | null;
+  fineCurrency: string | null;
+  outcomeEvidenceText: string;
+  outcomeEvidenceLocator: string;
+  decisionProvenance: "OFFICIAL_METADATA";
+  decisionReviewStatus: "reviewed";
+  decisionReviewedAt: string;
+  decisionBuilderMethod: "supervisory-decision";
+  decisionBuilderVersion: "1.0.0";
+  authorityId: string;
+  authorityOfficialName: string;
+  authorityAcronym: string | null;
+  authorityType: "supervisory-authority";
+  authorityJurisdiction: string;
+  authoritySourceUrl: string;
+  authorityCheckedAt: string;
+  findingId: string;
+  relationType: "FINDS_VIOLATION_OF";
+  targetEntityId: string;
+  targetLabel: string;
+  targetTitle: string | null;
+  targetPath: string;
+  targetReference: string;
+  findingProvenance: "DECISION_TEXT";
+  evidenceText: string;
+  evidenceLocator: string;
+  evidenceSourceUrl: string;
+  findingReviewStatus: "reviewed";
+  findingReviewedAt: string;
+  findingBuilderMethod: "supervisory-decision";
+  findingBuilderVersion: "1.0.0";
 }
 
 interface ExplorerPayloadRow {
@@ -625,6 +692,8 @@ export class SqliteRuntimeRepository {
   readonly authorityCount: number;
   readonly authorityRelationshipCount: number;
   readonly timelineEventCount: number;
+  readonly supervisoryDecisionCount: number;
+  readonly supervisoryDecisionFindingCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -717,6 +786,14 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "timelineEventCount"),
         10,
       );
+      this.supervisoryDecisionCount = Number.parseInt(
+        manifestValue(this.database, "supervisoryDecisionCount"),
+        10,
+      );
+      this.supervisoryDecisionFindingCount = Number.parseInt(
+        manifestValue(this.database, "supervisoryDecisionFindingCount"),
+        10,
+      );
       this.unresolvedReferenceCount = Number.parseInt(
         manifestValue(this.database, "unresolvedReferenceCount"),
         10,
@@ -746,7 +823,11 @@ export class SqliteRuntimeRepository {
           EXISTS (
             SELECT 1 FROM implementation_timeline_events timeline
             WHERE timeline.document_id = documents.id
-          ) AS hasImplementationTimeline
+          ) AS hasImplementationTimeline,
+          EXISTS (
+            SELECT 1 FROM supervisory_decisions decision
+            WHERE decision.target_document_id = documents.id
+          ) AS hasSupervisoryDecisions
         FROM documents
         ORDER BY display_order ASC
       `)
@@ -754,6 +835,7 @@ export class SqliteRuntimeRepository {
     return rows.map((row) => ({
       ...row,
       hasImplementationTimeline: row.hasImplementationTimeline === 1,
+      hasSupervisoryDecisions: row.hasSupervisoryDecisions === 1,
     }));
   }
 
@@ -849,6 +931,194 @@ export class SqliteRuntimeRepository {
           version: row.builderVersion,
         },
       })),
+    });
+  }
+
+  findDocumentSupervisoryDecisions(
+    documentId: string,
+    provisionId?: string,
+  ): DocumentSupervisoryDecisionsResponse | null {
+    const document = this.database
+      .prepare(`
+        SELECT id, slug, short_name AS shortName, official_title AS officialTitle
+        FROM documents
+        WHERE id = ?
+      `)
+      .get(documentId) as
+      | { id: string; slug: string; shortName: string; officialTitle: string }
+      | undefined;
+    if (!document) return null;
+    if (
+      provisionId &&
+      !this.database
+        .prepare(`
+          SELECT id FROM legal_entities
+          WHERE id = @provisionId AND document_id = @documentId
+        `)
+        .get({ documentId, provisionId })
+    ) {
+      return null;
+    }
+
+    const rows = this.database
+      .prepare(`
+        SELECT
+          decision.id AS decisionId,
+          decision.slug AS decisionSlug,
+          decision.jurisdiction,
+          decision.decision_number AS decisionNumber,
+          decision.decision_date AS decisionDate,
+          decision.decision_type AS decisionType,
+          decision.official_title AS officialTitle,
+          decision.subject,
+          decision.respondent_label AS respondentLabel,
+          decision.target_document_id AS targetDocumentId,
+          document.slug AS targetDocumentSlug,
+          document.short_name AS targetDocumentShortName,
+          document.official_title AS targetDocumentOfficialTitle,
+          decision.source_page_url AS sourcePageUrl,
+          decision.source_document_url AS sourceDocumentUrl,
+          decision.source_document_sha256 AS sourceDocumentSha256,
+          decision.source_document_byte_count AS sourceDocumentByteCount,
+          decision.source_document_page_count AS sourceDocumentPageCount,
+          decision.outcome_kind AS outcomeKind,
+          decision.fine_amount_minor AS fineAmountMinor,
+          decision.fine_currency AS fineCurrency,
+          decision.outcome_evidence_text AS outcomeEvidenceText,
+          decision.outcome_evidence_locator AS outcomeEvidenceLocator,
+          decision.provenance AS decisionProvenance,
+          decision.review_status AS decisionReviewStatus,
+          decision.reviewed_at AS decisionReviewedAt,
+          decision.builder_method AS decisionBuilderMethod,
+          decision.builder_version AS decisionBuilderVersion,
+          authority.id AS authorityId,
+          authority.official_name AS authorityOfficialName,
+          authority.acronym AS authorityAcronym,
+          authority.authority_type AS authorityType,
+          authority.jurisdiction AS authorityJurisdiction,
+          authority.source_url AS authoritySourceUrl,
+          authority.checked_at AS authorityCheckedAt,
+          finding.relationship_id AS findingId,
+          finding.relation_type AS relationType,
+          finding.target_entity_id AS targetEntityId,
+          target.label AS targetLabel,
+          target.title AS targetTitle,
+          target.path AS targetPath,
+          finding.target_reference AS targetReference,
+          finding.provenance AS findingProvenance,
+          finding.evidence_text AS evidenceText,
+          finding.evidence_locator AS evidenceLocator,
+          finding.source_ref AS evidenceSourceUrl,
+          finding.review_status AS findingReviewStatus,
+          finding.reviewed_at AS findingReviewedAt,
+          finding.builder_method AS findingBuilderMethod,
+          finding.builder_version AS findingBuilderVersion
+        FROM supervisory_decisions decision
+        JOIN authorities authority ON authority.id = decision.authority_id
+        JOIN documents document ON document.id = decision.target_document_id
+        JOIN supervisory_decision_findings finding
+          ON finding.decision_id = decision.id
+        JOIN legal_entities target ON target.id = finding.target_entity_id
+        WHERE decision.target_document_id = @documentId
+          ${provisionId ? "AND finding.target_entity_id = @provisionId" : ""}
+        ORDER BY decision.decision_date DESC, decision.id ASC,
+          target.path ASC, finding.relationship_id ASC
+      `)
+      .all({ documentId, provisionId }) as SupervisoryDecisionRow[];
+    const decisions = new Map<string, SupervisoryDecision>();
+    for (const row of rows) {
+      let decision = decisions.get(row.decisionId);
+      if (!decision) {
+        decision = {
+          id: row.decisionId,
+          slug: row.decisionSlug,
+          path: `/decisions/${encodeURIComponent(row.targetDocumentSlug)}#${encodeURIComponent(row.decisionSlug)}`,
+          jurisdiction: row.jurisdiction,
+          decisionNumber: row.decisionNumber,
+          decisionDate: row.decisionDate,
+          decisionType: row.decisionType,
+          officialTitle: row.officialTitle,
+          subject: row.subject,
+          respondentLabel: row.respondentLabel,
+          authority: {
+            id: row.authorityId,
+            officialName: row.authorityOfficialName,
+            acronym: row.authorityAcronym,
+            authorityType: row.authorityType,
+            jurisdiction: row.authorityJurisdiction,
+            sourceUrl: row.authoritySourceUrl,
+            checkedAt: row.authorityCheckedAt,
+          },
+          sourcePageUrl: row.sourcePageUrl,
+          sourceDocumentUrl: row.sourceDocumentUrl,
+          sourceDocument: {
+            sha256: row.sourceDocumentSha256,
+            byteCount: row.sourceDocumentByteCount,
+            pageCount: row.sourceDocumentPageCount,
+          },
+          outcome: {
+            kind: row.outcomeKind,
+            amountMinor: row.fineAmountMinor,
+            currency: row.fineCurrency,
+            evidenceText: row.outcomeEvidenceText,
+            evidenceLocator: row.outcomeEvidenceLocator,
+          },
+          provenance: row.decisionProvenance,
+          reviewStatus: row.decisionReviewStatus,
+          reviewedAt: row.decisionReviewedAt,
+          builder: {
+            method: row.decisionBuilderMethod,
+            version: row.decisionBuilderVersion,
+          },
+          findings: [],
+        };
+        decisions.set(row.decisionId, decision);
+      }
+      const finding: SupervisoryDecisionFinding = {
+        id: row.findingId,
+        relationType: row.relationType,
+        target: {
+          entityId: row.targetEntityId,
+          documentId: row.targetDocumentId,
+          documentShortName: row.targetDocumentShortName,
+          label: row.targetLabel,
+          title: row.targetTitle,
+          path: row.targetPath,
+          reference: row.targetReference,
+        },
+        evidence: {
+          text: row.evidenceText,
+          locator: row.evidenceLocator,
+          sourceUrl: row.evidenceSourceUrl,
+        },
+        provenance: row.findingProvenance,
+        reviewStatus: row.findingReviewStatus,
+        reviewedAt: row.findingReviewedAt,
+        builder: {
+          method: row.findingBuilderMethod,
+          version: row.findingBuilderVersion,
+        },
+      };
+      decision.findings.push(finding);
+    }
+    for (const decision of decisions.values()) {
+      decision.findings.sort((left, right) =>
+        left.target.path.localeCompare(right.target.path, undefined, {
+          numeric: true,
+        }),
+      );
+    }
+    return documentSupervisoryDecisionsResponseSchema.parse({
+      schemaVersion: "1.0.0",
+      document,
+      runtime: {
+        buildId: this.buildId,
+        profileId: this.profileId,
+        profileVersion: this.profileVersion,
+        profileHash: this.profileHash,
+      },
+      provisionId,
+      decisions: [...decisions.values()],
     });
   }
 

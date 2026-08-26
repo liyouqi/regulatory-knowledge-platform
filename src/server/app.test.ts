@@ -7,6 +7,7 @@ import {
   findDocumentBySlug,
   findDocumentRegulatoryContext,
   findDocumentRelationshipGraph,
+  findDocumentSupervisoryDecisions,
   findDocumentVersionChain,
   findExplorerBySlug,
   findFamilyLevel2,
@@ -473,6 +474,34 @@ describe("Document lookup", () => {
       },
     });
     expect(findImplementationTimeline("dora")).toBeNull();
+  });
+
+  it("serves reviewed CNPD findings by GDPR provision", () => {
+    const response = findDocumentSupervisoryDecisions(
+      "gdpr",
+      "eu:32016R0679:article:12",
+    );
+
+    expect(response).toMatchObject({
+      document: { id: "eu:32016R0679", slug: "gdpr" },
+      provisionId: "eu:32016R0679:article:12",
+      runtime: { profileId: "full-corpus" },
+      decisions: [
+        {
+          id: "decision:lu:cnpd:18fr-2022",
+          authority: { acronym: "CNPD" },
+          findings: [
+            {
+              relationType: "FINDS_VIOLATION_OF",
+              target: { reference: "Article 12(3)–(4)" },
+              evidence: { locator: "pdf-page:30" },
+            },
+          ],
+        },
+      ],
+    });
+    expect(findDocumentSupervisoryDecisions("dora")?.decisions).toEqual([]);
+    expect(findDocumentSupervisoryDecisions("unknown")).toBeNull();
   });
 
   it("serves exact document definitions for Reader term previews", () => {

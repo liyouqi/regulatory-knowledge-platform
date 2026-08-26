@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "authorities": [
     {
       "id": "authority:eu:european-parliament",
@@ -37,6 +37,15 @@
       "jurisdiction": "EU",
       "sourceUrl": "https://www.eba.europa.eu/about-us",
       "checkedAt": "2026-08-26T00:00:00.000Z"
+    },
+    {
+      "id": "authority:lu:cnpd",
+      "officialName": "Commission nationale pour la protection des données",
+      "acronym": "CNPD",
+      "authorityType": "supervisory-authority",
+      "jurisdiction": "LU",
+      "sourceUrl": "https://cnpd.public.lu/en/commission-nationale/missions.html",
+      "checkedAt": "2026-08-26T17:30:00Z"
     }
   ],
   "relationships": [

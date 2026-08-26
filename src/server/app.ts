@@ -69,6 +69,19 @@ export function findImplementationTimeline(slug: string) {
   return runtimeRepository.findImplementationTimelineBySlug(slug);
 }
 
+export function findDocumentSupervisoryDecisions(
+  slug: string,
+  provisionId?: string,
+) {
+  const document = findDocumentBySlug(slug);
+  return document
+    ? runtimeRepository.findDocumentSupervisoryDecisions(
+        document.id,
+        provisionId,
+      )
+    : null;
+}
+
 export function findExplorerBySlug(slug: string) {
   return runtimeRepository.findExplorerBySlug(slug);
 }
@@ -201,6 +214,9 @@ app.get("/api/health", (_request, response) => {
       authorities: runtimeRepository.authorityCount,
       authorityRelationships: runtimeRepository.authorityRelationshipCount,
       timelineEvents: runtimeRepository.timelineEventCount,
+      supervisoryDecisions: runtimeRepository.supervisoryDecisionCount,
+      supervisoryDecisionFindings:
+        runtimeRepository.supervisoryDecisionFindingCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -246,6 +262,22 @@ app.get("/api/timelines/:slug", (request, response) => {
     return;
   }
   response.json(timeline);
+});
+
+app.get("/api/supervisory-decisions/:slug", (request, response) => {
+  const provisionId =
+    typeof request.query.provisionId === "string"
+      ? request.query.provisionId.slice(0, 200)
+      : undefined;
+  const decisions = findDocumentSupervisoryDecisions(
+    request.params.slug.slice(0, 100),
+    provisionId,
+  );
+  if (!decisions) {
+    response.status(404).json({ error: "Supervisory decisions not found" });
+    return;
+  }
+  response.json(decisions);
 });
 
 function sendFamilyLevel2(

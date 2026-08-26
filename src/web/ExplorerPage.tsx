@@ -3,6 +3,7 @@ import {
   BookOpen,
   CalendarDays,
   ExternalLink,
+  Landmark,
   ListTree,
   Network,
   Search,
@@ -23,6 +24,7 @@ import {
   explorerPath,
   implementationTimelinePath,
   level2LibraryPath,
+  supervisoryDecisionsPath,
 } from "../shared/reader-route";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { recordOpenedLaw } from "./opened-laws";
@@ -242,6 +244,15 @@ export function ExplorerPage({
             >
               <CalendarDays aria-hidden="true" size={15} />
               Timeline
+            </Link>
+          ) : null}
+          {documentSummary?.hasSupervisoryDecisions ? (
+            <Link
+              className="view-switch"
+              to={supervisoryDecisionsPath(document.slug)}
+            >
+              <Landmark aria-hidden="true" size={15} />
+              Decisions
             </Link>
           ) : null}
           {provisions[0]?.readerPath ? (

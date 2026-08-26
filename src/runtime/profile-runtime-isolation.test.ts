@@ -101,6 +101,20 @@ describe("banking-default runtime isolation", () => {
       document: { id: "lu:cssf:circular-12-552" },
     });
     expect(
+      repository?.findDocumentSupervisoryDecisions(
+        "eu:32016R0679",
+        "eu:32016R0679:article:6",
+      ),
+    ).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      decisions: [
+        {
+          id: "decision:lu:cnpd:18fr-2022",
+          findings: [{ target: { entityId: "eu:32016R0679:article:6" } }],
+        },
+      ],
+    });
+    expect(
       repository?.findImplementationTimelineBySlug("ai-act"),
     ).toMatchObject({
       runtime: { profileId: "banking-default" },

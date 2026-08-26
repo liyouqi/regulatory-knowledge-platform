@@ -58,6 +58,7 @@ describe("SQLite runtime repository", () => {
       officialTitle: dora.officialTitle,
       defaultPath: dora.provisions[0].path,
       hasImplementationTimeline: false,
+      hasSupervisoryDecisions: false,
       provenance: dora.provenance,
       familyId: "family:dora",
       regulatoryLevel: "level-1",
@@ -105,6 +106,57 @@ describe("SQLite runtime repository", () => {
     ).toMatchObject({ hasImplementationTimeline: true });
   });
 
+  it("returns the reviewed CNPD decision and provision-level findings", () => {
+    const decisions =
+      repository?.findDocumentSupervisoryDecisions("eu:32016R0679");
+
+    expect(decisions).toMatchObject({
+      schemaVersion: "1.0.0",
+      document: { id: "eu:32016R0679", slug: "gdpr" },
+      runtime: { buildId: repository?.buildId, profileId: "full-corpus" },
+      decisions: [
+        {
+          id: "decision:lu:cnpd:18fr-2022",
+          decisionNumber: "18FR/2022",
+          authority: { id: "authority:lu:cnpd", acronym: "CNPD" },
+          outcome: { amountMinor: 150000, currency: "EUR" },
+        },
+      ],
+    });
+    expect(decisions?.decisions[0]?.findings).toHaveLength(4);
+    expect(
+      repository?.findDocumentSupervisoryDecisions(
+        "eu:32016R0679",
+        "eu:32016R0679:article:15",
+      )?.decisions[0]?.findings,
+    ).toEqual([
+      expect.objectContaining({
+        relationType: "FINDS_VIOLATION_OF",
+        provenance: "DECISION_TEXT",
+        target: expect.objectContaining({ reference: "Article 15(1)(b)–(c)" }),
+        evidence: expect.objectContaining({ locator: "pdf-page:30" }),
+      }),
+    ]);
+    expect(
+      repository?.findDocumentSupervisoryDecisions("eu:32022R2554")?.decisions,
+    ).toEqual([]);
+    expect(
+      repository?.findDocumentSupervisoryDecisions(
+        "eu:32016R0679",
+        "eu:32016R0679:article:999",
+      ),
+    ).toBeNull();
+    expect(repository).toMatchObject({
+      supervisoryDecisionCount: 1,
+      supervisoryDecisionFindingCount: 4,
+    });
+    expect(
+      repository
+        ?.listDocumentSummaries()
+        .find((document) => document.slug === "gdpr"),
+    ).toMatchObject({ hasSupervisoryDecisions: true });
+  });
+
   it("returns null for unknown document and Explorer identities", () => {
     expect(repository?.findDocument("eu:unknown")).toBeNull();
     expect(repository?.findDocumentBySlug("unknown")).toBeNull();
@@ -150,7 +202,7 @@ describe("SQLite runtime repository", () => {
     expect(repository).toMatchObject({
       domainCount: 3,
       domainAssignmentCount: 10,
-      authorityCount: 4,
+      authorityCount: 5,
       authorityRelationshipCount: 4,
     });
     expect(

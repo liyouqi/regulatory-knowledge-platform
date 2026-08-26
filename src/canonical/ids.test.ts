@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   caseLogicalId,
+  decisionLogicalId,
   documentLogicalId,
   normalizeLegalNumber,
   provisionLogicalId,
@@ -17,6 +18,15 @@ describe("stable legal identifiers", () => {
     expect(caseLogicalId("62021CJ0340_1")).toBe("case:eu:62021CJ0340_1");
     expect(() => caseLogicalId("32016R0679")).toThrow(
       "Invalid EU case CELEX identifier",
+    );
+  });
+
+  it("keeps supervisory decisions in an authority-scoped namespace", () => {
+    expect(decisionLogicalId("authority:lu:cnpd", "18FR/2022")).toBe(
+      "decision:lu:cnpd:18fr-2022",
+    );
+    expect(() => decisionLogicalId("cnpd", "18FR/2022")).toThrow(
+      "Invalid supervisory decision identifier",
     );
   });
 

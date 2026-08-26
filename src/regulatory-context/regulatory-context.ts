@@ -283,6 +283,7 @@ export function buildRegulatoryContext(
   domainDataset = loadRegulatoryDomainDataset(),
   authorityDataset = loadAuthorityDataset(),
   legalNatureDataset = loadLegalNatureDataset(),
+  additionalAuthorityIds: Set<string> = new Set(),
 ): RegulatoryContextBuild {
   validateDomainHierarchy(domainDataset);
   const selectedDocumentIds = new Set(documents.map((document) => document.id));
@@ -373,6 +374,15 @@ export function buildRegulatoryContext(
       (relationship) => relationship.targetAuthorityId,
     ),
   );
+  const knownAuthorityIds = new Set(
+    authorityDataset.authorities.map((authority) => authority.id),
+  );
+  for (const authorityId of additionalAuthorityIds) {
+    if (!knownAuthorityIds.has(authorityId)) {
+      throw new Error(`Unknown additional Authority ${authorityId}`);
+    }
+    selectedAuthorityIds.add(authorityId);
+  }
   const legalNatures = legalNatureDataset.records.flatMap((record) => {
     if (knownDocumentIds && !knownDocumentIds.has(record.documentId)) {
       throw new Error(

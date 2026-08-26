@@ -30,6 +30,8 @@ describe("runtime artifact verification", () => {
       lifecycleRelationships: 14,
       externalWorks: 14,
       timelineEvents: 0,
+      supervisoryDecisions: 0,
+      supervisoryDecisionFindings: 0,
       bytes: expect.any(Number),
       input: databasePath,
     });

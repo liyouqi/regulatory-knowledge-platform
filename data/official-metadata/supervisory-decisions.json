@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "supervisory-decisions",
+  "version": "1.0.0",
+  "reviewedAt": "2026-08-26T17:30:00Z",
+  "decisions": [
+    {
+      "id": "decision:lu:cnpd:18fr-2022",
+      "slug": "cnpd-18fr-2022",
+      "authorityId": "authority:lu:cnpd",
+      "jurisdiction": "LU",
+      "decisionNumber": "18FR/2022",
+      "decisionDate": "2022-12-13",
+      "decisionType": "administrative-fine",
+      "officialTitle": "Délibération n° 18FR/2022 du 13 décembre 2022",
+      "subject": "Défaut de base légale pour justifier la licéité du traitement – Non-respect du droit d’accès de la personne concernée et des modalités de l’exercice dudit droit",
+      "respondentLabel": "Société A",
+      "targetDocumentId": "eu:32016R0679",
+      "sourcePageUrl": "https://cnpd.public.lu/fr/decisions-sanctions/2022/decision-18-fr-2022.html",
+      "sourceDocumentUrl": "https://cnpd.public.lu/content/dam/cnpd/fr/decisions-avis/2023/dlibration-18-fr-2022-du-13-dcembre-2022.pdf",
+      "sourceDocument": {
+        "sha256": "97740ec639232feeb332b80bdde777d93dd9d90619c5632ae912b04668248140",
+        "byteCount": 1084907,
+        "pageCount": 31
+      },
+      "outcome": {
+        "kind": "administrative-fine",
+        "amountMinor": 150000,
+        "currency": "EUR",
+        "evidenceText": "- de prononcer à l’encontre de la Société A, une amende administrative d’un montant de 1.500 (mille cinq cents) euros, au regard des manquements constitués aux articles 5.1.a), 6.1, 12.3 et 4 ainsi qu’à l’article 15.1.b) et c) du RGPD.",
+        "evidenceLocator": "pdf-page:30"
+      },
+      "findings": [
+        {
+          "targetEntityId": "eu:32016R0679:article:5",
+          "targetReference": "Article 5(1)(a)",
+          "evidenceCitation": "5.1.a)"
+        },
+        {
+          "targetEntityId": "eu:32016R0679:article:6",
+          "targetReference": "Article 6(1)",
+          "evidenceCitation": "6.1"
+        },
+        {
+          "targetEntityId": "eu:32016R0679:article:12",
+          "targetReference": "Article 12(3)–(4)",
+          "evidenceCitation": "12.3 et 4"
+        },
+        {
+          "targetEntityId": "eu:32016R0679:article:15",
+          "targetReference": "Article 15(1)(b)–(c)",
+          "evidenceCitation": "15.1b) et c)"
+        }
+      ],
+      "findingEvidence": {
+        "text": "- de retenir les manquements aux articles 5.1.a), 6.1, 12.3 et 4 ainsi qu’à l’article 15.1b) et c) du RGPD ; et",
+        "locator": "pdf-page:30"
+      },
+      "provenance": "OFFICIAL_METADATA",
+      "reviewStatus": "reviewed"
+    }
+  ]
+}

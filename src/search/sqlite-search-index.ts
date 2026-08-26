@@ -10,6 +10,13 @@ import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import {
+  DEFAULT_SUPERVISORY_DECISIONS_PATH,
+  SUPERVISORY_DECISION_BUILDER,
+  SUPERVISORY_DECISION_BUILDER_VERSION,
+  buildSupervisoryDecisions,
+  loadSupervisoryDecisionDataset,
+} from "../decisions/supervisory-decision";
+import {
   DEFAULT_AUTHORITIES_PATH,
   DEFAULT_LEGAL_NATURES_PATH,
   DEFAULT_REGULATORY_DOMAINS_PATH,
@@ -95,7 +102,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.1.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.2.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -128,6 +135,8 @@ export interface RuntimeDatabaseManifest {
   authorityCount: number;
   authorityRelationshipCount: number;
   timelineEventCount: number;
+  supervisoryDecisionCount: number;
+  supervisoryDecisionFindingCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -294,6 +303,7 @@ function runtimeBuildId(
   implementationTimelineDataset: ReturnType<
     typeof loadImplementationTimelineDataset
   >,
+  supervisoryDecisionDataset: ReturnType<typeof loadSupervisoryDecisionDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -327,6 +337,8 @@ function runtimeBuildId(
         JSON.stringify(legalNatureDataset),
         `${IMPLEMENTATION_TIMELINE_BUILDER}@${IMPLEMENTATION_TIMELINE_BUILDER_VERSION}`,
         JSON.stringify(implementationTimelineDataset),
+        `${SUPERVISORY_DECISION_BUILDER}@${SUPERVISORY_DECISION_BUILDER_VERSION}`,
+        JSON.stringify(supervisoryDecisionDataset),
         input,
       ].join("\n"),
     )
@@ -390,6 +402,18 @@ export function buildRuntimeDatabase(
   );
   const authorityDataset = loadAuthorityDataset(DEFAULT_AUTHORITIES_PATH);
   const legalNatureDataset = loadLegalNatureDataset(DEFAULT_LEGAL_NATURES_PATH);
+  const supervisoryDecisionDataset = loadSupervisoryDecisionDataset(
+    DEFAULT_SUPERVISORY_DECISIONS_PATH,
+  );
+  const supervisoryDecisionBuild = buildSupervisoryDecisions(
+    documents,
+    relationshipBuild.entities,
+    authorityDataset.authorities,
+    supervisoryDecisionDataset,
+    inputSources.length > 0
+      ? new Set(inputDocuments.map((document) => document.id))
+      : null,
+  );
   const regulatoryContextBuild = buildRegulatoryContext(
     documents,
     relationshipBuild.entities,
@@ -399,6 +423,7 @@ export function buildRuntimeDatabase(
     regulatoryDomainDataset,
     authorityDataset,
     legalNatureDataset,
+    supervisoryDecisionBuild.authorityIds,
   );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -515,6 +540,7 @@ export function buildRuntimeDatabase(
     authorityDataset,
     legalNatureDataset,
     implementationTimelineDataset,
+    supervisoryDecisionDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -804,6 +830,72 @@ export function buildRuntimeDatabase(
       ) STRICT;
       CREATE INDEX implementation_timeline_events_document_date
         ON implementation_timeline_events(document_id, event_date);
+      CREATE TABLE supervisory_decisions (
+        id TEXT PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        authority_id TEXT NOT NULL REFERENCES authorities(id),
+        jurisdiction TEXT NOT NULL,
+        decision_number TEXT NOT NULL,
+        decision_date TEXT NOT NULL,
+        decision_type TEXT NOT NULL CHECK (decision_type IN (
+          'administrative-fine', 'corrective-measure',
+          'fine-and-corrective-measure', 'case-closure'
+        )),
+        official_title TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        respondent_label TEXT,
+        target_document_id TEXT NOT NULL REFERENCES documents(id),
+        source_page_url TEXT NOT NULL,
+        source_document_url TEXT NOT NULL,
+        source_document_sha256 TEXT NOT NULL,
+        source_document_byte_count INTEGER NOT NULL CHECK (source_document_byte_count > 0),
+        source_document_page_count INTEGER NOT NULL CHECK (source_document_page_count > 0),
+        outcome_kind TEXT NOT NULL CHECK (outcome_kind IN (
+          'administrative-fine', 'corrective-measure',
+          'fine-and-corrective-measure', 'case-closure'
+        )),
+        fine_amount_minor INTEGER,
+        fine_currency TEXT,
+        outcome_evidence_text TEXT NOT NULL,
+        outcome_evidence_locator TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_METADATA'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        CHECK (
+          (fine_amount_minor IS NULL AND fine_currency IS NULL) OR
+          (fine_amount_minor IS NOT NULL AND fine_currency IS NOT NULL)
+        )
+      ) STRICT;
+      CREATE INDEX supervisory_decisions_target_document
+        ON supervisory_decisions(target_document_id, decision_date);
+      CREATE TABLE supervisory_decision_findings (
+        relationship_id TEXT PRIMARY KEY,
+        decision_id TEXT NOT NULL REFERENCES supervisory_decisions(id),
+        relation_type TEXT NOT NULL CHECK (relation_type = 'FINDS_VIOLATION_OF'),
+        target_document_id TEXT NOT NULL REFERENCES documents(id),
+        target_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        target_reference TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'DECISION_TEXT'),
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        source_ref TEXT NOT NULL,
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        resolution_status TEXT NOT NULL CHECK (resolution_status = 'resolved'),
+        build_id TEXT NOT NULL,
+        UNIQUE (
+          decision_id, relation_type, target_entity_id,
+          provenance, evidence_locator
+        )
+      ) STRICT;
+      CREATE INDEX supervisory_decision_findings_target_entity
+        ON supervisory_decision_findings(target_entity_id);
+      CREATE INDEX supervisory_decision_findings_target_document
+        ON supervisory_decision_findings(target_document_id);
       CREATE TABLE relationships (
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -1032,6 +1124,38 @@ export function buildRuntimeDatabase(
         @provenance, @reviewStatus, @reviewedAt, @builderMethod, @builderVersion
       )
     `);
+    const insertSupervisoryDecision = database.prepare(`
+      INSERT INTO supervisory_decisions (
+        id, slug, authority_id, jurisdiction, decision_number, decision_date,
+        decision_type, official_title, subject, respondent_label,
+        target_document_id, source_page_url, source_document_url,
+        source_document_sha256, source_document_byte_count,
+        source_document_page_count, outcome_kind, fine_amount_minor,
+        fine_currency, outcome_evidence_text, outcome_evidence_locator,
+        provenance, review_status, reviewed_at, builder_method, builder_version
+      ) VALUES (
+        @id, @slug, @authorityId, @jurisdiction, @decisionNumber, @decisionDate,
+        @decisionType, @officialTitle, @subject, @respondentLabel,
+        @targetDocumentId, @sourcePageUrl, @sourceDocumentUrl,
+        @sourceDocumentSha256, @sourceDocumentByteCount,
+        @sourceDocumentPageCount, @outcomeKind, @fineAmountMinor,
+        @fineCurrency, @outcomeEvidenceText, @outcomeEvidenceLocator,
+        @provenance, @reviewStatus, @reviewedAt, @builderMethod, @builderVersion
+      )
+    `);
+    const insertSupervisoryDecisionFinding = database.prepare(`
+      INSERT INTO supervisory_decision_findings (
+        relationship_id, decision_id, relation_type, target_document_id,
+        target_entity_id, target_reference, provenance, evidence_text,
+        evidence_locator, source_ref, review_status, reviewed_at,
+        builder_method, builder_version, resolution_status, build_id
+      ) VALUES (
+        @id, @decisionId, @relationType, @targetDocumentId,
+        @targetEntityId, @targetReference, @provenance, @evidenceText,
+        @evidenceLocator, @sourceRef, @reviewStatus, @reviewedAt,
+        @builderMethod, @builderVersion, @resolutionStatus, @buildId
+      )
+    `);
     const insertLegalWork = database.prepare(`
       INSERT INTO legal_works (
         id, celex, cellar_work_uri, loaded_document_id, label, title,
@@ -1185,6 +1309,12 @@ export function buildRuntimeDatabase(
             : null,
         });
       }
+      for (const decision of supervisoryDecisionBuild.decisions) {
+        insertSupervisoryDecision.run(decision);
+      }
+      for (const finding of supervisoryDecisionBuild.findings) {
+        insertSupervisoryDecisionFinding.run({ ...finding, buildId });
+      }
       for (const work of lifecycleBuild.works) {
         insertLegalWork.run(work);
       }
@@ -1241,6 +1371,12 @@ export function buildRuntimeDatabase(
           regulatoryContextBuild.authorityRelationships.length,
         ),
         timelineEventCount: String(implementationTimelineEvents.length),
+        supervisoryDecisionCount: String(
+          supervisoryDecisionBuild.decisions.length,
+        ),
+        supervisoryDecisionFindingCount: String(
+          supervisoryDecisionBuild.findings.length,
+        ),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -1284,6 +1420,9 @@ export function buildRuntimeDatabase(
         ]),
         timelineBuilders: JSON.stringify([
           `${IMPLEMENTATION_TIMELINE_BUILDER}@${IMPLEMENTATION_TIMELINE_BUILDER_VERSION}`,
+        ]),
+        supervisoryDecisionBuilders: JSON.stringify([
+          `${SUPERVISORY_DECISION_BUILDER}@${SUPERVISORY_DECISION_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -1356,6 +1495,8 @@ export function buildRuntimeDatabase(
     authorityRelationshipCount:
       regulatoryContextBuild.authorityRelationships.length,
     timelineEventCount: implementationTimelineEvents.length,
+    supervisoryDecisionCount: supervisoryDecisionBuild.decisions.length,
+    supervisoryDecisionFindingCount: supervisoryDecisionBuild.findings.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

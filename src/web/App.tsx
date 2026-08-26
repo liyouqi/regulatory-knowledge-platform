@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Check,
   Copy,
+  Landmark,
   Link2,
   Map as MapIcon,
   Network,
@@ -57,18 +58,25 @@ import {
   parseQuickGo,
   parseReaderPath,
   parseRelationshipGraphPath,
+  parseSupervisoryDecisionsPath,
   relationshipGraphPath,
+  supervisoryDecisionsPath,
 } from "../shared/reader-route";
 import {
   type DocumentRegulatoryContext,
   documentRegulatoryContextSchema,
 } from "../shared/regulatory-context";
+import {
+  type DocumentSupervisoryDecisionsResponse,
+  documentSupervisoryDecisionsResponseSchema,
+} from "../shared/supervisory-decision";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { ImplementationTimelinePage } from "./ImplementationTimelinePage";
 import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
+import { SupervisoryDecisionsPage } from "./SupervisoryDecisionsPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
 import { inlineReferenceRanges } from "./inline-references";
@@ -663,6 +671,37 @@ function RelationshipList({
   );
 }
 
+function ProvisionDecisionList({
+  response,
+}: {
+  response: DocumentSupervisoryDecisionsResponse | null;
+}) {
+  if (!response || response.decisions.length === 0) return null;
+  return (
+    <section aria-label="Supervisory decisions" className="provision-decisions">
+      <p className="eyebrow">SUPERVISORY DECISIONS</p>
+      {response.decisions.map((decision) => (
+        <Link key={decision.id} to={decision.path}>
+          <Landmark aria-hidden="true" size={14} />
+          <span>
+            <strong>
+              {decision.authority.acronym ?? decision.authority.officialName} ·{" "}
+              {decision.decisionNumber}
+            </strong>
+            <small>
+              {decision.findings
+                .map((finding) => finding.target.reference)
+                .join(", ")}
+              {" · finds violation"}
+            </small>
+          </span>
+          <ArrowRight aria-hidden="true" size={14} />
+        </Link>
+      ))}
+    </section>
+  );
+}
+
 function escapePattern(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
@@ -893,6 +932,8 @@ function ReaderPage({
     useState<DefinitionSearchResult | null>(null);
   const [regulatoryContext, setRegulatoryContext] =
     useState<DocumentRegulatoryContext | null>(null);
+  const [provisionDecisions, setProvisionDecisions] =
+    useState<DocumentSupervisoryDecisionsResponse | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -994,6 +1035,30 @@ function ReaderPage({
       .catch((caught: unknown) => {
         if ((caught as DOMException).name !== "AbortError") {
           setRegulatoryContext(null);
+        }
+      });
+    return () => controller.abort();
+  }, [activeProvision, legalDocument]);
+
+  useEffect(() => {
+    if (!legalDocument || !activeProvision) return;
+    const controller = new AbortController();
+    setProvisionDecisions(null);
+    const query = new URLSearchParams({ provisionId: activeProvision.id });
+    void fetch(
+      `/api/supervisory-decisions/${encodeURIComponent(legalDocument.slug)}?${query}`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load decisions");
+        return documentSupervisoryDecisionsResponseSchema.parse(
+          await response.json(),
+        );
+      })
+      .then(setProvisionDecisions)
+      .catch((caught: unknown) => {
+        if ((caught as DOMException).name !== "AbortError") {
+          setProvisionDecisions(null);
         }
       });
     return () => controller.abort();
@@ -1153,6 +1218,14 @@ function ReaderPage({
               <CalendarDays aria-hidden="true" size={15} /> Timeline
             </Link>
           ) : null}
+          {documentSummary?.hasSupervisoryDecisions ? (
+            <Link
+              className="view-switch"
+              to={supervisoryDecisionsPath(legalDocument.slug)}
+            >
+              <Landmark aria-hidden="true" size={15} /> Decisions
+            </Link>
+          ) : null}
           <button
             className="search-button"
             onClick={onOpenSearch}
@@ -1271,6 +1344,7 @@ function ReaderPage({
           loading={relationshipsLoading}
           relationships={relationships}
         />
+        <ProvisionDecisionList response={provisionDecisions} />
         <nav className="provision-pagination" aria-label="Provision navigation">
           {previous ? (
             <button onClick={() => navigate(previous.path)} type="button">
@@ -1318,6 +1392,7 @@ function ReaderPage({
           loading={relationshipsLoading}
           relationships={relationships}
         />
+        <ProvisionDecisionList response={provisionDecisions} />
         {regulatoryContext &&
         (regulatoryContext.domainAssignments.length > 0 ||
           regulatoryContext.authorityRelationships.length > 0 ||
@@ -1463,6 +1538,7 @@ export function App() {
   const implementationTimeline = parseImplementationTimelinePath(
     location.pathname,
   );
+  const supervisoryDecisions = parseSupervisoryDecisionsPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const relationshipGraph = parseRelationshipGraphPath(location.pathname);
   const level2MandateQuery = isLevel2MandateQueryPath(location.pathname);
@@ -1515,6 +1591,13 @@ export function App() {
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}
           slug={implementationTimeline.slug}
+          theme={theme}
+        />
+      ) : supervisoryDecisions ? (
+        <SupervisoryDecisionsPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          slug={supervisoryDecisions.slug}
           theme={theme}
         />
       ) : relationshipGraph ? (
