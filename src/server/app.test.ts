@@ -3,6 +3,7 @@ import type { ExplorerNode } from "../shared/legal";
 import {
   findDocument,
   findDocumentBySlug,
+  findDocumentRegulatoryContext,
   findDocumentRelationshipGraph,
   findDocumentVersionChain,
   findExplorerBySlug,
@@ -323,6 +324,22 @@ describe("Document lookup", () => {
       label: "Article 3",
       excerpt: expect.any(String),
     });
+  });
+
+  it("serves reusable regulatory context for a representative banking provision", () => {
+    const context = findDocumentRegulatoryContext(
+      "eu:32013L0036",
+      "eu:32013L0036:article:88",
+    );
+
+    expect(context?.domainAssignments).toContainEqual(
+      expect.objectContaining({
+        targetEntityId: "eu:32013L0036:article:88",
+        provenance: "EDITORIAL",
+        reviewStatus: "reviewed",
+      }),
+    );
+    expect(context?.authorityRelationships).toHaveLength(2);
   });
 
   it("serves exact document definitions for Reader term previews", () => {

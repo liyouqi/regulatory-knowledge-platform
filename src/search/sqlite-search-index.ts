@@ -10,6 +10,15 @@ import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import {
+  DEFAULT_AUTHORITIES_PATH,
+  DEFAULT_REGULATORY_DOMAINS_PATH,
+  REGULATORY_CONTEXT_BUILDER,
+  REGULATORY_CONTEXT_BUILDER_VERSION,
+  buildRegulatoryContext,
+  loadAuthorityDataset,
+  loadRegulatoryDomainDataset,
+} from "../regulatory-context/regulatory-context";
+import {
   CELLAR_CASE_LAW_BUILDER,
   CELLAR_CASE_LAW_BUILDER_VERSION,
   buildCellarCaseLaw,
@@ -65,7 +74,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.6.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "4.7.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -79,6 +88,8 @@ export interface RuntimeDatabaseManifest {
   profileVersion: string;
   profileDisplayName: string;
   profileHash: string;
+  regulatoryDomainTaxonomyId: string;
+  regulatoryDomainTaxonomyVersion: string;
   documentCount: number;
   recordCount: number;
   definitionCount: number;
@@ -91,6 +102,10 @@ export interface RuntimeDatabaseManifest {
   relatedRecitalCount: number;
   versionNodeCount: number;
   versionEdgeCount: number;
+  domainCount: number;
+  domainAssignmentCount: number;
+  authorityCount: number;
+  authorityRelationshipCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -247,6 +262,8 @@ function runtimeBuildId(
   lifecycleRelations: ReturnType<typeof loadCellarLifecycleRelations>,
   caseLawMetadata: ReturnType<typeof loadCellarCaseLawMetadata>,
   relatedRecitalBenchmark: ReturnType<typeof loadRelatedRecitalBenchmark>,
+  regulatoryDomainDataset: ReturnType<typeof loadRegulatoryDomainDataset>,
+  authorityDataset: ReturnType<typeof loadAuthorityDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -270,6 +287,9 @@ function runtimeBuildId(
         `${TFIDF_RELATED_RECITAL_BUILDER}@${TFIDF_RELATED_RECITAL_BUILDER_VERSION}`,
         JSON.stringify(relatedRecitalBenchmark),
         `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
+        `${REGULATORY_CONTEXT_BUILDER}@${REGULATORY_CONTEXT_BUILDER_VERSION}`,
+        JSON.stringify(regulatoryDomainDataset),
+        JSON.stringify(authorityDataset),
         input,
       ].join("\n"),
     )
@@ -321,6 +341,19 @@ export function buildRuntimeDatabase(
   const versionNodes = versionChains.flatMap((chain) => chain.nodes);
   const versionEdges = versionChains.flatMap((chain) => chain.edges);
   const relationshipBuild = buildExplicitReferences(documents);
+  const regulatoryDomainDataset = loadRegulatoryDomainDataset(
+    DEFAULT_REGULATORY_DOMAINS_PATH,
+  );
+  const authorityDataset = loadAuthorityDataset(DEFAULT_AUTHORITIES_PATH);
+  const regulatoryContextBuild = buildRegulatoryContext(
+    documents,
+    relationshipBuild.entities,
+    inputSources.length > 0
+      ? new Set(inputDocuments.map((document) => document.id))
+      : null,
+    regulatoryDomainDataset,
+    authorityDataset,
+  );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
       const identifier = source.celex ?? source.localId;
@@ -406,6 +439,8 @@ export function buildRuntimeDatabase(
     lifecycleRelations,
     caseLawMetadata,
     relatedRecitalBenchmark,
+    regulatoryDomainDataset,
+    authorityDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -572,6 +607,69 @@ export function buildRuntimeDatabase(
       ) STRICT;
       CREATE INDEX legal_entities_document_id ON legal_entities(document_id);
       CREATE INDEX legal_entities_root_provision_id ON legal_entities(root_provision_id);
+      CREATE TABLE regulatory_domains (
+        id TEXT PRIMARY KEY,
+        parent_id TEXT REFERENCES regulatory_domains(id),
+        label TEXT NOT NULL,
+        description TEXT NOT NULL,
+        taxonomy_id TEXT NOT NULL,
+        taxonomy_version TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL
+      ) STRICT;
+      CREATE INDEX regulatory_domains_parent_id ON regulatory_domains(parent_id);
+      CREATE TABLE domain_assignments (
+        assignment_id TEXT PRIMARY KEY,
+        domain_id TEXT NOT NULL REFERENCES regulatory_domains(id),
+        target_document_id TEXT NOT NULL REFERENCES documents(id),
+        target_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        target_kind TEXT NOT NULL CHECK (target_kind IN ('document', 'provision')),
+        role TEXT NOT NULL CHECK (role IN ('contains', 'primary')),
+        provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
+        assignment_version TEXT NOT NULL,
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        rationale TEXT NOT NULL,
+        review_note TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        UNIQUE (domain_id, target_entity_id, role, assignment_version)
+      ) STRICT;
+      CREATE INDEX domain_assignments_target_document_id
+        ON domain_assignments(target_document_id);
+      CREATE INDEX domain_assignments_target_entity_id
+        ON domain_assignments(target_entity_id);
+      CREATE TABLE authorities (
+        id TEXT PRIMARY KEY,
+        official_name TEXT NOT NULL,
+        acronym TEXT,
+        authority_type TEXT NOT NULL CHECK (authority_type IN (
+          'legislative-institution', 'supervisory-authority'
+        )),
+        jurisdiction TEXT NOT NULL,
+        source_url TEXT NOT NULL,
+        checked_at TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE authority_relationships (
+        relationship_id TEXT PRIMARY KEY,
+        source_document_id TEXT NOT NULL REFERENCES documents(id),
+        relation_type TEXT NOT NULL CHECK (relation_type = 'ISSUED_BY'),
+        target_authority_id TEXT NOT NULL REFERENCES authorities(id),
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_METADATA'),
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        source_ref TEXT NOT NULL,
+        builder_method TEXT NOT NULL,
+        builder_version TEXT NOT NULL,
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        UNIQUE (
+          source_document_id, relation_type, target_authority_id,
+          provenance, evidence_locator
+        )
+      ) STRICT;
+      CREATE INDEX authority_relationships_source_document_id
+        ON authority_relationships(source_document_id);
       CREATE TABLE relationships (
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -728,6 +826,46 @@ export function buildRuntimeDatabase(
         @kind, @label, @title, @path
       )
     `);
+    const insertDomain = database.prepare(`
+      INSERT INTO regulatory_domains (
+        id, parent_id, label, description, taxonomy_id, taxonomy_version,
+        provenance, review_status, reviewed_at
+      ) VALUES (
+        @id, @parentId, @label, @description, @taxonomyId, @taxonomyVersion,
+        @provenance, @reviewStatus, @reviewedAt
+      )
+    `);
+    const insertDomainAssignment = database.prepare(`
+      INSERT INTO domain_assignments (
+        assignment_id, domain_id, target_document_id, target_entity_id,
+        target_kind, role, provenance, assignment_version, review_status,
+        reviewed_at, rationale, review_note, evidence_locator
+      ) VALUES (
+        @id, @domainId, @targetDocumentId, @targetEntityId,
+        @targetKind, @role, @provenance, @assignmentVersion, @reviewStatus,
+        @reviewedAt, @rationale, @reviewNote, @evidenceLocator
+      )
+    `);
+    const insertAuthority = database.prepare(`
+      INSERT INTO authorities (
+        id, official_name, acronym, authority_type, jurisdiction,
+        source_url, checked_at
+      ) VALUES (
+        @id, @officialName, @acronym, @authorityType, @jurisdiction,
+        @sourceUrl, @checkedAt
+      )
+    `);
+    const insertAuthorityRelationship = database.prepare(`
+      INSERT INTO authority_relationships (
+        relationship_id, source_document_id, relation_type,
+        target_authority_id, provenance, evidence_text, evidence_locator,
+        source_ref, builder_method, builder_version, review_status, reviewed_at
+      ) VALUES (
+        @id, @sourceDocumentId, @relationType,
+        @targetAuthorityId, @provenance, @evidenceText, @evidenceLocator,
+        @sourceRef, @builderMethod, @builderVersion, @reviewStatus, @reviewedAt
+      )
+    `);
     const insertLegalWork = database.prepare(`
       INSERT INTO legal_works (
         id, celex, cellar_work_uri, loaded_document_id, label, title,
@@ -855,6 +993,18 @@ export function buildRuntimeDatabase(
       for (const entity of relationshipBuild.entities) {
         insertEntity.run(entity);
       }
+      for (const domain of regulatoryContextBuild.domains) {
+        insertDomain.run(domain);
+      }
+      for (const assignment of regulatoryContextBuild.assignments) {
+        insertDomainAssignment.run(assignment);
+      }
+      for (const authority of regulatoryContextBuild.authorities) {
+        insertAuthority.run(authority);
+      }
+      for (const relationship of regulatoryContextBuild.authorityRelationships) {
+        insertAuthorityRelationship.run(relationship);
+      }
       for (const work of lifecycleBuild.works) {
         insertLegalWork.run(work);
       }
@@ -882,6 +1032,8 @@ export function buildRuntimeDatabase(
         profileVersion: compilation.profile.version,
         profileDisplayName: compilation.profile.displayName,
         profileHash,
+        regulatoryDomainTaxonomyId: regulatoryContextBuild.taxonomyId,
+        regulatoryDomainTaxonomyVersion: regulatoryContextBuild.taxonomyVersion,
         documentCount: String(documents.length),
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
@@ -900,6 +1052,14 @@ export function buildRuntimeDatabase(
         ),
         versionNodeCount: String(versionNodes.length),
         versionEdgeCount: String(versionEdges.length),
+        domainCount: String(regulatoryContextBuild.domains.length),
+        domainAssignmentCount: String(
+          regulatoryContextBuild.assignments.length,
+        ),
+        authorityCount: String(regulatoryContextBuild.authorities.length),
+        authorityRelationshipCount: String(
+          regulatoryContextBuild.authorityRelationships.length,
+        ),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -927,6 +1087,9 @@ export function buildRuntimeDatabase(
         ]),
         versionBuilders: JSON.stringify([
           `${DOCUMENT_VERSION_CHAIN_BUILDER}@${DOCUMENT_VERSION_CHAIN_BUILDER_VERSION}`,
+        ]),
+        regulatoryContextBuilders: JSON.stringify([
+          `${REGULATORY_CONTEXT_BUILDER}@${REGULATORY_CONTEXT_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -977,6 +1140,8 @@ export function buildRuntimeDatabase(
     profileVersion: compilation.profile.version,
     profileDisplayName: compilation.profile.displayName,
     profileHash,
+    regulatoryDomainTaxonomyId: regulatoryContextBuild.taxonomyId,
+    regulatoryDomainTaxonomyVersion: regulatoryContextBuild.taxonomyVersion,
     documentCount: documents.length,
     recordCount: rows.length,
     definitionCount: definitions.length,
@@ -991,6 +1156,11 @@ export function buildRuntimeDatabase(
     relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
     versionNodeCount: versionNodes.length,
     versionEdgeCount: versionEdges.length,
+    domainCount: regulatoryContextBuild.domains.length,
+    domainAssignmentCount: regulatoryContextBuild.assignments.length,
+    authorityCount: regulatoryContextBuild.authorities.length,
+    authorityRelationshipCount:
+      regulatoryContextBuild.authorityRelationships.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

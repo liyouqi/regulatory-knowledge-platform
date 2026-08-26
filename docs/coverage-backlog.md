@@ -41,7 +41,7 @@ Representative scope:
 
 This pilot validates the workflow and data contracts. It does not attempt simultaneous full coverage of CRR/CRD, AML, payments, credit, markets, funds, insurance, prudential reporting, ESG, or national implementations.
 
-Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. Provision-level governance classification, EBA/GL/2021/05, Authority entities, and the reviewed EU → Luxembourg relation remain the next bounded slices.
+Current 0→1 status: the complete original-OJ English Formex text of Directive 2013/36/EU (CRD IV), including Annexes I–II, is pinned and reproducibly onboarded through the corpus manifest with explicit current-version and corrigendum metadata. The loaded text is not represented as the current consolidated text. A versioned `Banking governance and internal control` Domain now has reviewed `EDITORIAL` assignments on CRD Articles 74, 76, and 88 plus representative Circular CSSF 12/552 provisions. European Parliament, Council, and CSSF are normalized Authorities with reviewed `ISSUED_BY` official metadata, exposed with the assignments through one internal regulatory-context service output. EBA/GL/2021/05 and a reviewed EU → Luxembourg legal relation remain the next bounded slices.
 
 ## Financial-domain 1→100 queues
 

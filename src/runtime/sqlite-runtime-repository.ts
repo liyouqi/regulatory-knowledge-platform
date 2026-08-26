@@ -40,6 +40,12 @@ import {
   documentLifecycleRelationshipsResponseSchema,
 } from "../shared/lifecycle";
 import { explorerPath } from "../shared/reader-route";
+import {
+  type AuthorityRelationship,
+  type DocumentRegulatoryContext,
+  type DomainAssignment,
+  documentRegulatoryContextSchema,
+} from "../shared/regulatory-context";
 import { sourceStatusSchema } from "../shared/source-status";
 
 type LawSearchSource = Pick<
@@ -178,6 +184,53 @@ interface EntityPreviewRow {
   path: string;
   documentShortName: string;
   sourceUrl: string;
+}
+
+interface DomainAssignmentRow {
+  id: string;
+  domainId: string;
+  parentId: string | null;
+  domainLabel: string;
+  domainDescription: string;
+  taxonomyId: string;
+  taxonomyVersion: string;
+  domainProvenance: "EDITORIAL";
+  domainReviewStatus: "reviewed";
+  domainReviewedAt: string;
+  targetDocumentId: string;
+  targetEntityId: string;
+  targetKind: "document" | "provision";
+  targetLabel: string;
+  targetPath: string;
+  role: "contains" | "primary";
+  provenance: "EDITORIAL";
+  assignmentVersion: string;
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+  rationale: string;
+  reviewNote: string;
+  evidenceLocator: string;
+}
+
+interface AuthorityRelationshipRow {
+  id: string;
+  sourceDocumentId: string;
+  relationType: "ISSUED_BY";
+  provenance: "OFFICIAL_METADATA";
+  evidenceText: string;
+  evidenceLocator: string;
+  sourceRef: string;
+  builderMethod: string;
+  builderVersion: string;
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+  authorityId: string;
+  officialName: string;
+  acronym: string | null;
+  authorityType: "legislative-institution" | "supervisory-authority";
+  jurisdiction: string;
+  authoritySourceUrl: string;
+  checkedAt: string;
 }
 
 interface FamilyPrimaryRow {
@@ -493,6 +546,8 @@ export class SqliteRuntimeRepository {
   readonly profileVersion: string;
   readonly profileDisplayName: string;
   readonly profileHash: string;
+  readonly regulatoryDomainTaxonomyId: string;
+  readonly regulatoryDomainTaxonomyVersion: string;
   readonly relationshipCount: number;
   readonly cellarRelationshipCount: number;
   readonly lifecycleRelationshipCount: number;
@@ -502,6 +557,10 @@ export class SqliteRuntimeRepository {
   readonly relatedRecitalCount: number;
   readonly versionNodeCount: number;
   readonly versionEdgeCount: number;
+  readonly domainCount: number;
+  readonly domainAssignmentCount: number;
+  readonly authorityCount: number;
+  readonly authorityRelationshipCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -530,6 +589,14 @@ export class SqliteRuntimeRepository {
         "profileDisplayName",
       );
       this.profileHash = manifestValue(this.database, "profileHash");
+      this.regulatoryDomainTaxonomyId = manifestValue(
+        this.database,
+        "regulatoryDomainTaxonomyId",
+      );
+      this.regulatoryDomainTaxonomyVersion = manifestValue(
+        this.database,
+        "regulatoryDomainTaxonomyVersion",
+      );
       this.relationshipCount = Number.parseInt(
         manifestValue(this.database, "relationshipCount"),
         10,
@@ -564,6 +631,22 @@ export class SqliteRuntimeRepository {
       );
       this.versionEdgeCount = Number.parseInt(
         manifestValue(this.database, "versionEdgeCount"),
+        10,
+      );
+      this.domainCount = Number.parseInt(
+        manifestValue(this.database, "domainCount"),
+        10,
+      );
+      this.domainAssignmentCount = Number.parseInt(
+        manifestValue(this.database, "domainAssignmentCount"),
+        10,
+      );
+      this.authorityCount = Number.parseInt(
+        manifestValue(this.database, "authorityCount"),
+        10,
+      );
+      this.authorityRelationshipCount = Number.parseInt(
+        manifestValue(this.database, "authorityRelationshipCount"),
         10,
       );
       this.unresolvedReferenceCount = Number.parseInt(
@@ -633,6 +716,163 @@ export class SqliteRuntimeRepository {
       `)
       .get(slug) as DocumentPayloadRow | undefined;
     return row ? documentViewSchema.parse(JSON.parse(row.readerPayload)) : null;
+  }
+
+  findDocumentRegulatoryContext(
+    documentId: string,
+    provisionId?: string,
+  ): DocumentRegulatoryContext | null {
+    const document = this.database
+      .prepare("SELECT id FROM documents WHERE id = ?")
+      .get(documentId);
+    if (!document) return null;
+    if (provisionId) {
+      const provision = this.database
+        .prepare(`
+          SELECT id FROM legal_entities
+          WHERE id = ? AND document_id = ?
+            AND kind != 'document' AND root_provision_id IS NULL
+        `)
+        .get(provisionId, documentId);
+      if (!provision) return null;
+    }
+
+    const domainRows = this.database
+      .prepare(`
+        SELECT
+          da.assignment_id AS id,
+          rd.id AS domainId,
+          rd.parent_id AS parentId,
+          rd.label AS domainLabel,
+          rd.description AS domainDescription,
+          rd.taxonomy_id AS taxonomyId,
+          rd.taxonomy_version AS taxonomyVersion,
+          rd.provenance AS domainProvenance,
+          rd.review_status AS domainReviewStatus,
+          rd.reviewed_at AS domainReviewedAt,
+          da.target_document_id AS targetDocumentId,
+          da.target_entity_id AS targetEntityId,
+          da.target_kind AS targetKind,
+          CASE WHEN le.title IS NULL THEN le.label
+            ELSE le.label || ' — ' || le.title END AS targetLabel,
+          le.path AS targetPath,
+          da.role,
+          da.provenance,
+          da.assignment_version AS assignmentVersion,
+          da.review_status AS reviewStatus,
+          da.reviewed_at AS reviewedAt,
+          da.rationale,
+          da.review_note AS reviewNote,
+          da.evidence_locator AS evidenceLocator
+        FROM domain_assignments da
+        JOIN regulatory_domains rd ON rd.id = da.domain_id
+        JOIN legal_entities le ON le.id = da.target_entity_id
+        WHERE da.target_document_id = @documentId
+          AND (
+            da.target_entity_id = @documentId
+            OR (@provisionId IS NOT NULL AND da.target_entity_id = @provisionId)
+          )
+        ORDER BY
+          CASE da.target_kind WHEN 'document' THEN 0 ELSE 1 END,
+          rd.label ASC,
+          da.assignment_id ASC
+      `)
+      .all({
+        documentId,
+        provisionId: provisionId ?? null,
+      }) as DomainAssignmentRow[];
+    const authorityRows = this.database
+      .prepare(`
+        SELECT
+          ar.relationship_id AS id,
+          ar.source_document_id AS sourceDocumentId,
+          ar.relation_type AS relationType,
+          ar.provenance,
+          ar.evidence_text AS evidenceText,
+          ar.evidence_locator AS evidenceLocator,
+          ar.source_ref AS sourceRef,
+          ar.builder_method AS builderMethod,
+          ar.builder_version AS builderVersion,
+          ar.review_status AS reviewStatus,
+          ar.reviewed_at AS reviewedAt,
+          a.id AS authorityId,
+          a.official_name AS officialName,
+          a.acronym,
+          a.authority_type AS authorityType,
+          a.jurisdiction,
+          a.source_url AS authoritySourceUrl,
+          a.checked_at AS checkedAt
+        FROM authority_relationships ar
+        JOIN authorities a ON a.id = ar.target_authority_id
+        WHERE ar.source_document_id = ?
+        ORDER BY a.official_name ASC, ar.relationship_id ASC
+      `)
+      .all(documentId) as AuthorityRelationshipRow[];
+
+    const domainAssignments: DomainAssignment[] = domainRows.map((row) => ({
+      id: row.id,
+      domain: {
+        id: row.domainId,
+        parentId: row.parentId,
+        label: row.domainLabel,
+        description: row.domainDescription,
+        taxonomyId: row.taxonomyId,
+        taxonomyVersion: row.taxonomyVersion,
+        provenance: row.domainProvenance,
+        reviewStatus: row.domainReviewStatus,
+        reviewedAt: row.domainReviewedAt,
+      },
+      targetDocumentId: row.targetDocumentId,
+      targetEntityId: row.targetEntityId,
+      targetKind: row.targetKind,
+      targetLabel: row.targetLabel,
+      targetPath: row.targetPath,
+      role: row.role,
+      provenance: row.provenance,
+      assignmentVersion: row.assignmentVersion,
+      reviewStatus: row.reviewStatus,
+      reviewedAt: row.reviewedAt,
+      rationale: row.rationale,
+      reviewNote: row.reviewNote,
+      evidenceLocator: row.evidenceLocator,
+    }));
+    const authorityRelationships: AuthorityRelationship[] = authorityRows.map(
+      (row) => ({
+        id: row.id,
+        sourceDocumentId: row.sourceDocumentId,
+        relationType: row.relationType,
+        target: {
+          id: row.authorityId,
+          officialName: row.officialName,
+          acronym: row.acronym,
+          authorityType: row.authorityType,
+          jurisdiction: row.jurisdiction,
+          sourceUrl: row.authoritySourceUrl,
+          checkedAt: row.checkedAt,
+        },
+        provenance: row.provenance,
+        evidenceText: row.evidenceText,
+        evidenceLocator: row.evidenceLocator,
+        sourceRef: row.sourceRef,
+        builder: {
+          method: row.builderMethod,
+          version: row.builderVersion,
+        },
+        reviewStatus: row.reviewStatus,
+        reviewedAt: row.reviewedAt,
+      }),
+    );
+
+    return documentRegulatoryContextSchema.parse({
+      documentId,
+      provisionId,
+      buildId: this.buildId,
+      profileId: this.profileId,
+      taxonomyId: this.regulatoryDomainTaxonomyId,
+      taxonomyVersion: this.regulatoryDomainTaxonomyVersion,
+      domainAssignments,
+      authorityRelationships,
+    });
   }
 
   findDocumentVersionChain(documentId: string): DocumentVersionChain | null {

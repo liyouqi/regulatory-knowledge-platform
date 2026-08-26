@@ -64,6 +64,12 @@ describe("banking-default runtime isolation", () => {
     expect(
       search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
     ).toHaveLength(68);
+    expect(
+      repository?.findDocumentRegulatoryContext(
+        "eu:32013L0036",
+        "eu:32013L0036:article:74",
+      )?.domainAssignments,
+    ).toHaveLength(2);
   });
 
   it("makes excluded Reader, Explorer, Library, and relationship lookups unavailable", () => {
@@ -81,6 +87,9 @@ describe("banking-default runtime isolation", () => {
       repository?.findRelationshipPreview("eu:32023R1114:article:62"),
     ).toBeNull();
     expect(search?.listDocumentDefinitions("eu:32023R1114")).toBeNull();
+    expect(
+      repository?.findDocumentRegulatoryContext("eu:32023R1114"),
+    ).toBeNull();
   });
 
   it("does not leak excluded documents through search or graph projections", () => {

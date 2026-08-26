@@ -34,6 +34,16 @@ export function findDocumentVersionChain(documentId: string) {
   return runtimeRepository.findDocumentVersionChain(documentId);
 }
 
+export function findDocumentRegulatoryContext(
+  documentId: string,
+  provisionId?: string,
+) {
+  return runtimeRepository.findDocumentRegulatoryContext(
+    documentId,
+    provisionId,
+  );
+}
+
 export function findExplorerBySlug(slug: string) {
   return runtimeRepository.findExplorerBySlug(slug);
 }
@@ -161,6 +171,10 @@ app.get("/api/health", (_request, response) => {
       relatedRecitals: runtimeRepository.relatedRecitalCount,
       versionNodes: runtimeRepository.versionNodeCount,
       versionEdges: runtimeRepository.versionEdgeCount,
+      regulatoryDomains: runtimeRepository.domainCount,
+      domainAssignments: runtimeRepository.domainAssignmentCount,
+      authorities: runtimeRepository.authorityCount,
+      authorityRelationships: runtimeRepository.authorityRelationshipCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -356,6 +370,25 @@ app.get("/api/documents/:documentId/definitions", (request, response) => {
   }
   response.json(definitions);
 });
+
+app.get(
+  "/api/documents/:documentId/regulatory-context",
+  (request, response) => {
+    const provisionId =
+      typeof request.query.provisionId === "string"
+        ? request.query.provisionId
+        : undefined;
+    const context = findDocumentRegulatoryContext(
+      request.params.documentId,
+      provisionId,
+    );
+    if (!context) {
+      response.status(404).json({ error: "Regulatory context not found" });
+      return;
+    }
+    response.json(context);
+  },
+);
 
 app.get("/api/documents/:documentId", (request, response) => {
   const document = findDocument(request.params.documentId);

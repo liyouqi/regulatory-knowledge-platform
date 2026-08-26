@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "authorities": [
+    {
+      "id": "authority:eu:european-parliament",
+      "officialName": "European Parliament",
+      "acronym": null,
+      "authorityType": "legislative-institution",
+      "jurisdiction": "EU",
+      "sourceUrl": "https://www.europarl.europa.eu/about-parliament/en",
+      "checkedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "id": "authority:eu:council-of-the-european-union",
+      "officialName": "Council of the European Union",
+      "acronym": "Council",
+      "authorityType": "legislative-institution",
+      "jurisdiction": "EU",
+      "sourceUrl": "https://www.consilium.europa.eu/en/council-eu/",
+      "checkedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "id": "authority:lu:cssf",
+      "officialName": "Commission de Surveillance du Secteur Financier",
+      "acronym": "CSSF",
+      "authorityType": "supervisory-authority",
+      "jurisdiction": "LU",
+      "sourceUrl": "https://www.cssf.lu/en/about-the-cssf/",
+      "checkedAt": "2026-08-26T12:00:00Z"
+    }
+  ],
+  "relationships": [
+    {
+      "sourceDocumentId": "eu:32013L0036",
+      "relationType": "ISSUED_BY",
+      "targetAuthorityId": "authority:eu:european-parliament",
+      "provenance": "OFFICIAL_METADATA",
+      "evidenceText": "Directive 2013/36/EU of the European Parliament and of the Council",
+      "evidenceLocator": "official-title:european-parliament",
+      "sourceRef": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "sourceDocumentId": "eu:32013L0036",
+      "relationType": "ISSUED_BY",
+      "targetAuthorityId": "authority:eu:council-of-the-european-union",
+      "provenance": "OFFICIAL_METADATA",
+      "evidenceText": "Directive 2013/36/EU of the European Parliament and of the Council",
+      "evidenceLocator": "official-title:council-of-the-european-union",
+      "sourceRef": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-08-26T12:00:00Z"
+    },
+    {
+      "sourceDocumentId": "lu:cssf:circular-12-552",
+      "relationType": "ISSUED_BY",
+      "targetAuthorityId": "authority:lu:cssf",
+      "provenance": "OFFICIAL_METADATA",
+      "evidenceText": "Circular CSSF 12/552",
+      "evidenceLocator": "official-document-page:cssf-circular-12-552",
+      "sourceRef": "https://www.cssf.lu/en/Document/circular-cssf-12-552/",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-08-26T12:00:00Z"
+    }
+  ]
+}

@@ -22,6 +22,10 @@ export interface RuntimeArtifactVerification {
   relatedRecitals: number;
   versionNodes: number;
   versionEdges: number;
+  regulatoryDomains: number;
+  domainAssignments: number;
+  authorities: number;
+  authorityRelationships: number;
   unresolvedReferences: number;
   bytes: number;
   input: string;
@@ -75,6 +79,10 @@ export function verifyRuntimeArtifact(
       relatedRecitals: repository.relatedRecitalCount,
       versionNodes: repository.versionNodeCount,
       versionEdges: repository.versionEdgeCount,
+      regulatoryDomains: repository.domainCount,
+      domainAssignments: repository.domainAssignmentCount,
+      authorities: repository.authorityCount,
+      authorityRelationships: repository.authorityRelationshipCount,
       unresolvedReferences: repository.unresolvedReferenceCount,
       bytes: statSync(databasePath).size,
       input: databasePath,

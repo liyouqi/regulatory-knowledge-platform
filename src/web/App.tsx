@@ -56,6 +56,10 @@ import {
   parseRelationshipGraphPath,
   relationshipGraphPath,
 } from "../shared/reader-route";
+import {
+  type DocumentRegulatoryContext,
+  documentRegulatoryContextSchema,
+} from "../shared/regulatory-context";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
@@ -877,6 +881,8 @@ function ReaderPage({
   const [definitions, setDefinitions] = useState<DefinitionSearchResult[]>([]);
   const [previewDefinition, setPreviewDefinition] =
     useState<DefinitionSearchResult | null>(null);
+  const [regulatoryContext, setRegulatoryContext] =
+    useState<DocumentRegulatoryContext | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -960,6 +966,28 @@ function ReaderPage({
         : [],
     [activeProvision, definitions],
   );
+
+  useEffect(() => {
+    if (!legalDocument || !activeProvision) return;
+    const controller = new AbortController();
+    setRegulatoryContext(null);
+    const query = new URLSearchParams({ provisionId: activeProvision.id });
+    void fetch(
+      `/api/documents/${encodeURIComponent(legalDocument.id)}/regulatory-context?${query}`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load regulatory context");
+        return documentRegulatoryContextSchema.parse(await response.json());
+      })
+      .then(setRegulatoryContext)
+      .catch((caught: unknown) => {
+        if ((caught as DOMException).name !== "AbortError") {
+          setRegulatoryContext(null);
+        }
+      });
+    return () => controller.abort();
+  }, [activeProvision, legalDocument]);
 
   useEffect(() => {
     if (!legalDocument || activeProvision) return;
@@ -1269,6 +1297,60 @@ function ReaderPage({
           loading={relationshipsLoading}
           relationships={relationships}
         />
+        {regulatoryContext &&
+        (regulatoryContext.domainAssignments.length > 0 ||
+          regulatoryContext.authorityRelationships.length > 0) ? (
+          <>
+            <div className="context-divider" />
+            <section
+              className="regulatory-context"
+              aria-label="Regulatory context"
+            >
+              <p className="eyebrow">REGULATORY CONTEXT</p>
+              {regulatoryContext.domainAssignments.length > 0 ? (
+                <div className="regulatory-context-group">
+                  <strong>Domain</strong>
+                  <ul>
+                    {regulatoryContext.domainAssignments.map((assignment) => (
+                      <li key={assignment.id}>
+                        <span>{assignment.domain.label}</span>
+                        <small>
+                          {assignment.targetKind === "document"
+                            ? "Document"
+                            : "Provision"}{" "}
+                          · {assignment.role} · Editorial, reviewed
+                        </small>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {regulatoryContext.authorityRelationships.length > 0 ? (
+                <div className="regulatory-context-group">
+                  <strong>Issued by</strong>
+                  <ul>
+                    {regulatoryContext.authorityRelationships.map(
+                      (relationship) => (
+                        <li key={relationship.id}>
+                          <a
+                            href={relationship.target.sourceUrl}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            {relationship.target.acronym ??
+                              relationship.target.officialName}
+                            <ArrowUpRight aria-hidden="true" size={12} />
+                          </a>
+                          <small>Official metadata · reviewed</small>
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
+          </>
+        ) : null}
         <div className="context-divider" />
         <p className="eyebrow">SOURCE</p>
         <dl>

@@ -50,6 +50,10 @@ console.table({
   relatedRecitals: manifest.relatedRecitalCount,
   versionNodes: manifest.versionNodeCount,
   versionEdges: manifest.versionEdgeCount,
+  regulatoryDomains: manifest.domainCount,
+  domainAssignments: manifest.domainAssignmentCount,
+  authorities: manifest.authorityCount,
+  authorityRelationships: manifest.authorityRelationshipCount,
   tfidfBenchmark: manifest.tfidfBenchmark?.passed
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",

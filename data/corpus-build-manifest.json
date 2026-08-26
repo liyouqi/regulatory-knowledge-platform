@@ -128,7 +128,9 @@
     "data/cssf-source-registry.json",
     "data/edition-profiles.json",
     "data/benchmarks/related-recitals.json",
+    "data/editorial/regulatory-domains.json",
     "data/official-mappings/level2.json",
+    "data/official-metadata/authorities.json",
     "data/official-metadata/cellar-case-law.json",
     "data/official-metadata/cellar-focused-relations.json",
     "data/official-metadata/cellar-lifecycle-relations.json"

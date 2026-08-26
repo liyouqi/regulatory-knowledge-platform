@@ -74,6 +74,57 @@ describe("SQLite runtime repository", () => {
     expect(repository?.findExplorerBySlug("unknown")).toBeNull();
   });
 
+  it("returns versioned regulatory Domain and Authority context without mixing provenance", () => {
+    const context = repository?.findDocumentRegulatoryContext(
+      "eu:32013L0036",
+      "eu:32013L0036:article:74",
+    );
+
+    expect(context).toMatchObject({
+      documentId: "eu:32013L0036",
+      provisionId: "eu:32013L0036:article:74",
+      buildId: repository?.buildId,
+      profileId: "full-corpus",
+      taxonomyId: "taxonomy:regulatory-domain",
+      taxonomyVersion: "1.0.0",
+    });
+    expect(context?.domainAssignments).toHaveLength(2);
+    expect(context?.domainAssignments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          targetKind: "document",
+          role: "contains",
+          provenance: "EDITORIAL",
+        }),
+        expect.objectContaining({
+          targetEntityId: "eu:32013L0036:article:74",
+          targetKind: "provision",
+          role: "primary",
+          provenance: "EDITORIAL",
+        }),
+      ]),
+    );
+    expect(context?.authorityRelationships).toHaveLength(2);
+    expect(context?.authorityRelationships[0]).toMatchObject({
+      relationType: "ISSUED_BY",
+      provenance: "OFFICIAL_METADATA",
+      reviewStatus: "reviewed",
+    });
+    expect(repository).toMatchObject({
+      domainCount: 3,
+      domainAssignmentCount: 8,
+      authorityCount: 3,
+      authorityRelationshipCount: 3,
+    });
+    expect(
+      repository?.findDocumentRegulatoryContext(
+        "eu:32013L0036",
+        "eu:32013L0036:article:999",
+      ),
+    ).toBeNull();
+    expect(repository?.findDocumentRegulatoryContext("eu:unknown")).toBeNull();
+  });
+
   it("returns a bounded, normalized version chain only for reviewed status", () => {
     const chain = repository?.findDocumentVersionChain("eu:32024R2956");
     const crdChain = repository?.findDocumentVersionChain("eu:32013L0036");

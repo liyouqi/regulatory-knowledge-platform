@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0.0",
+  "taxonomy": {
+    "id": "taxonomy:regulatory-domain",
+    "version": "1.0.0",
+    "provenance": "EDITORIAL",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-26T12:00:00Z"
+  },
+  "domains": [
+    {
+      "id": "domain:financial-regulation",
+      "parentId": null,
+      "label": "Financial regulation",
+      "description": "Editorial root for regulatory material governing financial-sector institutions, markets, and activities."
+    },
+    {
+      "id": "domain:banking",
+      "parentId": "domain:financial-regulation",
+      "label": "Banking",
+      "description": "Editorial domain for the prudential regulation and supervision of credit institutions."
+    },
+    {
+      "id": "domain:banking-governance-internal-control",
+      "parentId": "domain:banking",
+      "label": "Banking governance and internal control",
+      "description": "Editorial domain for governance arrangements, risk management, and internal control within credit institutions."
+    }
+  ],
+  "assignments": [
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036",
+      "targetKind": "document",
+      "role": "contains",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "CRD IV contains reviewed provisions on internal governance, risk management, and governance arrangements.",
+      "reviewNote": "Contains does not classify the whole Directive as exclusively belonging to this domain.",
+      "evidenceLocator": "eu:32013L0036:articles:74,76,88"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:74",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Article 74 expressly addresses internal governance and governance arrangements.",
+      "reviewNote": "Editorial classification of the provision; the legal text remains authoritative.",
+      "evidenceLocator": "eu:32013L0036:article:74"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:76",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Article 76 addresses management-body oversight of risks, risk committees, and the independent risk-management function.",
+      "reviewNote": "Editorial classification of the provision; the legal text remains authoritative.",
+      "evidenceLocator": "eu:32013L0036:article:76"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:88",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Article 88 expressly addresses governance arrangements and management-body responsibilities.",
+      "reviewNote": "Editorial classification of the provision; the legal text remains authoritative.",
+      "evidenceLocator": "eu:32013L0036:article:88"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552",
+      "targetKind": "document",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Circular CSSF 12/552 is an official CSSF source on central administration, internal governance, and risk management.",
+      "reviewNote": "Domain assignment is editorial; issuer metadata is recorded separately.",
+      "evidenceLocator": "https://www.cssf.lu/en/Document/circular-cssf-12-552/"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-7",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Point 7 addresses risk and compliance culture and internal control.",
+      "reviewNote": "Editorial classification of the provision; the official PDF text remains authoritative.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-7"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-8",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Point 8 addresses the quality and effectiveness of internal governance arrangements.",
+      "reviewNote": "Editorial classification of the provision; the official PDF text remains authoritative.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-8"
+    },
+    {
+      "domainId": "domain:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-11",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-26T12:00:00Z",
+      "rationale": "Point 11 addresses supervisory-body responsibility for governance and internal-control arrangements.",
+      "reviewNote": "Editorial classification of the provision; the official PDF text remains authoritative.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-11"
+    }
+  ]
+}
