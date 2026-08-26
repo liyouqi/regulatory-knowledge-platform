@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ExplorerNode } from "../shared/legal";
 import {
   findCitationContext,
+  findCitationRetrieval,
   findDocument,
   findDocumentBySlug,
   findDocumentRegulatoryContext,
@@ -412,6 +413,38 @@ describe("Document lookup", () => {
       }),
     );
     expect(findCitationContext("eu:unknown:article:1")).toBeNull();
+  });
+
+  it("retrieves ranked citation-ready context from a lexical query", () => {
+    const result = findCitationRetrieval(
+      "translating them proportionate Luxembourg banking sector",
+      { limit: 3 },
+    );
+
+    expect(result).toMatchObject({
+      schemaVersion: "1.0.0",
+      runtime: { profileId: "full-corpus" },
+      retrieval: {
+        method: "fts5-to-citation-context",
+        requestedLimit: 3,
+        resultCount: 1,
+      },
+      results: [
+        {
+          rank: 1,
+          searchRank: 1,
+          resolvedEntityId:
+            "lu:cssf:circular-12-552:provision:introduction:block:7",
+          resolution: "exact-search-entity",
+          context: {
+            target: { sourceLocator: { kind: "pdf-page", value: "2" } },
+          },
+        },
+      ],
+    });
+    expect(
+      findCitationRetrieval("nonexistentregulatoryphrase").results,
+    ).toEqual([]);
   });
 
   it("serves exact document definitions for Reader term previews", () => {

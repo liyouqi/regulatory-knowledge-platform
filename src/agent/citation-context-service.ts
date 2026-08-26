@@ -41,7 +41,9 @@ function indexBlock(
   provision: ProvisionView,
   block: BodyBlock,
 ): void {
-  index.set(block.id, { document, provision, block });
+  if (block.id !== provision.id) {
+    index.set(block.id, { document, provision, block });
+  }
   for (const child of block.children) {
     indexBlock(index, document, provision, child);
   }
@@ -66,6 +68,15 @@ export class CitationContextService {
         }
       }
     }
+  }
+
+  get runtimeIdentity() {
+    return {
+      buildId: this.repository.buildId,
+      profileId: this.repository.profileId,
+      profileVersion: this.repository.profileVersion,
+      profileHash: this.repository.profileHash,
+    };
   }
 
   findByEntityId(entityId: string): CitationContext | null {

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-08-26T13:00:00Z",
+  "topN": 1,
+  "minimumHitRate": 1,
+  "cases": [
+    {
+      "id": "citation-retrieval:crd:article-74-paragraph-3",
+      "query": "EBA shall issue guidelines arrangements processes mechanisms",
+      "expectedEntityIds": ["eu:32013L0036:article:74:paragraph:3"]
+    },
+    {
+      "id": "citation-retrieval:cssf:implementation-context",
+      "query": "translating them proportionate Luxembourg banking sector",
+      "expectedEntityIds": [
+        "lu:cssf:circular-12-552:provision:introduction:block:7"
+      ]
+    },
+    {
+      "id": "citation-retrieval:eba:paragraph-5",
+      "query": "should implement in accordance with Article 74",
+      "expectedEntityIds": ["eu:eba:gl:2021:05:paragraph:5:text"]
+    }
+  ]
+}

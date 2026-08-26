@@ -2252,7 +2252,7 @@ Phase 3 在公开 API 之前提供稳定的内部 machine-facing service output�
 
 AI orchestration 不进入 Canonical build dependency。模型生成的摘要、分类候选或解释必须是可关闭、可版本化、带 provenance 的 enrichment，不能写回 official text 或覆盖人工审核结论。Phase 4 只把这些已经稳定的 service outputs 适配为 versioned Public API / MCP。
 
-当前实现：Runtime 5.0.0 将 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator` 保留到 schema-validated Reader payload。`citation-context-service` 只接受已进入当前 Edition/Profile 的 stable Provision 或 Body Block ID，以 `stable-entity-id@1.0.0` exact match 组装 `textSegments`、document snapshot/version/as-of、Canonical/Runtime build identity、root-Provision relationships 和 regulatory context；不重新解析正文、不拼接模型摘要、不产生 embedding。内部 `GET /api/internal/citation-context/:entityId` 是 Phase 3 controlled transport，未知或 Profile-excluded ID fail closed。其 rank/score 固定为 deterministic exact retrieval metadata，不表示法律置信度。Public compatibility、auth、rate limit 和 MCP adapter 仍在 Phase 4。
+当前实现：Runtime 5.0.0 将 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator` 保留到 schema-validated Reader payload。`citation-context-service` 只接受已进入当前 Edition/Profile 的 stable Provision 或 Body Block ID，以 `stable-entity-id@1.0.0` exact match 组装 `textSegments`、document snapshot/version/as-of、Canonical/Runtime build identity、root-Provision relationships 和 regulatory context；不重新解析正文、不拼接模型摘要、不产生 embedding。内部 `GET /api/internal/citation-context/:entityId` 是 Phase 3 controlled transport，未知或 Profile-excluded ID fail closed。`citation-retrieval-service@1.0.0` 进一步把同一 Profile 的 SQLite FTS5 结果确定性解析为这些 citation bundles，保留原始 `searchRank` 与最终 `rank`；只允许 exact entity 或该结果自身 root Provision fallback，不跨法规猜测。`GET /api/internal/citation-retrieval` 支持 query、可选 document scope 和 1–10 条 limit。三条人工复核的 CRD/CSSF/EBA query 必须在 `npm run citation:benchmark` 中达到 Top-1 hit rate 100%。这些 rank/score 只表示 deterministic retrieval，不表示法律置信度。Public compatibility、auth、rate limit 和 MCP adapter 仍在 Phase 4；semantic/vector retrieval 与 AI orchestration 是后续可评测的 Phase 3 enrichment，不进入当前同步路径。
 
 ---
 
@@ -3095,6 +3095,8 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 ## 32.6 Agent/RAG Internal Retrieval
 
 - 内部 service 能返回 stable ID、exact official excerpt、locator、source/version/build、relationship evidence 和 `profileId`；
+- lexical query 能确定性返回 ranked citation bundles，并保留 search rank、entity resolution 与空结果语义；
+- reviewed CRD/CSSF/EBA retrieval benchmark 可重复执行并满足固定 Top-N threshold；
 - Web 与 Agent/RAG context assembly 读取同一 Runtime/Service，不复制法规数据库；
 - Canonical build 不依赖 LLM；
 - 模型 enrichment 可关闭、可版本化并与 official/editorial data 分层。
@@ -3281,10 +3283,10 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 ## Phase 3 Sequence
 
 1. manifest-driven corpus orchestration（已完成）；raw snapshot remote retention（archive gate 已完成，外部存储待配置）；
-2. Banking Governance & Internal Control pilot（进行中：CRD source、首个 provision-level Domain 与 Authority/`ISSUED_BY` slice 已完成）；
-3. EBA/GL/2021/05 onboarding 与 legal nature；
-4. EU → Luxembourg legal relations；
-5. Agent/RAG citation-ready context assembly；
+2. Banking Governance & Internal Control 0→1 pilot（已完成）；
+3. EBA/GL/2021/05 onboarding 与 legal nature（已完成）；
+4. 首条 EU authority instrument → Luxembourg implementation relation（已完成）；
+5. Agent/RAG citation-ready context assembly 与 bounded retrieval evaluation（已完成）；
 6. implementation timeline and supervisory decisions；
 7. applicability navigation and cross-regulation paths；
 8. focused graph persistence only when query load requires it。

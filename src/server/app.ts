@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
+import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import {
   toDocumentRelationshipGraph,
   toGlobalRelationshipGraph,
@@ -26,6 +27,10 @@ const lawSearchRecords = createLawSearchRecords(
   runtimeRepository.listLawSearchSources(),
 );
 const searchService = new SearchService(runtimePath);
+const citationRetrievalService = new CitationRetrievalService(
+  searchService,
+  citationContextService,
+);
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
@@ -51,6 +56,13 @@ export function findDocumentRegulatoryContext(
 
 export function findCitationContext(entityId: string) {
   return citationContextService.findByEntityId(entityId);
+}
+
+export function findCitationRetrieval(
+  query: string,
+  options: { documentId?: string; limit?: number } = {},
+) {
+  return citationRetrievalService.search(query, options);
 }
 
 export function findExplorerBySlug(slug: string) {
@@ -200,6 +212,24 @@ app.get("/api/internal/citation-context/:entityId", (request, response) => {
     return;
   }
   response.json(context);
+});
+
+app.get("/api/internal/citation-retrieval", (request, response) => {
+  const query = typeof request.query.q === "string" ? request.query.q : "";
+  const documentId =
+    typeof request.query.documentId === "string"
+      ? request.query.documentId.slice(0, 160)
+      : undefined;
+  const requestedLimit =
+    typeof request.query.limit === "string"
+      ? Number.parseInt(request.query.limit, 10)
+      : undefined;
+  response.json(
+    findCitationRetrieval(query.slice(0, 200), {
+      documentId,
+      limit: Number.isFinite(requestedLimit) ? requestedLimit : undefined,
+    }),
+  );
 });
 
 function sendFamilyLevel2(

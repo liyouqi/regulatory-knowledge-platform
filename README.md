@@ -243,6 +243,7 @@ Phase 3 exposes one unversioned internal transport over the reusable citation-co
 
 ```text
 GET /api/internal/citation-context/:entityId
+GET /api/internal/citation-retrieval?q=<query>&limit=<1-10>&documentId=<optional>
 ```
 
 Pass a stable Provision or Body Block ID returned by full-text search. The response contains exact, unmodified official-text segments with their stable IDs and source locators; document URL, snapshot/version/as-of and Canonical build identity; Runtime build/Profile identity; root-Provision relationships with direction, provenance and evidence; and the same Domain, Authority and legal-nature context used by the Web product. Retrieval metadata is explicitly `stable-entity-id@1.0.0`, exact match, rank `1`, score `1`; it is not a semantic-confidence or legal-confidence score. Unknown or Profile-excluded IDs return `404` rather than falling back to another law.
@@ -251,9 +252,14 @@ After `npm run dev`, for example:
 
 ```bash
 curl 'http://localhost:3000/api/internal/citation-context/lu%3Acssf%3Acircular-12-552%3Aprovision%3Aintroduction%3Ablock%3A7'
+curl --get 'http://localhost:3000/api/internal/citation-retrieval' \
+  --data-urlencode 'q=EBA shall issue guidelines arrangements processes mechanisms' \
+  --data-urlencode 'limit=3'
 ```
 
-This route is for controlled Phase 3 integrations and does not promise public compatibility, authentication, or rate limiting. Phase 4 Public API/MCP will be a thin adapter over the schema-validated service output. No model, embedding service, or AI-generated text participates in this path.
+The retrieval route runs the existing SQLite FTS5 search and resolves each result to its exact citation bundle. It preserves both final `rank` and original `searchRank`; an unresolved body record may fall back only to its own root Provision, never to another law. Empty lexical matches return an identity-bearing response with no results. The reviewed CRD/CSSF/EBA 0→1 gate can be rerun with `npm run citation:benchmark`; all three cases must hit the expected entity at Top 1.
+
+These routes are for controlled Phase 3 integrations and do not promise public compatibility, authentication, or rate limiting. Phase 4 Public API/MCP will be a thin adapter over the schema-validated service output. No model, embedding service, vector store, reranker, or AI-generated text participates in this path.
 
 ### EBA Guidelines source
 

@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { CitationContextService } from "../agent/citation-context-service";
+import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
@@ -22,6 +23,7 @@ const databasePath = join(testDirectory, "banking.sqlite");
 let repository: SqliteRuntimeRepository | undefined;
 let search: SearchService | undefined;
 let citationContext: CitationContextService | undefined;
+let citationRetrieval: CitationRetrievalService | undefined;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -41,6 +43,7 @@ beforeAll(() => {
   repository = new SqliteRuntimeRepository(databasePath);
   search = new SearchService(databasePath);
   citationContext = new CitationContextService(repository);
+  citationRetrieval = new CitationRetrievalService(search, citationContext);
 });
 
 afterAll(() => {
@@ -120,6 +123,11 @@ describe("banking-default runtime isolation", () => {
     expect(
       citationContext?.findByEntityId("eu:32023R1114:article:62"),
     ).toBeNull();
+    expect(
+      citationRetrieval?.search("crypto-assets", {
+        documentId: "eu:32023R1114",
+      }).results,
+    ).toEqual([]);
   });
 
   it("does not leak excluded documents through search or graph projections", () => {
