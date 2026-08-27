@@ -14,6 +14,7 @@ import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 import { level2MandateQueryResponseSchema } from "../shared/legal";
+import { RegulatoryTopicService } from "../topics/regulatory-topic-service";
 
 export const app = express();
 const runtimePath = runtimeDatabasePath();
@@ -33,6 +34,7 @@ const citationRetrievalService = new CitationRetrievalService(
   citationContextService,
 );
 const regulatoryPathService = new RegulatoryPathService(runtimeRepository);
+const regulatoryTopicService = new RegulatoryTopicService(runtimeRepository);
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
@@ -90,6 +92,14 @@ export function findRegulatoryPath(domainSlug: string) {
 
 export function findApplicability(slug: string, entityTypeId?: string) {
   return runtimeRepository.findApplicabilityBySlug(slug, entityTypeId);
+}
+
+export function listRegulatoryTopics() {
+  return regulatoryTopicService.list();
+}
+
+export function findRegulatoryTopic(slug: string) {
+  return regulatoryTopicService.findBySlug(slug);
 }
 
 export function findExplorerBySlug(slug: string) {
@@ -229,6 +239,8 @@ app.get("/api/health", (_request, response) => {
         runtimeRepository.supervisoryDecisionFindingCount,
       applicabilityRules: runtimeRepository.applicabilityRuleCount,
       applicabilityEvidence: runtimeRepository.applicabilityEvidenceCount,
+      regulatoryTopics: runtimeRepository.topicCount,
+      topicAssignments: runtimeRepository.topicAssignmentCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -315,6 +327,19 @@ app.get("/api/applicability/:slug", (request, response) => {
     return;
   }
   response.json(result);
+});
+
+app.get("/api/topics", (_request, response) => {
+  response.json(listRegulatoryTopics());
+});
+
+app.get("/api/topics/:slug", (request, response) => {
+  const topic = findRegulatoryTopic(request.params.slug.slice(0, 120));
+  if (!topic) {
+    response.status(404).json({ error: "Regulatory Topic not found" });
+    return;
+  }
+  response.json(topic);
 });
 
 function sendFamilyLevel2(

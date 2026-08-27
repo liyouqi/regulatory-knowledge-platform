@@ -18,12 +18,48 @@ import {
   findLevel2Mandates,
   findProvisionRelationships,
   findRegulatoryPath,
+  findRegulatoryTopic,
   findRelationshipGraph,
   findRelationshipPreview,
   listDocumentDefinitions,
+  listRegulatoryTopics,
 } from "./app";
 
 describe("Document lookup", () => {
+  it("serves the reviewed Topic catalog and cross-file detail", () => {
+    const catalog = listRegulatoryTopics();
+    const topic = findRegulatoryTopic("major-ict-incident-reporting");
+
+    expect(catalog.topics).toHaveLength(3);
+    expect(catalog.topics).toContainEqual(
+      expect.objectContaining({
+        id: "topic:major-ict-incident-reporting",
+        documentCount: 4,
+        provisionCount: 1,
+      }),
+    );
+    expect(topic).toMatchObject({
+      topic: { id: "topic:major-ict-incident-reporting" },
+      scope: {
+        classificationProvenance: "EDITORIAL",
+        applicabilityConclusion: false,
+      },
+    });
+    expect(topic?.documents).toHaveLength(4);
+    expect(topic?.relationships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+          source: expect.objectContaining({
+            entityId: "eu:32022R2554:article:20",
+          }),
+        }),
+      ]),
+    );
+    expect(findRegulatoryTopic("unknown")).toBeNull();
+  });
+
   it("serves reviewed DORA applicability evidence without a final determination", () => {
     const result = findApplicability("dora", "credit-institution");
 

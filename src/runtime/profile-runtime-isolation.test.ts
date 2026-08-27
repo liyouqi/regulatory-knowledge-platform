@@ -13,6 +13,7 @@ import { toGlobalRelationshipGraph } from "../relationships/relationship-graph";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 import { buildRuntimeDatabase } from "../search/sqlite-search-index";
+import { RegulatoryTopicService } from "../topics/regulatory-topic-service";
 import {
   findEditionProfile,
   loadEditionProfileRegistrySync,
@@ -26,6 +27,7 @@ let search: SearchService | undefined;
 let citationContext: CitationContextService | undefined;
 let citationRetrieval: CitationRetrievalService | undefined;
 let regulatoryPaths: RegulatoryPathService | undefined;
+let regulatoryTopics: RegulatoryTopicService | undefined;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -47,6 +49,7 @@ beforeAll(() => {
   citationContext = new CitationContextService(repository);
   citationRetrieval = new CitationRetrievalService(search, citationContext);
   regulatoryPaths = new RegulatoryPathService(repository);
+  regulatoryTopics = new RegulatoryTopicService(repository);
 });
 
 afterAll(() => {
@@ -138,6 +141,25 @@ describe("banking-default runtime isolation", () => {
       relationships: expect.arrayContaining([
         expect.objectContaining({ relationType: "MANDATES" }),
         expect.objectContaining({ relationType: "IMPLEMENTS" }),
+      ]),
+    });
+    expect(regulatoryTopics?.list()).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      topics: expect.arrayContaining([
+        expect.objectContaining({ id: "topic:ict-third-party-risk" }),
+        expect.objectContaining({
+          id: "topic:banking-governance-internal-control",
+        }),
+      ]),
+    });
+    expect(
+      regulatoryTopics?.findBySlug("banking-governance-internal-control"),
+    ).toMatchObject({
+      scope: { applicabilityConclusion: false },
+      documents: expect.arrayContaining([
+        expect.objectContaining({ id: "eu:32013L0036" }),
+        expect.objectContaining({ id: "eu:eba:gl:2021:05" }),
+        expect.objectContaining({ id: "lu:cssf:circular-12-552" }),
       ]),
     });
   });

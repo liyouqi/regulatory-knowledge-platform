@@ -53,6 +53,8 @@ export interface CorpusVerification {
   runtimeSupervisoryDecisionFindings: number;
   runtimeApplicabilityRules: number;
   runtimeApplicabilityEvidence: number;
+  runtimeRegulatoryTopics: number;
+  runtimeTopicAssignments: number;
   unresolvedReferences: number;
 }
 
@@ -129,6 +131,8 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
     runtimeSupervisoryDecisionFindings: runtime.supervisoryDecisionFindings,
     runtimeApplicabilityRules: runtime.applicabilityRules,
     runtimeApplicabilityEvidence: runtime.applicabilityEvidence,
+    runtimeRegulatoryTopics: runtime.regulatoryTopics,
+    runtimeTopicAssignments: runtime.topicAssignments,
     unresolvedReferences: runtime.unresolvedReferences,
   };
 }

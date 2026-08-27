@@ -64,6 +64,8 @@ console.table({
   supervisoryDecisionFindings: manifest.supervisoryDecisionFindingCount,
   applicabilityRules: manifest.applicabilityRuleCount,
   applicabilityEvidence: manifest.applicabilityEvidenceCount,
+  regulatoryTopics: manifest.topicCount,
+  topicAssignments: manifest.topicAssignmentCount,
   tfidfBenchmark: manifest.tfidfBenchmark?.passed
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",

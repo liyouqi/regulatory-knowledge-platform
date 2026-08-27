@@ -4,6 +4,7 @@ import {
   CalendarDays,
   ExternalLink,
   Landmark,
+  Layers3,
   ListTree,
   Network,
   Route,
@@ -29,6 +30,7 @@ import {
   level2LibraryPath,
   regulatoryDomainPath,
   supervisoryDecisionsPath,
+  topicCatalogPath,
 } from "../shared/reader-route";
 import {
   type DocumentRegulatoryContext,
@@ -285,6 +287,11 @@ export function ExplorerPage({
           {documentSummary?.hasApplicabilityRules ? (
             <Link className="view-switch" to={applicabilityPath(document.slug)}>
               <ShieldCheck aria-hidden="true" size={15} /> Applicability
+            </Link>
+          ) : null}
+          {documentSummary?.hasTopicAssignments ? (
+            <Link className="view-switch" to={topicCatalogPath()}>
+              <Layers3 aria-hidden="true" size={15} /> Topics
             </Link>
           ) : null}
           {regulatoryContext?.domainAssignments[0] ? (

@@ -62,6 +62,22 @@ export function parseApplicabilityPath(
   return match ? { slug: decodeURIComponent(match[1]) } : null;
 }
 
+export function topicCatalogPath(): string {
+  return "/topics";
+}
+
+export function regulatoryTopicPath(slug: string): string {
+  return `/topics/${encodeURIComponent(slug)}`;
+}
+
+export function parseRegulatoryTopicPath(
+  pathname: string,
+): { scope: "catalog" } | { scope: "topic"; slug: string } | null {
+  if (/^\/topics\/?$/u.test(pathname)) return { scope: "catalog" };
+  const match = /^\/topics\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { scope: "topic", slug: decodeURIComponent(match[1]) } : null;
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

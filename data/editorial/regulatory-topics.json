@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.0.0",
+  "taxonomy": {
+    "id": "taxonomy:regulatory-topic",
+    "version": "1.0.0",
+    "provenance": "EDITORIAL",
+    "reviewStatus": "reviewed",
+    "reviewedAt": "2026-08-27T13:00:00Z"
+  },
+  "topics": [
+    {
+      "id": "topic:major-ict-incident-reporting",
+      "label": "Major ICT incident reporting",
+      "description": "Reviewed navigation topic for DORA reporting content, time limits, templates, procedures, and Luxembourg supervisory material."
+    },
+    {
+      "id": "topic:ict-third-party-risk",
+      "label": "ICT third-party risk",
+      "description": "Reviewed navigation topic for DORA third-party principles, contractual policy, and the register of information."
+    },
+    {
+      "id": "topic:banking-governance-internal-control",
+      "label": "Banking governance and internal control",
+      "description": "Reviewed navigation topic connecting CRD governance provisions, EBA internal-governance guidance, and Luxembourg supervisory material."
+    }
+  ],
+  "assignments": [
+    {
+      "topicId": "topic:major-ict-incident-reporting",
+      "targetDocumentId": "eu:32022R2554",
+      "targetEntityId": "eu:32022R2554:article:20",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Article 20 addresses harmonisation of reporting content and templates.",
+      "reviewNote": "Editorial topic classification; the official provision title and text remain authoritative.",
+      "evidenceLocator": "eu:32022R2554:article:20"
+    },
+    {
+      "topicId": "topic:major-ict-incident-reporting",
+      "targetDocumentId": "eu:32025R0301",
+      "targetEntityId": "eu:32025R0301",
+      "targetKind": "document",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "The official title identifies content and time limits for major ICT-related incident reports.",
+      "reviewNote": "Editorial classification of the loaded RTS; legal effect is represented separately.",
+      "evidenceLocator": "eu:32025R0301"
+    },
+    {
+      "topicId": "topic:major-ict-incident-reporting",
+      "targetDocumentId": "eu:32025R0302",
+      "targetEntityId": "eu:32025R0302",
+      "targetKind": "document",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "The official title identifies forms, templates, and procedures for major ICT-related incident reporting.",
+      "reviewNote": "Editorial classification of the loaded ITS; legal effect is represented separately.",
+      "evidenceLocator": "eu:32025R0302"
+    },
+    {
+      "topicId": "topic:major-ict-incident-reporting",
+      "targetDocumentId": "lu:cssf:circular-25-893",
+      "targetEntityId": "lu:cssf:circular-25-893",
+      "targetKind": "document",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Circular CSSF 25/893 is the loaded Luxembourg supervisory circular on DORA incident reporting.",
+      "reviewNote": "Editorial topic classification; issuer and legal relationship metadata remain separate.",
+      "evidenceLocator": "lu:cssf:circular-25-893"
+    },
+    {
+      "topicId": "topic:ict-third-party-risk",
+      "targetDocumentId": "eu:32022R2554",
+      "targetEntityId": "eu:32022R2554:article:28",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Article 28 contains the general principles for managing ICT third-party risk.",
+      "reviewNote": "Editorial topic classification; the official provision title and text remain authoritative.",
+      "evidenceLocator": "eu:32022R2554:article:28"
+    },
+    {
+      "topicId": "topic:ict-third-party-risk",
+      "targetDocumentId": "eu:32024R1773",
+      "targetEntityId": "eu:32024R1773",
+      "targetKind": "document",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "The official title identifies the policy for ICT contractual arrangements supporting critical or important functions.",
+      "reviewNote": "Editorial classification of the loaded RTS; legal effect is represented separately.",
+      "evidenceLocator": "eu:32024R1773"
+    },
+    {
+      "topicId": "topic:ict-third-party-risk",
+      "targetDocumentId": "eu:32024R2956",
+      "targetEntityId": "eu:32024R2956",
+      "targetKind": "document",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "The official title identifies standard templates for the register of information.",
+      "reviewNote": "Editorial classification of the loaded ITS; legal effect is represented separately.",
+      "evidenceLocator": "eu:32024R2956"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:74",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Article 74 expressly addresses internal governance and governance arrangements.",
+      "reviewNote": "Editorial topic classification; the official provision title and text remain authoritative.",
+      "evidenceLocator": "eu:32013L0036:article:74"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:5",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Paragraph 5 states the guideline subject matter for internal governance arrangements under CRD Article 74.",
+      "reviewNote": "Editorial topic classification; guideline legal nature is represented separately.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:5"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-7",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-08-27T13:00:00Z",
+      "rationale": "Point 7 addresses risk and compliance culture and internal control.",
+      "reviewNote": "Editorial topic classification; the official PDF text remains authoritative.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-7"
+    }
+  ]
+}

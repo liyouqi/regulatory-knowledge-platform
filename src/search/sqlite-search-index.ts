@@ -103,13 +103,20 @@ import {
   loadImplementationTimelineDataset,
 } from "../timelines/implementation-timeline";
 import {
+  DEFAULT_REGULATORY_TOPICS_PATH,
+  REGULATORY_TOPIC_BUILDER,
+  REGULATORY_TOPIC_BUILDER_VERSION,
+  buildRegulatoryTopics,
+  loadRegulatoryTopicDataset,
+} from "../topics/regulatory-topic";
+import {
   DOCUMENT_VERSION_CHAIN_BUILDER,
   DOCUMENT_VERSION_CHAIN_BUILDER_VERSION,
   buildDocumentVersionChain,
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.3.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.4.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -125,6 +132,9 @@ export interface RuntimeDatabaseManifest {
   profileHash: string;
   regulatoryDomainTaxonomyId: string;
   regulatoryDomainTaxonomyVersion: string;
+  regulatoryTopicTaxonomyId: string;
+  regulatoryTopicTaxonomyVersion: string;
+  regulatoryTopicTaxonomyReviewedAt: string;
   documentCount: number;
   recordCount: number;
   definitionCount: number;
@@ -146,6 +156,8 @@ export interface RuntimeDatabaseManifest {
   supervisoryDecisionFindingCount: number;
   applicabilityRuleCount: number;
   applicabilityEvidenceCount: number;
+  topicCount: number;
+  topicAssignmentCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -314,6 +326,7 @@ function runtimeBuildId(
   >,
   supervisoryDecisionDataset: ReturnType<typeof loadSupervisoryDecisionDataset>,
   applicabilityRuleDataset: ReturnType<typeof loadApplicabilityRuleDataset>,
+  regulatoryTopicDataset: ReturnType<typeof loadRegulatoryTopicDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -351,6 +364,8 @@ function runtimeBuildId(
         JSON.stringify(supervisoryDecisionDataset),
         `${APPLICABILITY_RULE_BUILDER}@${APPLICABILITY_RULE_BUILDER_VERSION}`,
         JSON.stringify(applicabilityRuleDataset),
+        `${REGULATORY_TOPIC_BUILDER}@${REGULATORY_TOPIC_BUILDER_VERSION}`,
+        JSON.stringify(regulatoryTopicDataset),
         input,
       ].join("\n"),
     )
@@ -446,6 +461,17 @@ export function buildRuntimeDatabase(
     authorityDataset,
     legalNatureDataset,
     supervisoryDecisionBuild.authorityIds,
+  );
+  const regulatoryTopicDataset = loadRegulatoryTopicDataset(
+    DEFAULT_REGULATORY_TOPICS_PATH,
+  );
+  const regulatoryTopicBuild = buildRegulatoryTopics(
+    documents,
+    relationshipBuild.entities,
+    inputSources.length > 0
+      ? new Set(inputDocuments.map((document) => document.id))
+      : null,
+    regulatoryTopicDataset,
   );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -564,6 +590,7 @@ export function buildRuntimeDatabase(
     implementationTimelineDataset,
     supervisoryDecisionDataset,
     applicabilityRuleDataset,
+    regulatoryTopicDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -762,6 +789,39 @@ export function buildRuntimeDatabase(
         ON domain_assignments(target_document_id);
       CREATE INDEX domain_assignments_target_entity_id
         ON domain_assignments(target_entity_id);
+      CREATE TABLE regulatory_topics (
+        id TEXT PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        label TEXT NOT NULL,
+        description TEXT NOT NULL,
+        taxonomy_id TEXT NOT NULL CHECK (taxonomy_id = 'taxonomy:regulatory-topic'),
+        taxonomy_version TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE topic_assignments (
+        assignment_id TEXT PRIMARY KEY,
+        topic_id TEXT NOT NULL REFERENCES regulatory_topics(id),
+        target_document_id TEXT NOT NULL REFERENCES documents(id),
+        target_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        target_kind TEXT NOT NULL CHECK (target_kind IN ('document', 'provision')),
+        target_label TEXT NOT NULL,
+        target_title TEXT,
+        target_path TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('primary', 'supporting')),
+        provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
+        assignment_version TEXT NOT NULL,
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        rationale TEXT NOT NULL,
+        review_note TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        UNIQUE (topic_id, target_entity_id, role, assignment_version)
+      ) STRICT;
+      CREATE INDEX topic_assignments_topic_id ON topic_assignments(topic_id);
+      CREATE INDEX topic_assignments_document_id
+        ON topic_assignments(target_document_id);
       CREATE TABLE authorities (
         id TEXT PRIMARY KEY,
         official_name TEXT NOT NULL,
@@ -1138,6 +1198,28 @@ export function buildRuntimeDatabase(
         @reviewedAt, @rationale, @reviewNote, @evidenceLocator
       )
     `);
+    const insertTopic = database.prepare(`
+      INSERT INTO regulatory_topics (
+        id, slug, label, description, taxonomy_id, taxonomy_version,
+        provenance, review_status, reviewed_at
+      ) VALUES (
+        @id, @slug, @label, @description, @taxonomyId, @taxonomyVersion,
+        @provenance, @reviewStatus, @reviewedAt
+      )
+    `);
+    const insertTopicAssignment = database.prepare(`
+      INSERT INTO topic_assignments (
+        assignment_id, topic_id, target_document_id, target_entity_id,
+        target_kind, target_label, target_title, target_path, role, provenance,
+        assignment_version, review_status, reviewed_at, rationale,
+        review_note, evidence_locator
+      ) VALUES (
+        @id, @topicId, @targetDocumentId, @targetEntityId,
+        @targetKind, @targetLabel, @targetTitle, @targetPath, @role, @provenance,
+        @assignmentVersion, @reviewStatus, @reviewedAt, @rationale,
+        @reviewNote, @evidenceLocator
+      )
+    `);
     const insertAuthority = database.prepare(`
       INSERT INTO authorities (
         id, official_name, acronym, authority_type, jurisdiction,
@@ -1380,6 +1462,12 @@ export function buildRuntimeDatabase(
       for (const assignment of regulatoryContextBuild.assignments) {
         insertDomainAssignment.run(assignment);
       }
+      for (const topic of regulatoryTopicBuild.topics) {
+        insertTopic.run(topic);
+      }
+      for (const assignment of regulatoryTopicBuild.assignments) {
+        insertTopicAssignment.run(assignment);
+      }
       for (const authority of regulatoryContextBuild.authorities) {
         insertAuthority.run(authority);
       }
@@ -1444,6 +1532,10 @@ export function buildRuntimeDatabase(
         profileHash,
         regulatoryDomainTaxonomyId: regulatoryContextBuild.taxonomyId,
         regulatoryDomainTaxonomyVersion: regulatoryContextBuild.taxonomyVersion,
+        regulatoryTopicTaxonomyId: regulatoryTopicBuild.taxonomyId,
+        regulatoryTopicTaxonomyVersion: regulatoryTopicBuild.taxonomyVersion,
+        regulatoryTopicTaxonomyReviewedAt:
+          regulatoryTopicBuild.taxonomyReviewedAt,
         documentCount: String(documents.length),
         recordCount: String(rows.length),
         definitionCount: String(definitions.length),
@@ -1481,6 +1573,8 @@ export function buildRuntimeDatabase(
         applicabilityEvidenceCount: String(
           applicabilityRuleBuild.evidence.length,
         ),
+        topicCount: String(regulatoryTopicBuild.topics.length),
+        topicAssignmentCount: String(regulatoryTopicBuild.assignments.length),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -1530,6 +1624,9 @@ export function buildRuntimeDatabase(
         ]),
         applicabilityBuilders: JSON.stringify([
           `${APPLICABILITY_RULE_BUILDER}@${APPLICABILITY_RULE_BUILDER_VERSION}`,
+        ]),
+        topicBuilders: JSON.stringify([
+          `${REGULATORY_TOPIC_BUILDER}@${REGULATORY_TOPIC_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -1582,6 +1679,9 @@ export function buildRuntimeDatabase(
     profileHash,
     regulatoryDomainTaxonomyId: regulatoryContextBuild.taxonomyId,
     regulatoryDomainTaxonomyVersion: regulatoryContextBuild.taxonomyVersion,
+    regulatoryTopicTaxonomyId: regulatoryTopicBuild.taxonomyId,
+    regulatoryTopicTaxonomyVersion: regulatoryTopicBuild.taxonomyVersion,
+    regulatoryTopicTaxonomyReviewedAt: regulatoryTopicBuild.taxonomyReviewedAt,
     documentCount: documents.length,
     recordCount: rows.length,
     definitionCount: definitions.length,
@@ -1606,6 +1706,8 @@ export function buildRuntimeDatabase(
     supervisoryDecisionFindingCount: supervisoryDecisionBuild.findings.length,
     applicabilityRuleCount: applicabilityRuleBuild.rules.length,
     applicabilityEvidenceCount: applicabilityRuleBuild.evidence.length,
+    topicCount: regulatoryTopicBuild.topics.length,
+    topicAssignmentCount: regulatoryTopicBuild.assignments.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

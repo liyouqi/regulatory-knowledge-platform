@@ -59,6 +59,12 @@ import {
   documentRegulatoryContextSchema,
   regulatoryDomainSchema,
 } from "../shared/regulatory-context";
+import {
+  type RegulatoryTopic,
+  type TopicAssignment,
+  regulatoryTopicSchema,
+  topicAssignmentSchema,
+} from "../shared/regulatory-topic";
 import { sourceStatusSchema } from "../shared/source-status";
 import {
   type DocumentSupervisoryDecisionsResponse,
@@ -82,10 +88,43 @@ interface DocumentSummaryRow
     | "hasImplementationTimeline"
     | "hasSupervisoryDecisions"
     | "hasApplicabilityRules"
+    | "hasTopicAssignments"
   > {
   hasImplementationTimeline: 0 | 1;
   hasSupervisoryDecisions: 0 | 1;
   hasApplicabilityRules: 0 | 1;
+  hasTopicAssignments: 0 | 1;
+}
+
+interface RegulatoryTopicRow {
+  id: string;
+  slug: string;
+  label: string;
+  description: string;
+  taxonomyId: "taxonomy:regulatory-topic";
+  taxonomyVersion: string;
+  provenance: "EDITORIAL";
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+}
+
+interface TopicAssignmentRow {
+  id: string;
+  topicId: string;
+  targetDocumentId: string;
+  targetEntityId: string;
+  targetKind: "document" | "provision";
+  targetLabel: string;
+  targetTitle: string | null;
+  targetPath: string;
+  role: "primary" | "supporting";
+  provenance: "EDITORIAL";
+  assignmentVersion: string;
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+  rationale: string;
+  reviewNote: string;
+  evidenceLocator: string;
 }
 
 interface ApplicabilityRuleRow {
@@ -769,6 +808,9 @@ export class SqliteRuntimeRepository {
   readonly profileHash: string;
   readonly regulatoryDomainTaxonomyId: string;
   readonly regulatoryDomainTaxonomyVersion: string;
+  readonly regulatoryTopicTaxonomyId: "taxonomy:regulatory-topic";
+  readonly regulatoryTopicTaxonomyVersion: string;
+  readonly regulatoryTopicTaxonomyReviewedAt: string;
   readonly relationshipCount: number;
   readonly cellarRelationshipCount: number;
   readonly lifecycleRelationshipCount: number;
@@ -787,6 +829,8 @@ export class SqliteRuntimeRepository {
   readonly supervisoryDecisionFindingCount: number;
   readonly applicabilityRuleCount: number;
   readonly applicabilityEvidenceCount: number;
+  readonly topicCount: number;
+  readonly topicAssignmentCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -822,6 +866,24 @@ export class SqliteRuntimeRepository {
       this.regulatoryDomainTaxonomyVersion = manifestValue(
         this.database,
         "regulatoryDomainTaxonomyVersion",
+      );
+      const regulatoryTopicTaxonomyId = manifestValue(
+        this.database,
+        "regulatoryTopicTaxonomyId",
+      );
+      if (regulatoryTopicTaxonomyId !== "taxonomy:regulatory-topic") {
+        throw new Error(
+          `Unsupported Regulatory Topic taxonomy ${regulatoryTopicTaxonomyId}`,
+        );
+      }
+      this.regulatoryTopicTaxonomyId = regulatoryTopicTaxonomyId;
+      this.regulatoryTopicTaxonomyVersion = manifestValue(
+        this.database,
+        "regulatoryTopicTaxonomyVersion",
+      );
+      this.regulatoryTopicTaxonomyReviewedAt = manifestValue(
+        this.database,
+        "regulatoryTopicTaxonomyReviewedAt",
       );
       this.relationshipCount = Number.parseInt(
         manifestValue(this.database, "relationshipCount"),
@@ -895,6 +957,14 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "applicabilityEvidenceCount"),
         10,
       );
+      this.topicCount = Number.parseInt(
+        manifestValue(this.database, "topicCount"),
+        10,
+      );
+      this.topicAssignmentCount = Number.parseInt(
+        manifestValue(this.database, "topicAssignmentCount"),
+        10,
+      );
       this.unresolvedReferenceCount = Number.parseInt(
         manifestValue(this.database, "unresolvedReferenceCount"),
         10,
@@ -932,7 +1002,11 @@ export class SqliteRuntimeRepository {
           EXISTS (
             SELECT 1 FROM applicability_rules rule
             WHERE rule.document_id = documents.id
-          ) AS hasApplicabilityRules
+          ) AS hasApplicabilityRules,
+          EXISTS (
+            SELECT 1 FROM topic_assignments assignment
+            WHERE assignment.target_document_id = documents.id
+          ) AS hasTopicAssignments
         FROM documents
         ORDER BY display_order ASC
       `)
@@ -942,7 +1016,56 @@ export class SqliteRuntimeRepository {
       hasImplementationTimeline: row.hasImplementationTimeline === 1,
       hasSupervisoryDecisions: row.hasSupervisoryDecisions === 1,
       hasApplicabilityRules: row.hasApplicabilityRules === 1,
+      hasTopicAssignments: row.hasTopicAssignments === 1,
     }));
+  }
+
+  listRegulatoryTopics(): RegulatoryTopic[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          id, slug, label, description,
+          taxonomy_id AS taxonomyId,
+          taxonomy_version AS taxonomyVersion,
+          provenance,
+          review_status AS reviewStatus,
+          reviewed_at AS reviewedAt
+        FROM regulatory_topics
+        ORDER BY label ASC, id ASC
+      `)
+      .all() as RegulatoryTopicRow[];
+    return regulatoryTopicSchema.array().parse(rows);
+  }
+
+  listTopicAssignments(topicId?: string): TopicAssignment[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          assignment_id AS id,
+          topic_id AS topicId,
+          target_document_id AS targetDocumentId,
+          target_entity_id AS targetEntityId,
+          target_kind AS targetKind,
+          target_label AS targetLabel,
+          target_title AS targetTitle,
+          target_path AS targetPath,
+          role,
+          provenance,
+          assignment_version AS assignmentVersion,
+          review_status AS reviewStatus,
+          reviewed_at AS reviewedAt,
+          rationale,
+          review_note AS reviewNote,
+          evidence_locator AS evidenceLocator
+        FROM topic_assignments
+        WHERE (@topicId IS NULL OR topic_id = @topicId)
+        ORDER BY topic_id ASC,
+          CASE role WHEN 'primary' THEN 0 ELSE 1 END,
+          target_path ASC,
+          assignment_id ASC
+      `)
+      .all({ topicId: topicId ?? null }) as TopicAssignmentRow[];
+    return topicAssignmentSchema.array().parse(rows);
   }
 
   findApplicabilityBySlug(

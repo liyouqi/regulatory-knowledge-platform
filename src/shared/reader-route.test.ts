@@ -15,12 +15,15 @@ import {
   parseQuickGo,
   parseReaderPath,
   parseRegulatoryDomainPath,
+  parseRegulatoryTopicPath,
   parseRelationshipGraphPath,
   parseSupervisoryDecisionsPath,
   provisionPath,
   regulatoryDomainPath,
+  regulatoryTopicPath,
   relationshipGraphPath,
   supervisoryDecisionsPath,
+  topicCatalogPath,
 } from "./reader-route";
 
 describe("Reader routes", () => {
@@ -119,6 +122,18 @@ describe("Reader routes", () => {
       slug: "dora",
     });
     expect(parseApplicabilityPath("/applicability/dora/extra")).toBeNull();
+  });
+
+  it("builds and parses the regulatory Topic catalog and detail routes", () => {
+    expect(topicCatalogPath()).toBe("/topics");
+    expect(parseRegulatoryTopicPath("/topics")).toEqual({ scope: "catalog" });
+    expect(regulatoryTopicPath("major-ict-incident-reporting")).toBe(
+      "/topics/major-ict-incident-reporting",
+    );
+    expect(
+      parseRegulatoryTopicPath("/topics/major-ict-incident-reporting"),
+    ).toEqual({ scope: "topic", slug: "major-ict-incident-reporting" });
+    expect(parseRegulatoryTopicPath("/topics/a/extra")).toBeNull();
   });
 
   it.each([

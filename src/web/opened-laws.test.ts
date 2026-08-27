@@ -29,6 +29,7 @@ const dora: DocumentSummary = {
   hasImplementationTimeline: false,
   hasSupervisoryDecisions: false,
   hasApplicabilityRules: false,
+  hasTopicAssignments: false,
   id: "eu:32022R2554",
   familyId: "family:dora",
   regulatoryLevel: "level-1",

@@ -2096,6 +2096,8 @@ Topic 页面聚合：
 - Case Law；
 - Authority materials。
 
+当前实现：Runtime `5.4.0` 发布首个有界 Topic/Taxonomy 0→1。版本控制的 `data/editorial/regulatory-topics.json` 定义 3 个 reviewed editorial Topics：`Major ICT incident reporting`、`ICT third-party risk`、`Banking governance and internal control`，并以 10 条 assignment 指向 exact loaded Document 或 Provision stable ID。独立 `regulatory-topic@1.0.0` builder 在 Edition/Profile compilation 后校验 endpoint、target kind、review lineage 和 evidence locator；只有至少保留 2 个 Document 且含 1 个 Provision assignment 的 Topic 才可 materialize，避免 Profile 产生残缺聚合。`regulatory_topics` 与 `topic_assignments` 独立于 Domain、Applicability 和主法律关系表；`GET /api/topics`、`GET /api/topics/:slug`、`/topics` 与 `/topics/:slug` 从同一 read-only Runtime projection 返回。Topic detail 只复用既有 `OFFICIAL_MAPPING` relationship 及 exact evidence，不复制法律关系，也固定声明 `applicabilityConclusion: false`。
+
 ## 23.2 Implementation Timeline
 
 参考 artificialintelligenceact.eu 的 timeline 产品形态。
@@ -3305,7 +3307,8 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 5. Agent/RAG citation-ready context assembly 与 bounded retrieval evaluation（已完成）；
 6. AI Act implementation timeline 0→1（已完成）；CNPD supervisory decision 0→1（已完成）；
 7. cross-regulation path 0→1（已完成）；evidence-bearing DORA applicability rule/navigation 0→1（已完成）；
-8. focused graph persistence only when query load requires it。
+8. cross-file Topic/Taxonomy navigation 0→1（已完成）；
+9. focused graph persistence only when query load requires it。
 
 ## Phase 4 Sequence
 

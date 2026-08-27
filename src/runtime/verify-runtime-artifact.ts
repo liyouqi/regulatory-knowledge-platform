@@ -31,6 +31,8 @@ export interface RuntimeArtifactVerification {
   supervisoryDecisionFindings: number;
   applicabilityRules: number;
   applicabilityEvidence: number;
+  regulatoryTopics: number;
+  topicAssignments: number;
   unresolvedReferences: number;
   bytes: number;
   input: string;
@@ -93,6 +95,8 @@ export function verifyRuntimeArtifact(
       supervisoryDecisionFindings: repository.supervisoryDecisionFindingCount,
       applicabilityRules: repository.applicabilityRuleCount,
       applicabilityEvidence: repository.applicabilityEvidenceCount,
+      regulatoryTopics: repository.topicCount,
+      topicAssignments: repository.topicAssignmentCount,
       unresolvedReferences: repository.unresolvedReferenceCount,
       bytes: statSync(databasePath).size,
       input: databasePath,

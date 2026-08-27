@@ -139,6 +139,7 @@ export const documentSummarySchema = z.object({
   hasImplementationTimeline: z.boolean(),
   hasSupervisoryDecisions: z.boolean(),
   hasApplicabilityRules: z.boolean(),
+  hasTopicAssignments: z.boolean(),
   provenance: z.enum(["official", "fixture"]),
   familyId: z.string().startsWith("family:"),
   regulatoryLevel: z.enum(["level-1", "level-2", "level-3"]),

@@ -62,11 +62,13 @@ import {
   parseQuickGo,
   parseReaderPath,
   parseRegulatoryDomainPath,
+  parseRegulatoryTopicPath,
   parseRelationshipGraphPath,
   parseSupervisoryDecisionsPath,
   regulatoryDomainPath,
   relationshipGraphPath,
   supervisoryDecisionsPath,
+  topicCatalogPath,
 } from "../shared/reader-route";
 import {
   type DocumentRegulatoryContext,
@@ -84,6 +86,7 @@ import { ImplementationTimelinePage } from "./ImplementationTimelinePage";
 import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { RegulatoryPathPage } from "./RegulatoryPathPage";
+import { RegulatoryTopicPage } from "./RegulatoryTopicPage";
 import { SupervisoryDecisionsPage } from "./SupervisoryDecisionsPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
@@ -1242,6 +1245,11 @@ function ReaderPage({
               <ShieldCheck aria-hidden="true" size={15} /> Applicability
             </Link>
           ) : null}
+          {documentSummary?.hasTopicAssignments ? (
+            <Link className="view-switch" to={topicCatalogPath()}>
+              <RouteIcon aria-hidden="true" size={15} /> Topics
+            </Link>
+          ) : null}
           <button
             className="search-button"
             onClick={onOpenSearch}
@@ -1564,6 +1572,7 @@ export function App() {
   );
   const supervisoryDecisions = parseSupervisoryDecisionsPath(location.pathname);
   const regulatoryDomain = parseRegulatoryDomainPath(location.pathname);
+  const regulatoryTopic = parseRegulatoryTopicPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const relationshipGraph = parseRelationshipGraphPath(location.pathname);
   const level2MandateQuery = isLevel2MandateQueryPath(location.pathname);
@@ -1605,7 +1614,16 @@ export function App() {
 
   return (
     <>
-      {applicability ? (
+      {regulatoryTopic ? (
+        <RegulatoryTopicPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          slug={
+            regulatoryTopic.scope === "topic" ? regulatoryTopic.slug : undefined
+          }
+          theme={theme}
+        />
+      ) : applicability ? (
         <ApplicabilityPage
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}

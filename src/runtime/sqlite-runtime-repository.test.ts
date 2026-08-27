@@ -60,6 +60,7 @@ describe("SQLite runtime repository", () => {
       hasImplementationTimeline: false,
       hasSupervisoryDecisions: false,
       hasApplicabilityRules: true,
+      hasTopicAssignments: true,
       provenance: dora.provenance,
       familyId: "family:dora",
       regulatoryLevel: "level-1",
@@ -125,6 +126,32 @@ describe("SQLite runtime repository", () => {
     expect(repository).toMatchObject({
       applicabilityRuleCount: 1,
       applicabilityEvidenceCount: 10,
+    });
+  });
+
+  it("returns reviewed cross-file Topics and exact assignments", () => {
+    expect(repository?.listRegulatoryTopics()).toHaveLength(3);
+    expect(repository?.listTopicAssignments()).toHaveLength(10);
+    expect(
+      repository?.listTopicAssignments("topic:major-ict-incident-reporting"),
+    ).toHaveLength(4);
+    expect(
+      repository
+        ?.listTopicAssignments("topic:major-ict-incident-reporting")
+        .find(
+          (assignment) =>
+            assignment.targetEntityId === "eu:32022R2554:article:20",
+        ),
+    ).toMatchObject({
+      targetKind: "provision",
+      targetPath: "/read/dora/articles/20",
+      role: "primary",
+      provenance: "EDITORIAL",
+    });
+    expect(repository).toMatchObject({
+      regulatoryTopicTaxonomyId: "taxonomy:regulatory-topic",
+      topicCount: 3,
+      topicAssignmentCount: 10,
     });
   });
 
