@@ -8,6 +8,10 @@ import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { createLawSearchRecords } from "../search/law-search";
 import {
   PUBLIC_API_CONTRACT_VERSION,
+  publicDocumentTypeSchema,
+  publicJurisdictionSchema,
+  publicMeasureTypeSchema,
+  publicRegulatoryLevelSchema,
   publicRelationshipProvenanceSchema,
   publicRelationshipTypeSchema,
 } from "../shared/public-api";
@@ -59,6 +63,33 @@ function responseValidator(schemaName: string) {
 }
 
 describe("Public API OpenAPI 3.1 contract", () => {
+  it("documents bounded resolve filters from the shared contract", () => {
+    const parameters =
+      publicApiOpenApiDocument.paths["/laws/resolve"].get.parameters;
+    expect(parameters.map((parameter) => parameter.name)).toEqual([
+      "q",
+      "profileId",
+      "jurisdiction",
+      "documentType",
+      "regulatoryLevel",
+      "measureType",
+    ]);
+    const filters =
+      publicApiOpenApiDocument.components.schemas.LawResolveFilters;
+    expect(filters.properties.jurisdiction.enum).toEqual(
+      publicJurisdictionSchema.options,
+    );
+    expect(filters.properties.documentType.enum).toEqual(
+      publicDocumentTypeSchema.options,
+    );
+    expect(filters.properties.regulatoryLevel.enum).toEqual(
+      publicRegulatoryLevelSchema.options,
+    );
+    expect(filters.properties.measureType.enum).toEqual(
+      publicMeasureTypeSchema.options,
+    );
+  });
+
   it("documents every current REST operation with Bearer security", () => {
     expect(publicApiOpenApiDocument.openapi).toBe("3.1.0");
     expect(publicApiOpenApiDocument.info.version).toBe(
@@ -116,7 +147,16 @@ describe("Public API OpenAPI 3.1 contract", () => {
   it("validates representative service responses against documented JSON Schemas", () => {
     const cases = [
       ["DiscoveryResponse", success(service?.discover())],
-      ["LawResolveResponse", success(service?.resolveLaw("DORA Article 28"))],
+      [
+        "LawResolveResponse",
+        success(
+          service?.resolveLaw("DORA", undefined, {
+            jurisdiction: "EU",
+            regulatoryLevel: "level-2",
+            measureType: "its",
+          }),
+        ),
+      ],
       [
         "LawStructureResponse",
         success(service?.getLawStructure("eu:32022R2554")),

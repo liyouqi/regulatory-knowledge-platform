@@ -142,8 +142,12 @@ Open the interactive Swagger UI at `http://localhost:3000/api/docs`, download th
 ```bash
 curl --get http://localhost:3000/api/v1/laws/resolve \
   --header "Authorization: Bearer local-development-key-2026" \
-  --data-urlencode "q=DORA article 28"
+  --data-urlencode "q=DORA" \
+  --data-urlencode "regulatoryLevel=level-2" \
+  --data-urlencode "measureType=its"
 ```
+
+`resolve` also accepts optional `jurisdiction`, `documentType`, `regulatoryLevel`, and `measureType` filters. They only narrow the current deployment-fixed Profile; they do not switch corpus editions or determine legal applicability.
 
 The current slice also exposes `GET /api/v1/laws/:documentId/structure`, `GET /api/v1/provisions/:entityId`, and `GET /api/v1/provisions/:entityId/relationships`. The relationship endpoint accepts one exact root Provision stable ID and returns the reviewed, directed relationship groups with provenance and evidence:
 
@@ -156,7 +160,7 @@ Every regulatory-data response identifies API contract, Runtime build, and deplo
 
 ## MCP server
 
-Phase 4 also exposes the same four deterministic capabilities as local read-only MCP tools: `resolve_law`, `get_law_structure`, `get_provision`, and `get_relationships`. A client can resolve “DORA Article 28” to its stable ID and then retrieve the published `mandates` relationships without AI inference. Build the Runtime once, then let the MCP host launch the server; do not start it separately:
+Phase 4 also exposes the same four deterministic capabilities as local read-only MCP tools: `resolve_law`, `get_law_structure`, `get_provision`, and `get_relationships`. `resolve_law` accepts the same bounded filters as REST. A client can resolve “DORA Article 28” to its stable ID and then retrieve the published `mandates` relationships without AI inference. Build the Runtime once, then let the MCP host launch the server; do not start it separately:
 
 ```json
 {

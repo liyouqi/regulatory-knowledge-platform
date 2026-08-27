@@ -3,7 +3,39 @@ import { lawSearchMatchReasonSchema } from "./legal";
 import { sourceLocatorSchema } from "./source-locator";
 
 export const PUBLIC_API_VERSION = "v1";
-export const PUBLIC_API_CONTRACT_VERSION = "1.2.0";
+export const PUBLIC_API_CONTRACT_VERSION = "1.3.0";
+
+export const publicJurisdictionSchema = z.enum(["EU", "LU"]);
+export const publicDocumentTypeSchema = z.enum([
+  "regulation",
+  "directive",
+  "law",
+  "circular",
+  "guidance",
+  "other",
+]);
+export const publicRegulatoryLevelSchema = z.enum([
+  "level-1",
+  "level-2",
+  "level-3",
+]);
+export const publicMeasureTypeSchema = z.enum([
+  "primary-act",
+  "rts",
+  "its",
+  "guideline",
+  "qa",
+  "other",
+]);
+
+export const publicLawResolveFiltersSchema = z
+  .object({
+    jurisdiction: publicJurisdictionSchema.optional(),
+    documentType: publicDocumentTypeSchema.optional(),
+    regulatoryLevel: publicRegulatoryLevelSchema.optional(),
+    measureType: publicMeasureTypeSchema.optional(),
+  })
+  .strict();
 
 const publicRuntimeIdentitySchema = z
   .object({
@@ -51,18 +83,11 @@ export const publicApiErrorResponseSchema = z
 const publicDocumentReferenceSchema = z
   .object({
     id: z.string().min(1),
-    jurisdiction: z.enum(["EU", "LU"]),
+    jurisdiction: publicJurisdictionSchema,
     slug: z.string().regex(/^[a-z0-9-]+$/),
     shortName: z.string().min(1),
     officialTitle: z.string().min(1),
-    documentType: z.enum([
-      "regulation",
-      "directive",
-      "law",
-      "circular",
-      "guidance",
-      "other",
-    ]),
+    documentType: publicDocumentTypeSchema,
     celex: z.string().min(1).optional(),
     localId: z.string().min(1).optional(),
     sourceUrl: z.string().url(),
@@ -75,15 +100,8 @@ const publicLawResultSchema = z
   .object({
     document: publicDocumentReferenceSchema,
     familyId: z.string().startsWith("family:"),
-    regulatoryLevel: z.enum(["level-1", "level-2", "level-3"]),
-    measureType: z.enum([
-      "primary-act",
-      "rts",
-      "its",
-      "guideline",
-      "qa",
-      "other",
-    ]),
+    regulatoryLevel: publicRegulatoryLevelSchema,
+    measureType: publicMeasureTypeSchema,
     aliases: z.array(z.string().min(1)),
     match: z
       .object({
@@ -137,6 +155,7 @@ export const publicLawResolveResponseSchema = z
       .object({
         query: z.string().min(1),
         normalizedQuery: z.string().min(1),
+        filters: publicLawResolveFiltersSchema,
         resultCount: z.number().int().nonnegative(),
         bestMatch: publicLawResultSchema.nullable(),
         results: z.array(publicLawResultSchema).max(10),
@@ -387,6 +406,9 @@ export type PublicApiDiscoveryResponse = z.infer<
 >;
 export type PublicLawResolveResponse = z.infer<
   typeof publicLawResolveResponseSchema
+>;
+export type PublicLawResolveFilters = z.infer<
+  typeof publicLawResolveFiltersSchema
 >;
 export type PublicLawStructureResponse = z.infer<
   typeof publicLawStructureResponseSchema

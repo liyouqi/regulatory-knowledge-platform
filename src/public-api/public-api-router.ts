@@ -84,6 +84,12 @@ export function createPublicApiRouter(
       service.resolveLaw(
         queryParameter(request.query.q) ?? "",
         queryParameter(request.query.profileId),
+        {
+          jurisdiction: queryParameter(request.query.jurisdiction),
+          documentType: queryParameter(request.query.documentType),
+          regulatoryLevel: queryParameter(request.query.regulatoryLevel),
+          measureType: queryParameter(request.query.measureType),
+        },
       ),
     );
   });

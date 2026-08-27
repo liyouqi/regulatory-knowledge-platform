@@ -4,18 +4,18 @@ The Phase 4 MCP adapter exposes deterministic regulatory retrieval to local MCP 
 
 ## Current scope
 
-Server identity: `regulatory-knowledge-platform@0.2.0`.
+Server identity: `regulatory-knowledge-platform@0.3.0`.
 
 | Tool | Required input | Optional input | Output boundary |
 |---|---|---|---|
-| `resolve_law` | `query` (1–200 characters) | deployment-fixed `profileId` | Up to ten matching laws and an exact Provision stable ID when the query contains one. |
+| `resolve_law` | `query` (1–200 characters) | deployment-fixed `profileId`; `jurisdiction`; `documentType`; `regulatoryLevel`; `measureType` | Up to ten matching laws and an exact Provision stable ID when the query contains one. |
 | `get_law_structure` | `documentId` (1–180 characters) | deployment-fixed `profileId` | Document source/version identity and table of contents without legal body text. |
 | `get_provision` | root Provision `entityId` (1–260 characters) | deployment-fixed `profileId` | One exact Provision, official-text block tree, source locators, and source/version identity. |
 | `get_relationships` | root Provision `entityId` (1–260 characters) | deployment-fixed `profileId` | All relationship groups published for that Provision, with directed stable endpoints, provenance, evidence, builder identity, and optional score. |
 
 All tools are declared read-only, non-destructive, idempotent, and closed-world over the loaded artifact. Every success and service error contains the same `meta.apiVersion`, external contract version, Runtime build, and Profile identity used by Public API v1. Tool results provide both a JSON text content block for broad client compatibility and equivalent `structuredContent`.
 
-An empty `resolve_law` result means “no match in the current artifact,” not “the law does not exist.” An empty relationship group means only that no edge of that group is published for the Provision in the loaded Profile. The adapter retrieves official text, identifiers, and reviewed relationships; it does not generate legal interpretation, conclusions, or advice.
+The `resolve_law` filter values match the [Public API resolve contract](public-api-v1.md#resolve-filters). They are combined with AND, narrow only the loaded Profile, and are not legal-applicability conclusions. An empty `resolve_law` result means “no match in the current artifact and filters,” not “the law does not exist.” An empty relationship group means only that no edge of that group is published for the Provision in the loaded Profile. The adapter retrieves official text, identifiers, and reviewed relationships; it does not generate legal interpretation, conclusions, or advice.
 
 ## Build and connect
 
@@ -73,6 +73,6 @@ This is not yet a remotely hosted MCP endpoint. Streamable HTTP, remote authenti
 
 ## Compatibility
 
-- Tool names, documented input meaning, stable IDs, Profile isolation, and structured output semantics form the MCP `0.2.0` contract.
+- Tool names, documented input meaning, stable IDs, Profile isolation, and structured output semantics form the MCP `0.3.0` contract.
 - Compatible tools or optional fields may be added during `0.x`; incompatible input/output changes require an MCP server version change and migration note.
 - MCP and REST remain separate transports. Neither transport owns legal business logic or a second regulatory dataset.

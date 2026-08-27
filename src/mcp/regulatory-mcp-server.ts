@@ -7,11 +7,18 @@ import type {
   PublicApiOperation,
   PublicApiService,
 } from "../public-api/public-api-service";
+import {
+  type PublicLawResolveFilters,
+  publicDocumentTypeSchema,
+  publicJurisdictionSchema,
+  publicMeasureTypeSchema,
+  publicRegulatoryLevelSchema,
+} from "../shared/public-api";
 
 export const REGULATORY_MCP_SERVER_NAME = "regulatory-knowledge-platform";
-export const REGULATORY_MCP_SERVER_VERSION = "0.2.0";
+export const REGULATORY_MCP_SERVER_VERSION = "0.3.0";
 
-type ResolveLawInput = {
+type ResolveLawInput = PublicLawResolveFilters & {
   query: string;
   profileId?: string;
 };
@@ -47,6 +54,27 @@ const resolveLawInputSchema = fromJsonSchema<ResolveLawInput>({
         "Law name, alias, or exact provision reference, for example DORA article 28.",
     },
     profileId: profileIdProperty,
+    jurisdiction: {
+      type: "string",
+      enum: publicJurisdictionSchema.options,
+      description: "Narrow results to one jurisdiction in the loaded Profile.",
+    },
+    documentType: {
+      type: "string",
+      enum: publicDocumentTypeSchema.options,
+      description: "Narrow results to one document type in the loaded Profile.",
+    },
+    regulatoryLevel: {
+      type: "string",
+      enum: publicRegulatoryLevelSchema.options,
+      description:
+        "Narrow results to one regulatory level in the loaded Profile.",
+    },
+    measureType: {
+      type: "string",
+      enum: publicMeasureTypeSchema.options,
+      description: "Narrow results to one measure type in the loaded Profile.",
+    },
   },
 });
 
@@ -131,12 +159,26 @@ export function createRegulatoryMcpServer(service: PublicApiService) {
     {
       title: "Resolve law",
       description:
-        "Resolve a law name, alias, or provision reference against the loaded reviewed Profile. An empty result means no match in the current artifact, not that the law does not exist.",
+        "Resolve a law name, alias, or provision reference against the loaded reviewed Profile. Optional filters only narrow that Profile and are not legal-applicability conclusions. An empty result means no match in the current artifact, not that the law does not exist.",
       inputSchema: resolveLawInputSchema,
       annotations: readOnlyAnnotations,
     },
-    async ({ query, profileId }) =>
-      toolResult(service.resolveLaw(query, profileId)),
+    async ({
+      query,
+      profileId,
+      jurisdiction,
+      documentType,
+      regulatoryLevel,
+      measureType,
+    }) =>
+      toolResult(
+        service.resolveLaw(query, profileId, {
+          jurisdiction,
+          documentType,
+          regulatoryLevel,
+          measureType,
+        }),
+      ),
   );
 
   server.registerTool(

@@ -42,7 +42,7 @@ afterAll(async () => {
 });
 
 describe("Regulatory MCP server", () => {
-  it("publishes only the three bounded read-only tools", async () => {
+  it("publishes only the four bounded read-only tools", async () => {
     const result = await client?.listTools();
 
     expect(result?.tools.map((tool) => tool.name)).toEqual([
@@ -62,6 +62,33 @@ describe("Regulatory MCP server", () => {
         type: "object",
         additionalProperties: false,
       });
+    }
+  });
+
+  it("applies bounded resolve filters without widening the Profile", async () => {
+    const result = await client?.callTool({
+      name: "resolve_law",
+      arguments: {
+        query: "DORA",
+        jurisdiction: "EU",
+        regulatoryLevel: "level-2",
+        measureType: "its",
+      },
+    });
+    const payload = publicLawResolveResponseSchema.parse(
+      result?.structuredContent,
+    );
+
+    expect(payload.data.filters).toEqual({
+      jurisdiction: "EU",
+      regulatoryLevel: "level-2",
+      measureType: "its",
+    });
+    expect(payload.data.resultCount).toBeGreaterThan(0);
+    for (const item of payload.data.results) {
+      expect(item.document.jurisdiction).toBe("EU");
+      expect(item.regulatoryLevel).toBe("level-2");
+      expect(item.measureType).toBe("its");
     }
   });
 
@@ -130,7 +157,7 @@ describe("Regulatory MCP server", () => {
     );
 
     expect(result?.isError).not.toBe(true);
-    expect(payload.meta.contractVersion).toBe("1.2.0");
+    expect(payload.meta.contractVersion).toBe("1.3.0");
     expect(payload.data.groups.mandates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -197,8 +224,12 @@ describe("Regulatory MCP server", () => {
       name: "get_law_structure",
       arguments: { documentId: "eu:32022R2554", extra: true },
     });
+    const invalidFilter = await client?.callTool({
+      name: "resolve_law",
+      arguments: { query: "DORA", jurisdiction: "US" },
+    });
 
-    for (const result of [missing, additional]) {
+    for (const result of [missing, additional, invalidFilter]) {
       expect(result?.isError).toBe(true);
       expect(result?.content).toEqual([
         expect.objectContaining({

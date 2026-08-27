@@ -2,6 +2,10 @@ import { createRequire } from "node:module";
 import {
   PUBLIC_API_CONTRACT_VERSION,
   PUBLIC_API_VERSION,
+  publicDocumentTypeSchema,
+  publicJurisdictionSchema,
+  publicMeasureTypeSchema,
+  publicRegulatoryLevelSchema,
   publicRelationshipProvenanceSchema,
   publicRelationshipTypeSchema,
 } from "../shared/public-api";
@@ -36,13 +40,13 @@ const nonEmptyString = { type: "string", minLength: 1 };
 const nullableString = { type: ["string", "null"] };
 const documentReferenceProperties = {
   id: nonEmptyString,
-  jurisdiction: { type: "string", enum: ["EU", "LU"] },
+  jurisdiction: { type: "string", enum: publicJurisdictionSchema.options },
   slug: { type: "string", pattern: "^[a-z0-9-]+$" },
   shortName: nonEmptyString,
   officialTitle: nonEmptyString,
   documentType: {
     type: "string",
-    enum: ["regulation", "directive", "law", "circular", "guidance", "other"],
+    enum: publicDocumentTypeSchema.options,
   },
   celex: nonEmptyString,
   localId: nonEmptyString,
@@ -149,11 +153,11 @@ const schemas = {
     familyId: { type: "string", pattern: "^family:" },
     regulatoryLevel: {
       type: "string",
-      enum: ["level-1", "level-2", "level-3"],
+      enum: publicRegulatoryLevelSchema.options,
     },
     measureType: {
       type: "string",
-      enum: ["primary-act", "rts", "its", "guideline", "qa", "other"],
+      enum: publicMeasureTypeSchema.options,
     },
     aliases: arrayOf(nonEmptyString),
     match: closedObject({
@@ -176,11 +180,24 @@ const schemas = {
     }),
     target: { oneOf: [reference("LawTarget"), { type: "null" }] },
   }),
+  LawResolveFilters: closedObject(
+    {
+      jurisdiction: { type: "string", enum: publicJurisdictionSchema.options },
+      documentType: { type: "string", enum: publicDocumentTypeSchema.options },
+      regulatoryLevel: {
+        type: "string",
+        enum: publicRegulatoryLevelSchema.options,
+      },
+      measureType: { type: "string", enum: publicMeasureTypeSchema.options },
+    },
+    [],
+  ),
   LawResolveResponse: closedObject({
     meta: reference("Meta"),
     data: closedObject({
       query: nonEmptyString,
       normalizedQuery: nonEmptyString,
+      filters: reference("LawResolveFilters"),
       resultCount: { type: "integer", minimum: 0 },
       bestMatch: { oneOf: [reference("LawResult"), { type: "null" }] },
       results: arrayOf(reference("LawResult"), 10),
@@ -447,6 +464,20 @@ const profileParameter = {
   schema: nonEmptyString,
 };
 
+function resolveFilterParameter(
+  name: string,
+  values: readonly string[],
+  description: string,
+) {
+  return {
+    name,
+    in: "query",
+    required: false,
+    description,
+    schema: { type: "string", enum: values },
+  };
+}
+
 export const publicApiOpenApiDocument = {
   openapi: "3.1.0",
   jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
@@ -496,6 +527,26 @@ export const publicApiOpenApiDocument = {
             schema: { type: "string", minLength: 1, maxLength: 200 },
           },
           profileParameter,
+          resolveFilterParameter(
+            "jurisdiction",
+            publicJurisdictionSchema.options,
+            "Narrow results to one jurisdiction in the loaded Profile.",
+          ),
+          resolveFilterParameter(
+            "documentType",
+            publicDocumentTypeSchema.options,
+            "Narrow results to one document type in the loaded Profile.",
+          ),
+          resolveFilterParameter(
+            "regulatoryLevel",
+            publicRegulatoryLevelSchema.options,
+            "Narrow results to one regulatory level in the loaded Profile.",
+          ),
+          resolveFilterParameter(
+            "measureType",
+            publicMeasureTypeSchema.options,
+            "Narrow results to one measure type in the loaded Profile.",
+          ),
         ],
         responses: {
           "200": jsonResponse(

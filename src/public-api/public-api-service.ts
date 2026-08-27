@@ -13,6 +13,7 @@ import {
   PUBLIC_API_VERSION,
   type PublicApiDiscoveryResponse,
   type PublicApiErrorResponse,
+  type PublicLawResolveFilters,
   type PublicLawResolveResponse,
   type PublicLawStructureResponse,
   type PublicProvisionRelationshipsResponse,
@@ -21,6 +22,7 @@ import {
   type PublicTextBlock,
   publicApiDiscoveryResponseSchema,
   publicApiErrorResponseSchema,
+  publicLawResolveFiltersSchema,
   publicLawResolveResponseSchema,
   publicLawStructureResponseSchema,
   publicProvisionRelationshipsResponseSchema,
@@ -239,7 +241,8 @@ export class PublicApiService {
             {
               id: "resolve-law",
               method: "GET",
-              pathTemplate: "/api/v1/laws/resolve{?q,profileId}",
+              pathTemplate:
+                "/api/v1/laws/resolve{?q,profileId,jurisdiction,documentType,regulatoryLevel,measureType}",
             },
             {
               id: "law-structure",
@@ -266,9 +269,25 @@ export class PublicApiService {
   resolveLaw(
     query: string,
     profileId?: string,
+    filterInput: unknown = {},
   ): PublicApiOperation<PublicLawResolveResponse> {
     const profileError = this.profileError(profileId);
     if (profileError) return profileError;
+    const parsedFilters = publicLawResolveFiltersSchema.safeParse(filterInput);
+    if (!parsedFilters.success) {
+      const parameter = parsedFilters.error.issues[0]?.path[0];
+      return this.error(
+        400,
+        "INVALID_REQUEST",
+        "One or more resolve filters are invalid",
+        typeof parameter === "string" ? parameter : "filters",
+      );
+    }
+    const filters = Object.fromEntries(
+      Object.entries(parsedFilters.data).filter(
+        ([, value]) => value !== undefined,
+      ),
+    ) as PublicLawResolveFilters;
     if (!query.trim()) {
       return this.error(
         400,
@@ -285,7 +304,22 @@ export class PublicApiService {
         "q",
       );
     }
-    const result = searchLaws(this.lawSearchRecords, query);
+    const filteredRecords = this.lawSearchRecords.filter((record) => {
+      const document = this.documentsById.get(record.id);
+      if (!document) {
+        throw new Error(`Public API could not resolve Document ${record.id}`);
+      }
+      return (
+        (!filters.jurisdiction ||
+          document.jurisdiction === filters.jurisdiction) &&
+        (!filters.documentType ||
+          record.documentType === filters.documentType) &&
+        (!filters.regulatoryLevel ||
+          record.regulatoryLevel === filters.regulatoryLevel) &&
+        (!filters.measureType || record.measureType === filters.measureType)
+      );
+    });
+    const result = searchLaws(filteredRecords, query);
     const toPublicResult = (item: LawSearchResult) => {
       const document = this.documentsById.get(item.id);
       if (!document) {
@@ -330,6 +364,7 @@ export class PublicApiService {
         data: {
           query: result.query,
           normalizedQuery: result.normalizedQuery,
+          filters,
           resultCount: results.length,
           bestMatch: results[0] ?? null,
           results,

@@ -8,7 +8,7 @@ The current `v1` capability slice provides four bounded capabilities:
 
 | Capability | Endpoint | Result boundary |
 |---|---|---|
-| Resolve law | `GET /api/v1/laws/resolve?q=<query>` | Up to 10 matching laws and, when supplied in the query, one exact Provision stable ID. |
+| Resolve law | `GET /api/v1/laws/resolve?q=<query>` | Up to 10 matching laws after optional bounded filters and, when supplied in the query, one exact Provision stable ID. |
 | Law structure | `GET /api/v1/laws/:documentId/structure` | Document source/version identity and table-of-contents structure without legal body text. |
 | Get Provision | `GET /api/v1/provisions/:entityId` | One exact root Provision, its official-text block tree, source locators, and source/version identity. |
 | Get relationships | `GET /api/v1/provisions/:entityId/relationships` | All reviewed relationship groups published for one exact root Provision, preserving direction, provenance, evidence, and builder identity. |
@@ -27,6 +27,30 @@ The example key is for local development only. The API normally listens at `http
 curl --get http://localhost:3000/api/v1/laws/resolve \
   --header "Authorization: Bearer local-development-key-2026" \
   --data-urlencode "q=DORA article 28"
+```
+
+### Resolve filters
+
+`resolve` accepts four optional exact-value filters. The response always returns the filters that were applied in `data.filters`.
+
+| Parameter | Values |
+|---|---|
+| `jurisdiction` | `EU`, `LU` |
+| `documentType` | `regulation`, `directive`, `law`, `circular`, `guidance`, `other` |
+| `regulatoryLevel` | `level-1`, `level-2`, `level-3` |
+| `measureType` | `primary-act`, `rts`, `its`, `guideline`, `qa`, `other` |
+
+Filters are combined with AND and applied before ranking. They only narrow records already compiled into the loaded Profile; they cannot switch or widen the Profile. They are retrieval controls, not a legal-applicability conclusion. An unsupported value returns `400 INVALID_REQUEST`; a valid combination with no match returns `200` with empty results.
+
+For example, resolve only DORA Level 2 ITS documents:
+
+```bash
+curl --get http://localhost:3000/api/v1/laws/resolve \
+  --header "Authorization: Bearer local-development-key-2026" \
+  --data-urlencode "q=DORA" \
+  --data-urlencode "jurisdiction=EU" \
+  --data-urlencode "regulatoryLevel=level-2" \
+  --data-urlencode "measureType=its"
 ```
 
 Read structure or one exact Provision by stable ID:
@@ -77,7 +101,7 @@ Every regulatory operation response contains:
 {
   "meta": {
     "apiVersion": "v1",
-    "contractVersion": "1.2.0",
+    "contractVersion": "1.3.0",
     "profilePolicy": "deployment-fixed",
     "runtime": {
       "buildId": "runtime-...",

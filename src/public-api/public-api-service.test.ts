@@ -41,7 +41,7 @@ describe("Public API v1 service contract", () => {
     expect(payload).toMatchObject({
       meta: {
         apiVersion: "v1",
-        contractVersion: "1.2.0",
+        contractVersion: "1.3.0",
         profilePolicy: "deployment-fixed",
         runtime: { profileId: "full-corpus" },
       },
@@ -53,6 +53,9 @@ describe("Public API v1 service contract", () => {
       "get-provision",
       "get-relationships",
     ]);
+    expect(payload.data.capabilities[0]?.pathTemplate).toContain(
+      "jurisdiction,documentType,regulatoryLevel,measureType",
+    );
   });
 
   it("resolves a law and exact provision without exposing Web payloads", () => {
@@ -66,8 +69,44 @@ describe("Public API v1 service contract", () => {
         number: "28",
       },
     });
+    expect(payload.data.filters).toEqual({});
     expect(JSON.stringify(payload)).not.toContain("readerPath");
     expect(JSON.stringify(payload)).not.toContain("explorerPath");
+  });
+
+  it("narrows law resolution within the loaded Profile", () => {
+    const payload = success(
+      service?.resolveLaw("DORA", undefined, {
+        jurisdiction: "EU",
+        regulatoryLevel: "level-2",
+        measureType: "its",
+      }),
+    );
+
+    expect(payload.data.filters).toEqual({
+      jurisdiction: "EU",
+      regulatoryLevel: "level-2",
+      measureType: "its",
+    });
+    expect(payload.data.resultCount).toBeGreaterThan(0);
+    for (const result of payload.data.results) {
+      expect(result.document.jurisdiction).toBe("EU");
+      expect(result.regulatoryLevel).toBe("level-2");
+      expect(result.measureType).toBe("its");
+    }
+
+    const noCurrentProfileMatch = success(
+      service?.resolveLaw("DORA", undefined, {
+        jurisdiction: "LU",
+        documentType: "regulation",
+      }),
+    );
+    expect(noCurrentProfileMatch.data).toMatchObject({
+      filters: { jurisdiction: "LU", documentType: "regulation" },
+      resultCount: 0,
+      bestMatch: null,
+      results: [],
+    });
   });
 
   it("returns structure separately from exact provision text", () => {
@@ -159,6 +198,9 @@ describe("Public API v1 service contract", () => {
   it("uses stable error codes and rejects Profile switching", () => {
     const missingQuery = failure(service?.resolveLaw(""));
     const oversizedQuery = failure(service?.resolveLaw("x".repeat(201)));
+    const invalidFilter = failure(
+      service?.resolveLaw("DORA", undefined, { jurisdiction: "US" }),
+    );
     const profile = failure(service?.discover("banking-default"));
     const block = failure(
       service?.getProvision("eu:32022R2554:article:28:paragraph:1"),
@@ -187,6 +229,12 @@ describe("Public API v1 service contract", () => {
     expect(oversizedQuery).toMatchObject({
       status: 400,
       response: { error: { code: "INVALID_REQUEST", parameter: "q" } },
+    });
+    expect(invalidFilter).toMatchObject({
+      status: 400,
+      response: {
+        error: { code: "INVALID_REQUEST", parameter: "jurisdiction" },
+      },
     });
     expect(profile).toMatchObject({
       status: 403,
