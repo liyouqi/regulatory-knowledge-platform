@@ -49,12 +49,14 @@
     "citation:benchmark": "node --import tsx src/agent/benchmark-citation-retrieval.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",
+    "mcp": "node --import tsx src/mcp/mcp-stdio.ts",
     "pretest": "npm run runtime:build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
     "@xyflow/react": "^12.11.3",
     "better-sqlite3": "^13.0.3",
     "express": "^5.1.0",
@@ -69,6 +71,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@modelcontextprotocol/client": "^2.0.0",
     "@playwright/test": "^1.51.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.0",

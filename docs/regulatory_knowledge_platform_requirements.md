@@ -3133,19 +3133,21 @@ Public API 能力包括：
 - get version / topic / timeline / applicability / regulatory paths。
 - 在授权范围内选择 Edition/Profile，并按 domain、jurisdiction、authority、document type 与版本过滤。
 
-当前实现：Phase 4 Public API 以 `/api/v1` 和 contract `1.1.0` 发布独立 delivery adapter。首批 `resolve-law`、`law-structure`、`get-provision` 能力分别复用现有 deterministic law resolver、Runtime Document structure 和 citation-ready exact entity index；adapter 不读取 raw/Canonical/editorial 文件或 SQLite table。所有成功与错误 response 均携带 API version、Runtime build 和 Profile identity；structure 不返回 legal body，Provision endpoint 只返回一个 root Provision 的 exact official-text block tree 与 source locator，不要求加载整部法规。可选 `profileId` 只能匹配当前 deployment 已编译 artifact，否则返回稳定 `403 PROFILE_NOT_AVAILABLE`，不执行动态切库。错误模型区分 request、authentication、Profile、not-found、rate-limit、configuration 与 internal failure；无匹配 resolve 是带空 results 的 `200`，不推断法律不存在。第二个 0→1 slice 以集中校验的环境配置启用 Bearer API key、按 key 的进程内 fixed-window limit、未认证 client-address bucket、标准 rate headers 与不含 key identity 的 health counters；未配置 key 时只让 `/api/v1` fail closed，不影响 Web。该限流不是 Cloud Run 多实例全局 quota，也不提供账号、计费或审计；MCP 和 production abuse-management 仍未完成，因此不代表 Phase 4 全部验收完成。
+当前实现：Phase 4 Public API 以 `/api/v1` 和 contract `1.1.0` 发布独立 delivery adapter。首批 `resolve-law`、`law-structure`、`get-provision` 能力分别复用现有 deterministic law resolver、Runtime Document structure 和 citation-ready exact entity index；adapter 不读取 raw/Canonical/editorial 文件或 SQLite table。所有成功与错误 response 均携带 API version、Runtime build 和 Profile identity；structure 不返回 legal body，Provision endpoint 只返回一个 root Provision 的 exact official-text block tree 与 source locator，不要求加载整部法规。可选 `profileId` 只能匹配当前 deployment 已编译 artifact，否则返回稳定 `403 PROFILE_NOT_AVAILABLE`，不执行动态切库。错误模型区分 request、authentication、Profile、not-found、rate-limit、configuration 与 internal failure；无匹配 resolve 是带空 results 的 `200`，不推断法律不存在。第二个 0→1 slice 以集中校验的环境配置启用 Bearer API key、按 key 的进程内 fixed-window limit、未认证 client-address bucket、标准 rate headers 与不含 key identity 的 health counters；未配置 key 时只让 `/api/v1` fail closed，不影响 Web。该限流不是 Cloud Run 多实例全局 quota，也不提供账号、计费或审计；remote MCP 和 production abuse-management 仍未完成，因此不代表 Phase 4 全部验收完成。
 
-MCP 不重新实现法律逻辑，只是复用同一 service layer。首批工具建议：
+当前 MCP 0→1：使用官方 MCP TypeScript SDK `2.0.0` 和 stdio factory transport，以 `regulatory-knowledge-platform@0.1.0` 发布 `resolve_law`、`get_law_structure`、`get_provision` 三个 read-only/idempotent tool。它直接复用相同的 schema-validated external service outputs，不经 Public REST、不打开网络端口、不读取 raw/Canonical/editorial 文件或新建 repository。结果同时返回 JSON text 与 structured content；service error 保留同一 machine-readable envelope，Profile mismatch 与 Body Block ID fail closed。stdio 依赖启动用户的 OS/filesystem trust boundary，不使用 Public API key。Remote Streamable HTTP MCP、remote auth、quota、audit 和更多 tools 仍在后续，因此 Phase 4 尚未全部验收。
+
+MCP 不重新实现法律逻辑，只是复用同一 service layer。当前工具与后续候选为：
 
 ```text
-search_regulation
-resolve_regulation
-get_law_structure
-get_provision
-get_relationships
-get_case_law
-get_version_info
-get_regulatory_path
+resolve_law                 [current]
+get_law_structure           [current]
+get_provision               [current]
+search_regulation           [later]
+get_relationships           [later]
+get_case_law                [later]
+get_version_info            [later]
+get_regulatory_path         [later]
 ```
 
 Phase 4 验收要求：
@@ -3316,7 +3318,7 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 
 1. stabilize selected internal services as Public API v1；
 2. API versioning、authentication、rate limits 与 developer documentation；
-3. MCP adapter；
+3. MCP stdio adapter 0→1（已完成）；
 4. SDK / client examples；
 5. Agent and third-party integrations；
 6. authorized Profile selection and query filters；

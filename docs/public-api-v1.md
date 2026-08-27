@@ -12,7 +12,7 @@ The first `v1` capability slice provides three bounded capabilities:
 | Law structure | `GET /api/v1/laws/:documentId/structure` | Document source/version identity and table-of-contents structure without legal body text. |
 | Get Provision | `GET /api/v1/provisions/:entityId` | One exact root Provision, its official-text block tree, source locators, and source/version identity. |
 
-`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are now part of the delivery boundary. Relationships, Topics, timelines, decisions, applicability, regulatory paths, MCP, and SDK examples remain later Phase 4 slices. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
+`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are now part of the delivery boundary. Relationships, Topics, timelines, decisions, applicability, regulatory paths, and SDK examples remain later REST slices. The [local stdio MCP adapter](mcp-server.md) is documented separately and does not inherit this REST compatibility boundary. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
 
 ## Start locally
 
