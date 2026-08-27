@@ -108,6 +108,16 @@ export function createPublicApiRouter(
     );
   });
 
+  router.get("/provisions/:entityId/relationships", (request, response) => {
+    sendOperation(
+      response,
+      service.getProvisionRelationships(
+        request.params.entityId,
+        queryParameter(request.query.profileId),
+      ),
+    );
+  });
+
   router.use(
     (
       error: unknown,

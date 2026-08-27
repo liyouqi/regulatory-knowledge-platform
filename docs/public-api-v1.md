@@ -4,15 +4,16 @@ The Phase 4 Public API is a versioned delivery adapter over the same read-only R
 
 ## Current scope
 
-The first `v1` capability slice provides three bounded capabilities:
+The current `v1` capability slice provides four bounded capabilities:
 
 | Capability | Endpoint | Result boundary |
 |---|---|---|
 | Resolve law | `GET /api/v1/laws/resolve?q=<query>` | Up to 10 matching laws and, when supplied in the query, one exact Provision stable ID. |
 | Law structure | `GET /api/v1/laws/:documentId/structure` | Document source/version identity and table-of-contents structure without legal body text. |
 | Get Provision | `GET /api/v1/provisions/:entityId` | One exact root Provision, its official-text block tree, source locators, and source/version identity. |
+| Get relationships | `GET /api/v1/provisions/:entityId/relationships` | All reviewed relationship groups published for one exact root Provision, preserving direction, provenance, evidence, and builder identity. |
 
-`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are now part of the delivery boundary. Relationships, Topics, timelines, decisions, applicability, regulatory paths, and SDK examples remain later REST slices. The [local stdio MCP adapter](mcp-server.md) is documented separately and does not inherit this REST compatibility boundary. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
+`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are part of the delivery boundary. Broader relationship search, Topics, timelines, decisions, applicability, regulatory paths, and SDK examples remain later REST slices. The [local stdio MCP adapter](mcp-server.md) is documented separately and does not inherit this REST compatibility boundary. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
 
 ## Start locally
 
@@ -35,7 +36,15 @@ curl --header "Authorization: Bearer local-development-key-2026" \
   http://localhost:3000/api/v1/laws/eu%3A32022R2554/structure
 curl --header "Authorization: Bearer local-development-key-2026" \
   http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28
+curl --header "Authorization: Bearer local-development-key-2026" \
+  http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28/relationships
 ```
+
+## Relationship boundary
+
+The relationship response contains `references`, `citedBy`, `mandates`, `adoptedUnder`, `supplements`, `implements`, `relatedDocuments`, and `relatedRecitals`. Every edge retains its stable relationship ID, original source/target direction, provenance, exact evidence and locator, builder method/version, and any published score. Endpoint objects contain stable legal IDs and official URLs, not Web routes.
+
+`citedBy` is a query-perspective group; its edge still retains the original citing source and cited target. Empty groups mean only that the loaded Profile contains no published relationship of that group for this Provision. They do not establish that no legal relationship exists. The endpoint does not parse a question, infer a relationship, or dynamically read curated mappings.
 
 ## Access configuration
 
@@ -59,7 +68,7 @@ Every response contains:
 {
   "meta": {
     "apiVersion": "v1",
-    "contractVersion": "1.1.0",
+    "contractVersion": "1.2.0",
     "profilePolicy": "deployment-fixed",
     "runtime": {
       "buildId": "runtime-...",
@@ -108,7 +117,7 @@ Current codes:
 | `401` | `AUTHENTICATION_REQUIRED` | The Bearer credential is missing, malformed, or invalid. |
 | `403` | `PROFILE_NOT_AVAILABLE` | The requested Profile is not served by this deployment. |
 | `404` | `LAW_NOT_FOUND` | The stable Document ID is unavailable in the current Profile. |
-| `404` | `PROVISION_NOT_FOUND` | The root Provision stable ID is unavailable; Body Block IDs are not accepted by this endpoint. |
+| `404` | `PROVISION_NOT_FOUND` | The root Provision stable ID is unavailable; Body Block IDs are not accepted by Provision or relationship endpoints. |
 | `429` | `RATE_LIMIT_EXCEEDED` | The current key or unauthorized client bucket exceeded its process-local window. |
 | `500` | `INTERNAL_ERROR` | The adapter failed without exposing implementation details. |
 | `503` | `SERVICE_NOT_CONFIGURED` | No Public API key is configured for this deployment. |

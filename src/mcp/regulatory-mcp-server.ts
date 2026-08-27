@@ -9,7 +9,7 @@ import type {
 } from "../public-api/public-api-service";
 
 export const REGULATORY_MCP_SERVER_NAME = "regulatory-knowledge-platform";
-export const REGULATORY_MCP_SERVER_VERSION = "0.1.0";
+export const REGULATORY_MCP_SERVER_VERSION = "0.2.0";
 
 type ResolveLawInput = {
   query: string;
@@ -81,6 +81,22 @@ const getProvisionInputSchema = fromJsonSchema<GetProvisionInput>({
   },
 });
 
+const getRelationshipsInputSchema = fromJsonSchema<GetProvisionInput>({
+  type: "object",
+  additionalProperties: false,
+  required: ["entityId"],
+  properties: {
+    entityId: {
+      type: "string",
+      minLength: 1,
+      maxLength: 260,
+      description:
+        "Exact root Provision stable ID whose published relationships should be returned.",
+    },
+    profileId: profileIdProperty,
+  },
+});
+
 const readOnlyAnnotations = {
   readOnlyHint: true,
   destructiveHint: false,
@@ -147,6 +163,19 @@ export function createRegulatoryMcpServer(service: PublicApiService) {
     },
     async ({ entityId, profileId }) =>
       toolResult(service.getProvision(entityId, profileId)),
+  );
+
+  server.registerTool(
+    "get_relationships",
+    {
+      title: "Get provision relationships",
+      description:
+        "Get all relationship groups published for one exact root Provision. Results preserve direction, provenance, exact evidence, builder identity, and optional scored editorial similarity; empty groups mean only that no relationship of that type is published in the loaded artifact.",
+      inputSchema: getRelationshipsInputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async ({ entityId, profileId }) =>
+      toolResult(service.getProvisionRelationships(entityId, profileId)),
   );
 
   return server;

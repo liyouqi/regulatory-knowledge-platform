@@ -3,7 +3,7 @@ import { lawSearchMatchReasonSchema } from "./legal";
 import { sourceLocatorSchema } from "./source-locator";
 
 export const PUBLIC_API_VERSION = "v1";
-export const PUBLIC_API_CONTRACT_VERSION = "1.1.0";
+export const PUBLIC_API_CONTRACT_VERSION = "1.2.0";
 
 const publicRuntimeIdentitySchema = z
   .object({
@@ -114,7 +114,12 @@ export const publicApiDiscoveryResponseSchema = z
         capabilities: z.array(
           z
             .object({
-              id: z.enum(["resolve-law", "law-structure", "get-provision"]),
+              id: z.enum([
+                "resolve-law",
+                "law-structure",
+                "get-provision",
+                "get-relationships",
+              ]),
               method: z.literal("GET"),
               pathTemplate: z.string().startsWith("/api/v1/"),
             })
@@ -279,6 +284,97 @@ export const publicProvisionResponseSchema = z
   })
   .strict();
 
+const publicRelationshipEndpointSchema = z
+  .object({
+    entityId: z.string().min(1),
+    documentId: z.string().min(1),
+    documentShortName: z.string().min(1),
+    provisionId: z.string().min(1).optional(),
+    kind: z.string().min(1),
+    label: z.string().min(1),
+    title: z.string().nullable(),
+    officialUrl: z.string().url(),
+  })
+  .strict();
+
+const publicProvisionRelationshipSchema = z
+  .object({
+    id: z.string().startsWith("relationship:"),
+    relationType: z.enum([
+      "REFERENCES",
+      "CITED_BY",
+      "MANDATES",
+      "ADOPTED_UNDER",
+      "AMENDS",
+      "CORRECTS",
+      "SUPPLEMENTS",
+      "IMPLEMENTS",
+      "RELATED_DOCUMENT",
+      "RELATED_RECITAL",
+    ]),
+    provenance: z.enum([
+      "LEGAL_TEXT",
+      "OFFICIAL_METADATA",
+      "OFFICIAL_MAPPING",
+      "CASE_TEXT",
+      "EDITORIAL",
+      "TFIDF",
+    ]),
+    source: publicRelationshipEndpointSchema,
+    target: publicRelationshipEndpointSchema,
+    evidence: z
+      .object({
+        text: z.string().min(1),
+        locator: z.string().min(1),
+        sourceUrl: z.string().url(),
+      })
+      .strict(),
+    builder: z
+      .object({
+        method: z.string().min(1),
+        version: z.string().min(1),
+      })
+      .strict(),
+    score: z.number().nonnegative().optional(),
+    resolutionStatus: z.literal("resolved"),
+  })
+  .strict();
+
+const publicRelationshipGroupsSchema = z
+  .object({
+    references: z.array(publicProvisionRelationshipSchema),
+    citedBy: z.array(publicProvisionRelationshipSchema),
+    mandates: z.array(publicProvisionRelationshipSchema),
+    adoptedUnder: z.array(publicProvisionRelationshipSchema),
+    supplements: z.array(publicProvisionRelationshipSchema),
+    implements: z.array(publicProvisionRelationshipSchema),
+    relatedDocuments: z.array(publicProvisionRelationshipSchema),
+    relatedRecitals: z.array(publicProvisionRelationshipSchema),
+  })
+  .strict();
+
+export const publicProvisionRelationshipsResponseSchema = z
+  .object({
+    meta: publicApiMetaSchema,
+    data: z
+      .object({
+        provision: z
+          .object({
+            entityId: z.string().min(1),
+            documentId: z.string().min(1),
+            documentShortName: z.string().min(1),
+            kind: z.string().min(1),
+            label: z.string().min(1),
+            title: z.string().nullable(),
+          })
+          .strict(),
+        relationshipCount: z.number().int().nonnegative(),
+        groups: publicRelationshipGroupsSchema,
+      })
+      .strict(),
+  })
+  .strict();
+
 export type PublicApiErrorResponse = z.infer<
   typeof publicApiErrorResponseSchema
 >;
@@ -293,4 +389,7 @@ export type PublicLawStructureResponse = z.infer<
 >;
 export type PublicProvisionResponse = z.infer<
   typeof publicProvisionResponseSchema
+>;
+export type PublicProvisionRelationshipsResponse = z.infer<
+  typeof publicProvisionRelationshipsResponseSchema
 >;

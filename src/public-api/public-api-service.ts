@@ -1,7 +1,13 @@
 import type { CitationContextService } from "../agent/citation-context-service";
 import type { LawSearchRecord } from "../search/law-search";
 import { searchLaws } from "../search/law-search";
-import type { DocumentView, LawSearchResult, TocNode } from "../shared/legal";
+import type {
+  DocumentView,
+  LawSearchResult,
+  ProvisionRelationship,
+  RelationshipEndpoint,
+  TocNode,
+} from "../shared/legal";
 import {
   PUBLIC_API_CONTRACT_VERSION,
   PUBLIC_API_VERSION,
@@ -9,6 +15,7 @@ import {
   type PublicApiErrorResponse,
   type PublicLawResolveResponse,
   type PublicLawStructureResponse,
+  type PublicProvisionRelationshipsResponse,
   type PublicProvisionResponse,
   type PublicStructureNode,
   type PublicTextBlock,
@@ -16,6 +23,7 @@ import {
   publicApiErrorResponseSchema,
   publicLawResolveResponseSchema,
   publicLawStructureResponseSchema,
+  publicProvisionRelationshipsResponseSchema,
   publicProvisionResponseSchema,
 } from "../shared/public-api";
 
@@ -80,6 +88,45 @@ function textBlock(
     text: block.text,
     sourceLocator: block.sourceLocator,
     children: block.children.map(textBlock),
+  };
+}
+
+function publicRelationshipEndpoint(
+  endpoint: RelationshipEndpoint,
+  documentsById: Map<string, DocumentView>,
+) {
+  const document = documentsById.get(endpoint.documentId);
+  if (!document) {
+    throw new Error(
+      `Public API relationship endpoint is outside the loaded Profile: ${endpoint.entityId}`,
+    );
+  }
+  return {
+    entityId: endpoint.entityId,
+    documentId: endpoint.documentId,
+    documentShortName: endpoint.documentShortName,
+    provisionId: endpoint.provisionId,
+    kind: endpoint.kind,
+    label: endpoint.label,
+    title: endpoint.title,
+    officialUrl: document.sourceUrl,
+  };
+}
+
+function publicRelationship(
+  relationship: ProvisionRelationship,
+  documentsById: Map<string, DocumentView>,
+) {
+  return {
+    id: relationship.id,
+    relationType: relationship.relationType,
+    provenance: relationship.provenance,
+    source: publicRelationshipEndpoint(relationship.source, documentsById),
+    target: publicRelationshipEndpoint(relationship.target, documentsById),
+    evidence: relationship.evidence,
+    builder: relationship.builder,
+    score: relationship.score,
+    resolutionStatus: relationship.resolutionStatus,
   };
 }
 
@@ -203,6 +250,12 @@ export class PublicApiService {
               id: "get-provision",
               method: "GET",
               pathTemplate: "/api/v1/provisions/{entityId}{?profileId}",
+            },
+            {
+              id: "get-relationships",
+              method: "GET",
+              pathTemplate:
+                "/api/v1/provisions/{entityId}/relationships{?profileId}",
             },
           ],
         },
@@ -388,6 +441,68 @@ export class PublicApiService {
             lastChecked: document.lastChecked,
             canonicalBuildId: document.buildId,
           },
+        },
+      }),
+    };
+  }
+
+  getProvisionRelationships(
+    entityId: string,
+    profileId?: string,
+  ): PublicApiOperation<PublicProvisionRelationshipsResponse> {
+    const profileError = this.profileError(profileId);
+    if (profileError) return profileError;
+    if (!entityId || entityId.length > 260) {
+      return this.error(
+        400,
+        "INVALID_REQUEST",
+        "Path parameter entityId must contain 1 to 260 characters",
+        "entityId",
+      );
+    }
+    const context = this.citationContext.findByEntityId(entityId);
+    if (!context || context.target.rootProvisionId !== entityId) {
+      return this.error(
+        404,
+        "PROVISION_NOT_FOUND",
+        `Provision ${entityId} was not found in the current Profile`,
+        "entityId",
+      );
+    }
+    const relationships = context.relationships;
+    const mapGroup = (group: ProvisionRelationship[]) =>
+      group.map((relationship) =>
+        publicRelationship(relationship, this.documentsById),
+      );
+    const groups = {
+      references: mapGroup(relationships.references),
+      citedBy: mapGroup(relationships.citedBy),
+      mandates: mapGroup(relationships.mandates),
+      adoptedUnder: mapGroup(relationships.adoptedUnder),
+      supplements: mapGroup(relationships.supplements),
+      implements: mapGroup(relationships.implements),
+      relatedDocuments: mapGroup(relationships.relatedDocuments),
+      relatedRecitals: mapGroup(relationships.relatedRecitals),
+    };
+    const relationshipCount = Object.values(groups).reduce(
+      (total, group) => total + group.length,
+      0,
+    );
+    return {
+      ok: true,
+      response: publicProvisionRelationshipsResponseSchema.parse({
+        meta: this.meta(),
+        data: {
+          provision: {
+            entityId,
+            documentId: context.document.id,
+            documentShortName: context.document.shortName,
+            kind: context.target.kind,
+            label: context.target.label,
+            title: context.target.title,
+          },
+          relationshipCount,
+          groups,
         },
       }),
     };

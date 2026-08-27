@@ -8,6 +8,7 @@ import {
   publicApiErrorResponseSchema,
   publicLawResolveResponseSchema,
   publicLawStructureResponseSchema,
+  publicProvisionRelationshipsResponseSchema,
   publicProvisionResponseSchema,
 } from "../shared/public-api";
 import { createRegulatoryMcpServer } from "./regulatory-mcp-server";
@@ -48,6 +49,7 @@ describe("Regulatory MCP server", () => {
       "resolve_law",
       "get_law_structure",
       "get_provision",
+      "get_relationships",
     ]);
     for (const tool of result?.tools ?? []) {
       expect(tool.annotations).toMatchObject({
@@ -118,6 +120,36 @@ describe("Regulatory MCP server", () => {
     }
   });
 
+  it("returns directed evidence-bearing relationships for an exact Provision", async () => {
+    const result = await client?.callTool({
+      name: "get_relationships",
+      arguments: { entityId: "eu:32022R2554:article:28" },
+    });
+    const payload = publicProvisionRelationshipsResponseSchema.parse(
+      result?.structuredContent,
+    );
+
+    expect(result?.isError).not.toBe(true);
+    expect(payload.meta.contractVersion).toBe("1.2.0");
+    expect(payload.data.groups.mandates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+          source: expect.objectContaining({
+            entityId: "eu:32022R2554:article:28",
+          }),
+          target: expect.objectContaining({ entityId: "eu:32024R2956" }),
+          evidence: expect.objectContaining({ text: expect.any(String) }),
+        }),
+        expect.objectContaining({
+          target: expect.objectContaining({ entityId: "eu:32024R1773" }),
+        }),
+      ]),
+    );
+    expect(JSON.stringify(payload)).not.toContain('"path"');
+  });
+
   it("keeps Profile isolation and service errors in the structured result", async () => {
     const profileResult = await client?.callTool({
       name: "resolve_law",
@@ -132,17 +164,28 @@ describe("Regulatory MCP server", () => {
         entityId: "eu:32022R2554:article:28:paragraph:1",
       },
     });
+    const relationshipBlockResult = await client?.callTool({
+      name: "get_relationships",
+      arguments: {
+        entityId: "eu:32022R2554:article:28:paragraph:1",
+      },
+    });
     const profileError = publicApiErrorResponseSchema.parse(
       profileResult?.structuredContent,
     );
     const blockError = publicApiErrorResponseSchema.parse(
       blockResult?.structuredContent,
     );
+    const relationshipBlockError = publicApiErrorResponseSchema.parse(
+      relationshipBlockResult?.structuredContent,
+    );
 
     expect(profileResult?.isError).toBe(true);
     expect(profileError.error.code).toBe("PROFILE_NOT_AVAILABLE");
     expect(blockResult?.isError).toBe(true);
     expect(blockError.error.code).toBe("PROVISION_NOT_FOUND");
+    expect(relationshipBlockResult?.isError).toBe(true);
+    expect(relationshipBlockError.error.code).toBe("PROVISION_NOT_FOUND");
   });
 
   it("rejects invalid MCP arguments before calling the service", async () => {

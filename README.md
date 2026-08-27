@@ -144,11 +144,18 @@ curl --get http://localhost:3000/api/v1/laws/resolve \
   --data-urlencode "q=DORA article 28"
 ```
 
-The first slice also exposes `GET /api/v1/laws/:documentId/structure` and `GET /api/v1/provisions/:entityId`. Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Bearer API-key authentication, process-scoped fixed-window limiting, and aggregate health counters are enabled; without a configured key, `/api/v1` fails closed while the Web product remains available. See `docs/public-api-v1.md` for the exact REST contract and current usage boundary.
+The current slice also exposes `GET /api/v1/laws/:documentId/structure`, `GET /api/v1/provisions/:entityId`, and `GET /api/v1/provisions/:entityId/relationships`. The relationship endpoint accepts one exact root Provision stable ID and returns the reviewed, directed relationship groups with provenance and evidence:
+
+```bash
+curl --header "Authorization: Bearer local-development-key-2026" \
+  http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28/relationships
+```
+
+Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Bearer API-key authentication, process-scoped fixed-window limiting, and aggregate health counters are enabled; without a configured key, `/api/v1` fails closed while the Web product remains available. See `docs/public-api-v1.md` for the exact REST contract and current usage boundary.
 
 ## MCP server
 
-Phase 4 also exposes the same three deterministic capabilities as local read-only MCP tools: `resolve_law`, `get_law_structure`, and `get_provision`. Build the Runtime once, then let the MCP host launch the server; do not start it separately:
+Phase 4 also exposes the same four deterministic capabilities as local read-only MCP tools: `resolve_law`, `get_law_structure`, `get_provision`, and `get_relationships`. A client can resolve “DORA Article 28” to its stable ID and then retrieve the published `mandates` relationships without AI inference. Build the Runtime once, then let the MCP host launch the server; do not start it separately:
 
 ```json
 {
@@ -162,7 +169,7 @@ Phase 4 also exposes the same three deterministic capabilities as local read-onl
 }
 ```
 
-The `--silent` flag is required because stdout is the MCP protocol channel. The local stdio process uses the current user's filesystem access and does not use the Public API key. Remote Streamable HTTP MCP, OAuth/API-key protection, relationships, and additional tools remain later Phase 4 slices. See `docs/mcp-server.md` for exact inputs, error semantics, and client boundaries.
+The `--silent` flag is required because stdout is the MCP protocol channel. The local stdio process uses the current user's filesystem access and does not use the Public API key. Remote Streamable HTTP MCP, OAuth/API-key protection, broader relationship search, and additional tools remain later Phase 4 slices. See `docs/mcp-server.md` for exact inputs, error semantics, and client boundaries.
 
 ## Deploy to Google Cloud Run
 

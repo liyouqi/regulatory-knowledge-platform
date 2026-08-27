@@ -41,7 +41,7 @@ describe("Public API v1 service contract", () => {
     expect(payload).toMatchObject({
       meta: {
         apiVersion: "v1",
-        contractVersion: "1.1.0",
+        contractVersion: "1.2.0",
         profilePolicy: "deployment-fixed",
         runtime: { profileId: "full-corpus" },
       },
@@ -51,6 +51,7 @@ describe("Public API v1 service contract", () => {
       "resolve-law",
       "law-structure",
       "get-provision",
+      "get-relationships",
     ]);
   });
 
@@ -96,12 +97,82 @@ describe("Public API v1 service contract", () => {
     }
   });
 
+  it("publishes exact directed Provision relationships without Web paths", () => {
+    const payload = success(
+      service?.getProvisionRelationships("eu:32022R2554:article:28"),
+    );
+
+    expect(payload.data.provision).toEqual({
+      entityId: "eu:32022R2554:article:28",
+      documentId: "eu:32022R2554",
+      documentShortName: "DORA",
+      kind: "article",
+      label: "Article 28",
+      title: "General principles",
+    });
+    expect(payload.data.relationshipCount).toBe(
+      Object.values(payload.data.groups).reduce(
+        (total, group) => total + group.length,
+        0,
+      ),
+    );
+    expect(payload.data.groups.mandates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+          source: expect.objectContaining({
+            entityId: "eu:32022R2554:article:28",
+            officialUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+          }),
+          target: expect.objectContaining({
+            entityId: "eu:32024R2956",
+            documentShortName: "DORA ITS Register of Information",
+            officialUrl:
+              "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng",
+          }),
+          evidence: expect.objectContaining({
+            text: expect.any(String),
+            sourceUrl: expect.stringContaining("eur-lex.europa.eu"),
+          }),
+          builder: { method: "official-mapping", version: "1.0.0" },
+          resolutionStatus: "resolved",
+        }),
+        expect.objectContaining({
+          target: expect.objectContaining({ entityId: "eu:32024R1773" }),
+        }),
+      ]),
+    );
+    expect(payload.data.groups.relatedRecitals).toContainEqual(
+      expect.objectContaining({
+        relationType: "RELATED_RECITAL",
+        provenance: "TFIDF",
+        score: expect.any(Number),
+      }),
+    );
+    const serialized = JSON.stringify(payload);
+    expect(serialized).not.toContain('"path"');
+    expect(serialized).not.toContain("regulatory.sqlite");
+    expect(serialized).not.toContain("data/raw");
+  });
+
   it("uses stable error codes and rejects Profile switching", () => {
     const missingQuery = failure(service?.resolveLaw(""));
     const oversizedQuery = failure(service?.resolveLaw("x".repeat(201)));
     const profile = failure(service?.discover("banking-default"));
     const block = failure(
       service?.getProvision("eu:32022R2554:article:28:paragraph:1"),
+    );
+    const relationshipBlock = failure(
+      service?.getProvisionRelationships(
+        "eu:32022R2554:article:28:paragraph:1",
+      ),
+    );
+    const relationshipProfile = failure(
+      service?.getProvisionRelationships(
+        "eu:32022R2554:article:28",
+        "banking-default",
+      ),
     );
     const law = failure(service?.getLawStructure("eu:unknown"));
     const internal = failure(service?.internalError());
@@ -124,6 +195,14 @@ describe("Public API v1 service contract", () => {
     expect(block).toMatchObject({
       status: 404,
       response: { error: { code: "PROVISION_NOT_FOUND" } },
+    });
+    expect(relationshipBlock).toMatchObject({
+      status: 404,
+      response: { error: { code: "PROVISION_NOT_FOUND" } },
+    });
+    expect(relationshipProfile).toMatchObject({
+      status: 403,
+      response: { error: { code: "PROFILE_NOT_AVAILABLE" } },
     });
     expect(law).toMatchObject({
       status: 404,
