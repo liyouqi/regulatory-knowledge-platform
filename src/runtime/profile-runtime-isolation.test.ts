@@ -9,6 +9,7 @@ import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
+import { PublicApiService } from "../public-api/public-api-service";
 import { toGlobalRelationshipGraph } from "../relationships/relationship-graph";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
@@ -28,6 +29,7 @@ let citationContext: CitationContextService | undefined;
 let citationRetrieval: CitationRetrievalService | undefined;
 let regulatoryPaths: RegulatoryPathService | undefined;
 let regulatoryTopics: RegulatoryTopicService | undefined;
+let publicApi: PublicApiService | undefined;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -50,6 +52,14 @@ beforeAll(() => {
   citationRetrieval = new CitationRetrievalService(search, citationContext);
   regulatoryPaths = new RegulatoryPathService(repository);
   regulatoryTopics = new RegulatoryTopicService(repository);
+  publicApi = new PublicApiService(
+    repository,
+    createLawSearchRecords(
+      repository.listDocumentViews(),
+      repository.listLawSearchSources(),
+    ),
+    citationContext,
+  );
 });
 
 afterAll(() => {
@@ -190,6 +200,20 @@ describe("banking-default runtime isolation", () => {
         documentId: "eu:32023R1114",
       }).results,
     ).toEqual([]);
+    expect(publicApi?.resolveLaw("MiCA")).toMatchObject({
+      ok: true,
+      response: { data: { resultCount: 0, bestMatch: null, results: [] } },
+    });
+    expect(publicApi?.getLawStructure("eu:32023R1114")).toMatchObject({
+      ok: false,
+      status: 404,
+      response: { error: { code: "LAW_NOT_FOUND" } },
+    });
+    expect(publicApi?.discover("full-corpus")).toMatchObject({
+      ok: false,
+      status: 403,
+      response: { error: { code: "PROFILE_NOT_AVAILABLE" } },
+    });
   });
 
   it("does not leak excluded documents through search or graph projections", () => {

@@ -1165,9 +1165,11 @@ Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenan
 
 当前 delivery 提供三种 projection：Article Graph 使用既有 provision relationship response 保持精确 root-provision scope；Document Graph 查询 source/target document 命中的 resolved 跨文档边，在投影阶段聚合为 Document nodes，并合并当前 Document 的独立 lifecycle 与 case-law response；Global Network 以所有 loaded Document nodes 为默认层，并汇集同一 runtime 中的跨法规、lifecycle 与 case-law edges。Global Network 默认折叠 external Work 与 Case，用户可分别展开它们；这只是 UI projection，不新增 relationship type、SQLite table 或 Canonical contract。loaded endpoint 继续使用 Document node；external Work node 只有 stable ID、CELEX label 和官方 CELLAR URL；Case node 只显示官方 case number/name、ECLI、date、decision type 与 CELLAR URL。两类 metadata-only node 都不请求正文 preview，也没有 Reader/Explorer route。三种 projection 共享 Graph node/edge schema、React Flow 页面、筛选、拖拽状态和 provenance 图例，但 route 与 scope 显式区分，避免把 Work-level metadata 伪装成 Article 关系。
 
-## 21.5 Phase 4 External Adapters（预留）
+## 21.5 Phase 4 External Adapters
 
 Public API 和 MCP 都是 Service Adapter，不拥有业务逻辑。Phase 2 只需继续形成清晰的内部 service outputs；外部版本兼容、认证、限流和 transport implementation 延后到 Phase 4。
+
+当前 Public API `v1` 首个 slice 使用独立 `PublicApiService` 组合现有 law-search records、Runtime repository 和 `CitationContextService`，Express router 只负责 query bounds、HTTP status 与 version headers。公开 DTO 与 Web DTO 分离：resolve output 使用 stable Document/Provision IDs；structure 只投影 Document source/version identity 与 TOC；Provision output 只投影一个 root Provision 的 exact Body Block tree/source locator。统一 `meta` 固定 `apiVersion=v1`、contract version、Runtime build/Profile identity 和 `deployment-fixed` policy，统一 error envelope 固定 machine-readable code。请求中的 `profileId` 只允许等于当前 artifact Profile；adapter 不动态打开其他 SQLite、不回流 Profile 外节点。`/api/v1` 不暴露 raw XML、Canonical file、SQLite schema/path 或 Reader/Explorer-specific path。当前 HTTP adapter 未配置 auth/rate limit，只有完成对应 Phase 4 control 后才可作为 unrestricted production developer API 发布。
 
 优先工具：
 

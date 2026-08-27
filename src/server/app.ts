@@ -4,6 +4,8 @@ import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
+import { createPublicApiRouter } from "../public-api/public-api-router";
+import { PublicApiService } from "../public-api/public-api-service";
 import {
   toDocumentRelationshipGraph,
   toGlobalRelationshipGraph,
@@ -17,6 +19,7 @@ import { level2MandateQueryResponseSchema } from "../shared/legal";
 import { RegulatoryTopicService } from "../topics/regulatory-topic-service";
 
 export const app = express();
+app.disable("x-powered-by");
 const runtimePath = runtimeDatabasePath();
 const runtimeRepository = new SqliteRuntimeRepository(runtimePath);
 const documentViews = runtimeRepository.listDocumentViews();
@@ -35,6 +38,11 @@ const citationRetrievalService = new CitationRetrievalService(
 );
 const regulatoryPathService = new RegulatoryPathService(runtimeRepository);
 const regulatoryTopicService = new RegulatoryTopicService(runtimeRepository);
+const publicApiService = new PublicApiService(
+  runtimeRepository,
+  lawSearchRecords,
+  citationContextService,
+);
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
@@ -245,6 +253,8 @@ app.get("/api/health", (_request, response) => {
     },
   });
 });
+
+app.use("/api/v1", createPublicApiRouter(publicApiService));
 
 app.get("/api/documents", (_request, response) => {
   response.json({ documents: runtimeRepository.listDocumentSummaries() });

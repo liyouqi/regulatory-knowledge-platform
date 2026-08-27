@@ -3133,6 +3133,8 @@ Public API 能力包括：
 - get version / topic / timeline / applicability / regulatory paths。
 - 在授权范围内选择 Edition/Profile，并按 domain、jurisdiction、authority、document type 与版本过滤。
 
+当前实现：Phase 4 首个 Public API slice 以 `/api/v1` 和 contract `1.0.0` 发布独立 delivery adapter。首批 `resolve-law`、`law-structure`、`get-provision` 能力分别复用现有 deterministic law resolver、Runtime Document structure 和 citation-ready exact entity index；adapter 不读取 raw/Canonical/editorial 文件或 SQLite table。所有成功与错误 response 均携带 API version、Runtime build 和 Profile identity；structure 不返回 legal body，Provision endpoint 只返回一个 root Provision 的 exact official-text block tree 与 source locator，不要求加载整部法规。可选 `profileId` 只能匹配当前 deployment 已编译 artifact，否则返回稳定 `403 PROFILE_NOT_AVAILABLE`，不执行动态切库。错误模型区分 `400 INVALID_REQUEST`、`404 LAW_NOT_FOUND` 与 `404 PROVISION_NOT_FOUND`；无匹配 resolve 是带空 results 的 `200`，不推断法律不存在。当前 slice 尚未启用 authentication、rate limiting、MCP 或 production public exposure，因此不代表 Phase 4 全部验收完成。
+
 MCP 不重新实现法律逻辑，只是复用同一 service layer。首批工具建议：
 
 ```text

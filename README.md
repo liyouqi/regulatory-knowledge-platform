@@ -10,6 +10,7 @@ An English European financial regulatory knowledge platform for EU and Luxembour
 - `docs/corpus-onboarding-runbook.md`: repeatable workflow for adding or refreshing legal sources.
 - `docs/coverage-backlog.md`: bounded phase completion and deferred 1→100 corpus work.
 - `docs/runtime-operation-runbook.md`: staging, verification, promotion, and rollback of runtime artifacts.
+- `docs/public-api-v1.md`: Phase 4 Public API endpoints, Profile policy, errors, and compatibility boundary.
 - `AGENTS.md`: short, stable instructions for Codex and other coding agents.
 
 ## Development Environment
@@ -124,6 +125,17 @@ npm run build
 | `npm run cssf:canonical:inspect -- --snapshot <path>` | Inspect CSSF HTML or tagged-PDF structure and candidate fidelity metrics without publishing. |
 | `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF Canonical artifact after the media-specific quality gate passes. |
 | `npm run test:e2e` | Run Playwright smoke tests for the DORA Explorer, Reader, Level 2 library, and global search. |
+
+## Public API v1
+
+Phase 4 starts with a narrow versioned adapter over the existing read-only services. After `npm run dev`, discover it at `http://localhost:3000/api/v1` or resolve a law with:
+
+```bash
+curl --get http://localhost:3000/api/v1/laws/resolve \
+  --data-urlencode "q=DORA article 28"
+```
+
+The first slice also exposes `GET /api/v1/laws/:documentId/structure` and `GET /api/v1/provisions/:entityId`. Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Authentication, rate limiting, MCP, and the remaining Phase 4 capabilities are not enabled yet; see `docs/public-api-v1.md` for the exact contract and current usage boundary.
 
 ## Deploy to Google Cloud Run
 
