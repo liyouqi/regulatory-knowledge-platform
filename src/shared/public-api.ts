@@ -297,29 +297,33 @@ const publicRelationshipEndpointSchema = z
   })
   .strict();
 
+export const publicRelationshipTypeSchema = z.enum([
+  "REFERENCES",
+  "CITED_BY",
+  "MANDATES",
+  "ADOPTED_UNDER",
+  "AMENDS",
+  "CORRECTS",
+  "SUPPLEMENTS",
+  "IMPLEMENTS",
+  "RELATED_DOCUMENT",
+  "RELATED_RECITAL",
+]);
+
+export const publicRelationshipProvenanceSchema = z.enum([
+  "LEGAL_TEXT",
+  "OFFICIAL_METADATA",
+  "OFFICIAL_MAPPING",
+  "CASE_TEXT",
+  "EDITORIAL",
+  "TFIDF",
+]);
+
 const publicProvisionRelationshipSchema = z
   .object({
     id: z.string().startsWith("relationship:"),
-    relationType: z.enum([
-      "REFERENCES",
-      "CITED_BY",
-      "MANDATES",
-      "ADOPTED_UNDER",
-      "AMENDS",
-      "CORRECTS",
-      "SUPPLEMENTS",
-      "IMPLEMENTS",
-      "RELATED_DOCUMENT",
-      "RELATED_RECITAL",
-    ]),
-    provenance: z.enum([
-      "LEGAL_TEXT",
-      "OFFICIAL_METADATA",
-      "OFFICIAL_MAPPING",
-      "CASE_TEXT",
-      "EDITORIAL",
-      "TFIDF",
-    ]),
+    relationType: publicRelationshipTypeSchema,
+    provenance: publicRelationshipProvenanceSchema,
     source: publicRelationshipEndpointSchema,
     target: publicRelationshipEndpointSchema,
     evidence: z

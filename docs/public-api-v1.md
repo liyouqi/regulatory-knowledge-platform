@@ -13,7 +13,7 @@ The current `v1` capability slice provides four bounded capabilities:
 | Get Provision | `GET /api/v1/provisions/:entityId` | One exact root Provision, its official-text block tree, source locators, and source/version identity. |
 | Get relationships | `GET /api/v1/provisions/:entityId/relationships` | All reviewed relationship groups published for one exact root Provision, preserving direction, provenance, evidence, and builder identity. |
 
-`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are part of the delivery boundary. Broader relationship search, Topics, timelines, decisions, applicability, regulatory paths, and SDK examples remain later REST slices. The [local stdio MCP adapter](mcp-server.md) is documented separately and does not inherit this REST compatibility boundary. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
+`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, aggregate operational counters, an OpenAPI 3.1 contract, and a local-asset Swagger UI are part of the delivery boundary. Broader relationship search, Topics, timelines, decisions, applicability, regulatory paths, and a published SDK remain later REST slices. The [local stdio MCP adapter](mcp-server.md) is documented separately and does not inherit this REST compatibility boundary. Other existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
 
 ## Start locally
 
@@ -40,6 +40,15 @@ curl --header "Authorization: Bearer local-development-key-2026" \
   http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28/relationships
 ```
 
+## OpenAPI and Swagger UI
+
+- OpenAPI 3.1 JSON: `GET /api/v1/openapi.json`
+- Interactive Swagger UI: `GET /api/docs`
+
+Both documentation routes are intentionally readable without an API key so a developer can discover and generate a client before receiving data access. They contain only the public contract and locally served Swagger assets—no legal corpus payload, configured key, raw/Canonical path, SQLite detail, or client identity. Regulatory operations remain protected: select **Authorize** in Swagger UI and enter a configured Bearer API key before using **Try it out**. When no key is configured, the documentation still loads while regulatory operations return `503 SERVICE_NOT_CONFIGURED`.
+
+The OpenAPI `info.version` equals the response `contractVersion`. Its response schemas are release-tested with AJV against representative live service outputs for discovery, resolve, structure, exact Provision, relationships, and errors. Swagger UI is pinned through `swagger-ui-dist` and does not fetch a CDN at runtime. The OpenAPI document is a compatibility artifact, not another business schema or data source; implementation DTO validation remains in the existing Public API service boundary.
+
 ## Relationship boundary
 
 The relationship response contains `references`, `citedBy`, `mandates`, `adoptedUnder`, `supplements`, `implements`, `relatedDocuments`, and `relatedRecitals`. Every edge retains its stable relationship ID, original source/target direction, provenance, exact evidence and locator, builder method/version, and any published score. Endpoint objects contain stable legal IDs and official URLs, not Web routes.
@@ -50,7 +59,7 @@ The relationship response contains `references`, `citedBy`, `mandates`, `adopted
 
 | Environment variable | Default | Boundary |
 |---|---:|---|
-| `REGULATORY_PUBLIC_API_KEYS` | none | Comma-separated unique API keys, each 16–256 printable non-whitespace ASCII characters. No configured key means `/api/v1` returns `503`; other Web/API routes are unaffected. |
+| `REGULATORY_PUBLIC_API_KEYS` | none | Comma-separated unique API keys, each 16–256 printable non-whitespace ASCII characters. No configured key means regulatory operations under `/api/v1` return `503`; documentation and other Web/API routes are unaffected. |
 | `REGULATORY_PUBLIC_API_RATE_LIMIT` | `60` | Requests allowed per identity and window; integer `1–100000`. |
 | `REGULATORY_PUBLIC_API_RATE_WINDOW_MS` | `60000` | Fixed-window duration; integer `1000–3600000` milliseconds. |
 
@@ -62,7 +71,7 @@ For production, store the key value outside Git and the image. Cloud Run can inj
 
 ## Response identity
 
-Every response contains:
+Every regulatory operation response contains:
 
 ```json
 {
@@ -131,5 +140,6 @@ A valid resolve query with no corpus match returns `200` with `bestMatch: null` 
 - A future breaking contract uses a new major path such as `/api/v2` and a documented migration period.
 - Official text is returned only from the loaded verified artifact and is never generated, summarized, or silently corrected by the adapter.
 - Responses do not expose raw XML, local filesystem paths, SQLite schema, or UI-specific Reader/Explorer payload fields.
+- `GET /api/v1/openapi.json` documents this boundary and is validated against representative service payloads; `GET /api/docs` is only its interactive renderer.
 
 Authentication and bounded single-process protection are implemented, but this is not yet an account, billing, distributed-quota, audit-log, or abuse-management system. Keep Cloud Run at one instance when relying on this limiter as the deployment quota, or add an external gateway/distributed limiter in a later operational slice. MCP remains outside this REST compatibility boundary.

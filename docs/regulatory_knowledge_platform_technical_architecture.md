@@ -1173,6 +1173,8 @@ Public API 和 MCP 都是 Service Adapter，不拥有业务逻辑。Phase 2 只�
 
 `PublicApiAccessController` 从一个集中、bounded 的环境配置加载 API-key digests、limit 和 window；启动后不保存 plaintext key。Router 在调用 service 前执行 Bearer authentication 和 fixed-window rate limit，有效 key 与未认证 client-address 使用独立 bucket。未配置 key 时 Public API fail closed，Web/internal routes 继续运行。`/api/health` 只投影 configured state、process-scoped limit 与 aggregate counters，不返回 key/digest/client identity。该 Map limiter 有明确 bucket 上限，只适用于单进程或 `max-instances=1` 的基础保护；多实例全局 quota 必须由后续 gateway/shared store 实现，不能伪装为当前能力。
 
+`public-api-openapi` 是现有 external DTO 的文档投影，不是新的 domain model。它以 OpenAPI 3.1 描述五个 HTTP operations、Bearer security、deployment-fixed Profile、标准 rate/version headers、成功 DTO 和统一 error envelope；contract version 直接复用 `PUBLIC_API_CONTRACT_VERSION`，relationship type/provenance 直接复用公开 enum。AJV 2020 release test 将 representative live service outputs 对照 components schemas，另验证 operation coverage、stable enum 与不暴露 Web path。`/api/v1/openapi.json` 和 `/api/docs` 在 access middleware 之前只公开 contract；所有 regulatory operations 仍经过同一认证/限流。Swagger UI 通过 exact-pinned `swagger-ui-dist` 静态资源提供，CSP 仅允许 same-origin/data 和必要 inline bootstrap，不访问 runtime CDN，也不持久化 authorization。
+
 优先工具：
 
 - search_law；

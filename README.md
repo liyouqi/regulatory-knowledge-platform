@@ -137,7 +137,7 @@ Phase 4 starts with a narrow versioned adapter over the existing read-only servi
 REGULATORY_PUBLIC_API_KEYS=local-development-key-2026 npm run dev
 ```
 
-Then discover it at `http://localhost:3000/api/v1` or resolve a law with:
+Open the interactive Swagger UI at `http://localhost:3000/api/docs`, download the OpenAPI 3.1 contract from `http://localhost:3000/api/v1/openapi.json`, or resolve a law with:
 
 ```bash
 curl --get http://localhost:3000/api/v1/laws/resolve \
@@ -152,7 +152,7 @@ curl --header "Authorization: Bearer local-development-key-2026" \
   http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28/relationships
 ```
 
-Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Bearer API-key authentication, process-scoped fixed-window limiting, and aggregate health counters are enabled; without a configured key, `/api/v1` fails closed while the Web product remains available. See `docs/public-api-v1.md` for the exact REST contract and current usage boundary.
+Every regulatory-data response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Bearer API-key authentication, process-scoped fixed-window limiting, and aggregate health counters are enabled; without a configured key, regulatory operations under `/api/v1` fail closed while the Web product and public API documentation remain available. Swagger assets are pinned in the application and do not require a runtime CDN. See `docs/public-api-v1.md` for the exact REST contract and current usage boundary.
 
 ## MCP server
 

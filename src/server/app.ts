@@ -8,6 +8,7 @@ import {
   PublicApiAccessController,
   loadPublicApiAccessConfig,
 } from "../public-api/public-api-access-control";
+import { createPublicApiDocumentationRouter } from "../public-api/public-api-documentation-router";
 import { createPublicApiRouter } from "../public-api/public-api-router";
 import { PublicApiService } from "../public-api/public-api-service";
 import {
@@ -261,6 +262,8 @@ app.get("/api/health", (_request, response) => {
     publicApi: publicApiAccessController.snapshot(),
   });
 });
+
+app.use("/api", createPublicApiDocumentationRouter(runtimeRepository.buildId));
 
 app.use(
   "/api/v1",

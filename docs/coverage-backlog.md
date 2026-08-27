@@ -86,7 +86,7 @@ Supervisory decisions 0→1 is complete with CNPD `18FR/2022`: one normalized De
 - larger search and relationship evaluation sets;
 - durable content-addressed remote raw snapshot storage (manifest/archive gate is implemented);
 - incremental rebuild beyond the implemented full manifest-driven build and build report;
-- remote Public API/MCP account authorization, distributed quotas, audit policy, and published client SDK/REST examples beyond the completed API-key/stdio and executable MCP relationship-client 0→1 slices.
+- remote Public API/MCP account authorization, distributed quotas, audit policy, and a published client SDK beyond the completed API-key/OpenAPI/Swagger, stdio, and executable MCP relationship-client 0→1 slices.
 
 ## Guardrails
 
