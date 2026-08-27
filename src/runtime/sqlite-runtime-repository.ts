@@ -50,7 +50,9 @@ import {
   type DocumentRegulatoryContext,
   type DomainAssignment,
   type LegalNature,
+  type RegulatoryDomain,
   documentRegulatoryContextSchema,
+  regulatoryDomainSchema,
 } from "../shared/regulatory-context";
 import { sourceStatusSchema } from "../shared/source-status";
 import {
@@ -322,6 +324,18 @@ interface DomainAssignmentRow {
   evidenceLocator: string;
 }
 
+interface RegulatoryDomainRow {
+  id: string;
+  parentId: string | null;
+  label: string;
+  description: string;
+  taxonomyId: string;
+  taxonomyVersion: string;
+  provenance: "EDITORIAL";
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+}
+
 interface AuthorityRelationshipRow {
   id: string;
   sourceDocumentId: string;
@@ -530,6 +544,36 @@ function toProvisionRelationship(
     },
     score: row.score ?? undefined,
     resolutionStatus: row.resolutionStatus,
+  };
+}
+
+function toDomainAssignment(row: DomainAssignmentRow): DomainAssignment {
+  return {
+    id: row.id,
+    domain: {
+      id: row.domainId,
+      parentId: row.parentId,
+      label: row.domainLabel,
+      description: row.domainDescription,
+      taxonomyId: row.taxonomyId,
+      taxonomyVersion: row.taxonomyVersion,
+      provenance: row.domainProvenance,
+      reviewStatus: row.domainReviewStatus,
+      reviewedAt: row.domainReviewedAt,
+    },
+    targetDocumentId: row.targetDocumentId,
+    targetEntityId: row.targetEntityId,
+    targetKind: row.targetKind,
+    targetLabel: row.targetLabel,
+    targetPath: row.targetPath,
+    role: row.role,
+    provenance: row.provenance,
+    assignmentVersion: row.assignmentVersion,
+    reviewStatus: row.reviewStatus,
+    reviewedAt: row.reviewedAt,
+    rationale: row.rationale,
+    reviewNote: row.reviewNote,
+    evidenceLocator: row.evidenceLocator,
   };
 }
 
@@ -1159,6 +1203,68 @@ export class SqliteRuntimeRepository {
     return row ? documentViewSchema.parse(JSON.parse(row.readerPayload)) : null;
   }
 
+  listRegulatoryDomains(): RegulatoryDomain[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          id,
+          parent_id AS parentId,
+          label,
+          description,
+          taxonomy_id AS taxonomyId,
+          taxonomy_version AS taxonomyVersion,
+          provenance,
+          review_status AS reviewStatus,
+          reviewed_at AS reviewedAt
+        FROM regulatory_domains
+        ORDER BY id ASC
+      `)
+      .all() as RegulatoryDomainRow[];
+    return regulatoryDomainSchema.array().parse(rows);
+  }
+
+  listDomainAssignments(domainId: string): DomainAssignment[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          da.assignment_id AS id,
+          rd.id AS domainId,
+          rd.parent_id AS parentId,
+          rd.label AS domainLabel,
+          rd.description AS domainDescription,
+          rd.taxonomy_id AS taxonomyId,
+          rd.taxonomy_version AS taxonomyVersion,
+          rd.provenance AS domainProvenance,
+          rd.review_status AS domainReviewStatus,
+          rd.reviewed_at AS domainReviewedAt,
+          da.target_document_id AS targetDocumentId,
+          da.target_entity_id AS targetEntityId,
+          da.target_kind AS targetKind,
+          CASE WHEN le.title IS NULL THEN le.label
+            ELSE le.label || ' — ' || le.title END AS targetLabel,
+          le.path AS targetPath,
+          da.role,
+          da.provenance,
+          da.assignment_version AS assignmentVersion,
+          da.review_status AS reviewStatus,
+          da.reviewed_at AS reviewedAt,
+          da.rationale,
+          da.review_note AS reviewNote,
+          da.evidence_locator AS evidenceLocator
+        FROM domain_assignments da
+        JOIN regulatory_domains rd ON rd.id = da.domain_id
+        JOIN legal_entities le ON le.id = da.target_entity_id
+        WHERE da.domain_id = ?
+        ORDER BY
+          CASE da.target_kind WHEN 'document' THEN 0 ELSE 1 END,
+          da.target_document_id ASC,
+          le.path ASC,
+          da.assignment_id ASC
+      `)
+      .all(domainId) as DomainAssignmentRow[];
+    return rows.map(toDomainAssignment);
+  }
+
   findDocumentRegulatoryContext(
     documentId: string,
     provisionId?: string,
@@ -1274,33 +1380,7 @@ export class SqliteRuntimeRepository {
       `)
       .get(documentId) as LegalNatureRow | undefined;
 
-    const domainAssignments: DomainAssignment[] = domainRows.map((row) => ({
-      id: row.id,
-      domain: {
-        id: row.domainId,
-        parentId: row.parentId,
-        label: row.domainLabel,
-        description: row.domainDescription,
-        taxonomyId: row.taxonomyId,
-        taxonomyVersion: row.taxonomyVersion,
-        provenance: row.domainProvenance,
-        reviewStatus: row.domainReviewStatus,
-        reviewedAt: row.domainReviewedAt,
-      },
-      targetDocumentId: row.targetDocumentId,
-      targetEntityId: row.targetEntityId,
-      targetKind: row.targetKind,
-      targetLabel: row.targetLabel,
-      targetPath: row.targetPath,
-      role: row.role,
-      provenance: row.provenance,
-      assignmentVersion: row.assignmentVersion,
-      reviewStatus: row.reviewStatus,
-      reviewedAt: row.reviewedAt,
-      rationale: row.rationale,
-      reviewNote: row.reviewNote,
-      evidenceLocator: row.evidenceLocator,
-    }));
+    const domainAssignments = domainRows.map(toDomainAssignment);
     const authorityRelationships: AuthorityRelationship[] = authorityRows.map(
       (row) => ({
         id: row.id,

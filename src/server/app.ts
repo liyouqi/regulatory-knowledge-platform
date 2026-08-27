@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
+import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import {
   toDocumentRelationshipGraph,
   toGlobalRelationshipGraph,
@@ -31,6 +32,7 @@ const citationRetrievalService = new CitationRetrievalService(
   searchService,
   citationContextService,
 );
+const regulatoryPathService = new RegulatoryPathService(runtimeRepository);
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
@@ -80,6 +82,10 @@ export function findDocumentSupervisoryDecisions(
         provisionId,
       )
     : null;
+}
+
+export function findRegulatoryPath(domainSlug: string) {
+  return regulatoryPathService.findByDomainSlug(domainSlug);
 }
 
 export function findExplorerBySlug(slug: string) {
@@ -278,6 +284,15 @@ app.get("/api/supervisory-decisions/:slug", (request, response) => {
     return;
   }
   response.json(decisions);
+});
+
+app.get("/api/regulatory-paths/:domainSlug", (request, response) => {
+  const path = findRegulatoryPath(request.params.domainSlug.slice(0, 120));
+  if (!path) {
+    response.status(404).json({ error: "Regulatory path not found" });
+    return;
+  }
+  response.json(path);
 });
 
 function sendFamilyLevel2(

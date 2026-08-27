@@ -40,6 +40,17 @@ export function parseSupervisoryDecisionsPath(
   return match ? { slug: decodeURIComponent(match[1]) } : null;
 }
 
+export function regulatoryDomainPath(domainSlug: string): string {
+  return `/domains/${encodeURIComponent(domainSlug)}`;
+}
+
+export function parseRegulatoryDomainPath(
+  pathname: string,
+): { domainSlug: string } | null {
+  const match = /^\/domains\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { domainSlug: decodeURIComponent(match[1]) } : null;
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

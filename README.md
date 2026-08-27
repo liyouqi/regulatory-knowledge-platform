@@ -74,6 +74,7 @@ Vite normally uses port `5173`; if that port is occupied, use the port printed b
 | Article Graph | `http://localhost:5173/relationships/dora/articles/20` | Explore relationships scoped to one exact provision. |
 | Implementation Timeline | `http://localhost:5173/timelines/ai-act` | Review AI Act publication, entry-into-force, and phased-application milestones with exact Article 113 evidence. |
 | Supervisory Decisions | `http://localhost:5173/decisions/gdpr` | Review provision-level CNPD findings with the exact official operative text and source PDF. |
+| Regulatory Path | `http://localhost:5173/domains/banking-governance-internal-control` | Follow the reviewed CRD → EBA → CSSF path with explicit direction and exact relationship evidence. |
 
 Press `Cmd+K` on macOS or `Ctrl+K` elsewhere from any product page to open global law, full-text, definition, and opened-law search.
 
@@ -238,6 +239,10 @@ Runtime schema `5.2.0` keeps CELEX and authority-local identifiers in separate n
 The Phase 3 Banking Governance context is materialized at build time. `data/editorial/regulatory-domains.json` publishes a reviewed, versioned editorial taxonomy and representative CRD/CSSF/EBA assignments; `data/official-metadata/authorities.json` separately publishes reviewed official issuer metadata, while `data/official-metadata/legal-natures.json` records the EBA guideline's compliance expectation, status, review flag, and application date with distinct official evidence. Runtime `5.2.0` keeps these in normalized context tables rather than modifying Canonical legal text or weakening the existing legal-entity relationship contract. Reader consumes the same read-only service output as future Agent/RAG adapters through `/api/documents/:documentId/regulatory-context?provisionId=<stable-id>`. The bounded set now contains 3 Domains, 10 Document/Provision assignments, 5 Authorities, 4 issuer relationships, and one reviewed legal-nature record.
 
 The first reviewed national implementation mapping publishes `Circular CSSF 12/552 Introduction block 7 → IMPLEMENTS → EBA/GL/2021/05`. Its evidence is the exact Circular paragraph that identifies the Guidelines and describes translating applicable European principles into the Luxembourg banking-sector context. In this 0→1 contract, `IMPLEMENTS` runs from an evidence-bearing loaded national body block to the loaded EU or authority instrument; it does not assert that the Circular `TRANSPOSES` CRD. The mapping is Profile-filtered and fails closed if its official-text evidence drifts.
+
+### Banking Governance regulatory path
+
+The generic `/domains/:domainSlug` product surface and `GET /api/regulatory-paths/:domainSlug` service project the existing Runtime taxonomy, assignments, authorities, legal nature, Profile identity, and cross-document relationships into one evidence-bearing navigation path. The first path at `/domains/banking-governance-internal-control` displays CRD IV, EBA/GL/2021/05, and Circular CSSF 12/552 together with the existing `MANDATES`, `SUPPLEMENTS`, and `IMPLEMENTS` directions and their exact official evidence. It does not read curated JSON at request time, reverse edges for visual convenience, or treat an Edition/Profile as an institution-specific legal applicability conclusion. CRD, EBA, and CSSF Reader/Explorer context links back to the same generic path.
 
 ### AI Act implementation timeline
 

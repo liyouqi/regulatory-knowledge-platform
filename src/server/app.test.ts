@@ -16,6 +16,7 @@ import {
   findLaws,
   findLevel2Mandates,
   findProvisionRelationships,
+  findRegulatoryPath,
   findRelationshipGraph,
   findRelationshipPreview,
   listDocumentDefinitions,
@@ -502,6 +503,62 @@ describe("Document lookup", () => {
     });
     expect(findDocumentSupervisoryDecisions("dora")?.decisions).toEqual([]);
     expect(findDocumentSupervisoryDecisions("unknown")).toBeNull();
+  });
+
+  it("serves the reviewed Banking Governance multi-hop path", () => {
+    const path = findRegulatoryPath("banking-governance-internal-control");
+
+    expect(path).toMatchObject({
+      schemaVersion: "1.0.0",
+      id: "regulatory-path:domain:banking-governance-internal-control",
+      domain: {
+        id: "domain:banking-governance-internal-control",
+        provenance: "EDITORIAL",
+      },
+      runtime: { profileId: "full-corpus" },
+      scope: {
+        classificationProvenance: "EDITORIAL",
+        relationshipProvenance: "OFFICIAL_MAPPING",
+        applicabilityConclusion: false,
+      },
+    });
+    expect(path?.ancestors.map((domain) => domain.id)).toEqual([
+      "domain:financial-regulation",
+      "domain:banking",
+    ]);
+    expect(path?.documents.map((document) => document.id)).toEqual(
+      expect.arrayContaining([
+        "eu:32013L0036",
+        "eu:eba:gl:2021:05",
+        "lu:cssf:circular-12-552",
+      ]),
+    );
+    expect(
+      path?.relationships.map((relationship) => ({
+        relationType: relationship.relationType,
+        source: relationship.source.entityId,
+        target: relationship.target.entityId,
+      })),
+    ).toEqual(
+      expect.arrayContaining([
+        {
+          relationType: "MANDATES",
+          source: "eu:32013L0036:article:74",
+          target: "eu:eba:gl:2021:05",
+        },
+        {
+          relationType: "SUPPLEMENTS",
+          source: "eu:eba:gl:2021:05:paragraph:5",
+          target: "eu:32013L0036:article:74",
+        },
+        {
+          relationType: "IMPLEMENTS",
+          source: "lu:cssf:circular-12-552:provision:introduction:block:7",
+          target: "eu:eba:gl:2021:05",
+        },
+      ]),
+    );
+    expect(findRegulatoryPath("unknown-domain")).toBeNull();
   });
 
   it("serves exact document definitions for Reader term previews", () => {

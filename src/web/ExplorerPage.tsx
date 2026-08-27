@@ -6,6 +6,7 @@ import {
   Landmark,
   ListTree,
   Network,
+  Route,
   Search,
 } from "lucide-react";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
@@ -24,8 +25,13 @@ import {
   explorerPath,
   implementationTimelinePath,
   level2LibraryPath,
+  regulatoryDomainPath,
   supervisoryDecisionsPath,
 } from "../shared/reader-route";
+import {
+  type DocumentRegulatoryContext,
+  documentRegulatoryContextSchema,
+} from "../shared/regulatory-context";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -108,6 +114,8 @@ export function ExplorerPage({
   const [catalog, setCatalog] = useState<DocumentSummary[]>([]);
   const [document, setDocument] = useState<ExplorerDocument | null>(null);
   const [level2, setLevel2] = useState<FamilyLevel2Response | null>(null);
+  const [regulatoryContext, setRegulatoryContext] =
+    useState<DocumentRegulatoryContext | null>(null);
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
@@ -149,6 +157,23 @@ export function ExplorerPage({
       });
     return () => controller.abort();
   }, [slug]);
+
+  useEffect(() => {
+    if (!document) return;
+    const controller = new AbortController();
+    setRegulatoryContext(null);
+    void fetch(
+      `/api/documents/${encodeURIComponent(document.id)}/regulatory-context`,
+      { signal: controller.signal },
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load regulatory context");
+        return documentRegulatoryContextSchema.parse(await response.json());
+      })
+      .then(setRegulatoryContext)
+      .catch(() => setRegulatoryContext(null));
+    return () => controller.abort();
+  }, [document]);
 
   const documentSummary = catalog.find((item) => item.slug === slug);
 
@@ -253,6 +278,19 @@ export function ExplorerPage({
             >
               <Landmark aria-hidden="true" size={15} />
               Decisions
+            </Link>
+          ) : null}
+          {regulatoryContext?.domainAssignments[0] ? (
+            <Link
+              className="view-switch"
+              to={regulatoryDomainPath(
+                regulatoryContext.domainAssignments[0].domain.id.replace(
+                  /^domain:/u,
+                  "",
+                ),
+              )}
+            >
+              <Route aria-hidden="true" size={15} /> Domain path
             </Link>
           ) : null}
           {provisions[0]?.readerPath ? (

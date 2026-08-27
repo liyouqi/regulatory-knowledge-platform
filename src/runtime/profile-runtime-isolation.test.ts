@@ -8,6 +8,7 @@ import { loadDocumentViews } from "../data/document-repository";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
+import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import { toGlobalRelationshipGraph } from "../relationships/relationship-graph";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
@@ -24,6 +25,7 @@ let repository: SqliteRuntimeRepository | undefined;
 let search: SearchService | undefined;
 let citationContext: CitationContextService | undefined;
 let citationRetrieval: CitationRetrievalService | undefined;
+let regulatoryPaths: RegulatoryPathService | undefined;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -44,6 +46,7 @@ beforeAll(() => {
   search = new SearchService(databasePath);
   citationContext = new CitationContextService(repository);
   citationRetrieval = new CitationRetrievalService(search, citationContext);
+  regulatoryPaths = new RegulatoryPathService(repository);
 });
 
 afterAll(() => {
@@ -120,6 +123,16 @@ describe("banking-default runtime isolation", () => {
       runtime: { profileId: "banking-default" },
       events: expect.arrayContaining([
         expect.objectContaining({ date: "2026-08-02" }),
+      ]),
+    });
+    expect(
+      regulatoryPaths?.findByDomainSlug("banking-governance-internal-control"),
+    ).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      scope: { applicabilityConclusion: false },
+      relationships: expect.arrayContaining([
+        expect.objectContaining({ relationType: "MANDATES" }),
+        expect.objectContaining({ relationType: "IMPLEMENTS" }),
       ]),
     });
   });

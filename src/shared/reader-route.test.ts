@@ -12,9 +12,11 @@ import {
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
+  parseRegulatoryDomainPath,
   parseRelationshipGraphPath,
   parseSupervisoryDecisionsPath,
   provisionPath,
+  regulatoryDomainPath,
   relationshipGraphPath,
   supervisoryDecisionsPath,
 } from "./reader-route";
@@ -97,6 +99,16 @@ describe("Reader routes", () => {
       slug: "gdpr",
     });
     expect(parseSupervisoryDecisionsPath("/decisions/gdpr/extra")).toBeNull();
+  });
+
+  it("builds and parses generic Regulatory Domain routes", () => {
+    expect(regulatoryDomainPath("banking-governance-internal-control")).toBe(
+      "/domains/banking-governance-internal-control",
+    );
+    expect(
+      parseRegulatoryDomainPath("/domains/banking-governance-internal-control"),
+    ).toEqual({ domainSlug: "banking-governance-internal-control" });
+    expect(parseRegulatoryDomainPath("/domains/banking/extra")).toBeNull();
   });
 
   it.each([

@@ -2190,6 +2190,8 @@ AI Act Article 10
 
 当路径中的节点属于已入库法规时，用户应能够在 `Reader / Explorer / Graph` 三种视图间互相定位，以形成后续“关系发现 → 宏观定位 → 条文精读”的自然引流。
 
+当前实现：`Banking governance and internal control` 构成首个 cross-regulation path 0→1。通用 `RegulatoryPathService` 只从当前 Runtime/Profile 的 normalized Domain、assignment、Authority、legal nature 与 cross-document relationship 组装 schema-validated output；`GET /api/regulatory-paths/banking-governance-internal-control` 和 `/domains/banking-governance-internal-control` 页面不读取 curated JSON。输出保留 `CRD Article 74 → MANDATES → EBA/GL/2021/05`、`EBA paragraph 5 → SUPPLEMENTS → CRD Article 74`、`CSSF 12/552 Introduction block 7 → IMPLEMENTS → EBA/GL/2021/05` 的原始方向、stable endpoints、`OFFICIAL_MAPPING` provenance、exact evidence、locator 和 source URL，不为形成线性视觉链而反转或合并关系。Domain assignment 继续明确为 `EDITORIAL`；response 的 `applicabilityConclusion` 固定为 `false`，Edition 只表示 corpus visibility。Reader/Explorer 的 Domain context 可进入该页面；未知或当前 Profile 没有已发布 path 的 Domain 返回 `404`。
+
 ## 23.6 Focused Knowledge Graph Persistence
 
 当 relationship dataset 规模和查询复杂度达到必要程度时，可引入 GraphDB 或其他 graph store。
@@ -3292,7 +3294,7 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 4. 首条 EU authority instrument → Luxembourg implementation relation（已完成）；
 5. Agent/RAG citation-ready context assembly 与 bounded retrieval evaluation（已完成）；
 6. AI Act implementation timeline 0→1（已完成）；CNPD supervisory decision 0→1（已完成）；
-7. applicability navigation and cross-regulation paths；
+7. cross-regulation path 0→1（已完成）；evidence-bearing applicability rule/navigation 0→1（待完成）；
 8. focused graph persistence only when query load requires it。
 
 ## Phase 4 Sequence

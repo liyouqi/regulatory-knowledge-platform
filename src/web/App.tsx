@@ -10,6 +10,7 @@ import {
   Link2,
   Map as MapIcon,
   Network,
+  Route as RouteIcon,
   Search,
   Undo2,
   X,
@@ -57,8 +58,10 @@ import {
   parseLevel2LibraryPath,
   parseQuickGo,
   parseReaderPath,
+  parseRegulatoryDomainPath,
   parseRelationshipGraphPath,
   parseSupervisoryDecisionsPath,
+  regulatoryDomainPath,
   relationshipGraphPath,
   supervisoryDecisionsPath,
 } from "../shared/reader-route";
@@ -76,6 +79,7 @@ import { GlobalLawSearch } from "./GlobalLawSearch";
 import { ImplementationTimelinePage } from "./ImplementationTimelinePage";
 import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
+import { RegulatoryPathPage } from "./RegulatoryPathPage";
 import { SupervisoryDecisionsPage } from "./SupervisoryDecisionsPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
@@ -1410,7 +1414,14 @@ function ReaderPage({
                   <ul>
                     {regulatoryContext.domainAssignments.map((assignment) => (
                       <li key={assignment.id}>
-                        <span>{assignment.domain.label}</span>
+                        <Link
+                          to={regulatoryDomainPath(
+                            assignment.domain.id.replace(/^domain:/u, ""),
+                          )}
+                        >
+                          {assignment.domain.label}
+                          <RouteIcon aria-hidden="true" size={12} />
+                        </Link>
                         <small>
                           {assignment.targetKind === "document"
                             ? "Document"
@@ -1539,6 +1550,7 @@ export function App() {
     location.pathname,
   );
   const supervisoryDecisions = parseSupervisoryDecisionsPath(location.pathname);
+  const regulatoryDomain = parseRegulatoryDomainPath(location.pathname);
   const level2Library = parseLevel2LibraryPath(location.pathname);
   const relationshipGraph = parseRelationshipGraphPath(location.pathname);
   const level2MandateQuery = isLevel2MandateQueryPath(location.pathname);
@@ -1582,6 +1594,13 @@ export function App() {
     <>
       {level2MandateQuery ? (
         <Level2MandateQueryPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          theme={theme}
+        />
+      ) : regulatoryDomain ? (
+        <RegulatoryPathPage
+          domainSlug={regulatoryDomain.domainSlug}
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}
           theme={theme}
