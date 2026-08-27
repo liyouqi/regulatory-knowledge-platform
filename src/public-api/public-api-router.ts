@@ -3,6 +3,7 @@ import {
   PUBLIC_API_CONTRACT_VERSION,
   PUBLIC_API_VERSION,
 } from "../shared/public-api";
+import type { PublicApiAccessController } from "./public-api-access-control";
 import type {
   PublicApiOperation,
   PublicApiService,
@@ -21,17 +22,53 @@ function sendOperation(
     .json(operation.response);
 }
 
-export function createPublicApiRouter(service: PublicApiService) {
+function setRateLimitHeaders(
+  response: express.Response,
+  rateLimit: { limit: number; remaining: number; resetAt: number },
+) {
+  response.setHeader("RateLimit-Limit", rateLimit.limit);
+  response.setHeader("RateLimit-Remaining", Math.max(0, rateLimit.remaining));
+  response.setHeader("RateLimit-Reset", Math.ceil(rateLimit.resetAt / 1_000));
+}
+
+export function createPublicApiRouter(
+  service: PublicApiService,
+  accessController: PublicApiAccessController,
+) {
   const router = express.Router();
 
-  router.use((_request, response, next) => {
+  router.use((request, response, next) => {
     response.setHeader("X-API-Version", PUBLIC_API_VERSION);
     response.setHeader("X-API-Contract-Version", PUBLIC_API_CONTRACT_VERSION);
     response.setHeader(
       "X-Runtime-Build-Id",
       service.discover().response.meta.runtime.buildId,
     );
-    next();
+    const decision = accessController.authorize(
+      request.header("authorization"),
+      request.ip || request.socket.remoteAddress || "unknown",
+    );
+    if (decision.allowed) {
+      setRateLimitHeaders(response, decision);
+      next();
+      return;
+    }
+    if (decision.reason === "service-not-configured") {
+      sendOperation(response, service.serviceNotConfigured());
+      return;
+    }
+    if (decision.reason === "authentication-required") {
+      if (decision.rateLimit) setRateLimitHeaders(response, decision.rateLimit);
+      response.setHeader("WWW-Authenticate", 'Bearer realm="public-api-v1"');
+      sendOperation(response, service.authenticationRequired());
+      return;
+    }
+    setRateLimitHeaders(response, decision);
+    response.setHeader(
+      "Retry-After",
+      Math.max(1, Math.ceil((decision.resetAt - Date.now()) / 1_000)),
+    );
+    sendOperation(response, service.rateLimitExceeded());
   });
 
   router.get("/", (request, response) => {
@@ -79,6 +116,7 @@ export function createPublicApiRouter(service: PublicApiService) {
       _next: express.NextFunction,
     ) => {
       console.error("Public API v1 request failed", error);
+      accessController.recordServerError();
       sendOperation(response, service.internalError());
     },
   );

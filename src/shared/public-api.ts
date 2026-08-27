@@ -3,7 +3,7 @@ import { lawSearchMatchReasonSchema } from "./legal";
 import { sourceLocatorSchema } from "./source-locator";
 
 export const PUBLIC_API_VERSION = "v1";
-export const PUBLIC_API_CONTRACT_VERSION = "1.0.0";
+export const PUBLIC_API_CONTRACT_VERSION = "1.1.0";
 
 const publicRuntimeIdentitySchema = z
   .object({
@@ -25,6 +25,9 @@ export const publicApiMetaSchema = z
   .strict();
 
 export const publicApiErrorCodeSchema = z.enum([
+  "SERVICE_NOT_CONFIGURED",
+  "AUTHENTICATION_REQUIRED",
+  "RATE_LIMIT_EXCEEDED",
   "INVALID_REQUEST",
   "PROFILE_NOT_AVAILABLE",
   "LAW_NOT_FOUND",

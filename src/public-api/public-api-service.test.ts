@@ -41,7 +41,7 @@ describe("Public API v1 service contract", () => {
     expect(payload).toMatchObject({
       meta: {
         apiVersion: "v1",
-        contractVersion: "1.0.0",
+        contractVersion: "1.1.0",
         profilePolicy: "deployment-fixed",
         runtime: { profileId: "full-corpus" },
       },
@@ -105,6 +105,9 @@ describe("Public API v1 service contract", () => {
     );
     const law = failure(service?.getLawStructure("eu:unknown"));
     const internal = failure(service?.internalError());
+    const unconfigured = failure(service?.serviceNotConfigured());
+    const authentication = failure(service?.authenticationRequired());
+    const rateLimit = failure(service?.rateLimitExceeded());
 
     expect(missingQuery).toMatchObject({
       status: 400,
@@ -129,6 +132,18 @@ describe("Public API v1 service contract", () => {
     expect(internal).toMatchObject({
       status: 500,
       response: { error: { code: "INTERNAL_ERROR" } },
+    });
+    expect(unconfigured).toMatchObject({
+      status: 503,
+      response: { error: { code: "SERVICE_NOT_CONFIGURED" } },
+    });
+    expect(authentication).toMatchObject({
+      status: 401,
+      response: { error: { code: "AUTHENTICATION_REQUIRED" } },
+    });
+    expect(rateLimit).toMatchObject({
+      status: 429,
+      response: { error: { code: "RATE_LIMIT_EXCEEDED" } },
     });
   });
 });

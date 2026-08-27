@@ -1169,7 +1169,9 @@ Graph DTO 只包含 stable endpoint metadata、方向、relation type、provenan
 
 Public API 和 MCP 都是 Service Adapter，不拥有业务逻辑。Phase 2 只需继续形成清晰的内部 service outputs；外部版本兼容、认证、限流和 transport implementation 延后到 Phase 4。
 
-当前 Public API `v1` 首个 slice 使用独立 `PublicApiService` 组合现有 law-search records、Runtime repository 和 `CitationContextService`，Express router 只负责 query bounds、HTTP status 与 version headers。公开 DTO 与 Web DTO 分离：resolve output 使用 stable Document/Provision IDs；structure 只投影 Document source/version identity 与 TOC；Provision output 只投影一个 root Provision 的 exact Body Block tree/source locator。统一 `meta` 固定 `apiVersion=v1`、contract version、Runtime build/Profile identity 和 `deployment-fixed` policy，统一 error envelope 固定 machine-readable code。请求中的 `profileId` 只允许等于当前 artifact Profile；adapter 不动态打开其他 SQLite、不回流 Profile 外节点。`/api/v1` 不暴露 raw XML、Canonical file、SQLite schema/path 或 Reader/Explorer-specific path。当前 HTTP adapter 未配置 auth/rate limit，只有完成对应 Phase 4 control 后才可作为 unrestricted production developer API 发布。
+当前 Public API `v1` 使用独立 `PublicApiService` 组合现有 law-search records、Runtime repository 和 `CitationContextService`，Express router 只负责 bounded transport、HTTP status、version headers 与 access control。公开 DTO 与 Web DTO 分离：resolve output 使用 stable Document/Provision IDs；structure 只投影 Document source/version identity 与 TOC；Provision output 只投影一个 root Provision 的 exact Body Block tree/source locator。统一 `meta` 固定 `apiVersion=v1`、contract version、Runtime build/Profile identity 和 `deployment-fixed` policy，统一 error envelope 固定 machine-readable code。请求中的 `profileId` 只允许等于当前 artifact Profile；adapter 不动态打开其他 SQLite、不回流 Profile 外节点。`/api/v1` 不暴露 raw XML、Canonical file、SQLite schema/path 或 Reader/Explorer-specific path。
+
+`PublicApiAccessController` 从一个集中、bounded 的环境配置加载 API-key digests、limit 和 window；启动后不保存 plaintext key。Router 在调用 service 前执行 Bearer authentication 和 fixed-window rate limit，有效 key 与未认证 client-address 使用独立 bucket。未配置 key 时 Public API fail closed，Web/internal routes 继续运行。`/api/health` 只投影 configured state、process-scoped limit 与 aggregate counters，不返回 key/digest/client identity。该 Map limiter 有明确 bucket 上限，只适用于单进程或 `max-instances=1` 的基础保护；多实例全局 quota 必须由后续 gateway/shared store 实现，不能伪装为当前能力。
 
 优先工具：
 
@@ -1292,6 +1294,7 @@ Phase 1 不要求生产服务器自己下载 bulk dump。
 | source | EUR-Lex/CSSF/EBA endpoint base URL |
 | build | TF-IDF top-N、fixtures、strict mode |
 | edition | `REGULATORY_EDITION_PROFILE`（build/dev only）、profile config path |
+| public API | `REGULATORY_PUBLIC_API_KEYS`、`REGULATORY_PUBLIC_API_RATE_LIMIT`、`REGULATORY_PUBLIC_API_RATE_WINDOW_MS` |
 
 配置必须集中读取和验证，不能在代码各处直接 `process.env.X`。
 

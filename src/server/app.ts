@@ -4,6 +4,10 @@ import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
+import {
+  PublicApiAccessController,
+  loadPublicApiAccessConfig,
+} from "../public-api/public-api-access-control";
 import { createPublicApiRouter } from "../public-api/public-api-router";
 import { PublicApiService } from "../public-api/public-api-service";
 import {
@@ -42,6 +46,9 @@ const publicApiService = new PublicApiService(
   runtimeRepository,
   lawSearchRecords,
   citationContextService,
+);
+const publicApiAccessController = new PublicApiAccessController(
+  loadPublicApiAccessConfig(),
 );
 
 export function findDocument(documentId: string) {
@@ -251,10 +258,14 @@ app.get("/api/health", (_request, response) => {
       topicAssignments: runtimeRepository.topicAssignmentCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
+    publicApi: publicApiAccessController.snapshot(),
   });
 });
 
-app.use("/api/v1", createPublicApiRouter(publicApiService));
+app.use(
+  "/api/v1",
+  createPublicApiRouter(publicApiService, publicApiAccessController),
+);
 
 app.get("/api/documents", (_request, response) => {
   response.json({ documents: runtimeRepository.listDocumentSummaries() });

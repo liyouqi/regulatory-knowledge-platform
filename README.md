@@ -128,14 +128,21 @@ npm run build
 
 ## Public API v1
 
-Phase 4 starts with a narrow versioned adapter over the existing read-only services. After `npm run dev`, discover it at `http://localhost:3000/api/v1` or resolve a law with:
+Phase 4 starts with a narrow versioned adapter over the existing read-only services. Start it with a local development key (the value below is an example, not a production secret):
+
+```bash
+REGULATORY_PUBLIC_API_KEYS=local-development-key-2026 npm run dev
+```
+
+Then discover it at `http://localhost:3000/api/v1` or resolve a law with:
 
 ```bash
 curl --get http://localhost:3000/api/v1/laws/resolve \
+  --header "Authorization: Bearer local-development-key-2026" \
   --data-urlencode "q=DORA article 28"
 ```
 
-The first slice also exposes `GET /api/v1/laws/:documentId/structure` and `GET /api/v1/provisions/:entityId`. Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Authentication, rate limiting, MCP, and the remaining Phase 4 capabilities are not enabled yet; see `docs/public-api-v1.md` for the exact contract and current usage boundary.
+The first slice also exposes `GET /api/v1/laws/:documentId/structure` and `GET /api/v1/provisions/:entityId`. Every response identifies API contract, Runtime build, and deployment-fixed Profile. It does not expose raw source, SQLite, filesystem, or Web DTO details. Bearer API-key authentication, process-scoped fixed-window limiting, and aggregate health counters are enabled; without a configured key, `/api/v1` fails closed while the Web product remains available. MCP and the remaining Phase 4 capabilities are not enabled yet; see `docs/public-api-v1.md` for the exact contract and current usage boundary.
 
 ## Deploy to Google Cloud Run
 
@@ -147,7 +154,10 @@ Before building an image, create and verify the artifact locally or in a control
 npm run runtime:build
 npm run runtime:verify
 docker build -t regulatory-knowledge-platform:local .
-docker run --rm -p 8080:8080 -e PORT=8080 regulatory-knowledge-platform:local
+docker run --rm -p 8080:8080 \
+  -e PORT=8080 \
+  -e REGULATORY_PUBLIC_API_KEYS=local-development-key-2026 \
+  regulatory-knowledge-platform:local
 ```
 
 Then verify `http://localhost:8080/api/health` and `http://localhost:8080/`. This runtime makes no external data request: Reader, Explorer, Search, Library, and Relationship Graph all use the bundled read-only SQLite artifact. Network access is only needed to update source snapshots, open an official-source link, or serve the public deployment.
@@ -199,6 +209,17 @@ gcloud run deploy regulatory-knowledge-platform \
   --memory 1Gi \
   --max-instances 1
 ```
+
+That command deploys the Web product but leaves `/api/v1` fail-closed. To enable the Public API, create a strong comma-separated key value in Secret Manager, grant the Cloud Run service identity Secret Manager access, and inject a pinned secret version into a new revision:
+
+```bash
+gcloud run deploy regulatory-knowledge-platform \
+  --image "$IMAGE" \
+  --region europe-west1 \
+  --update-secrets REGULATORY_PUBLIC_API_KEYS=regulatory-public-api-keys:1
+```
+
+Do not put production API keys in Git, the Docker image, or plain deployment arguments. `REGULATORY_PUBLIC_API_RATE_LIMIT` and `REGULATORY_PUBLIC_API_RATE_WINDOW_MS` may be set as ordinary environment configuration. Cloud Run's official secret configuration guide is linked in `docs/public-api-v1.md`.
 
 After deployment, obtain the service URL from the command output and check `<service-url>/api/health`. Keep the deployed image tag and the response's `runtimeDatabase.buildId` with the release record. A new verified SQLite artifact is promoted by building and deploying a new immutable image, then routing traffic to the new Cloud Run revision; retain the preceding image for rollback. The service honours Cloud Run's injected `PORT` variable.
 

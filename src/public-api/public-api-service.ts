@@ -33,7 +33,7 @@ export type PublicApiOperation<T> =
   | { ok: true; response: T }
   | {
       ok: false;
-      status: 400 | 403 | 404 | 500;
+      status: 400 | 401 | 403 | 404 | 429 | 500 | 503;
       response: PublicApiErrorResponse;
     };
 
@@ -112,7 +112,7 @@ export class PublicApiService {
   }
 
   private error(
-    status: 400 | 403 | 404 | 500,
+    status: 400 | 401 | 403 | 404 | 429 | 500 | 503,
     code: PublicApiErrorResponse["error"]["code"],
     message: string,
     parameter?: string,
@@ -151,6 +151,30 @@ export class PublicApiService {
       500,
       "INTERNAL_ERROR",
       "The Public API could not complete the request",
+    );
+  }
+
+  serviceNotConfigured(): PublicApiOperation<never> {
+    return this.error(
+      503,
+      "SERVICE_NOT_CONFIGURED",
+      "The Public API is not configured for authenticated access",
+    );
+  }
+
+  authenticationRequired(): PublicApiOperation<never> {
+    return this.error(
+      401,
+      "AUTHENTICATION_REQUIRED",
+      "A valid Bearer API key is required",
+    );
+  }
+
+  rateLimitExceeded(): PublicApiOperation<never> {
+    return this.error(
+      429,
+      "RATE_LIMIT_EXCEEDED",
+      "The Public API request limit was exceeded",
     );
   }
 

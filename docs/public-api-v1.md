@@ -4,7 +4,7 @@ The Phase 4 Public API is a versioned delivery adapter over the same read-only R
 
 ## Current scope
 
-The first `v1` slice provides three bounded capabilities:
+The first `v1` capability slice provides three bounded capabilities:
 
 | Capability | Endpoint | Result boundary |
 |---|---|---|
@@ -12,27 +12,44 @@ The first `v1` slice provides three bounded capabilities:
 | Law structure | `GET /api/v1/laws/:documentId/structure` | Document source/version identity and table-of-contents structure without legal body text. |
 | Get Provision | `GET /api/v1/provisions/:entityId` | One exact root Provision, its official-text block tree, source locators, and source/version identity. |
 
-`GET /api/v1` returns capability discovery. Relationships, Topics, timelines, decisions, applicability, regulatory paths, authentication, rate limiting, MCP, and SDK examples remain later Phase 4 slices. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
+`GET /api/v1` returns capability discovery. Bearer API-key authentication, process-scoped fixed-window rate limiting, and aggregate operational counters are now part of the delivery boundary. Relationships, Topics, timelines, decisions, applicability, regulatory paths, MCP, and SDK examples remain later Phase 4 slices. Existing `/api/*` endpoints are internal Web transports and do not inherit the Public API compatibility commitment.
 
 ## Start locally
 
 ```bash
-npm run dev
+REGULATORY_PUBLIC_API_KEYS=local-development-key-2026 npm run dev
 ```
 
-The API normally listens at `http://localhost:3000`. Resolve a structured citation:
+The example key is for local development only. The API normally listens at `http://localhost:3000`. Resolve a structured citation:
 
 ```bash
 curl --get http://localhost:3000/api/v1/laws/resolve \
+  --header "Authorization: Bearer local-development-key-2026" \
   --data-urlencode "q=DORA article 28"
 ```
 
 Read structure or one exact Provision by stable ID:
 
 ```bash
-curl http://localhost:3000/api/v1/laws/eu%3A32022R2554/structure
-curl http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28
+curl --header "Authorization: Bearer local-development-key-2026" \
+  http://localhost:3000/api/v1/laws/eu%3A32022R2554/structure
+curl --header "Authorization: Bearer local-development-key-2026" \
+  http://localhost:3000/api/v1/provisions/eu%3A32022R2554%3Aarticle%3A28
 ```
+
+## Access configuration
+
+| Environment variable | Default | Boundary |
+|---|---:|---|
+| `REGULATORY_PUBLIC_API_KEYS` | none | Comma-separated unique API keys, each 16–256 printable non-whitespace ASCII characters. No configured key means `/api/v1` returns `503`; other Web/API routes are unaffected. |
+| `REGULATORY_PUBLIC_API_RATE_LIMIT` | `60` | Requests allowed per identity and window; integer `1–100000`. |
+| `REGULATORY_PUBLIC_API_RATE_WINDOW_MS` | `60000` | Fixed-window duration; integer `1000–3600000` milliseconds. |
+
+Clients send `Authorization: Bearer <key>`. Key comparison uses fixed-length SHA-256 digests and constant-time comparison; keys and digests are not returned by health output. Multiple comma-separated keys support bounded rotation without adding account or tenant semantics.
+
+The limiter is intentionally process-scoped. Valid keys have independent buckets; missing or invalid credentials are limited by client address. Responses include `RateLimit-Limit`, `RateLimit-Remaining`, and Unix-seconds `RateLimit-Reset`; `429` also includes `Retry-After`. A Cloud Run deployment with more than one instance does not have a global quota—distributed account quotas remain a later infrastructure slice.
+
+For production, store the key value outside Git and the image. Cloud Run can inject a pinned Secret Manager version into `REGULATORY_PUBLIC_API_KEYS` using `gcloud run deploy ... --update-secrets REGULATORY_PUBLIC_API_KEYS=<secret>:<version>`; see the [official Cloud Run secret configuration](https://docs.cloud.google.com/run/docs/configuring/services/secrets).
 
 ## Response identity
 
@@ -42,7 +59,7 @@ Every response contains:
 {
   "meta": {
     "apiVersion": "v1",
-    "contractVersion": "1.0.0",
+    "contractVersion": "1.1.0",
     "profilePolicy": "deployment-fixed",
     "runtime": {
       "buildId": "runtime-...",
@@ -56,7 +73,7 @@ Every response contains:
 }
 ```
 
-The HTTP response also includes `X-API-Version`, `X-API-Contract-Version`, and `X-Runtime-Build-Id` headers.
+The HTTP response also includes `X-API-Version`, `X-API-Contract-Version`, and `X-Runtime-Build-Id` headers. `GET /api/health` exposes only aggregate Public API configuration and request/error counters; counters reset when the process restarts and contain no key identity.
 
 ## Profile policy
 
@@ -88,10 +105,13 @@ Current codes:
 | HTTP status | Code | Meaning |
 |---|---|---|
 | `400` | `INVALID_REQUEST` | A required or bounded input is invalid. |
+| `401` | `AUTHENTICATION_REQUIRED` | The Bearer credential is missing, malformed, or invalid. |
 | `403` | `PROFILE_NOT_AVAILABLE` | The requested Profile is not served by this deployment. |
 | `404` | `LAW_NOT_FOUND` | The stable Document ID is unavailable in the current Profile. |
 | `404` | `PROVISION_NOT_FOUND` | The root Provision stable ID is unavailable; Body Block IDs are not accepted by this endpoint. |
+| `429` | `RATE_LIMIT_EXCEEDED` | The current key or unauthorized client bucket exceeded its process-local window. |
 | `500` | `INTERNAL_ERROR` | The adapter failed without exposing implementation details. |
+| `503` | `SERVICE_NOT_CONFIGURED` | No Public API key is configured for this deployment. |
 
 A valid resolve query with no corpus match returns `200` with `bestMatch: null` and an empty `results` array. This means “not published in the current artifact,” not “the law does not exist.”
 
@@ -103,4 +123,4 @@ A valid resolve query with no corpus match returns `200` with `bestMatch: null` 
 - Official text is returned only from the loaded verified artifact and is never generated, summarized, or silently corrected by the adapter.
 - Responses do not expose raw XML, local filesystem paths, SQLite schema, or UI-specific Reader/Explorer payload fields.
 
-Authentication and rate limiting are not enabled in this first local/controlled slice. Do not expose the service as an unrestricted production developer API until those Phase 4 controls and operational monitoring are configured.
+Authentication and bounded single-process protection are implemented, but this is not yet an account, billing, distributed-quota, audit-log, or abuse-management system. Keep Cloud Run at one instance when relying on this limiter as the deployment quota, or add an external gateway/distributed limiter in a later operational slice. MCP remains outside this REST compatibility boundary.
