@@ -576,7 +576,7 @@ The lifecycle discovery command is a separate open-neighborhood review gate for 
 
 ## Current Release Status
 
-Annotated Git tag `v0.1.0` marks commit `4b485b6` as the first usable product release. The earlier `phase-1.0.0` tag remains the Phase 1 milestone; later Phase 2 work builds on it without rewriting the Phase 1 Canonical contract.
+Annotated Git tag `v0.1.0` marks commit `4b485b6` as the first usable product release. The earlier `phase-1.0.0` and `phase-2.0.0` tags retain their respective milestones. `phase-3.0.0` marks the validated bounded regulatory-intelligence release: Topics, timeline, decision, applicability, regulatory path, banking pilot, and internal citation retrieval all reuse the same read-only Runtime contract; GraphDB evaluation and all 1→100 expansion remain deferred.
 
 Release 0.1 has a complete local multi-law Reader foundation:
 

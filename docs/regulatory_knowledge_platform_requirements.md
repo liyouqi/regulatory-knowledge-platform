@@ -3308,7 +3308,7 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 6. AI Act implementation timeline 0→1（已完成）；CNPD supervisory decision 0→1（已完成）；
 7. cross-regulation path 0→1（已完成）；evidence-bearing DORA applicability rule/navigation 0→1（已完成）；
 8. cross-file Topic/Taxonomy navigation 0→1（已完成）；
-9. focused graph persistence only when query load requires it。
+9. focused graph persistence deferred until observed query load requires it（不阻塞 Phase 3 0→1 completion）。
 
 ## Phase 4 Sequence
 

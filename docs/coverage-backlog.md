@@ -25,6 +25,21 @@ The visible Web product and the Agent/RAG data product consume the same reviewed
 
 Phase 2 does not wait for every future regulation, case, amendment, or Level 3 document. It completes when the planned 0→1 rows are validated and documented.
 
+## Phase 3 bounded completion
+
+| Capability | 0→1 completion | Later 1→100 or on-demand work | Status |
+|---|---|---|---|
+| Financial-domain pilot | CRD, EBA internal-governance guidance, CSSF 12/552, and one evidence-bearing EU → Luxembourg chain | further banking governance, prudential, payments, AML, funds, insurance, and markets slices | validated |
+| Topic / taxonomy | three cross-file reviewed Topics with provision links and Profile-safe materialization | broader Topic coverage and official/algorithmic assistance | validated |
+| Implementation timeline | six AI Act milestones with exact Article 113 evidence | further regulation timelines and delegated/implementing milestones | validated |
+| Supervisory decision | CNPD `18FR/2022` with four exact GDPR Article findings | more jurisdictions, outcomes, appeals, and decision-text coverage | validated |
+| Applicability navigation | DORA credit-institution scope evidence and RTS/ITS navigation without a final conclusion | more entity types, activities, and institution-specific profiles | validated |
+| Multi-hop regulatory path | Banking Governance CRD → EBA → CSSF path over existing exact edges | additional Domains and richer comparison/navigation templates | validated |
+| Internal Agent/RAG retrieval | citation-ready stable-ID context and 3-case deterministic Top-1 benchmark | broader evaluation sets and Phase 4 public transports | validated |
+| Focused graph persistence | graph-neutral SQLite repository/service boundary retained | evaluate GraphDB only when observed query load requires it | deferred |
+
+Phase 3 completes its planned 0→1 intelligence capabilities without a GraphDB. The deferred persistence option is an implementation-scale decision, not an unmet product requirement; all future coverage is tracked below rather than treated as incomplete phase work.
+
 ## Phase 3 first non-IT pilot
 
 Use **Banking Governance & Internal Control** as the first financial-business domain slice.
