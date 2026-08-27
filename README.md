@@ -127,6 +127,7 @@ npm run build
 | `npm run cssf:canonical:build -- --snapshot <path>` | Publish an immutable CSSF Canonical artifact after the media-specific quality gate passes. |
 | `npm run test:e2e` | Run Playwright smoke tests for the DORA Explorer, Reader, Level 2 library, and global search. |
 | `npm run mcp` | Start the local stdio MCP server over the already built read-only Runtime artifact; MCP clients should invoke it with npm's `--silent` flag. |
+| `npm run example:mcp:relationships -- "DORA Article 28"` | Run the executable two-step MCP client example: resolve an exact Provision stable ID, then retrieve its published relationships. |
 
 ## Public API v1
 
@@ -168,6 +169,14 @@ Phase 4 also exposes the same four deterministic capabilities as local read-only
   }
 }
 ```
+
+To test the same two-step workflow with the included standalone client:
+
+```bash
+npm run example:mcp:relationships -- "DORA Article 28"
+```
+
+The example prints group counts plus the selected `mandates` edges with complete evidence. Use `--group references` (or another returned group name) to inspect a different group. Set `REGULATORY_EXAMPLE_PROFILE_ID` only when you want to assert the deployment-fixed Profile explicitly.
 
 The `--silent` flag is required because stdout is the MCP protocol channel. The local stdio process uses the current user's filesystem access and does not use the Public API key. Remote Streamable HTTP MCP, OAuth/API-key protection, broader relationship search, and additional tools remain later Phase 4 slices. See `docs/mcp-server.md` for exact inputs, error semantics, and client boundaries.
 

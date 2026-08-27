@@ -44,6 +44,18 @@ Some hosts use a different outer configuration key or do not support `cwd`; in t
 
 The implementation follows the official MCP TypeScript SDK v2 stdio factory pattern: [`serveStdio`](https://ts.sdk.modelcontextprotocol.io/v2/servers/stdio). The same factory supports current and legacy protocol openings through the SDK's default negotiation policy.
 
+## Executable client example
+
+Run the copyable SDK client from the repository root:
+
+```bash
+npm run example:mcp:relationships -- "DORA Article 28"
+```
+
+The client spawns the stdio server, calls `resolve_law`, requires an exact root Provision stable ID, and passes that ID to `get_relationships`. It prints the contract/Runtime/Profile identity, deterministic resolution metadata, counts for all groups, and the selected group's complete published edges and evidence. The default group is `mandates`; pass `--group references` or another returned group name after the query to inspect a different group. It does not send the original query directly to `get_relationships` and does not add AI interpretation.
+
+An optional `REGULATORY_EXAMPLE_PROFILE_ID=full-corpus` asserts a specific deployment-fixed Profile; a mismatch fails through the normal structured service error. The example has no API key because it uses local stdio. It is an executable integration example, not a published client library or a remote MCP deployment.
+
 ## Errors and Profile isolation
 
 - MCP input-schema failures return an MCP tool error before the service is called.

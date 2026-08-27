@@ -50,6 +50,7 @@
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",
     "mcp": "node --import tsx src/mcp/mcp-stdio.ts",
+    "example:mcp:relationships": "node examples/mcp-resolve-relationships.mjs",
     "pretest": "npm run runtime:build",
     "test": "vitest run",
     "test:watch": "vitest",
