@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -141,6 +141,7 @@
     "data/official-mappings/level2.json",
     "data/official-mappings/guidelines.json",
     "data/official-mappings/national-implementations.json",
+    "data/official-mappings/applicability.json",
     "data/official-metadata/authorities.json",
     "data/official-metadata/legal-natures.json",
     "data/official-metadata/implementation-timelines.json",

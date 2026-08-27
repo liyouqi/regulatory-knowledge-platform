@@ -32,6 +32,8 @@ describe("runtime artifact verification", () => {
       timelineEvents: 0,
       supervisoryDecisions: 0,
       supervisoryDecisionFindings: 0,
+      applicabilityRules: 1,
+      applicabilityEvidence: 10,
       bytes: expect.any(Number),
       input: databasePath,
     });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  applicabilityPath,
   documentRelationshipGraphPath,
   explorerPath,
   globalRelationshipGraphPath,
@@ -7,6 +8,7 @@ import {
   isLevel2MandateQueryPath,
   level2LibraryPath,
   level2MandateQueryPath,
+  parseApplicabilityPath,
   parseExplorerPath,
   parseImplementationTimelinePath,
   parseLevel2LibraryPath,
@@ -109,6 +111,14 @@ describe("Reader routes", () => {
       parseRegulatoryDomainPath("/domains/banking-governance-internal-control"),
     ).toEqual({ domainSlug: "banking-governance-internal-control" });
     expect(parseRegulatoryDomainPath("/domains/banking/extra")).toBeNull();
+  });
+
+  it("builds and parses generic applicability routes", () => {
+    expect(applicabilityPath("dora")).toBe("/applicability/dora");
+    expect(parseApplicabilityPath("/applicability/dora")).toEqual({
+      slug: "dora",
+    });
+    expect(parseApplicabilityPath("/applicability/dora/extra")).toBeNull();
   });
 
   it.each([

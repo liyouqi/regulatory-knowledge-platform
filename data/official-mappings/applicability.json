@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applicability-rules",
+  "version": "1.0.0",
+  "reviewedAt": "2026-08-27T10:00:00Z",
+  "rules": [
+    {
+      "id": "applicability-rule:dora:credit-institution",
+      "documentId": "eu:32022R2554",
+      "entityType": {
+        "id": "credit-institution",
+        "label": "Credit institution"
+      },
+      "status": "listed-in-scope-subject-to-qualifications",
+      "scopeProvisionId": "eu:32022R2554:article:2",
+      "evidence": [
+        {
+          "role": "scope-intro",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:1",
+          "evidenceText": "Without prejudice to paragraphs 3 and 4, this Regulation applies to the following entities:"
+        },
+        {
+          "role": "entity-listing",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:1:point:a",
+          "evidenceText": "credit institutions;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3",
+          "evidenceText": "This Regulation does not apply to:"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:a",
+          "evidenceText": "managers of alternative investment funds as referred to in Article 3(2) of Directive 2011/61/EU;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:b",
+          "evidenceText": "insurance and reinsurance undertakings as referred to in Article 4 of Directive 2009/138/EC;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:c",
+          "evidenceText": "institutions for occupational retirement provision which operate pension schemes which together do not have more than 15 members in total;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:d",
+          "evidenceText": "natural or legal persons exempted pursuant to Articles 2 and 3 of Directive 2014/65/EU;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:e",
+          "evidenceText": "insurance intermediaries, reinsurance intermediaries and ancillary insurance intermediaries which are microenterprises or small or medium-sized enterprises;"
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:3:point:f",
+          "evidenceText": "post office giro institutions as referred to in Article 2(5), point (3), of Directive 2013/36/EU."
+        },
+        {
+          "role": "qualification",
+          "sourceEntityId": "eu:32022R2554:article:2:paragraph:4",
+          "evidenceText": "Member States may exclude from the scope of this Regulation entities referred to in Article 2(5), points (4) to (23), of Directive 2013/36/EU that are located within their respective territories. Where a Member State makes use of such option, it shall inform the Commission thereof as well as of any subsequent changes thereto. The Commission shall make that information publicly available on its website or other easily accessible means."
+        }
+      ],
+      "navigationProvisionIds": [
+        "eu:32022R2554:article:20",
+        "eu:32022R2554:article:28"
+      ],
+      "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
+      "provenance": "LEGAL_TEXT",
+      "reviewStatus": "reviewed"
+    }
+  ]
+}

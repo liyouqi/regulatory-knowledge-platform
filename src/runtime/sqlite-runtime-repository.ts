@@ -7,6 +7,11 @@ import {
   RUNTIME_DATABASE_SCHEMA_VERSION,
 } from "../search/sqlite-search-index";
 import {
+  type ApplicabilityEvidenceRole,
+  type ApplicabilityResponse,
+  applicabilityResponseSchema,
+} from "../shared/applicability";
+import {
   type CaseLawRelationship,
   type DocumentCaseLawRelationshipsResponse,
   documentCaseLawRelationshipsResponseSchema,
@@ -74,10 +79,52 @@ interface DocumentPayloadRow {
 interface DocumentSummaryRow
   extends Omit<
     DocumentSummary,
-    "hasImplementationTimeline" | "hasSupervisoryDecisions"
+    | "hasImplementationTimeline"
+    | "hasSupervisoryDecisions"
+    | "hasApplicabilityRules"
   > {
   hasImplementationTimeline: 0 | 1;
   hasSupervisoryDecisions: 0 | 1;
+  hasApplicabilityRules: 0 | 1;
+}
+
+interface ApplicabilityRuleRow {
+  id: string;
+  datasetVersion: string;
+  documentId: string;
+  documentSlug: string;
+  documentShortName: string;
+  documentOfficialTitle: string;
+  documentSourceUrl: string;
+  entityTypeId: string;
+  entityTypeLabel: string;
+  status: "listed-in-scope-subject-to-qualifications";
+  scopeProvisionId: string;
+  scopeLabel: string;
+  scopeTitle: string | null;
+  scopePath: string;
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+  builderMethod: "applicability-rule";
+  builderVersion: "1.0.0";
+}
+
+interface ApplicabilityEvidenceRow {
+  role: ApplicabilityEvidenceRole;
+  sourceEntityId: string;
+  sourceLabel: string;
+  sourcePath: string;
+  evidenceText: string;
+  evidenceLocator: string;
+  sourceUrl: string;
+  provenance: "LEGAL_TEXT";
+}
+
+interface ApplicabilityNavigationRow {
+  provisionId: string;
+  label: string;
+  title: string | null;
+  path: string;
 }
 
 interface TimelineEventRow {
@@ -738,6 +785,8 @@ export class SqliteRuntimeRepository {
   readonly timelineEventCount: number;
   readonly supervisoryDecisionCount: number;
   readonly supervisoryDecisionFindingCount: number;
+  readonly applicabilityRuleCount: number;
+  readonly applicabilityEvidenceCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -838,6 +887,14 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "supervisoryDecisionFindingCount"),
         10,
       );
+      this.applicabilityRuleCount = Number.parseInt(
+        manifestValue(this.database, "applicabilityRuleCount"),
+        10,
+      );
+      this.applicabilityEvidenceCount = Number.parseInt(
+        manifestValue(this.database, "applicabilityEvidenceCount"),
+        10,
+      );
       this.unresolvedReferenceCount = Number.parseInt(
         manifestValue(this.database, "unresolvedReferenceCount"),
         10,
@@ -871,7 +928,11 @@ export class SqliteRuntimeRepository {
           EXISTS (
             SELECT 1 FROM supervisory_decisions decision
             WHERE decision.target_document_id = documents.id
-          ) AS hasSupervisoryDecisions
+          ) AS hasSupervisoryDecisions,
+          EXISTS (
+            SELECT 1 FROM applicability_rules rule
+            WHERE rule.document_id = documents.id
+          ) AS hasApplicabilityRules
         FROM documents
         ORDER BY display_order ASC
       `)
@@ -880,7 +941,143 @@ export class SqliteRuntimeRepository {
       ...row,
       hasImplementationTimeline: row.hasImplementationTimeline === 1,
       hasSupervisoryDecisions: row.hasSupervisoryDecisions === 1,
+      hasApplicabilityRules: row.hasApplicabilityRules === 1,
     }));
+  }
+
+  findApplicabilityBySlug(
+    slug: string,
+    entityTypeId?: string,
+  ): ApplicabilityResponse | null {
+    const availableEntityTypes = this.database
+      .prepare(`
+        SELECT
+          rule.entity_type_id AS id,
+          rule.entity_type_label AS label
+        FROM applicability_rules rule
+        JOIN documents document ON document.id = rule.document_id
+        WHERE document.slug = ?
+        ORDER BY rule.entity_type_label ASC, rule.entity_type_id ASC
+      `)
+      .all(slug) as Array<{ id: string; label: string }>;
+    const selectedEntityTypeId = entityTypeId ?? availableEntityTypes[0]?.id;
+    if (!selectedEntityTypeId) return null;
+
+    const rule = this.database
+      .prepare(`
+        SELECT
+          rule.id,
+          rule.dataset_version AS datasetVersion,
+          document.id AS documentId,
+          document.slug AS documentSlug,
+          document.short_name AS documentShortName,
+          document.official_title AS documentOfficialTitle,
+          document.source_url AS documentSourceUrl,
+          rule.entity_type_id AS entityTypeId,
+          rule.entity_type_label AS entityTypeLabel,
+          rule.status,
+          rule.scope_provision_id AS scopeProvisionId,
+          scope.label AS scopeLabel,
+          scope.title AS scopeTitle,
+          scope.path AS scopePath,
+          rule.review_status AS reviewStatus,
+          rule.reviewed_at AS reviewedAt,
+          rule.builder_method AS builderMethod,
+          rule.builder_version AS builderVersion
+        FROM applicability_rules rule
+        JOIN documents document ON document.id = rule.document_id
+        JOIN legal_entities scope ON scope.id = rule.scope_provision_id
+        WHERE document.slug = @slug
+          AND rule.entity_type_id = @entityTypeId
+      `)
+      .get({ slug, entityTypeId: selectedEntityTypeId }) as
+      | ApplicabilityRuleRow
+      | undefined;
+    if (!rule) return null;
+
+    const evidence = this.database
+      .prepare(`
+        SELECT
+          role,
+          source_entity_id AS sourceEntityId,
+          source_label AS sourceLabel,
+          source_path AS sourcePath,
+          evidence_text AS evidenceText,
+          evidence_locator AS evidenceLocator,
+          source_url AS sourceUrl,
+          provenance
+        FROM applicability_rule_evidence
+        WHERE rule_id = ?
+        ORDER BY display_order ASC
+      `)
+      .all(rule.id) as ApplicabilityEvidenceRow[];
+    const navigationRows = this.database
+      .prepare(`
+        SELECT
+          navigation.provision_id AS provisionId,
+          provision.label,
+          provision.title,
+          provision.path
+        FROM applicability_rule_navigation navigation
+        JOIN legal_entities provision ON provision.id = navigation.provision_id
+        WHERE navigation.rule_id = ?
+        ORDER BY navigation.display_order ASC
+      `)
+      .all(rule.id) as ApplicabilityNavigationRow[];
+
+    return applicabilityResponseSchema.parse({
+      schemaVersion: "1.0.0",
+      id: rule.id,
+      runtime: {
+        buildId: this.buildId,
+        profileId: this.profileId,
+        profileVersion: this.profileVersion,
+        profileDisplayName: this.profileDisplayName,
+        profileHash: this.profileHash,
+      },
+      document: {
+        id: rule.documentId,
+        slug: rule.documentSlug,
+        shortName: rule.documentShortName,
+        officialTitle: rule.documentOfficialTitle,
+        sourceUrl: rule.documentSourceUrl,
+      },
+      availableEntityTypes,
+      entityType: { id: rule.entityTypeId, label: rule.entityTypeLabel },
+      result: {
+        status: rule.status,
+        scopeProvision: {
+          entityId: rule.scopeProvisionId,
+          label: rule.scopeLabel,
+          title: rule.scopeTitle,
+          path: rule.scopePath,
+        },
+        evidence,
+        navigation: navigationRows.map((navigation) => ({
+          provision: {
+            entityId: navigation.provisionId,
+            label: navigation.label,
+            title: navigation.title,
+            path: navigation.path,
+          },
+          relationships:
+            this.findProvisionRelationships(
+              rule.documentId,
+              navigation.provisionId,
+            )?.mandates ?? [],
+        })),
+      },
+      review: {
+        reviewStatus: rule.reviewStatus,
+        reviewedAt: rule.reviewedAt,
+        builderMethod: rule.builderMethod,
+        builderVersion: rule.builderVersion,
+      },
+      guardrails: {
+        finalLegalDetermination: false,
+        profileControlsVisibilityOnly: true,
+      },
+    });
   }
 
   findImplementationTimelineBySlug(

@@ -51,6 +51,8 @@ export interface CorpusVerification {
   runtimeTimelineEvents: number;
   runtimeSupervisoryDecisions: number;
   runtimeSupervisoryDecisionFindings: number;
+  runtimeApplicabilityRules: number;
+  runtimeApplicabilityEvidence: number;
   unresolvedReferences: number;
 }
 
@@ -125,6 +127,8 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
     runtimeTimelineEvents: runtime.timelineEvents,
     runtimeSupervisoryDecisions: runtime.supervisoryDecisions,
     runtimeSupervisoryDecisionFindings: runtime.supervisoryDecisionFindings,
+    runtimeApplicabilityRules: runtime.applicabilityRules,
+    runtimeApplicabilityEvidence: runtime.applicabilityEvidence,
     unresolvedReferences: runtime.unresolvedReferences,
   };
 }

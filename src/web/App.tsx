@@ -12,6 +12,7 @@ import {
   Network,
   Route as RouteIcon,
   Search,
+  ShieldCheck,
   Undo2,
   X,
 } from "lucide-react";
@@ -50,9 +51,11 @@ import {
   relationshipPreviewSchema,
 } from "../shared/legal";
 import {
+  applicabilityPath,
   explorerPath,
   implementationTimelinePath,
   isLevel2MandateQueryPath,
+  parseApplicabilityPath,
   parseExplorerPath,
   parseImplementationTimelinePath,
   parseLevel2LibraryPath,
@@ -73,6 +76,7 @@ import {
   type DocumentSupervisoryDecisionsResponse,
   documentSupervisoryDecisionsResponseSchema,
 } from "../shared/supervisory-decision";
+import { ApplicabilityPage } from "./ApplicabilityPage";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
@@ -1230,6 +1234,14 @@ function ReaderPage({
               <Landmark aria-hidden="true" size={15} /> Decisions
             </Link>
           ) : null}
+          {documentSummary?.hasApplicabilityRules ? (
+            <Link
+              className="view-switch"
+              to={applicabilityPath(legalDocument.slug)}
+            >
+              <ShieldCheck aria-hidden="true" size={15} /> Applicability
+            </Link>
+          ) : null}
           <button
             className="search-button"
             onClick={onOpenSearch}
@@ -1546,6 +1558,7 @@ function ReaderPage({
 export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
+  const applicability = parseApplicabilityPath(location.pathname);
   const implementationTimeline = parseImplementationTimelinePath(
     location.pathname,
   );
@@ -1592,7 +1605,14 @@ export function App() {
 
   return (
     <>
-      {level2MandateQuery ? (
+      {applicability ? (
+        <ApplicabilityPage
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          slug={applicability.slug}
+          theme={theme}
+        />
+      ) : level2MandateQuery ? (
         <Level2MandateQueryPage
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}

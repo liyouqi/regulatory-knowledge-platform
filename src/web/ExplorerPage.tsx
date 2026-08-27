@@ -8,6 +8,7 @@ import {
   Network,
   Route,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import {
   familyLevel2ResponseSchema,
 } from "../shared/legal";
 import {
+  applicabilityPath,
   documentRelationshipGraphPath,
   explorerPath,
   implementationTimelinePath,
@@ -278,6 +280,11 @@ export function ExplorerPage({
             >
               <Landmark aria-hidden="true" size={15} />
               Decisions
+            </Link>
+          ) : null}
+          {documentSummary?.hasApplicabilityRules ? (
+            <Link className="view-switch" to={applicabilityPath(document.slug)}>
+              <ShieldCheck aria-hidden="true" size={15} /> Applicability
             </Link>
           ) : null}
           {regulatoryContext?.domainAssignments[0] ? (

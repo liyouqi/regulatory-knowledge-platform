@@ -8,6 +8,13 @@ import {
 } from "node:fs";
 import { dirname, resolve } from "node:path";
 import Database from "better-sqlite3";
+import {
+  APPLICABILITY_RULE_BUILDER,
+  APPLICABILITY_RULE_BUILDER_VERSION,
+  DEFAULT_APPLICABILITY_RULES_PATH,
+  buildApplicabilityRules,
+  loadApplicabilityRuleDataset,
+} from "../applicability/applicability-rule";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import {
   DEFAULT_SUPERVISORY_DECISIONS_PATH,
@@ -102,7 +109,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.2.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.3.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -137,6 +144,8 @@ export interface RuntimeDatabaseManifest {
   timelineEventCount: number;
   supervisoryDecisionCount: number;
   supervisoryDecisionFindingCount: number;
+  applicabilityRuleCount: number;
+  applicabilityEvidenceCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   documentBuilds: Array<{ documentId: string; buildId: string }>;
@@ -304,6 +313,7 @@ function runtimeBuildId(
     typeof loadImplementationTimelineDataset
   >,
   supervisoryDecisionDataset: ReturnType<typeof loadSupervisoryDecisionDataset>,
+  applicabilityRuleDataset: ReturnType<typeof loadApplicabilityRuleDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -339,6 +349,8 @@ function runtimeBuildId(
         JSON.stringify(implementationTimelineDataset),
         `${SUPERVISORY_DECISION_BUILDER}@${SUPERVISORY_DECISION_BUILDER_VERSION}`,
         JSON.stringify(supervisoryDecisionDataset),
+        `${APPLICABILITY_RULE_BUILDER}@${APPLICABILITY_RULE_BUILDER_VERSION}`,
+        JSON.stringify(applicabilityRuleDataset),
         input,
       ].join("\n"),
     )
@@ -410,6 +422,16 @@ export function buildRuntimeDatabase(
     relationshipBuild.entities,
     authorityDataset.authorities,
     supervisoryDecisionDataset,
+    inputSources.length > 0
+      ? new Set(inputDocuments.map((document) => document.id))
+      : null,
+  );
+  const applicabilityRuleDataset = loadApplicabilityRuleDataset(
+    DEFAULT_APPLICABILITY_RULES_PATH,
+  );
+  const applicabilityRuleBuild = buildApplicabilityRules(
+    documents,
+    applicabilityRuleDataset,
     inputSources.length > 0
       ? new Set(inputDocuments.map((document) => document.id))
       : null,
@@ -541,6 +563,7 @@ export function buildRuntimeDatabase(
     legalNatureDataset,
     implementationTimelineDataset,
     supervisoryDecisionDataset,
+    applicabilityRuleDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -896,6 +919,49 @@ export function buildRuntimeDatabase(
         ON supervisory_decision_findings(target_entity_id);
       CREATE INDEX supervisory_decision_findings_target_document
         ON supervisory_decision_findings(target_document_id);
+      CREATE TABLE applicability_rules (
+        id TEXT PRIMARY KEY,
+        dataset_version TEXT NOT NULL,
+        document_id TEXT NOT NULL REFERENCES documents(id),
+        entity_type_id TEXT NOT NULL,
+        entity_type_label TEXT NOT NULL,
+        status TEXT NOT NULL CHECK (
+          status = 'listed-in-scope-subject-to-qualifications'
+        ),
+        scope_provision_id TEXT NOT NULL REFERENCES legal_entities(id),
+        source_url TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'LEGAL_TEXT'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL,
+        builder_method TEXT NOT NULL CHECK (builder_method = 'applicability-rule'),
+        builder_version TEXT NOT NULL,
+        UNIQUE (document_id, entity_type_id)
+      ) STRICT;
+      CREATE INDEX applicability_rules_document
+        ON applicability_rules(document_id, entity_type_id);
+      CREATE TABLE applicability_rule_evidence (
+        rule_id TEXT NOT NULL REFERENCES applicability_rules(id),
+        display_order INTEGER NOT NULL,
+        role TEXT NOT NULL CHECK (
+          role IN ('scope-intro', 'entity-listing', 'qualification')
+        ),
+        source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
+        source_label TEXT NOT NULL,
+        source_path TEXT NOT NULL,
+        evidence_text TEXT NOT NULL,
+        evidence_locator TEXT NOT NULL,
+        source_url TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'LEGAL_TEXT'),
+        PRIMARY KEY (rule_id, display_order),
+        UNIQUE (rule_id, role, source_entity_id)
+      ) STRICT;
+      CREATE TABLE applicability_rule_navigation (
+        rule_id TEXT NOT NULL REFERENCES applicability_rules(id),
+        provision_id TEXT NOT NULL REFERENCES legal_entities(id),
+        display_order INTEGER NOT NULL,
+        PRIMARY KEY (rule_id, provision_id),
+        UNIQUE (rule_id, display_order)
+      ) STRICT;
       CREATE TABLE relationships (
         relationship_id TEXT PRIMARY KEY,
         source_entity_id TEXT NOT NULL REFERENCES legal_entities(id),
@@ -1156,6 +1222,31 @@ export function buildRuntimeDatabase(
         @builderMethod, @builderVersion, @resolutionStatus, @buildId
       )
     `);
+    const insertApplicabilityRule = database.prepare(`
+      INSERT INTO applicability_rules (
+        id, dataset_version, document_id, entity_type_id, entity_type_label,
+        status, scope_provision_id, source_url, provenance, review_status,
+        reviewed_at, builder_method, builder_version
+      ) VALUES (
+        @id, @datasetVersion, @documentId, @entityTypeId, @entityTypeLabel,
+        @status, @scopeProvisionId, @sourceUrl, @provenance, @reviewStatus,
+        @reviewedAt, @builderMethod, @builderVersion
+      )
+    `);
+    const insertApplicabilityEvidence = database.prepare(`
+      INSERT INTO applicability_rule_evidence (
+        rule_id, display_order, role, source_entity_id, source_label,
+        source_path, evidence_text, evidence_locator, source_url, provenance
+      ) VALUES (
+        @ruleId, @displayOrder, @role, @sourceEntityId, @sourceLabel,
+        @sourcePath, @evidenceText, @evidenceLocator, @sourceUrl, @provenance
+      )
+    `);
+    const insertApplicabilityNavigation = database.prepare(`
+      INSERT INTO applicability_rule_navigation (
+        rule_id, provision_id, display_order
+      ) VALUES (@ruleId, @provisionId, @displayOrder)
+    `);
     const insertLegalWork = database.prepare(`
       INSERT INTO legal_works (
         id, celex, cellar_work_uri, loaded_document_id, label, title,
@@ -1315,6 +1406,15 @@ export function buildRuntimeDatabase(
       for (const finding of supervisoryDecisionBuild.findings) {
         insertSupervisoryDecisionFinding.run({ ...finding, buildId });
       }
+      for (const rule of applicabilityRuleBuild.rules) {
+        insertApplicabilityRule.run(rule);
+      }
+      for (const evidence of applicabilityRuleBuild.evidence) {
+        insertApplicabilityEvidence.run(evidence);
+      }
+      for (const navigation of applicabilityRuleBuild.navigation) {
+        insertApplicabilityNavigation.run(navigation);
+      }
       for (const work of lifecycleBuild.works) {
         insertLegalWork.run(work);
       }
@@ -1377,6 +1477,10 @@ export function buildRuntimeDatabase(
         supervisoryDecisionFindingCount: String(
           supervisoryDecisionBuild.findings.length,
         ),
+        applicabilityRuleCount: String(applicabilityRuleBuild.rules.length),
+        applicabilityEvidenceCount: String(
+          applicabilityRuleBuild.evidence.length,
+        ),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -1423,6 +1527,9 @@ export function buildRuntimeDatabase(
         ]),
         supervisoryDecisionBuilders: JSON.stringify([
           `${SUPERVISORY_DECISION_BUILDER}@${SUPERVISORY_DECISION_BUILDER_VERSION}`,
+        ]),
+        applicabilityBuilders: JSON.stringify([
+          `${APPLICABILITY_RULE_BUILDER}@${APPLICABILITY_RULE_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -1497,6 +1604,8 @@ export function buildRuntimeDatabase(
     timelineEventCount: implementationTimelineEvents.length,
     supervisoryDecisionCount: supervisoryDecisionBuild.decisions.length,
     supervisoryDecisionFindingCount: supervisoryDecisionBuild.findings.length,
+    applicabilityRuleCount: applicabilityRuleBuild.rules.length,
+    applicabilityEvidenceCount: applicabilityRuleBuild.evidence.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     documentBuilds: documents.map((document) => ({

@@ -88,6 +88,10 @@ export function findRegulatoryPath(domainSlug: string) {
   return regulatoryPathService.findByDomainSlug(domainSlug);
 }
 
+export function findApplicability(slug: string, entityTypeId?: string) {
+  return runtimeRepository.findApplicabilityBySlug(slug, entityTypeId);
+}
+
 export function findExplorerBySlug(slug: string) {
   return runtimeRepository.findExplorerBySlug(slug);
 }
@@ -223,6 +227,8 @@ app.get("/api/health", (_request, response) => {
       supervisoryDecisions: runtimeRepository.supervisoryDecisionCount,
       supervisoryDecisionFindings:
         runtimeRepository.supervisoryDecisionFindingCount,
+      applicabilityRules: runtimeRepository.applicabilityRuleCount,
+      applicabilityEvidence: runtimeRepository.applicabilityEvidenceCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
   });
@@ -293,6 +299,22 @@ app.get("/api/regulatory-paths/:domainSlug", (request, response) => {
     return;
   }
   response.json(path);
+});
+
+app.get("/api/applicability/:slug", (request, response) => {
+  const entityTypeId =
+    typeof request.query.entityType === "string"
+      ? request.query.entityType.slice(0, 100)
+      : undefined;
+  const result = findApplicability(
+    request.params.slug.slice(0, 100),
+    entityTypeId,
+  );
+  if (!result) {
+    response.status(404).json({ error: "Applicability rule not found" });
+    return;
+  }
+  response.json(result);
 });
 
 function sendFamilyLevel2(

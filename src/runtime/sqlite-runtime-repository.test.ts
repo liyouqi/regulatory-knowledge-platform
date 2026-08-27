@@ -59,6 +59,7 @@ describe("SQLite runtime repository", () => {
       defaultPath: dora.provisions[0].path,
       hasImplementationTimeline: false,
       hasSupervisoryDecisions: false,
+      hasApplicabilityRules: true,
       provenance: dora.provenance,
       familyId: "family:dora",
       regulatoryLevel: "level-1",
@@ -73,6 +74,57 @@ describe("SQLite runtime repository", () => {
         "Digital Operational Resilience Act",
         "Digital Operational Resilience Regulation",
       ],
+    });
+  });
+
+  it("returns reviewed DORA scope evidence and relationship navigation", () => {
+    const result = repository?.findApplicabilityBySlug(
+      "dora",
+      "credit-institution",
+    );
+
+    expect(result).toMatchObject({
+      schemaVersion: "1.0.0",
+      id: "applicability-rule:dora:credit-institution",
+      runtime: { buildId: repository?.buildId, profileId: "full-corpus" },
+      document: { id: "eu:32022R2554", slug: "dora" },
+      entityType: { id: "credit-institution", label: "Credit institution" },
+      result: {
+        status: "listed-in-scope-subject-to-qualifications",
+        scopeProvision: { entityId: "eu:32022R2554:article:2" },
+      },
+      guardrails: {
+        finalLegalDetermination: false,
+        profileControlsVisibilityOnly: true,
+      },
+    });
+    expect(result?.result.evidence).toHaveLength(10);
+    expect(result?.result.evidence[1]).toMatchObject({
+      role: "entity-listing",
+      evidenceText: "credit institutions;",
+      provenance: "LEGAL_TEXT",
+    });
+    expect(
+      result?.result.navigation.map((item) => item.provision.entityId),
+    ).toEqual(["eu:32022R2554:article:20", "eu:32022R2554:article:28"]);
+    expect(result?.result.navigation[0]?.relationships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          relationType: "MANDATES",
+          provenance: "OFFICIAL_MAPPING",
+        }),
+      ]),
+    );
+    expect(repository?.findApplicabilityBySlug("unknown")).toBeNull();
+    expect(
+      repository?.findApplicabilityBySlug(
+        "dora",
+        "crypto-asset-service-provider",
+      ),
+    ).toBeNull();
+    expect(repository).toMatchObject({
+      applicabilityRuleCount: 1,
+      applicabilityEvidenceCount: 10,
     });
   });
 

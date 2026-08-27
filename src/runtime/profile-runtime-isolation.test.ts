@@ -125,6 +125,11 @@ describe("banking-default runtime isolation", () => {
         expect.objectContaining({ date: "2026-08-02" }),
       ]),
     });
+    expect(repository?.findApplicabilityBySlug("dora")).toMatchObject({
+      runtime: { profileId: "banking-default" },
+      entityType: { id: "credit-institution" },
+      guardrails: { finalLegalDetermination: false },
+    });
     expect(
       regulatoryPaths?.findByDomainSlug("banking-governance-internal-control"),
     ).toMatchObject({

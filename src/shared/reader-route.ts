@@ -51,6 +51,17 @@ export function parseRegulatoryDomainPath(
   return match ? { domainSlug: decodeURIComponent(match[1]) } : null;
 }
 
+export function applicabilityPath(slug: string): string {
+  return `/applicability/${encodeURIComponent(slug)}`;
+}
+
+export function parseApplicabilityPath(
+  pathname: string,
+): { slug: string } | null {
+  const match = /^\/applicability\/([^/]+)\/?$/u.exec(pathname);
+  return match ? { slug: decodeURIComponent(match[1]) } : null;
+}
+
 export function explorerPath(slug: string): string {
   return `/explore/${encodeURIComponent(slug)}`;
 }

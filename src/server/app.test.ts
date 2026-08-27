@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ExplorerNode } from "../shared/legal";
 import {
+  findApplicability,
   findCitationContext,
   findCitationRetrieval,
   findDocument,
@@ -23,6 +24,20 @@ import {
 } from "./app";
 
 describe("Document lookup", () => {
+  it("serves reviewed DORA applicability evidence without a final determination", () => {
+    const result = findApplicability("dora", "credit-institution");
+
+    expect(result).toMatchObject({
+      id: "applicability-rule:dora:credit-institution",
+      entityType: { id: "credit-institution" },
+      guardrails: { finalLegalDetermination: false },
+    });
+    expect(
+      result?.result.evidence.filter((item) => item.role === "qualification"),
+    ).toHaveLength(8);
+    expect(findApplicability("unknown")).toBeNull();
+  });
+
   it("returns the DORA fixture by stable document ID", async () => {
     const document = findDocument("eu:32022R2554");
 

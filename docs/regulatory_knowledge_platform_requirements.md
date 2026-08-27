@@ -2056,7 +2056,7 @@ Phase 2 提供一个 `banking-default` representative Profile，验证同一 mas
 
 Phase 2 不实现任意 API 请求动态选择 Profile、多租户、Profile 权限或跨 Profile 聚合；这些属于 Phase 4 external delivery。
 
-当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU、Regulatory Context 与 Graph 数据。`banking-default` 当前允许 CRD（含 EBA/GL/2021/05）、DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work、Domain assignment、Authority relation 或 legal nature 均不会回流。Runtime schema `5.2.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、CRD/EBA 进入 banking corpus、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph/Regulatory Context 无旁路。
+当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU、Regulatory Context、Applicability 与 Graph 数据。`banking-default` 当前允许 CRD（含 EBA/GL/2021/05）、DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work、Domain assignment、Authority relation、legal nature 或 applicability rule 均不会回流。Runtime schema `5.3.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、CRD/EBA 进入 banking corpus、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph/Regulatory Context 无旁路。
 
 ---
 
@@ -2139,6 +2139,8 @@ Entity type
 ```
 
 该能力优先使用结构化规则与官方依据，每个结论都必须能够追溯到 provision。
+
+当前实现：DORA credit institution 构成首个 applicability 0→1。版本控制的 `data/official-mappings/applicability.json` 只保存 reviewed rule、stable entity IDs、exact evidence text、review lineage 和 navigation Provision IDs；`applicability-rule@1.0.0` 在构建期逐字核对 Article 2(1) scope introduction、Article 2(1)(a) entity listing、完整 Article 2(3) exclusion subtree 以及 Article 2(4)，缺少任一 qualification descendant 或正文漂移即 fail closed。Runtime `5.3.0` 将 1 条 rule、10 条 evidence 和 Article 20/28 navigation 分表 materialize；`GET /api/applicability/dora?entityType=credit-institution` 与 `/applicability/dora` 只读取当前 Profile 的 SQLite projection。输出只声明 `listed-in-scope-subject-to-qualifications`，并显式设置 `finalLegalDetermination: false`；Article 20/28 下的 RTS/ITS 来自既有 `MANDATES` edges，不作为自动适用义务。未知 entity type 或被 Profile 排除的 DORA 不返回推断结果。
 
 ## 23.4 Supervisory / Authority Decisions
 
@@ -2258,7 +2260,7 @@ Phase 3 在公开 API 之前提供稳定的内部 machine-facing service output�
 
 Canonical build 只依赖可审核、可重复执行的 source、mapping、metadata 与 deterministic builders。Phase 4 只把这些已经稳定的 service outputs 适配为 versioned Public API / MCP。
 
-当前实现：Runtime 5.2.0 将 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator` 保留到 schema-validated Reader payload。`citation-context-service` 只接受已进入当前 Edition/Profile 的 stable Provision 或 Body Block ID，以 `stable-entity-id@1.0.0` exact match 组装 `textSegments`、document snapshot/version/as-of、Canonical/Runtime build identity、root-Provision relationships 和 regulatory context。内部 `GET /api/internal/citation-context/:entityId` 是 Phase 3 controlled transport，未知或 Profile-excluded ID fail closed。`citation-retrieval-service@1.0.0` 进一步把同一 Profile 的 SQLite FTS5 结果确定性解析为这些 citation bundles，保留原始 `searchRank` 与最终 `rank`；只允许 exact entity 或该结果自身 root Provision fallback，不跨法规猜测。`GET /api/internal/citation-retrieval` 支持 query、可选 document scope 和 1–10 条 limit。三条人工复核的 CRD/CSSF/EBA query 必须在 `npm run citation:benchmark` 中达到 Top-1 hit rate 100%。这些 rank/score 只表示 deterministic retrieval，不表示法律置信度。Public compatibility、auth、rate limit 和 MCP adapter 仍在 Phase 4。
+当前实现：Runtime 5.3.0 将 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator` 保留到 schema-validated Reader payload。`citation-context-service` 只接受已进入当前 Edition/Profile 的 stable Provision 或 Body Block ID，以 `stable-entity-id@1.0.0` exact match 组装 `textSegments`、document snapshot/version/as-of、Canonical/Runtime build identity、root-Provision relationships 和 regulatory context。内部 `GET /api/internal/citation-context/:entityId` 是 Phase 3 controlled transport，未知或 Profile-excluded ID fail closed。`citation-retrieval-service@1.0.0` 进一步把同一 Profile 的 SQLite FTS5 结果确定性解析为这些 citation bundles，保留原始 `searchRank` 与最终 `rank`；只允许 exact entity 或该结果自身 root Provision fallback，不跨法规猜测。`GET /api/internal/citation-retrieval` 支持 query、可选 document scope 和 1–10 条 limit。三条人工复核的 CRD/CSSF/EBA query 必须在 `npm run citation:benchmark` 中达到 Top-1 hit rate 100%。这些 rank/score 只表示 deterministic retrieval，不表示法律置信度。Public compatibility、auth、rate limit 和 MCP adapter 仍在 Phase 4。
 
 ---
 
@@ -3079,18 +3081,26 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 - timeline item 可关联具体 legal source；
 - 时间数据与 UI 解耦。
 
-## 32.3 Decisions
+## 32.3 Applicability
+
+- 至少一个机构类型能从 reviewed rule 进入具体 scope Provision；
+- scope listing、qualification 和 related navigation 均可追溯到 exact stable entity/evidence；
+- qualification subtree 不完整或正文漂移时构建失败；
+- Profile 只控制 rule visibility，不生成最终机构法律结论；
+- Web 与内部 service 使用同一 Runtime projection。
+
+## 32.4 Decisions
 
 - 至少一个法规 family 能展示 CJEU + national/DPA/authority decision 的统一 relation model；
 - jurisdiction/authority/source 信息完整。
 
-## 32.4 Regulatory Path
+## 32.5 Regulatory Path
 
 - 能显示至少一种 multi-hop path；
 - 每一跳都有具体关系来源；
 - path 可由 Web 使用，并形成 Phase 4 adapter 可复用的 structured output。
 
-## 32.5 Financial Domain Pilot
+## 32.6 Financial Domain Pilot
 
 - Banking Governance & Internal Control representative corpus 通过统一 onboarding workflow；
 - 至少一个 Domain assignment 落到 representative Provision，并带 `EDITORIAL` provenance、版本和 review status；
@@ -3098,7 +3108,7 @@ Phase 1 总验收表示 `0.1–0.6` 全部完成，不阻止前序版本独立�
 - 至少一条 EU → Luxembourg 法律关系链具有准确 relation semantics 与 evidence；
 - 新 corpus 自动获得 Reader、Explorer、Search 和适用的 Graph 能力，不增加法规专用页面。
 
-## 32.6 Agent/RAG Internal Retrieval
+## 32.7 Agent/RAG Internal Retrieval
 
 - 内部 service 能返回 stable ID、exact official excerpt、locator、source/version/build、relationship evidence 和 `profileId`；
 - lexical query 能确定性返回 ranked citation bundles，并保留 search rank、entity resolution 与空结果语义；
@@ -3294,7 +3304,7 @@ Phase 3 Banking Governance pilot 当前已完成五个有界切片。第一，Di
 4. 首条 EU authority instrument → Luxembourg implementation relation（已完成）；
 5. Agent/RAG citation-ready context assembly 与 bounded retrieval evaluation（已完成）；
 6. AI Act implementation timeline 0→1（已完成）；CNPD supervisory decision 0→1（已完成）；
-7. cross-regulation path 0→1（已完成）；evidence-bearing applicability rule/navigation 0→1（待完成）；
+7. cross-regulation path 0→1（已完成）；evidence-bearing DORA applicability rule/navigation 0→1（已完成）；
 8. focused graph persistence only when query load requires it。
 
 ## Phase 4 Sequence
