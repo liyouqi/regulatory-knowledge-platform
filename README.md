@@ -59,25 +59,27 @@ npm run dev
 
 Then open `http://localhost:5173`. The Vite web app proxies `/api` calls to the Express API at `http://localhost:3000`.
 
-### Quick Navigation
+### Main Product Pages
 
 Vite normally uses port `5173`; if that port is occupied, use the port printed by `npm run dev` (for example `5175`) in the same paths below.
 
+For a first product tour, open these pages in order: **Regulatory Topics** → **Regulatory Path** → **Applicability Navigator** → **Implementation Timeline** → **Supervisory Decisions** → **Global Network**. The Reader, Explorer, and Library are the primary document-level views reached from those product surfaces.
+
 | Product surface | Example URL | Purpose |
 | --- | --- | --- |
+| Regulatory Topics | `http://localhost:5173/topics` | Main cross-file entry: browse reviewed subjects spanning primary law, RTS/ITS, authority guidance, and national material. |
+| Topic Detail | `http://localhost:5173/topics/major-ict-incident-reporting` | Follow one reviewed Topic to exact provisions and existing evidence-bearing official mappings. |
+| Regulatory Path | `http://localhost:5173/domains/banking-governance-internal-control` | Follow the reviewed CRD → EBA → CSSF path with explicit direction and exact relationship evidence. |
+| Applicability Navigator | `http://localhost:5173/applicability/dora` | Review DORA Article 2 scope evidence for a credit institution, retain all loaded qualifications, then continue to related RTS/ITS mappings. |
+| Implementation Timeline | `http://localhost:5173/timelines/ai-act` | Review AI Act publication, entry-into-force, and phased-application milestones with exact Article 113 evidence. |
+| Supervisory Decisions | `http://localhost:5173/decisions/gdpr` | Review provision-level CNPD findings with the exact official operative text and source PDF. |
+| Global Network | `http://localhost:5173/relationships` | View loaded regulations in one connected space; optionally reveal CJEU cases and external CELLAR Works. |
 | Reader | `http://localhost:5173/read/dora/articles/1` | Read an exact provision with stable navigation and relationship context. |
 | EBA Guideline | `http://localhost:5173/read/eba-gl-2021-05/provisions/5` | Read the EBA internal-governance subject-matter paragraph and its reviewed CRD relationship. |
 | Act Explorer | `http://localhost:5173/explore/dora` | Browse the complete structure of one legal act. |
 | RTS/ITS Library | `http://localhost:5173/library/dora` | Browse a regulatory family's reviewed Level 2 measures; append `/rts` or `/its` to filter. |
-| Global Network | `http://localhost:5173/relationships` | View loaded regulations in one connected space; optionally reveal CJEU cases and external CELLAR Works. |
 | Document Graph | `http://localhost:5173/relationships/gdpr` | Explore Act-level relationships, including the reviewed GDPR CJEU Case nodes. |
 | Article Graph | `http://localhost:5173/relationships/dora/articles/20` | Explore relationships scoped to one exact provision. |
-| Implementation Timeline | `http://localhost:5173/timelines/ai-act` | Review AI Act publication, entry-into-force, and phased-application milestones with exact Article 113 evidence. |
-| Supervisory Decisions | `http://localhost:5173/decisions/gdpr` | Review provision-level CNPD findings with the exact official operative text and source PDF. |
-| Regulatory Path | `http://localhost:5173/domains/banking-governance-internal-control` | Follow the reviewed CRD → EBA → CSSF path with explicit direction and exact relationship evidence. |
-| Applicability Navigator | `http://localhost:5173/applicability/dora` | Review DORA Article 2 scope evidence for a credit institution, retain all loaded qualifications, then continue to related RTS/ITS mappings. |
-| Regulatory Topics | `http://localhost:5173/topics` | Enter reviewed cross-file subjects spanning primary law, RTS/ITS, authority guidance, and national material. |
-| Topic Detail | `http://localhost:5173/topics/major-ict-incident-reporting` | Follow one reviewed Topic to exact provisions and existing evidence-bearing official mappings. |
 
 Press `Cmd+K` on macOS or `Ctrl+K` elsewhere from any product page to open global law, full-text, definition, and opened-law search.
 
