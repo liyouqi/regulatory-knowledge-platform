@@ -32,6 +32,25 @@ The repository currently provides separate commands for:
 
 The implemented command is `npm run corpus:build -- --profile <profileId>`. The explicit acquisition and inspection steps below still apply when adding or refreshing a source; the orchestrator never fetches mutable current content in place of a missing pinned snapshot and never replaces legal review.
 
+## Refresh the current experimental corpus
+
+Daily development and first setup use a separate current-source workflow:
+
+```bash
+npm run corpus:refresh
+```
+
+This command downloads the current official bytes for every registered EUR-Lex, CSSF, and EBA source, selects the newest verified local snapshot, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, and atomically rebuilds the default Runtime SQLite. Use `--skip-fetch` to repeat the pipeline from the newest local snapshots.
+
+The data ownership boundary is intentional:
+
+- large official snapshots and derived Canonical/Runtime artifacts stay ignored because they can be downloaded and rebuilt;
+- small reviewed mappings, topics, applicability rules, metadata, registries, and Profiles stay in Git because they contain human-reviewed semantics that downloading a PDF cannot reproduce.
+
+Current-source refresh does not pretend that a new official version has already been reviewed. Parser count/hash differences are recorded as `qualityDrift` in `data/artifacts/refresh/build-report.json`. A reviewed record whose Document/provision/evidence endpoint no longer validates is omitted from that experimental Runtime and recorded under `reviewedInputIssues`; it is never retargeted automatically. Review the source change, update the affected Git dataset and quality baseline, run its targeted fixtures/evals, and commit those small changes.
+
+This tolerant behavior applies only to experimental refresh, local development, and ordinary test setup. `npm run corpus:build`, `npm run runtime:build` without `--review-mode report`, and release verification remain strict, pinned review gates.
+
 ## Decide whether an adapter already exists
 
 Before adding a source, classify it:

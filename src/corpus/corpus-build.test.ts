@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertCorpusSnapshotChecksum,
   corpusBuildManifestHash,
   corpusBuildManifestSchema,
   loadCorpusBuildManifest,
   resolveCorpusBuildSources,
+  validateCorpusBuildManifestSources,
 } from "./corpus-build";
 
 describe("corpus build manifest", () => {
-  it("pins every registered source to one locally verified snapshot", async () => {
+  it("pins every registered source to one reviewed parser definition", () => {
     const manifest = loadCorpusBuildManifest();
-    const sources = await resolveCorpusBuildSources(manifest);
+    const sources = validateCorpusBuildManifestSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
     expect(sources).toHaveLength(18);
@@ -35,9 +37,14 @@ describe("corpus build manifest", () => {
     expect(sources.every((source) => source.parserVersion !== "pending")).toBe(
       true,
     );
-    expect(new Set(sources.map((source) => source.snapshotPath)).size).toBe(
-      sources.length,
-    );
+    expect(
+      new Set(
+        sources.map(
+          (source) =>
+            `${source.manifest.adapter}:${source.manifest.identifier}`,
+        ),
+      ).size,
+    ).toBe(sources.length);
   });
 
   it("derives a stable identity from the validated manifest", () => {
@@ -55,13 +62,14 @@ describe("corpus build manifest", () => {
     ).rejects.toThrow("Snapshot archive gate failed");
   });
 
-  it("fails closed when a pinned checksum differs from the snapshot", async () => {
-    const manifest = structuredClone(loadCorpusBuildManifest());
-    manifest.sources[0].contentSha256 = `sha256:${"0".repeat(64)}`;
-
-    await expect(resolveCorpusBuildSources(manifest)).rejects.toThrow(
-      "Snapshot checksum differs from corpus manifest",
-    );
+  it("fails closed when a pinned checksum differs from the snapshot", () => {
+    expect(() =>
+      assertCorpusSnapshotChecksum(
+        "fixture",
+        `sha256:${"1".repeat(64)}`,
+        `sha256:${"0".repeat(64)}`,
+      ),
+    ).toThrow("Snapshot checksum differs from corpus manifest");
   });
 
   it("rejects duplicate source identities and unsafe reviewed-input paths", () => {

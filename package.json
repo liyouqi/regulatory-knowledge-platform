@@ -8,7 +8,7 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
-    "predev": "npm run runtime:build",
+    "predev": "npm run runtime:build -- --review-mode report",
     "dev": "concurrently --kill-others-on-fail npm:dev:server npm:dev:web",
     "dev:server": "tsx watch src/server/index.ts",
     "dev:web": "vite",
@@ -42,6 +42,7 @@
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
     "corpus:build": "node --import tsx src/corpus/corpus-build-cli.ts",
+    "corpus:refresh": "node --import tsx src/corpus/corpus-refresh-cli.ts",
     "runtime:build": "node --import tsx src/search/build-search-index.ts",
     "runtime:verify": "node --import tsx src/runtime/verify-runtime-artifact.ts",
     "release:verify": "npm run runtime:build && node --import tsx src/release/verify-corpus.ts",
@@ -49,7 +50,7 @@
     "citation:benchmark": "node --import tsx src/agent/benchmark-citation-retrieval.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",
-    "pretest": "npm run runtime:build",
+    "pretest": "npm run runtime:build -- --review-mode report",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test"

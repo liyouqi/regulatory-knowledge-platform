@@ -125,10 +125,13 @@ export interface CorpusBuildOptions {
   requireArchived?: boolean;
 }
 
-interface ResolvedCorpusSource {
+interface RegisteredCorpusSource {
   definition: SourceDefinition | CssfSourceDefinition | EbaSourceDefinition;
   manifest: CorpusBuildSource;
   parserVersion: string;
+}
+
+interface ResolvedCorpusSource extends RegisteredCorpusSource {
   snapshotPath: string;
 }
 
@@ -291,22 +294,15 @@ function parserVersion(
     : `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`;
 }
 
-export async function resolveCorpusBuildSources(
+export function validateCorpusBuildManifestSources(
   manifest: CorpusBuildManifest,
-  requireArchived = false,
-): Promise<ResolvedCorpusSource[]> {
+): RegisteredCorpusSource[] {
   const euSources = loadSourceRegistrySync();
   const cssfSources = loadCssfSourceRegistrySync();
   const ebaSources = loadEbaSourceRegistrySync();
   assertExactCoverage(manifest, euSources, cssfSources, ebaSources);
 
-  const resolvedSources: ResolvedCorpusSource[] = [];
-  for (const source of manifest.sources) {
-    if (requireArchived && source.retention.status !== "archived") {
-      throw new Error(
-        `Snapshot archive gate failed for ${source.adapter}:${source.identifier}`,
-      );
-    }
+  return manifest.sources.map((source) => {
     const definition =
       source.adapter === "eur-lex"
         ? euSources.find((candidate) => candidate.celex === source.identifier)
@@ -334,7 +330,38 @@ export async function resolveCorpusBuildSources(
         `Source has no reviewed quality baseline: ${source.identifier}`,
       );
     }
+    return {
+      definition,
+      manifest: source,
+      parserVersion: parserVersion(source, definition),
+    };
+  });
+}
 
+export function assertCorpusSnapshotChecksum(
+  identifier: string,
+  actual: string,
+  expected: string,
+): void {
+  if (actual !== expected) {
+    throw new Error(
+      `Snapshot checksum differs from corpus manifest: ${identifier}`,
+    );
+  }
+}
+
+export async function resolveCorpusBuildSources(
+  manifest: CorpusBuildManifest,
+  requireArchived = false,
+): Promise<ResolvedCorpusSource[]> {
+  const resolvedSources: ResolvedCorpusSource[] = [];
+  for (const registered of validateCorpusBuildManifestSources(manifest)) {
+    const source = registered.manifest;
+    if (requireArchived && source.retention.status !== "archived") {
+      throw new Error(
+        `Snapshot archive gate failed for ${source.adapter}:${source.identifier}`,
+      );
+    }
     const snapshotPath = findSnapshotPath(source);
     const verified =
       source.adapter === "eur-lex"
@@ -342,15 +369,13 @@ export async function resolveCorpusBuildSources(
         : source.adapter === "cssf"
           ? await readVerifiedCssfSourceSnapshot(snapshotPath)
           : await readVerifiedEbaSourceSnapshot(snapshotPath);
-    if (verified.snapshot.content.sha256 !== source.contentSha256) {
-      throw new Error(
-        `Snapshot checksum differs from corpus manifest: ${source.identifier}`,
-      );
-    }
+    assertCorpusSnapshotChecksum(
+      source.identifier,
+      verified.snapshot.content.sha256,
+      source.contentSha256,
+    );
     resolvedSources.push({
-      definition,
-      manifest: source,
-      parserVersion: parserVersion(source, definition),
+      ...registered,
       snapshotPath,
     });
   }

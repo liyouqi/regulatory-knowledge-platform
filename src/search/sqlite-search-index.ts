@@ -75,6 +75,10 @@ import {
   buildOfficialMappings,
   loadOfficialMappings,
 } from "../relationships/official-mapping";
+import type {
+  ReviewValidationMode,
+  ReviewedInputIssue,
+} from "../relationships/review-validation";
 import {
   type RelatedRecitalEvaluation,
   TFIDF_RELATED_RECITAL_BUILDER,
@@ -160,9 +164,35 @@ export interface RuntimeDatabaseManifest {
   topicAssignmentCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
+  reviewedInputIssues: ReviewedInputIssue[];
   documentBuilds: Array<{ documentId: string; buildId: string }>;
   outputPath: string;
   byteCount: number;
+}
+
+export interface RuntimeDatabaseBuildOptions {
+  reviewValidationMode?: ReviewValidationMode;
+}
+
+function reviewedBuild<T>(
+  mode: ReviewValidationMode,
+  issues: ReviewedInputIssue[],
+  dataset: string,
+  recordId: string,
+  fallback: T,
+  build: () => T,
+): T {
+  try {
+    return build();
+  } catch (error) {
+    if (mode === "strict") throw error;
+    issues.push({
+      dataset,
+      recordId,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return fallback;
+  }
 }
 
 interface IndexRow {
@@ -394,6 +424,7 @@ export function buildRuntimeDatabase(
   inputSources: RuntimeSourceDefinition[] = [],
   outputPath = DEFAULT_RUNTIME_DATABASE_PATH,
   profile: EditionProfile = DEFAULT_EDITION_PROFILE,
+  options: RuntimeDatabaseBuildOptions = {},
 ): RuntimeDatabaseManifest {
   if (inputDocuments.length === 0)
     throw new Error("Cannot build an empty runtime database");
@@ -403,6 +434,8 @@ export function buildRuntimeDatabase(
     inputSources,
   );
   const { documents, sources, profileHash, excludedCelexes } = compilation;
+  const reviewValidationMode = options.reviewValidationMode ?? "strict";
+  const reviewedInputIssues: ReviewedInputIssue[] = [];
   const resolvedOutput = resolve(outputPath);
   mkdirSync(dirname(resolvedOutput), { recursive: true });
   const temporaryPath = `${resolvedOutput}.${process.pid}.tmp`;
@@ -417,12 +450,24 @@ export function buildRuntimeDatabase(
   const versionNodes = versionChains.flatMap((chain) => chain.nodes);
   const versionEdges = versionChains.flatMap((chain) => chain.edges);
   const relationshipBuild = buildExplicitReferences(documents);
+  const knownDocumentIds =
+    inputSources.length > 0
+      ? new Set(inputDocuments.map((document) => document.id))
+      : null;
   const implementationTimelineDataset = loadImplementationTimelineDataset(
     DEFAULT_IMPLEMENTATION_TIMELINES_PATH,
   );
-  const implementationTimelineEvents = buildImplementationTimelineEvents(
-    documents,
-    implementationTimelineDataset,
+  const implementationTimelineEvents = reviewedBuild(
+    reviewValidationMode,
+    reviewedInputIssues,
+    "implementation-timelines",
+    "dataset",
+    [],
+    () =>
+      buildImplementationTimelineEvents(
+        documents,
+        implementationTimelineDataset,
+      ),
   );
   const regulatoryDomainDataset = loadRegulatoryDomainDataset(
     DEFAULT_REGULATORY_DOMAINS_PATH,
@@ -432,35 +477,50 @@ export function buildRuntimeDatabase(
   const supervisoryDecisionDataset = loadSupervisoryDecisionDataset(
     DEFAULT_SUPERVISORY_DECISIONS_PATH,
   );
-  const supervisoryDecisionBuild = buildSupervisoryDecisions(
-    documents,
-    relationshipBuild.entities,
-    authorityDataset.authorities,
-    supervisoryDecisionDataset,
-    inputSources.length > 0
-      ? new Set(inputDocuments.map((document) => document.id))
-      : null,
+  const supervisoryDecisionBuild = reviewedBuild(
+    reviewValidationMode,
+    reviewedInputIssues,
+    "supervisory-decisions",
+    "dataset",
+    {
+      decisions: [],
+      findings: [],
+      authorityIds: new Set<string>(),
+    },
+    () =>
+      buildSupervisoryDecisions(
+        documents,
+        relationshipBuild.entities,
+        authorityDataset.authorities,
+        supervisoryDecisionDataset,
+        knownDocumentIds,
+      ),
   );
   const applicabilityRuleDataset = loadApplicabilityRuleDataset(
     DEFAULT_APPLICABILITY_RULES_PATH,
   );
-  const applicabilityRuleBuild = buildApplicabilityRules(
-    documents,
-    applicabilityRuleDataset,
-    inputSources.length > 0
-      ? new Set(inputDocuments.map((document) => document.id))
-      : null,
+  const applicabilityRuleBuild = reviewedBuild(
+    reviewValidationMode,
+    reviewedInputIssues,
+    "applicability-rules",
+    "dataset",
+    { rules: [], evidence: [], navigation: [] },
+    () =>
+      buildApplicabilityRules(
+        documents,
+        applicabilityRuleDataset,
+        knownDocumentIds,
+      ),
   );
   const regulatoryContextBuild = buildRegulatoryContext(
     documents,
     relationshipBuild.entities,
-    inputSources.length > 0
-      ? new Set(inputDocuments.map((document) => document.id))
-      : null,
+    knownDocumentIds,
     regulatoryDomainDataset,
     authorityDataset,
     legalNatureDataset,
     supervisoryDecisionBuild.authorityIds,
+    { mode: reviewValidationMode, issues: reviewedInputIssues },
   );
   const regulatoryTopicDataset = loadRegulatoryTopicDataset(
     DEFAULT_REGULATORY_TOPICS_PATH,
@@ -468,10 +528,9 @@ export function buildRuntimeDatabase(
   const regulatoryTopicBuild = buildRegulatoryTopics(
     documents,
     relationshipBuild.entities,
-    inputSources.length > 0
-      ? new Set(inputDocuments.map((document) => document.id))
-      : null,
+    knownDocumentIds,
     regulatoryTopicDataset,
+    { mode: reviewValidationMode, issues: reviewedInputIssues },
   );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -493,7 +552,7 @@ export function buildRuntimeDatabase(
       registeredCelex.has(mapping.level1.celex) &&
       registeredCelex.has(mapping.level2.celex),
   );
-  for (const mapping of officialMappings) {
+  const validatedOfficialMappings = officialMappings.filter((mapping) => {
     const level1Source = sourceByCelex.get(mapping.level1.celex);
     const level2Source = sourceByCelex.get(mapping.level2.celex);
     if (
@@ -502,13 +561,29 @@ export function buildRuntimeDatabase(
       level2Source.regulatoryLevel !== "level-2" ||
       level2Source.measureType !== mapping.level2.measureType
     ) {
-      throw new Error(`Source registry mismatch for ${mapping.id}`);
+      return reviewedBuild(
+        reviewValidationMode,
+        reviewedInputIssues,
+        "official-mappings",
+        mapping.id,
+        false,
+        () => {
+          throw new Error(`Source registry mismatch for ${mapping.id}`);
+        },
+      );
     }
-  }
-  const officialRelationships = buildOfficialMappings(
-    documents,
-    relationshipBuild.entities,
-    officialMappings,
+    return true;
+  });
+  const officialRelationships = validatedOfficialMappings.flatMap((mapping) =>
+    reviewedBuild(
+      reviewValidationMode,
+      reviewedInputIssues,
+      "official-mappings",
+      mapping.id,
+      [],
+      () =>
+        buildOfficialMappings(documents, relationshipBuild.entities, [mapping]),
+    ),
   );
   const loadedDocumentIds = new Set(documents.map((document) => document.id));
   const guidelineMappings = loadGuidelineMappings().filter(
@@ -516,10 +591,18 @@ export function buildRuntimeDatabase(
       loadedDocumentIds.has(mapping.primaryAct.documentId) &&
       loadedDocumentIds.has(mapping.guideline.documentId),
   );
-  const guidelineRelationships = buildGuidelineMappings(
-    documents,
-    relationshipBuild.entities,
-    guidelineMappings,
+  const guidelineRelationships = guidelineMappings.flatMap((mapping) =>
+    reviewedBuild(
+      reviewValidationMode,
+      reviewedInputIssues,
+      "guideline-mappings",
+      mapping.id,
+      [],
+      () =>
+        buildGuidelineMappings(documents, relationshipBuild.entities, [
+          mapping,
+        ]),
+    ),
   );
   const nationalImplementationMappings =
     loadNationalImplementationMappings().filter(
@@ -528,10 +611,20 @@ export function buildRuntimeDatabase(
         loadedDocumentIds.has(mapping.implementedDocumentId),
     );
   const nationalImplementationRelationships =
-    buildNationalImplementationMappings(
-      documents,
-      relationshipBuild.entities,
-      nationalImplementationMappings,
+    nationalImplementationMappings.flatMap((mapping) =>
+      reviewedBuild(
+        reviewValidationMode,
+        reviewedInputIssues,
+        "national-implementation-mappings",
+        mapping.id,
+        [],
+        () =>
+          buildNationalImplementationMappings(
+            documents,
+            relationshipBuild.entities,
+            [mapping],
+          ),
+      ),
     );
   const cellarRelations = loadCellarOfficialRelations().filter(
     (record) =>
@@ -1710,6 +1803,7 @@ export function buildRuntimeDatabase(
     topicAssignmentCount: regulatoryTopicBuild.assignments.length,
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
+    reviewedInputIssues,
     documentBuilds: documents.map((document) => ({
       documentId: document.id,
       buildId: document.buildId,
