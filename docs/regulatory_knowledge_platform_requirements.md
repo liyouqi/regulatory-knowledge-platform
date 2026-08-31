@@ -2264,6 +2264,8 @@ Canonical build 只依赖可审核、可重复执行的 source、mapping、metad
 
 当前实现：Runtime 5.3.0 将 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator` 保留到 schema-validated Reader payload。`citation-context-service` 只接受已进入当前 Edition/Profile 的 stable Provision 或 Body Block ID，以 `stable-entity-id@1.0.0` exact match 组装 `textSegments`、document snapshot/version/as-of、Canonical/Runtime build identity、root-Provision relationships 和 regulatory context。内部 `GET /api/internal/citation-context/:entityId` 是 Phase 3 controlled transport，未知或 Profile-excluded ID fail closed。`citation-retrieval-service@1.0.0` 进一步把同一 Profile 的 SQLite FTS5 结果确定性解析为这些 citation bundles，保留原始 `searchRank` 与最终 `rank`；只允许 exact entity 或该结果自身 root Provision fallback，不跨法规猜测。`GET /api/internal/citation-retrieval` 支持 query、可选 document scope 和 1–10 条 limit。三条人工复核的 CRD/CSSF/EBA query 必须在 `npm run citation:benchmark` 中达到 Top-1 hit rate 100%。这些 rank/score 只表示 deterministic retrieval，不表示法律置信度。Public compatibility、auth、rate limit 和 MCP adapter 仍在 Phase 4。
 
+当前离线交换实现：`platform-rag-export@1.0.0` 只从已经编译并验证的 deployment-fixed Runtime/Profile 生成 immutable English JSONL snapshot，固定包含 manifest、Legal Works、Expression/source identity、完整 Provision/Body Block 层级和已发布 relationship records。导出器以 read-only/query-only 模式打开 SQLite，不调用 acquisition adapter、不读取网络、不重新解析 raw source；已有输出目录拒绝覆盖，完整 schema、stable-ID reference、record count、byte count 与 SHA-256 验证通过后才从 staging promote。Snapshot 保留 relation direction、provenance、evidence、builder 和 record-level review status；TF-IDF 边仍为 `candidate`，metadata-only Case/外部 Work/Decision endpoint 不伪装成已加载全文。RAG 负责按 stable Document ID 选择 corpus、chunk/index/eval 和 atomic release，Platform 不维护依赖另一个项目当前状态的 delta 清单。交换契约和导入约束见 `docs/rag-snapshot-export.md`。
+
 ---
 
 # 24. Phase 1 架构预留矩阵

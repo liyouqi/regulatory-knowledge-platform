@@ -1192,6 +1192,24 @@ Phase 4 MCP 返回结构化官方数据与 provenance，不在 MCP 内再次生�
 
 stdio 没有 network authentication：其权限来自启动用户和本机 artifact 文件权限。它不复用 Public API key，也不能通过临时 TCP/socket proxy 伪装成 remote service。未来 Streamable HTTP 必须另行实现 remote authentication、per-client authorization/quota、host/origin validation 与 audit policy；不能把当前 stdio 完成状态表述为远程 MCP 已部署。
 
+## 21.6 Offline RAG Snapshot Adapter
+
+RAG snapshot 是 Runtime 下游的 release adapter，不是第二条 ingestion pipeline：
+
+```text
+verified deployment-fixed Runtime/Profile
+  → read-only snapshot projection
+  → schema/stable-reference/hash verification
+  → immutable JSONL directory
+  → receiving RAG staging import
+```
+
+`platform-rag-export@1.0.0` 直接投影 Runtime 中已经发布的 DocumentView、stable legal entities 和 normalized relationship tables，但输出 contract 不暴露 SQLite table/column。每个 loaded Legal Work 嵌入当前 English Expression identity；每个 root Provision 与 nested Body Block 保留 parent/root、hierarchy、source locator、direct text 与 deterministic subtree text。Relationship projection 同时覆盖 loaded legal-entity edges、lifecycle external Works、metadata-only CJEU Case edges 和 reviewed Decision findings，以 polymorphic self-describing endpoint 避免把 metadata node 伪装为 full-text Document。
+
+Exporter 不接受动态 Profile 选择；调用方先用既有 Runtime build gate 编译目标 Profile，再显式选择该 SQLite artifact。它也不查询接收方 release，因此始终导出完整 Profile，由 RAG importer 按 stable `document_id` 决定 corpus。输出目录先在同 parent staging path 完整构建和验证，再 atomic rename；已存在目录 fail closed。`manifest.json` 绑定 schema/generator、Runtime build/Profile、as-of、counts、bytes 和 file SHA-256。RAG importer 必须先验证，再 staging import、chunk/index/eval，最后 atomic publish；不能在 active release 上原地合并。
+
+Snapshot v1 不承担 chunk、embedding、BM25、vector、query planning 或 answer generation，也不导出尚未纳入 interchange contract 的 Domain/Topic、Applicability 和 Timeline projection。后续增加文件或语义字段必须提升 exchange schema 并进行兼容审查，不能复用空字段偷渡新语义。
+
 ---
 
 # 22. Phase 3 技术预留

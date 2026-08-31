@@ -10,4 +10,5 @@ test-results/
 !.env.example
 data/raw/
 data/artifacts/
+exports/
 .DS_Store

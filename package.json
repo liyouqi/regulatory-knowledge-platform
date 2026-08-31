@@ -48,6 +48,8 @@
     "corpus:refresh": "node --import tsx src/corpus/corpus-refresh-cli.ts",
     "runtime:build": "node --import tsx src/search/build-search-index.ts",
     "runtime:verify": "node --import tsx src/runtime/verify-runtime-artifact.ts",
+    "rag:export": "node --import tsx src/export/rag-snapshot-cli.ts export",
+    "rag:export:verify": "node --import tsx src/export/rag-snapshot-cli.ts verify",
     "release:verify": "npm run runtime:build && node --import tsx src/release/verify-corpus.ts",
     "relationships:benchmark": "node --import tsx src/relationships/benchmark-related-recitals.ts",
     "citation:benchmark": "node --import tsx src/agent/benchmark-citation-retrieval.ts",

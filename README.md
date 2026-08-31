@@ -10,6 +10,7 @@ An English European financial regulatory knowledge platform for EU and Luxembour
 - `docs/corpus-onboarding-runbook.md`: repeatable workflow for adding or refreshing legal sources.
 - `docs/coverage-backlog.md`: bounded phase completion and deferred 1→100 corpus work.
 - `docs/runtime-operation-runbook.md`: staging, verification, promotion, and rollback of runtime artifacts.
+- `docs/rag-snapshot-export.md`: offline, versioned Platform-to-RAG snapshot contract and handoff workflow.
 - `docs/public-api-v1.md`: Phase 4 Public API endpoints, Profile policy, errors, and compatibility boundary.
 - `docs/mcp-server.md`: Phase 4 local MCP tools, client configuration, and transport boundary.
 - `AGENTS.md`: short, stable instructions for Codex and other coding agents.
@@ -130,6 +131,8 @@ npm run build
 | `npm run runtime:build -- --profile banking-default` | Build the reviewed banking baseline; the current policy excludes the complete MiCA family. |
 | `REGULATORY_EDITION_PROFILE=banking-default npm run dev` | Build and run the local application with the banking baseline through the normal `predev` hook. |
 | `npm run runtime:verify` | Validate a built runtime SQLite artifact through the read-only Reader and Search services. |
+| `npm run rag:export -- --snapshot-id <id> --as-of <YYYY-MM-DD> --output <directory>` | Export the current compiled Runtime/Profile as an immutable, offline JSONL snapshot for RAG. It does not fetch or parse sources. |
+| `npm run rag:export:verify -- --input <snapshot-directory>` | Revalidate snapshot schemas, stable IDs, references, counts, byte sizes, and SHA-256 hashes before handoff or import. |
 | `npm run release:verify` | Rebuild and verify raw snapshots, registry IDs, Canonical views, and runtime SQLite as one corpus. |
 | `npm run relationships:benchmark` | Evaluate the reviewed Article ↔ Recital Top-5 cases and fail unless the publication gate passes. |
 | `npm run cellar:relations:fetch` | Fetch a bounded official CELLAR SPARQL snapshot for the loaded EU CELEX corpus without publishing it. |
@@ -302,9 +305,12 @@ source registry
 → reviewed relationship datasets and builders
 → atomic runtime SQLite build
 → runtime verification, tests, and release gates
+→ immutable offline RAG snapshot export
 ```
 
 These stages are real and independently runnable. `data/corpus-build-manifest.json` pins all 28 current registry entries to exact verified snapshot IDs and content hashes. `npm run corpus:build -- --profile <profileId>` verifies those snapshots and reviewed inputs, invokes the existing EUR-Lex/CSSF/EBA Canonical builders, compiles the selected Edition/Profile, verifies an isolated Runtime SQLite, and writes an ignored machine-readable build report. Rebuilding both `full-corpus` and `banking-default` reproduces their existing Runtime build IDs. Durable remote snapshot storage is not configured yet: all current entries are honestly marked `local-only`, and `--require-archived` fails closed until reviewed archive URIs are recorded. The workflow is documented in `docs/corpus-onboarding-runbook.md`.
+
+The RAG export is deliberately downstream of Runtime verification. It reads only the selected read-only SQLite artifact and writes `manifest.json`, `documents.jsonl`, `provisions.jsonl`, and `relationships.jsonl`; it never calls a source adapter or the network. Export the complete compiled Profile and let the receiving RAG release select stable document IDs. Do not maintain a Platform-side list of what another project currently lacks. Snapshot directories are ignored under `exports/`, are never overwritten, and are independently verifiable. See `docs/rag-snapshot-export.md`.
 
 The platform keeps one master Canonical corpus and compiles build-time editions. `banking-default` currently includes AML, CRD (including EBA/GL/2021/05), DORA, GDPR, AI Act, NIS2, Data Act, and CSSF families while excluding MiCA and its RTS; `full-corpus` remains the explicit default. The compiler constrains Documents, Definitions, Relationships, Search, Reader routes, Libraries, Graph endpoints, applicability rules, and regulatory Topics together, records Profile identity/hash in Runtime schema `5.4.0`, and prevents an excluded registered law from reappearing as an external graph Work or partial Topic. Dynamic per-request Profile switching, authorization, and public compatibility remain Phase 4 concerns.
 
