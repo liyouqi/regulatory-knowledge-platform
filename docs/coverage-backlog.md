@@ -67,12 +67,26 @@ Supervisory decisions 0→1 is complete with CNPD `18FR/2022`: one normalized De
 | Banking governance | completed CSSF → EBA implementation relation | governance, remuneration, fit-and-proper, internal control | 0→1 complete |
 | Prudential | one bounded CRR topic | capital, liquidity, leverage, reporting | deferred |
 | Payments | four reviewed core laws/materials using the corpus orchestrator | PSD/PSR, payment security, EBA guidance, national material | deferred |
-| AML/KYC | one EU package + one authority/national chain | AML package, EBA guidance, FIU/national implementation | deferred |
+| AML/KYC | three official EU acts are reproducibly onboarded; one authority/national chain remains the next bounded slice | EBA guidance, CSSF/FIU/national implementation, consolidated-version coverage | in-progress |
 | Funds/asset management | one UCITS/AIFMD family slice | delegated acts, ESMA guidance, national materials | deferred |
 | Insurance | one Solvency II family slice | delegated acts, EIOPA guidance, national materials | deferred |
 | Investment/markets | one MiFID/MiFIR topic | market structure, conduct, reporting, ESMA material | deferred |
 | Digital assets | existing MiCA family through a dedicated Profile | more RTS/ITS/Guidelines/Q&A | deferred |
 | Cross-sector digital | existing DORA/GDPR/AI Act/NIS2/Data Act corpus | further ICT/cyber/data measures | in-progress |
+
+## RAG corpus alignment
+
+The 31 August 2026 alignment uses the RAG repository only as a reviewed scope inventory. Platform independently acquires official bytes and applies its own snapshot, Canonical, quality, Profile, and release gates; RAG chunks, BM25/vector indexes, generated catalogs, and release artifacts are not imported.
+
+The first zero-code-complexity batch is validated: seven additional DORA EUR-Lex acts (`32022L2556`, `32024R1502`, `32024R1505`, `32025R0295`, `32025R0420`, `32025R0532`, and `32025R1190`) and three AML/payments acts (`32015L0849`, `32016R1675`, and `32023R1113`) reuse the existing Formex adapter without parser, Canonical-contract, relationship, Runtime-schema, API, or UI changes. The manifest now pins 28 documents; `full-corpus` contains all 28 and `banking-default` contains 26 after excluding the MiCA family. AMLD IV and Regulation 2016/1675 are deliberately loaded as original-OJ text with explicit current-version links; the RAG repository's consolidated XHTML is not silently substituted.
+
+The remaining 18 RAG-only documents are retained as an explicit future queue rather than forced through an unsuitable parser:
+
+- GDPR decisions `32021D0914` and `32021D0915` require a reviewed `decision` document-type slice.
+- Joint ESA/EBA guidelines `JC-GL-2024-36`, `JC-GL-2024-34`, `EBA-GL-2021-02`, `EBA-GL-2024-01`, `EBA-GL-2022-05`, `EBA-GL-2022-15`, `EBA-GL-2023-04`, and `EBA-GL-2024-11` require reusable, document-bounded authority-PDF profiles and quality fixtures.
+- CSSF Circulars `25/882`, `25/892`, `26/915`, `21/782`, `23/842`, `23/843`, `25/878`, and `25/879` require confirmation that an existing reviewed PDF profile fits; otherwise they need a separately bounded profile and fixture.
+
+This queue is coverage work, not permission to add RAG-specific ingestion code to Platform.
 
 ## Cross-cutting 1→100 queues
 

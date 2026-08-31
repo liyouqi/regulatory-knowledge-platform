@@ -77,11 +77,17 @@ describe("banking-default runtime isolation", () => {
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 16,
+      documentCount: 26,
     });
   });
 
-  it("includes the CRD pilot source across Reader and Search", () => {
+  it("includes the AML and CRD sources across Reader and Search", () => {
+    expect(repository?.findDocumentBySlug("amld-iv")?.id).toBe("eu:32015L0849");
+    expect(
+      search
+        ?.search("money laundering")
+        .results.some((result) => result.documentId === "eu:32015L0849"),
+    ).toBe(true);
     expect(repository?.findDocumentBySlug("crd-iv")?.id).toBe("eu:32013L0036");
     expect(
       search

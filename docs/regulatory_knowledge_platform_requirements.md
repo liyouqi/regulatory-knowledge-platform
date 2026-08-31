@@ -2056,7 +2056,7 @@ Phase 2 提供一个 `banking-default` representative Profile，验证同一 mas
 
 Phase 2 不实现任意 API 请求动态选择 Profile、多租户、Profile 权限或跨 Profile 聚合；这些属于 Phase 4 external delivery。
 
-当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU、Regulatory Context、Applicability 与 Graph 数据。`banking-default` 当前允许 CRD（含 EBA/GL/2021/05）、DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work、Domain assignment、Authority relation、legal nature 或 applicability rule 均不会回流。Runtime schema `5.3.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、CRD/EBA 进入 banking corpus、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph/Regulatory Context 无旁路。
+当前实现：`data/edition-profiles.json` 以 schema `1.0.0` 发布显式默认 `full-corpus` 和 `banking-default`。`runtime:build -- --profile <profileId>` 在同一个 builder 内先选择 Documents，再从相同 corpus 构建 Definitions、FTS、official mappings、CELLAR/lifecycle、CJEU、Regulatory Context、Applicability 与 Graph 数据。`banking-default` 当前允许 AML、CRD（含 EBA/GL/2021/05）、DORA、GDPR、AI Act、NIS2、Data Act 与 CSSF families，排除 MiCA 与其 RTS；被排除的已注册 Work、Domain assignment、Authority relation、legal nature 或 applicability rule 均不会回流。Runtime schema `5.3.0` 把 `profileId`、Profile version/name/hash 写入 manifest 和 build identity，Repository、Search、`runtime:verify` 与 `/api/health` 读取并交叉核验。专门测试覆盖 stable ID 不变、AML/CRD/EBA 进入 banking corpus、MiCA Reader/Explorer/Library/Definitions/relationships 不可访问，以及 Search/Global Graph/Regulatory Context 无旁路。
 
 ---
 

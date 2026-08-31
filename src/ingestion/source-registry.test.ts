@@ -5,8 +5,8 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(14);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(14);
+    expect(sources).toHaveLength(24);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(24);
     expect(sources.slice(0, 7).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
@@ -19,10 +19,15 @@ describe("EU source registry", () => {
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
     expect(
       sources.filter((source) => source.familyId === "family:dora"),
-    ).toHaveLength(7);
+    ).toHaveLength(14);
     expect(
       sources.filter((source) => source.familyId === "family:mica"),
     ).toHaveLength(2);
+    expect(
+      sources
+        .filter((source) => source.familyId === "family:aml")
+        .map((source) => source.celex),
+    ).toEqual(["32015L0849", "32016R1675", "32023R1113"]);
     expect(sources.every((source) => source.aliases.length > 0)).toBe(true);
     expect(
       sources.find((source) => source.celex === "32024R2956")?.sourceStatus,
@@ -45,6 +50,17 @@ describe("EU source registry", () => {
         basis: "original-oj",
         textAsOf: "2013-06-27",
         corrections: [{ date: "2013-08-02" }, { date: "2017-01-25" }],
+      },
+    });
+    expect(
+      sources.find((source) => source.celex === "32015L0849"),
+    ).toMatchObject({
+      familyId: "family:aml",
+      quality: { articleCount: 69, annexCount: 4, maximumWarnings: 0 },
+      sourceStatus: {
+        basis: "original-oj",
+        textAsOf: "2015-06-05",
+        currentVersionUrl: "https://eur-lex.europa.eu/eli/dir/2015/849",
       },
     });
     expect(

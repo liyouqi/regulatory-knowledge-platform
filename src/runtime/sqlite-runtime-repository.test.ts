@@ -322,6 +322,8 @@ describe("SQLite runtime repository", () => {
   it("returns a bounded, normalized version chain only for reviewed status", () => {
     const chain = repository?.findDocumentVersionChain("eu:32024R2956");
     const crdChain = repository?.findDocumentVersionChain("eu:32013L0036");
+    const amldChain = repository?.findDocumentVersionChain("eu:32015L0849");
+    const highRiskChain = repository?.findDocumentVersionChain("eu:32016R1675");
 
     expect(chain).toMatchObject({
       documentId: "eu:32024R2956",
@@ -375,13 +377,36 @@ describe("SQLite runtime repository", () => {
       "HAS_CORRIGENDUM",
       "HAS_CORRIGENDUM",
     ]);
+    expect(amldChain).toMatchObject({
+      documentId: "eu:32015L0849",
+      coverage: "source-status-only",
+      loadedVersionId: "version:eu:32015L0849:original-oj:2015-06-05",
+      nodes: [
+        expect.objectContaining({ kind: "original-oj-snapshot" }),
+        expect.objectContaining({
+          kind: "current-version-link",
+          sourceUrl: "https://eur-lex.europa.eu/eli/dir/2015/849",
+        }),
+      ],
+    });
+    expect(highRiskChain).toMatchObject({
+      documentId: "eu:32016R1675",
+      coverage: "source-status-only",
+      loadedVersionId: "version:eu:32016R1675:original-oj:2016-09-20",
+    });
     expect(repository?.findDocumentVersionChain(dora.id)).toBeNull();
     expect(repository?.findDocumentVersionChain("eu:unknown")).toBeNull();
     expect(repository?.versionNodeCount).toBe(
-      (chain?.nodes.length ?? 0) + (crdChain?.nodes.length ?? 0),
+      (chain?.nodes.length ?? 0) +
+        (crdChain?.nodes.length ?? 0) +
+        (amldChain?.nodes.length ?? 0) +
+        (highRiskChain?.nodes.length ?? 0),
     );
     expect(repository?.versionEdgeCount).toBe(
-      (chain?.edges.length ?? 0) + (crdChain?.edges.length ?? 0),
+      (chain?.edges.length ?? 0) +
+        (crdChain?.edges.length ?? 0) +
+        (amldChain?.edges.length ?? 0) +
+        (highRiskChain?.edges.length ?? 0),
     );
   });
 
@@ -688,7 +713,7 @@ describe("SQLite runtime repository", () => {
     expect(dora).toMatchObject({
       familyId: "family:dora",
       familyShortName: "DORA",
-      counts: { rts: 4, its: 2, guidelines: 0 },
+      counts: { rts: 8, its: 2, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -754,6 +779,11 @@ describe("SQLite runtime repository", () => {
               articleEntityId: "eu:32022R2554:article:20",
             }),
           ],
+        }),
+        expect.objectContaining({
+          id: "eu:32025R0532",
+          measureType: "rts",
+          mandates: [],
         }),
       ]),
     );

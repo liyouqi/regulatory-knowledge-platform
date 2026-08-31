@@ -445,5 +445,327 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/302/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA Amending Directive",
+    "aliases": [
+      "Directive (EU) 2022/2556",
+      "DORA Directive 2022/2556",
+      "Digital Operational Resilience Amending Directive"
+    ],
+    "celex": "32022L2556",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2022-12-27",
+    "quality": {
+      "articleCount": 11,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 12,
+      "pointCount": 76,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32022L2556:recital:1": "sha256:484bef301a9164e82d14366a3969611bfe91278fded3bb7c4c9c0706354d8e64",
+        "eu:32022L2556:article:1:subparagraph:1": "sha256:282a40459b7a202594d21fd53c7c2b80ef68f87baee0f48f3517eafd14bc684b",
+        "eu:32022L2556:article:11:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2022/2556/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS ICT Subcontracting",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/532",
+      "DORA RTS 2025/532",
+      "DORA ICT Subcontracting RTS"
+    ],
+    "celex": "32025R0532",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-07-02",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 13,
+      "pointCount": 41,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0532:recital:1": "sha256:8a1f4ea89caaa7e86c2db20ef5ebf015ebc380b46eb9a22ce9f6d4592a84cf79",
+        "eu:32025R0532:article:1:subparagraph:1": "sha256:16eabe2ec79f5b3d9f17ccbf449dc4aa99672275b7e9adbd7e9b098a8cc1319d",
+        "eu:32025R0532:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/532/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS TLPT",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/1190",
+      "DORA RTS 2025/1190",
+      "DORA Threat-Led Penetration Testing RTS"
+    ],
+    "celex": "32025R1190",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-06-18",
+    "quality": {
+      "articleCount": 17,
+      "recitalCount": 30,
+      "annexCount": 8,
+      "paragraphCount": 77,
+      "pointCount": 263,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R1190:recital:1": "sha256:0e89eba0ebec6f672656b1edf56412728f662004b921064270ca4310167a7669",
+        "eu:32025R1190:article:1:subparagraph:1": "sha256:5a07488df015854f11b5ddbf2e4bcd9d9b0e80e107d69b907e4b3927144c3a61",
+        "eu:32025R1190:article:17:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32025R1190:annex:i": "sha256:e7e809476c315f3965b60f03628775d4225723a7500afa90967d0c589a7c2d3d",
+        "eu:32025R1190:annex:viii": "sha256:1bccc1e89ebad00bb42d36958c581ad94f1cfb6daa8c3114f08a53ca779d770f"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/1190/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA CTPP Designation Criteria",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/1502",
+      "DORA Delegated Regulation 2024/1502",
+      "DORA Critical ICT Third-Party Provider Designation Criteria"
+    ],
+    "celex": "32024R1502",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2024-05-30",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 8,
+      "annexCount": 0,
+      "paragraphCount": 21,
+      "pointCount": 19,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1502:recital:1": "sha256:b70b38293ebea240d715a73110446f52fb19ef0a544441d2f90b8062c1133e3c",
+        "eu:32024R1502:article:1:paragraph:1": "sha256:8c5f31fcc47c548e09a91633f44ac2b58dedde385502ae577c334ec44902a446",
+        "eu:32024R1502:article:7:subparagraph:2": "sha256:c0de1e7f0f18c0acafb16f1fd4a9edb59d6928ac3e3d3c8fe545fa73b023d622"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1502/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA CTPP Oversight Fees",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/1505",
+      "DORA Delegated Regulation 2024/1505",
+      "DORA Critical ICT Third-Party Provider Oversight Fees"
+    ],
+    "celex": "32024R1505",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2024-05-30",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 9,
+      "annexCount": 0,
+      "paragraphCount": 18,
+      "pointCount": 7,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1505:recital:1": "sha256:e4c36bb4168486373fe5a46c8ef633ab6ebf204e1ca2307f9e09ac89a1f1d5ee",
+        "eu:32024R1505:article:1:paragraph:1": "sha256:5e3568d39e875efee9c03eb585f293bc8cff8fafc9dabda53f368f04bd861a18",
+        "eu:32024R1505:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1505/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS Oversight Activities",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/295",
+      "DORA RTS 2025/295",
+      "DORA Oversight Activities RTS"
+    ],
+    "celex": "32025R0295",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-02-13",
+    "quality": {
+      "articleCount": 7,
+      "recitalCount": 11,
+      "annexCount": 1,
+      "paragraphCount": 15,
+      "pointCount": 65,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0295:recital:1": "sha256:add9e032ca9d3eb24e2ee6e8e0c41d1fadeef2c0dc237c3a9c197dfb437cfa3b",
+        "eu:32025R0295:article:1:paragraph:1": "sha256:0c0ec4899c9dfae92c377f6378a078aaf1631a599ec46ea302395b6258696fce",
+        "eu:32025R0295:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32025R0295:annex:1": "sha256:b1351cb41c453a66b2a346a5695aa44fcf8a5ff3c9b0840da51afc0452d0b5b1"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/295/oj/eng"
+  },
+  {
+    "familyId": "family:dora",
+    "shortName": "DORA RTS Joint Examination Teams",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/420",
+      "DORA RTS 2025/420",
+      "DORA Joint Examination Team RTS"
+    ],
+    "celex": "32025R0420",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-03-24",
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 10,
+      "annexCount": 0,
+      "paragraphCount": 20,
+      "pointCount": 25,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0420:recital:1": "sha256:ac9768915f1467a6d2a5f27eff0b59843601b1ebef82c278958da9ed1ee7cadd",
+        "eu:32025R0420:article:1:paragraph:1": "sha256:024bc54795fa35150b1116d7c57583fd7d172b44d2f9357aefbba67d37712409",
+        "eu:32025R0420:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/420/oj/eng"
+  },
+  {
+    "familyId": "family:aml",
+    "shortName": "AMLD IV",
+    "aliases": [
+      "Fourth Anti-Money Laundering Directive",
+      "Directive (EU) 2015/849",
+      "4AMLD"
+    ],
+    "celex": "32015L0849",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2015-06-05",
+    "quality": {
+      "articleCount": 69,
+      "recitalCount": 68,
+      "annexCount": 4,
+      "paragraphCount": 211,
+      "pointCount": 230,
+      "structuralNodeCount": 23,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32015L0849:recital:1": "sha256:1950b9c5d75e793e2b263fa0f8cd85cbea94e8947b3ffc502de6cd9d60938686",
+        "eu:32015L0849:article:1:paragraph:1": "sha256:c9f98ae09f1601cb04240c3c79bc2c641cf61d129018d3588f6009ad84f71026",
+        "eu:32015L0849:article:69:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32015L0849:annex:i": "sha256:d2865c12ea94d1e6228ce05a5f6bcafe36f8f36b323bf984119a1ee0696aa38a",
+        "eu:32015L0849:annex:iv": "sha256:123c508d93e54c12bd85bb66df9ea344f8b312507481c4941230460860e70548"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2015-06-05",
+      "checkedAt": "2026-08-31T00:00:00.000Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2015/849",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/849/oj/eng"
+  },
+  {
+    "familyId": "family:aml",
+    "shortName": "AML High-Risk Third Countries Regulation",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2016/1675",
+      "High-Risk Third Countries Delegated Regulation",
+      "EU High-Risk Third Countries List"
+    ],
+    "celex": "32016R1675",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2016-09-20",
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 13,
+      "annexCount": 1,
+      "paragraphCount": 2,
+      "pointCount": 0,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R1675:recital:1": "sha256:0ab706e285117fb6b40b7fae128e691ded2a4a27f2a53524c6a55ea5d31a7f69",
+        "eu:32016R1675:article:1:subparagraph:1": "sha256:e1f4f9b8864e0f276172300af0f53fb10c2f74db69e86c2394637fed2bc6f27b",
+        "eu:32016R1675:article:2:subparagraph:1": "sha256:1683e019da62d143a5ba9b6e8362e502b484a28631725e9f00de172384d3a7ed",
+        "eu:32016R1675:annex:1": "sha256:9831ab48148292989a587d8411f8a2713fa62e7212e8fc9368a8d89e5a4115e6"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2016-09-20",
+      "checkedAt": "2026-08-31T00:00:00.000Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/1675",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/1675/oj/eng"
+  },
+  {
+    "familyId": "family:aml",
+    "shortName": "Transfer of Funds Regulation",
+    "aliases": [
+      "Regulation (EU) 2023/1113",
+      "EU Travel Rule Regulation",
+      "TFR"
+    ],
+    "celex": "32023R1113",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2023-06-09",
+    "quality": {
+      "articleCount": 40,
+      "recitalCount": 65,
+      "annexCount": 2,
+      "paragraphCount": 99,
+      "pointCount": 147,
+      "structuralNodeCount": 16,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32023R1113:recital:1": "sha256:341477378a45bac3a7b707a416fd63af5ca49875ab24da2d742404da32ca1d7a",
+        "eu:32023R1113:article:1:subparagraph:1": "sha256:9d2ca72bd848384d0e12d285614f81d6fe007281c22a0a2332bb361080ddf07f",
+        "eu:32023R1113:article:40:subparagraph:2": "sha256:ad784d292e6b282ff84d7f8ea38fb055aa580ace7fd212a40e4e7910659dcb3d",
+        "eu:32023R1113:annex:i": "sha256:933ffc5d3002d300ba5b22045a030d5a98e3023d4954c53f065e5aa9d27642af",
+        "eu:32023R1113:annex:ii": "sha256:59dadc044c506e5c36ebf5878b920211f9ffe81495d416fe3240cfb52f82e2a9"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1113/oj/eng"
   }
 ]

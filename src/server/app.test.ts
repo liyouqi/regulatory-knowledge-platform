@@ -343,7 +343,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      18,
+      28,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({
@@ -681,7 +681,7 @@ describe("Document lookup", () => {
     const dora = findFamilyLevel2("dora", "rts");
     expect(dora).toMatchObject({
       familyId: "family:dora",
-      counts: { rts: 4, its: 2, guidelines: 0 },
+      counts: { rts: 8, its: 2, guidelines: 0 },
     });
     expect(dora?.measures).toEqual(
       expect.arrayContaining([
@@ -708,6 +708,10 @@ describe("Document lookup", () => {
           mandates: expect.arrayContaining([
             expect.objectContaining({ label: "Article 20" }),
           ]),
+        }),
+        expect.objectContaining({
+          id: "eu:32025R0532",
+          mandates: [],
         }),
       ]),
     );
