@@ -49,6 +49,35 @@ describe("reviewed Regulatory Topics", () => {
     ).toThrow("Topic assignment has invalid endpoint");
   });
 
+  it("omits and reports only a drifted assignment in refresh mode", () => {
+    const dataset = structuredClone(loadRegulatoryTopicDataset());
+    const assignment = dataset.assignments[1];
+    if (!assignment) throw new Error("Topic assignment fixture is unavailable");
+    assignment.targetEntityId = "eu:32022R2554:article:999";
+    assignment.evidenceLocator = assignment.targetEntityId;
+    const issues: Array<{
+      dataset: string;
+      recordId: string;
+      message: string;
+    }> = [];
+
+    const build = buildRegulatoryTopics(
+      documents,
+      entities,
+      knownDocumentIds,
+      dataset,
+      { mode: "report", issues },
+    );
+
+    expect(build.assignments).toHaveLength(dataset.assignments.length - 1);
+    expect(issues).toEqual([
+      expect.objectContaining({
+        dataset: "regulatory-topics",
+        message: expect.stringContaining("invalid endpoint"),
+      }),
+    ]);
+  });
+
   it("does not publish a partial topic from a reduced corpus", () => {
     const dora = documents.filter((document) => document.slug === "dora");
     const build = buildRegulatoryTopics(

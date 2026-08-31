@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
@@ -6,6 +7,7 @@ import {
 } from "./eba-guidelines-pdf-parser";
 import { readVerifiedEbaSourceSnapshot } from "./eba-snapshot";
 import { findEbaSource } from "./eba-source-registry";
+import { compareQualityBaseline } from "./quality-drift";
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -35,6 +37,7 @@ async function build(): Promise<void> {
   const verified = await readVerifiedEbaSourceSnapshot(snapshotPath);
   const source = await findEbaSource(verified.snapshot.localId);
   const inspectOnly = process.argv.includes("--inspect");
+  const allowDrift = process.argv.includes("--allow-drift");
   if (!inspectOnly && !source.quality) {
     throw new Error(
       `EBA source ${source.localId} has no reviewed quality baseline; run eba:canonical:inspect first`,
@@ -43,8 +46,9 @@ async function build(): Promise<void> {
   const { document, report } = await parseEbaGuidelinesPdf(
     verified.contentBytes,
     verified.snapshot,
-    source,
+    inspectOnly || allowDrift ? { ...source, quality: undefined } : source,
   );
+  const qualityDrift = compareQualityBaseline(document, report, source.quality);
   const buildReport = {
     ...report,
     documentId: document.logicalId,
@@ -52,6 +56,12 @@ async function build(): Promise<void> {
     sourceFiles: [verified.snapshot.content.file],
     parserVersion: EBA_GUIDELINES_PDF_PARSER_VERSION,
     canonicalFile: "document.json",
+    ...(inspectOnly || allowDrift
+      ? {
+          qualityStatus: qualityDrift.length === 0 ? "matched" : "drifted",
+          qualityDrift,
+        }
+      : {}),
   };
   if (inspectOnly) {
     console.table(buildReport);
@@ -87,10 +97,14 @@ async function build(): Promise<void> {
     "",
   );
   const sourceHash = verified.snapshot.content.sha256.slice(7);
+  const qualityHash = createHash("sha256")
+    .update(JSON.stringify(source.quality))
+    .digest("hex")
+    .slice(0, 12);
   const outputDirectory = resolve(
     process.cwd(),
     argument("--output") ??
-      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}-parser-eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`,
+      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}${allowDrift ? `-refresh-quality-${qualityHash}` : ""}-parser-eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`,
   );
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([

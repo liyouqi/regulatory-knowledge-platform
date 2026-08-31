@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { extractFormexPackage } from "./formex-package";
 import { parseFormexAct } from "./formex-parser";
+import { compareQualityBaseline } from "./quality-drift";
 import { readVerifiedSourceSnapshot } from "./snapshot";
 import { findSource } from "./source-registry";
 
@@ -41,6 +42,7 @@ async function buildCanonicalDocument(): Promise<void> {
   const verified = await readVerifiedSourceSnapshot(snapshotPath);
   const source = await findSource(verified.snapshot.celex);
   const inspectOnly = process.argv.includes("--inspect");
+  const allowDrift = process.argv.includes("--allow-drift");
   if (!inspectOnly && !source.quality) {
     throw new Error(
       `CELEX ${source.celex} has no canonical quality baseline; run canonical:inspect first`,
@@ -52,11 +54,16 @@ async function buildCanonicalDocument(): Promise<void> {
   );
   const { document, report } = parseFormexAct(
     formex.act.xml,
-    source,
+    inspectOnly || allowDrift ? { ...source, quality: undefined } : source,
     verified.snapshot,
     formex.annexes,
   );
+  const qualityDrift = compareQualityBaseline(document, report, source.quality);
   const sourceHash = verified.snapshot.content.sha256.slice(7);
+  const qualityHash = createHash("sha256")
+    .update(JSON.stringify(source.quality ?? null))
+    .digest("hex")
+    .slice(0, 12);
   const sourceStatusHash = createHash("sha256")
     .update(JSON.stringify(source.sourceStatus ?? null))
     .digest("hex")
@@ -106,6 +113,8 @@ async function buildCanonicalDocument(): Promise<void> {
           structuralNodeCount: report.structuralNodeCount,
           maximumWarnings: report.warningCount,
           textHashes: Object.fromEntries(anchorHashes),
+          qualityStatus: qualityDrift.length === 0 ? "matched" : "drifted",
+          qualityDrift,
         },
         null,
         2,
@@ -120,7 +129,7 @@ async function buildCanonicalDocument(): Promise<void> {
   const outputDirectory = resolve(
     process.cwd(),
     argument("--output") ??
-      `data/artifacts/canonical/${source.celex}/${retrievalToken}-${sourceHash.slice(0, 12)}-status-${sourceStatusHash}-parser-${FORMEX_PARSER_VERSION}`,
+      `data/artifacts/canonical/${source.celex}/${retrievalToken}-${sourceHash.slice(0, 12)}-status-${sourceStatusHash}${allowDrift ? `-refresh-quality-${qualityHash}` : ""}-parser-${FORMEX_PARSER_VERSION}`,
   );
   const buildReport = {
     ...report,
@@ -133,6 +142,12 @@ async function buildCanonicalDocument(): Promise<void> {
     parserVersion: FORMEX_PARSER_VERSION,
     sourceStatusHash,
     canonicalFile: "document.json",
+    ...(allowDrift
+      ? {
+          qualityStatus: qualityDrift.length === 0 ? "matched" : "drifted",
+          qualityDrift,
+        }
+      : {}),
   };
   const documentJson = `${JSON.stringify(document, null, 2)}\n`;
   const reportJson = `${JSON.stringify(buildReport, null, 2)}\n`;

@@ -39,17 +39,36 @@ If `nvm` is not installed, install a current Node.js 24 LTS release, confirm `no
 
 ## First Setup
 
-From the repository root:
+The project has two deliberately different data layers:
+
+- Official legal source files and generated Canonical/Runtime artifacts are reproducible, potentially large, and excluded from Git under `data/raw/` and `data/artifacts/`.
+- Small reviewed relationships, topics, applicability rules, authority metadata, registries, and Edition Profiles are maintained in Git under `data/official-mappings/`, `data/official-metadata/`, `data/editorial/`, and the registry JSON files.
+
+On a new computer, clone/pull the code and run one current-source refresh. It downloads every public source declared by the EUR-Lex, CSSF, and EBA registries, builds Canonical documents, validates the Git-managed reviewed data against them, and builds Runtime SQLite:
 
 ```bash
 npm ci
-npm run runtime:build
+npm run corpus:refresh
+npm run runtime:verify
 npm run check
 npm test
 npm run build
+npm run dev
 ```
 
-Use `npm ci` for a clean or new machine. Use `npm install` only when `package.json` has intentionally changed; it updates `package-lock.json`.
+Open `http://localhost:5173` after the development server starts.
+
+`corpus:refresh` is the normal experimental workflow. A changed official document is parsed as the current version; count/hash differences from its reviewed baseline are written to `data/artifacts/refresh/build-report.json` instead of blocking the whole refresh. If a Git-managed relationship points to an endpoint that disappeared, that reviewed record is omitted from this experimental Runtime and listed in the same report. It is never silently redirected to another Article or provision.
+
+If `data/raw/` already contains snapshots, use `npm run corpus:refresh -- --skip-fetch` to rebuild from the newest local snapshot for every registered source. Copying raw files from another computer is optional and only necessary when reproducing exact historical bytes. Use `npm ci` for a clean/new machine; use `npm install` only when `package.json` intentionally changed.
+
+After a refresh reports source drift, review the official change and update any affected Git-managed relationship and quality baseline in a normal commit. For a release or exact reproduction of a reviewed corpus, use the manifest-pinned strict workflow:
+
+```bash
+npm run corpus:build -- --profile full-corpus
+```
+
+This strict command intentionally requires snapshots matching the IDs and SHA-256 hashes in `data/corpus-build-manifest.json`; it is not required for ordinary experimental setup.
 
 ## Daily Development
 
@@ -102,9 +121,12 @@ npm run build
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
+| `npm run corpus:refresh` | Download all current registered official sources, rebuild Canonical and experimental Runtime artifacts, and report baseline/relationship drift. |
+| `npm run corpus:refresh -- --skip-fetch` | Rebuild the same current-source pipeline from the newest local snapshots without downloading again. |
 | `npm run corpus:build -- --profile <profileId>` | Rebuild the exact manifest-pinned raw snapshots through existing Canonical builders into an isolated, verified Runtime artifact and machine-readable report. |
 | `npm run corpus:build -- --profile <profileId> --require-archived` | Apply the production snapshot-retention gate; currently fails until every pinned snapshot has a reviewed remote archive URI. |
 | `npm run runtime:build` | Atomically rebuild the default `full-corpus` read-only runtime SQLite from validated Canonical artifacts. |
+| `npm run runtime:build -- --review-mode report` | Build an experimental Runtime, omitting and reporting reviewed inputs whose endpoints no longer validate. |
 | `npm run runtime:build -- --profile banking-default` | Build the reviewed banking baseline; the current policy excludes the complete MiCA family. |
 | `REGULATORY_EDITION_PROFILE=banking-default npm run dev` | Build and run the local application with the banking baseline through the normal `predev` hook. |
 | `npm run runtime:verify` | Validate a built runtime SQLite artifact through the read-only Reader and Search services. |

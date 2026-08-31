@@ -16,7 +16,7 @@ function officialCandidates(artifactRoot: string, identifier: string) {
   const directory = resolve(artifactRoot, identifier);
   if (!existsSync(directory)) return [];
 
-  return readdirSync(directory, { withFileTypes: true })
+  const candidates = readdirSync(directory, { withFileTypes: true })
     .filter(
       (entry) =>
         entry.isDirectory() &&
@@ -29,10 +29,24 @@ function officialCandidates(artifactRoot: string, identifier: string) {
             `-parser-eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`,
           )),
     )
-    .map((entry) => resolve(directory, entry.name, "document.json"))
-    .filter(existsSync)
-    .map((path) =>
-      validateCanonicalDocument(JSON.parse(readFileSync(path, "utf8"))),
+    .map((entry) => ({
+      name: entry.name,
+      path: resolve(directory, entry.name, "document.json"),
+    }))
+    .filter((candidate) => existsSync(candidate.path))
+    .sort((left, right) => right.name.localeCompare(left.name));
+  const latestRetrievalToken = candidates[0]?.name.match(/^\d{8}T\d{9}Z/u)?.[0];
+  const latestCandidates = latestRetrievalToken
+    ? candidates.filter((candidate) =>
+        candidate.name.startsWith(latestRetrievalToken),
+      )
+    : candidates;
+
+  return latestCandidates
+    .map((candidate) =>
+      validateCanonicalDocument(
+        JSON.parse(readFileSync(candidate.path, "utf8")),
+      ),
     )
     .filter(
       (document) =>
@@ -41,10 +55,6 @@ function officialCandidates(artifactRoot: string, identifier: string) {
         document.source.provenance === "official",
     )
     .sort((left, right) => {
-      const retrievalOrder = right.source.retrievedAt.localeCompare(
-        left.source.retrievedAt,
-      );
-      if (retrievalOrder !== 0) return retrievalOrder;
       const statusOrder = (
         right.source.sourceStatus?.checkedAt ?? ""
       ).localeCompare(left.source.sourceStatus?.checkedAt ?? "");
@@ -52,7 +62,8 @@ function officialCandidates(artifactRoot: string, identifier: string) {
       return right.source.sourceVersion.localeCompare(
         left.source.sourceVersion,
       );
-    });
+    })
+    .slice(0, 1);
 }
 
 function documentBuildId(

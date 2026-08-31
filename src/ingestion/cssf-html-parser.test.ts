@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parseCssfHtml } from "./cssf-html-parser";
 import type { CssfSourceSnapshot } from "./cssf-snapshot";
 import type { CssfSourceDefinition } from "./cssf-source-registry";
+import { compareQualityBaseline } from "./quality-drift";
 
 const html = `<!doctype html>
 <html><body><main><div class="main-content"><div class="content-section">
@@ -137,5 +138,26 @@ describe("CSSF HTML structural adapter", () => {
         },
       }),
     ).toThrow("CSSF section count drift");
+  });
+
+  it("reports baseline drift without changing parsed official text", () => {
+    const result = parseCssfHtml(html, snapshot, source);
+    const drift = compareQualityBaseline(result.document, result.report, {
+      sectionCount: 3,
+      blockCount: 5,
+      maximumWarnings: 1,
+      textHashes: {
+        "lu:cssf:communication-test:provision:introduction": `sha256:${"0".repeat(64)}`,
+      },
+    });
+
+    expect(drift.map((item) => item.kind)).toEqual([
+      "count",
+      "warning-limit",
+      "text-hash",
+    ]);
+    expect(result.document.provisions[0]?.text).toBe(
+      "Official introduction1 with detail.",
+    );
   });
 });

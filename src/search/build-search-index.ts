@@ -16,14 +16,20 @@ const outputPath = outputIndex >= 0 ? process.argv[outputIndex + 1] : undefined;
 const profileIndex = process.argv.indexOf("--profile");
 const profileArgument =
   profileIndex >= 0 ? process.argv[profileIndex + 1] : undefined;
+const reviewModeIndex = process.argv.indexOf("--review-mode");
+const reviewModeArgument =
+  reviewModeIndex >= 0 ? process.argv[reviewModeIndex + 1] : undefined;
 const environmentProfile = process.env.REGULATORY_EDITION_PROFILE?.trim();
 const profileId = profileArgument || environmentProfile || undefined;
 if (
   (outputIndex >= 0 && !outputPath) ||
-  (profileIndex >= 0 && !profileArgument)
+  (profileIndex >= 0 && !profileArgument) ||
+  (reviewModeIndex >= 0 &&
+    reviewModeArgument !== "strict" &&
+    reviewModeArgument !== "report")
 ) {
   throw new Error(
-    "Usage: npm run runtime:build -- [--profile <profile-id>] [--output <sqlite-path>]",
+    "Usage: npm run runtime:build -- [--profile <profile-id>] [--output <sqlite-path>] [--review-mode <strict|report>]",
   );
 }
 const profile = findEditionProfile(profileId, loadEditionProfileRegistrySync());
@@ -37,6 +43,9 @@ const manifest = buildRuntimeDatabase(
   ],
   outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
   profile,
+  {
+    reviewValidationMode: reviewModeArgument === "report" ? "report" : "strict",
+  },
 );
 console.table({
   buildId: manifest.buildId,
@@ -70,6 +79,11 @@ console.table({
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",
   unresolvedReferences: manifest.unresolvedReferenceCount,
+  reviewedInputIssues: manifest.reviewedInputIssues.length,
   bytes: manifest.byteCount,
   output: manifest.outputPath,
 });
+if (manifest.reviewedInputIssues.length > 0) {
+  console.warn("Reviewed mappings omitted from this runtime:");
+  console.table(manifest.reviewedInputIssues);
+}

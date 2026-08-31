@@ -1,9 +1,11 @@
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { CSSF_HTML_PARSER_VERSION, parseCssfHtml } from "./cssf-html-parser";
 import { CSSF_PDF_PARSER_VERSION, parseCssfPdf } from "./cssf-pdf-parser";
 import { readVerifiedCssfSourceSnapshot } from "./cssf-snapshot";
 import { findCssfSource } from "./cssf-source-registry";
+import { compareQualityBaseline } from "./quality-drift";
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -39,6 +41,7 @@ async function buildCssfCanonicalDocument(): Promise<void> {
   const verified = await readVerifiedCssfSourceSnapshot(snapshotPath);
   const source = await findCssfSource(verified.snapshot.localId);
   const inspectOnly = process.argv.includes("--inspect");
+  const allowDrift = process.argv.includes("--allow-drift");
   const quality =
     source.contentMediaType === "text/html"
       ? source.quality
@@ -52,14 +55,23 @@ async function buildCssfCanonicalDocument(): Promise<void> {
     source.contentMediaType === "text/html"
       ? `html-${CSSF_HTML_PARSER_VERSION}`
       : `pdf-${CSSF_PDF_PARSER_VERSION}`;
+  const parserSource =
+    inspectOnly || allowDrift
+      ? { ...source, quality: undefined, pdfQuality: undefined }
+      : source;
   const { document, report } =
     source.contentMediaType === "text/html"
       ? parseCssfHtml(
           new TextDecoder().decode(verified.contentBytes),
           verified.snapshot,
-          source,
+          parserSource,
         )
-      : await parseCssfPdf(verified.contentBytes, verified.snapshot, source);
+      : await parseCssfPdf(
+          verified.contentBytes,
+          verified.snapshot,
+          parserSource,
+        );
+  const qualityDrift = compareQualityBaseline(document, report, quality);
   const buildReport = {
     ...report,
     documentId: document.logicalId,
@@ -67,6 +79,12 @@ async function buildCssfCanonicalDocument(): Promise<void> {
     sourceFiles: [verified.snapshot.content.file],
     parserVersion,
     canonicalFile: "document.json",
+    ...(inspectOnly || allowDrift
+      ? {
+          qualityStatus: qualityDrift.length === 0 ? "matched" : "drifted",
+          qualityDrift,
+        }
+      : {}),
   };
 
   if (inspectOnly) {
@@ -114,10 +132,14 @@ async function buildCssfCanonicalDocument(): Promise<void> {
     "",
   );
   const sourceHash = verified.snapshot.content.sha256.slice(7);
+  const qualityHash = createHash("sha256")
+    .update(JSON.stringify(quality))
+    .digest("hex")
+    .slice(0, 12);
   const outputDirectory = resolve(
     process.cwd(),
     argument("--output") ??
-      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}-parser-cssf-${parserVersion}`,
+      `data/artifacts/canonical/${source.localId}/${retrievalToken}-${sourceHash.slice(0, 12)}${allowDrift ? `-refresh-quality-${qualityHash}` : ""}-parser-cssf-${parserVersion}`,
   );
   await mkdir(outputDirectory, { recursive: true });
   await Promise.all([

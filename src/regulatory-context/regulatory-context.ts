@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 import type { LegalEntityRecord } from "../relationships/explicit-reference";
+import {
+  type ReviewValidationOptions,
+  rejectReviewedInput,
+} from "../relationships/review-validation";
 import type { BodyBlock, DocumentView } from "../shared/legal";
 import type {
   Authority,
@@ -284,19 +288,27 @@ export function buildRegulatoryContext(
   authorityDataset = loadAuthorityDataset(),
   legalNatureDataset = loadLegalNatureDataset(),
   additionalAuthorityIds: Set<string> = new Set(),
+  validation: ReviewValidationOptions = {},
 ): RegulatoryContextBuild {
   validateDomainHierarchy(domainDataset);
   const selectedDocumentIds = new Set(documents.map((document) => document.id));
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
   const domainIds = new Set(domainDataset.domains.map((domain) => domain.id));
   const assignments = domainDataset.assignments.flatMap((assignment) => {
+    const recordId = `${assignment.domainId}:${assignment.targetEntityId}`;
     if (
       knownDocumentIds &&
       !knownDocumentIds.has(assignment.targetDocumentId)
     ) {
-      throw new Error(
-        `Domain assignment targets unknown Document ${assignment.targetDocumentId}`,
+      rejectReviewedInput(
+        validation,
+        "regulatory-domains",
+        recordId,
+        new Error(
+          `Domain assignment targets unknown Document ${assignment.targetDocumentId}`,
+        ),
       );
+      return [];
     }
     if (!domainIds.has(assignment.domainId)) {
       throw new Error(
@@ -314,9 +326,15 @@ export function buildRegulatoryContext(
       entity.documentId !== assignment.targetDocumentId ||
       !hasExpectedKind
     ) {
-      throw new Error(
-        `Domain assignment has invalid endpoint ${assignment.targetEntityId}`,
+      rejectReviewedInput(
+        validation,
+        "regulatory-domains",
+        recordId,
+        new Error(
+          `Domain assignment has invalid endpoint ${assignment.targetEntityId}`,
+        ),
       );
+      return [];
     }
     return [
       {
@@ -343,9 +361,15 @@ export function buildRegulatoryContext(
         knownDocumentIds &&
         !knownDocumentIds.has(relationship.sourceDocumentId)
       ) {
-        throw new Error(
-          `Authority relationship targets unknown Document ${relationship.sourceDocumentId}`,
+        rejectReviewedInput(
+          validation,
+          "authority-relationships",
+          `${relationship.sourceDocumentId}:${relationship.targetAuthorityId}`,
+          new Error(
+            `Authority relationship targets unknown Document ${relationship.sourceDocumentId}`,
+          ),
         );
+        return [];
       }
       if (!selectedDocumentIds.has(relationship.sourceDocumentId)) return [];
       return [
@@ -385,9 +409,13 @@ export function buildRegulatoryContext(
   }
   const legalNatures = legalNatureDataset.records.flatMap((record) => {
     if (knownDocumentIds && !knownDocumentIds.has(record.documentId)) {
-      throw new Error(
-        `Legal nature targets unknown Document ${record.documentId}`,
+      rejectReviewedInput(
+        validation,
+        "legal-natures",
+        record.documentId,
+        new Error(`Legal nature targets unknown Document ${record.documentId}`),
       );
+      return [];
     }
     if (!selectedDocumentIds.has(record.documentId)) return [];
     for (const evidence of [
@@ -396,9 +424,15 @@ export function buildRegulatoryContext(
     ]) {
       const entity = entitiesById.get(evidence.entityId);
       if (!entity || entity.documentId !== record.documentId) {
-        throw new Error(
-          `Legal nature has invalid evidence endpoint ${evidence.entityId}`,
+        rejectReviewedInput(
+          validation,
+          "legal-natures",
+          record.documentId,
+          new Error(
+            `Legal nature has invalid evidence endpoint ${evidence.entityId}`,
+          ),
         );
+        return [];
       }
       const document = documents.find(
         (candidate) => candidate.id === record.documentId,
@@ -411,9 +445,15 @@ export function buildRegulatoryContext(
         ? findBlockText(provision.blocks, evidence.entityId)
         : null;
       if (!text?.includes(evidence.text)) {
-        throw new Error(
-          `Legal nature evidence text mismatch for ${evidence.entityId}`,
+        rejectReviewedInput(
+          validation,
+          "legal-natures",
+          record.documentId,
+          new Error(
+            `Legal nature evidence text mismatch for ${evidence.entityId}`,
+          ),
         );
+        return [];
       }
     }
     return [

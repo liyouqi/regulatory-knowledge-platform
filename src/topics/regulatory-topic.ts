@@ -3,6 +3,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 import type { LegalEntityRecord } from "../relationships/explicit-reference";
+import {
+  type ReviewValidationOptions,
+  rejectReviewedInput,
+} from "../relationships/review-validation";
 import type { DocumentView } from "../shared/legal";
 import type {
   RegulatoryTopic,
@@ -99,6 +103,7 @@ export function buildRegulatoryTopics(
   entities: LegalEntityRecord[],
   knownDocumentIds: Set<string> | null,
   dataset = loadRegulatoryTopicDataset(),
+  validation: ReviewValidationOptions = {},
 ): RegulatoryTopicBuild {
   assertUnique(
     dataset.topics.map((topic) => topic.id),
@@ -109,18 +114,31 @@ export function buildRegulatoryTopics(
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
 
   const assignments = dataset.assignments.flatMap((assignment) => {
+    const recordId = `${assignment.topicId}:${assignment.targetEntityId}`;
     if (!topicIds.has(assignment.topicId)) {
-      throw new Error(
-        `Topic assignment targets unknown Topic ${assignment.topicId}`,
+      rejectReviewedInput(
+        validation,
+        "regulatory-topics",
+        recordId,
+        new Error(
+          `Topic assignment targets unknown Topic ${assignment.topicId}`,
+        ),
       );
+      return [];
     }
     if (
       knownDocumentIds &&
       !knownDocumentIds.has(assignment.targetDocumentId)
     ) {
-      throw new Error(
-        `Topic assignment targets unknown Document ${assignment.targetDocumentId}`,
+      rejectReviewedInput(
+        validation,
+        "regulatory-topics",
+        recordId,
+        new Error(
+          `Topic assignment targets unknown Document ${assignment.targetDocumentId}`,
+        ),
       );
+      return [];
     }
     if (!selectedDocumentIds.has(assignment.targetDocumentId)) return [];
     const entity = entitiesById.get(assignment.targetEntityId);
@@ -134,9 +152,15 @@ export function buildRegulatoryTopics(
       !hasExpectedKind ||
       assignment.evidenceLocator !== assignment.targetEntityId
     ) {
-      throw new Error(
-        `Topic assignment has invalid endpoint ${assignment.targetEntityId}`,
+      rejectReviewedInput(
+        validation,
+        "regulatory-topics",
+        recordId,
+        new Error(
+          `Topic assignment has invalid endpoint ${assignment.targetEntityId}`,
+        ),
       );
+      return [];
     }
     return [
       {
