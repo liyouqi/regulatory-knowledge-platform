@@ -183,6 +183,38 @@ function LegalBlock({
 }) {
   const [copied, setCopied] = useState(false);
   const blockLabel = block.marker ?? block.kind;
+  const childrenById = new Map(
+    block.children.map((child) => [child.id, child]),
+  );
+  const orderedRuns: Array<
+    { type: "text"; text: string } | { type: "children"; children: BodyBlock[] }
+  > = [];
+  for (const item of block.orderedContent) {
+    if (item.type === "text") {
+      orderedRuns.push(item);
+      continue;
+    }
+    const child = childrenById.get(item.childId);
+    if (!child) {
+      throw new Error(
+        `Body block ${block.id} references missing ordered child ${item.childId}`,
+      );
+    }
+    const previous = orderedRuns.at(-1);
+    if (previous?.type === "children") previous.children.push(child);
+    else orderedRuns.push({ type: "children", children: [child] });
+  }
+  const orderedChildIds = orderedRuns.flatMap((run) =>
+    run.type === "children" ? run.children.map((child) => child.id) : [],
+  );
+  if (
+    orderedChildIds.length !== block.children.length ||
+    orderedChildIds.some(
+      (childId, index) => childId !== block.children[index]?.id,
+    )
+  ) {
+    throw new Error(`Body block ${block.id} ordered children are incomplete`);
+  }
 
   async function copyBlockPermalink() {
     const permalink = new URL(
@@ -196,59 +228,67 @@ function LegalBlock({
 
   return (
     <div className={`legal-block ${block.kind}`} id={block.anchor}>
-      <div className="block-copy">
-        <div className="block-marker-actions">
-          <a
-            aria-label={`Link to ${blockLabel}`}
-            href={`${provisionPath}#${block.anchor}`}
+      {orderedRuns.map((run, index) =>
+        run.type === "text" ? (
+          <div
+            className={index === 0 ? "block-copy" : "block-copy continuation"}
+            key={`${block.id}:text:${index}`}
           >
-            {block.marker ?? "¶"}
-          </a>
-          <button
-            aria-label={
-              copied
-                ? `Copied link to ${blockLabel}`
-                : `Copy link to ${blockLabel}`
-            }
-            className="block-copy-button"
-            onClick={copyBlockPermalink}
-            type="button"
-          >
-            {copied ? (
-              <Check aria-hidden="true" size={12} />
+            {index === 0 ? (
+              <div className="block-marker-actions">
+                <a
+                  aria-label={`Link to ${blockLabel}`}
+                  href={`${provisionPath}#${block.anchor}`}
+                >
+                  {block.marker ?? "¶"}
+                </a>
+                <button
+                  aria-label={
+                    copied
+                      ? `Copied link to ${blockLabel}`
+                      : `Copy link to ${blockLabel}`
+                  }
+                  className="block-copy-button"
+                  onClick={copyBlockPermalink}
+                  type="button"
+                >
+                  {copied ? (
+                    <Check aria-hidden="true" size={12} />
+                  ) : (
+                    <Copy aria-hidden="true" size={12} />
+                  )}
+                </button>
+              </div>
             ) : (
-              <Copy aria-hidden="true" size={12} />
+              <div aria-hidden="true" />
             )}
-          </button>
-        </div>
-        {block.text ? (
-          <p>
-            <AnnotatedLegalText
-              definitions={definitions}
-              onDefinitionPreview={onDefinitionPreview}
-              onPreview={onPreview}
-              relationships={relationships}
-              sourceEntityId={block.id}
-              text={block.text}
-            />
-          </p>
-        ) : null}
-      </div>
-      {block.children.length > 0 ? (
-        <div className="nested-blocks">
-          {block.children.map((child) => (
-            <LegalBlock
-              block={child}
-              definitions={definitions}
-              key={child.id}
-              onDefinitionPreview={onDefinitionPreview}
-              onPreview={onPreview}
-              provisionPath={provisionPath}
-              relationships={relationships}
-            />
-          ))}
-        </div>
-      ) : null}
+            <p>
+              <AnnotatedLegalText
+                definitions={definitions}
+                onDefinitionPreview={onDefinitionPreview}
+                onPreview={onPreview}
+                relationships={relationships}
+                sourceEntityId={block.id}
+                text={run.text}
+              />
+            </p>
+          </div>
+        ) : (
+          <div className="nested-blocks" key={`${block.id}:children:${index}`}>
+            {run.children.map((child) => (
+              <LegalBlock
+                block={child}
+                definitions={definitions}
+                key={child.id}
+                onDefinitionPreview={onDefinitionPreview}
+                onPreview={onPreview}
+                provisionPath={provisionPath}
+                relationships={relationships}
+              />
+            ))}
+          </div>
+        ),
+      )}
     </div>
   );
 }

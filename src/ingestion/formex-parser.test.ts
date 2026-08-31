@@ -64,7 +64,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
       <TI.ART>Article 1</TI.ART><STI.ART>Subject matter</STI.ART>
       <PARAG IDENTIFIER="001.001"><NO.PARAG>1.</NO.PARAG><ALINEA>
         <P>This Act provides:</P><LIST TYPE="alpha"><ITEM><NP><NO.P>(a)</NO.P><TXT>one rule;</TXT></NP></ITEM></LIST>
-      </ALINEA></PARAG>
+      </ALINEA><ALINEA>After the list.</ALINEA></PARAG>
     </ARTICLE>
     <ARTICLE IDENTIFIER="002">
       <TI.ART>Article 2</TI.ART><STI.ART>Application</STI.ART>
@@ -116,6 +116,29 @@ describe("Formex ACT parser", () => {
           provision.logicalId === "eu:32025R0001:article:1:paragraph:1:point:a",
       )?.text,
     ).toBe("one rule;");
+    const paragraph = document.provisions.find(
+      (provision) =>
+        provision.logicalId === "eu:32025R0001:article:1:paragraph:1",
+    );
+    expect(paragraph?.orderedContent).toEqual([
+      { type: "text", text: "This Act provides:" },
+      {
+        type: "child",
+        childLogicalId: "eu:32025R0001:article:1:paragraph:1:point:a",
+      },
+      { type: "text", text: "After the list." },
+    ]);
+    expect(
+      toDocumentView(document, "ordered-content-test").provisions[0]?.blocks[0]
+        ?.orderedContent,
+    ).toEqual([
+      { type: "text", text: "This Act provides:" },
+      {
+        type: "child",
+        childId: "eu:32025R0001:article:1:paragraph:1:point:a",
+      },
+      { type: "text", text: "After the list." },
+    ]);
     expect(
       document.provisions.find(
         (provision) =>

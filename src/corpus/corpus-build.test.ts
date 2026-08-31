@@ -21,7 +21,7 @@ describe("corpus build manifest", () => {
           adapter: "eba",
           identifier: "eba-gl-2021-05",
         }),
-        parserVersion: "eba-pdf-1.1.0",
+        parserVersion: "eba-pdf-1.1.1",
       }),
     );
     expect(sources).toContainEqual(

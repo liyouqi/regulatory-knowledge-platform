@@ -114,13 +114,17 @@ import {
   loadRegulatoryTopicDataset,
 } from "../topics/regulatory-topic";
 import {
+  loadDocumentExpressionMetadataDataset,
+  selectDocumentExpressionMetadata,
+} from "../versions/document-expression-metadata";
+import {
   DOCUMENT_VERSION_CHAIN_BUILDER,
   DOCUMENT_VERSION_CHAIN_BUILDER_VERSION,
   buildDocumentVersionChain,
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.4.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.5.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -151,6 +155,7 @@ export interface RuntimeDatabaseManifest {
   relatedRecitalCount: number;
   versionNodeCount: number;
   versionEdgeCount: number;
+  expressionMetadataCount: number;
   domainCount: number;
   domainAssignmentCount: number;
   authorityCount: number;
@@ -226,12 +231,18 @@ interface DefinitionRow {
 const DEFINITION_TERM_PATTERN = /^(.{1,240}?)\s+means(?:\s|:)/iu;
 
 function completeBlockText(block: BodyBlock): string {
-  return [
-    block.text,
-    ...block.children.map((child) =>
-      [child.marker, completeBlockText(child)].filter(Boolean).join(" "),
-    ),
-  ]
+  const children = new Map(block.children.map((child) => [child.id, child]));
+  return block.orderedContent
+    .map((item) => {
+      if (item.type === "text") return item.text;
+      const child = children.get(item.childId);
+      if (!child) {
+        throw new Error(
+          `Body block ${block.id} references missing child ${item.childId}`,
+        );
+      }
+      return [child.marker, completeBlockText(child)].filter(Boolean).join(" ");
+    })
     .filter(Boolean)
     .join(" ");
 }
@@ -357,6 +368,9 @@ function runtimeBuildId(
   supervisoryDecisionDataset: ReturnType<typeof loadSupervisoryDecisionDataset>,
   applicabilityRuleDataset: ReturnType<typeof loadApplicabilityRuleDataset>,
   regulatoryTopicDataset: ReturnType<typeof loadRegulatoryTopicDataset>,
+  documentExpressionMetadataDataset: ReturnType<
+    typeof loadDocumentExpressionMetadataDataset
+  >,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -396,6 +410,7 @@ function runtimeBuildId(
         JSON.stringify(applicabilityRuleDataset),
         `${REGULATORY_TOPIC_BUILDER}@${REGULATORY_TOPIC_BUILDER_VERSION}`,
         JSON.stringify(regulatoryTopicDataset),
+        JSON.stringify(documentExpressionMetadataDataset),
         input,
       ].join("\n"),
     )
@@ -449,6 +464,18 @@ export function buildRuntimeDatabase(
   });
   const versionNodes = versionChains.flatMap((chain) => chain.nodes);
   const versionEdges = versionChains.flatMap((chain) => chain.edges);
+  const documentExpressionMetadataDataset =
+    loadDocumentExpressionMetadataDataset();
+  const loadedDocumentIdSet = new Set(documents.map((document) => document.id));
+  const expressionMetadata =
+    inputSources.length > 0
+      ? selectDocumentExpressionMetadata(
+          loadedDocumentIdSet,
+          documentExpressionMetadataDataset,
+        )
+      : documentExpressionMetadataDataset.records.filter((record) =>
+          loadedDocumentIdSet.has(record.documentId),
+        );
   const relationshipBuild = buildExplicitReferences(documents);
   const knownDocumentIds =
     inputSources.length > 0
@@ -684,6 +711,7 @@ export function buildRuntimeDatabase(
     supervisoryDecisionDataset,
     applicabilityRuleDataset,
     regulatoryTopicDataset,
+    documentExpressionMetadataDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -725,6 +753,21 @@ export function buildRuntimeDatabase(
         document_id TEXT PRIMARY KEY REFERENCES documents(id),
         reader_payload_json TEXT NOT NULL,
         explorer_payload_json TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE document_expression_metadata (
+        document_id TEXT PRIMARY KEY REFERENCES documents(id),
+        language TEXT NOT NULL CHECK (language = 'en'),
+        issuers_json TEXT NOT NULL,
+        text_kind TEXT NOT NULL CHECK (text_kind IN (
+          'original_oj', 'consolidated', 'original_publication'
+        )),
+        currency_status TEXT NOT NULL CHECK (currency_status IN (
+          'current', 'historical', 'not_assessed'
+        )),
+        version_selection_policy TEXT NOT NULL,
+        fallback_reason TEXT,
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL
       ) STRICT;
       CREATE TABLE document_versions (
         id TEXT PRIMARY KEY,
@@ -1210,6 +1253,15 @@ export function buildRuntimeDatabase(
         document_id, reader_payload_json, explorer_payload_json
       ) VALUES (?, ?, ?)
     `);
+    const insertDocumentExpressionMetadata = database.prepare(`
+      INSERT INTO document_expression_metadata (
+        document_id, language, issuers_json, text_kind, currency_status,
+        version_selection_policy, fallback_reason, review_status, reviewed_at
+      ) VALUES (
+        @documentId, @language, @issuersJson, @textKind, @currencyStatus,
+        @versionSelectionPolicy, @fallbackReason, @reviewStatus, @reviewedAt
+      )
+    `);
     const insertDocumentVersion = database.prepare(`
       INSERT INTO document_versions (
         id, document_id, kind, label, version_date, source_url, availability
@@ -1522,6 +1574,12 @@ export function buildRuntimeDatabase(
           );
         });
       }
+      for (const metadata of expressionMetadata) {
+        insertDocumentExpressionMetadata.run({
+          ...metadata,
+          issuersJson: JSON.stringify(metadata.issuers),
+        });
+      }
       for (const node of versionNodes) {
         insertDocumentVersion.run({ ...node, date: node.date ?? null });
       }
@@ -1647,6 +1705,7 @@ export function buildRuntimeDatabase(
         ),
         versionNodeCount: String(versionNodes.length),
         versionEdgeCount: String(versionEdges.length),
+        expressionMetadataCount: String(expressionMetadata.length),
         domainCount: String(regulatoryContextBuild.domains.length),
         domainAssignmentCount: String(
           regulatoryContextBuild.assignments.length,
@@ -1789,6 +1848,7 @@ export function buildRuntimeDatabase(
     relatedRecitalCount: relatedRecitalBuild?.relationships.length ?? 0,
     versionNodeCount: versionNodes.length,
     versionEdgeCount: versionEdges.length,
+    expressionMetadataCount: expressionMetadata.length,
     domainCount: regulatoryContextBuild.domains.length,
     domainAssignmentCount: regulatoryContextBuild.assignments.length,
     authorityCount: regulatoryContextBuild.authorities.length,

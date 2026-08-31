@@ -20,6 +20,7 @@ import type { SourceDefinition } from "./source-registry";
 type OrderedNode = Record<string, unknown>;
 type StructuralNode = CanonicalDocument["structuralNodes"][number];
 type StructuralPath = Provision["structuralPath"];
+type OrderedProvisionContent = NonNullable<Provision["orderedContent"]>;
 
 const BLOCK_TAGS = new Set([
   "ALINEA",
@@ -127,6 +128,63 @@ function topLevelLists(node: OrderedNode): OrderedNode[] {
   return lists;
 }
 
+function normalizeText(value: string): string {
+  return value.replaceAll("\u00a0", " ").replace(/\s+/gu, " ").trim();
+}
+
+function orderedContentFromElement(
+  element: OrderedNode,
+  childLogicalIds: string[],
+): OrderedProvisionContent {
+  const raw: Array<string | { childLogicalId: string }> = [];
+  let childIndex = 0;
+
+  const appendText = (value: string): void => {
+    const previous = raw.at(-1);
+    if (typeof previous === "string") raw[raw.length - 1] = previous + value;
+    else raw.push(value);
+  };
+  const visit = (node: OrderedNode): void => {
+    if ("#text" in node) {
+      appendText(String(node["#text"] ?? ""));
+      return;
+    }
+    const tag = tagName(node);
+    if (!tag || TEXT_EXCLUSIONS.has(tag)) return;
+    if (tag === "LIST") {
+      for (const _item of directElements(node, "ITEM")) {
+        const childLogicalId = childLogicalIds[childIndex];
+        if (!childLogicalId) {
+          throw new Error("Ordered Formex list has more items than child IDs");
+        }
+        raw.push({ childLogicalId });
+        childIndex += 1;
+      }
+      return;
+    }
+    if (BLOCK_TAGS.has(tag)) appendText(" ");
+    for (const child of elementChildren(node)) visit(child);
+    if (BLOCK_TAGS.has(tag)) appendText(" ");
+  };
+  visit(element);
+  if (childIndex !== childLogicalIds.length) {
+    throw new Error(
+      `Ordered Formex content consumed ${childIndex}/${childLogicalIds.length} child IDs`,
+    );
+  }
+
+  const content: OrderedProvisionContent = [];
+  for (const item of raw) {
+    if (typeof item !== "string") {
+      content.push({ type: "child", childLogicalId: item.childLogicalId });
+      continue;
+    }
+    const text = normalizeText(item);
+    if (text) content.push({ type: "text", text });
+  }
+  return content;
+}
+
 function sourceVersion(snapshot: OfficialSourceSnapshot): string {
   const etag = snapshot.content.etag
     ?.replaceAll('"', "")
@@ -207,22 +265,27 @@ class FormexDocumentBuilder {
           numberRaw,
           occurrence,
         );
-        const text = plainText(item, new Set([...TEXT_EXCLUSIONS, "LIST"]));
+        const directText = plainText(
+          item,
+          new Set([...TEXT_EXCLUSIONS, "LIST"]),
+        );
         const warning =
           numberNode || listType === "DASH"
             ? []
             : ["List item has no explicit number."];
 
-        if (!text) {
+        if (!directText) {
           this.warnings.push(`Skipped empty list item at ${xpath}`);
           return;
         }
 
+        const provisionIndex = this.provisions.length;
+        const displayOrder = this.nextOrder();
         this.provisions.push({
           logicalId,
           sourceVersionId: this.versionedId(logicalId),
           sourceSnapshotId: this.snapshot.snapshotId,
-          displayOrder: this.nextOrder(),
+          displayOrder,
           sourceLocator: {
             kind: "xpath",
             value: `${listXpath}/ITEM[${itemIndex + 1}]`,
@@ -232,8 +295,8 @@ class FormexDocumentBuilder {
           numberRaw,
           numberNormalized: normalizeLegalNumber(numberRaw),
           label: numberRaw === "dash" ? "—" : numberRaw,
-          text,
-          contentHash: sha256(text),
+          text: directText,
+          contentHash: sha256(directText),
           parentLogicalId: parentId,
           structuralPath,
         });
@@ -244,6 +307,37 @@ class FormexDocumentBuilder {
           `${listXpath}/ITEM[${itemIndex + 1}]`,
           depth + 1,
         );
+        const directChildIds = this.provisions
+          .filter((provision) => provision.parentLogicalId === logicalId)
+          .sort((left, right) => left.displayOrder - right.displayOrder)
+          .map((provision) => provision.logicalId);
+        const orderedContent = orderedContentFromElement(item, directChildIds);
+        const childrenById = new Map(
+          this.provisions.map((provision) => [provision.logicalId, provision]),
+        );
+        const text = normalizeText(
+          orderedContent
+            .map((entry) =>
+              entry.type === "text"
+                ? entry.text
+                : childrenById.get(entry.childLogicalId)?.text,
+            )
+            .filter(Boolean)
+            .join(" "),
+        );
+        const expectedText = plainText(item, TEXT_EXCLUSIONS);
+        if (text !== expectedText) {
+          throw new Error(
+            `Ordered content drift at ${listXpath}/ITEM[${itemIndex + 1}]`,
+          );
+        }
+        this.provisions[provisionIndex] = {
+          ...this.provisions[provisionIndex],
+          text,
+          leadText: directText !== text ? directText : undefined,
+          orderedContent,
+          contentHash: sha256(text),
+        };
       });
     });
   }
@@ -268,6 +362,7 @@ class FormexDocumentBuilder {
     const warnings = text ? [] : ["Provision contains no normalized text."];
     if (!text) this.warnings.push(`Empty provision at ${xpath}`);
 
+    const provisionIndex = this.provisions.length;
     this.provisions.push({
       logicalId,
       sourceVersionId: this.versionedId(logicalId),
@@ -286,6 +381,31 @@ class FormexDocumentBuilder {
       structuralPath,
     });
     this.addPointLists(element, logicalId, structuralPath, xpath);
+    const directChildIds = this.provisions
+      .filter((provision) => provision.parentLogicalId === logicalId)
+      .sort((left, right) => left.displayOrder - right.displayOrder)
+      .map((provision) => provision.logicalId);
+    const orderedContent = orderedContentFromElement(element, directChildIds);
+    const childrenById = new Map(
+      this.provisions.map((provision) => [provision.logicalId, provision]),
+    );
+    const orderedText = normalizeText(
+      orderedContent
+        .map((entry) =>
+          entry.type === "text"
+            ? entry.text
+            : childrenById.get(entry.childLogicalId)?.text,
+        )
+        .filter(Boolean)
+        .join(" "),
+    );
+    if (orderedText !== text) {
+      throw new Error(`Ordered content drift at ${xpath}`);
+    }
+    this.provisions[provisionIndex] = {
+      ...this.provisions[provisionIndex],
+      orderedContent,
+    };
   }
 
   addArticle(

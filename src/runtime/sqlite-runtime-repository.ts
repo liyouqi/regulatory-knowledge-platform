@@ -820,6 +820,7 @@ export class SqliteRuntimeRepository {
   readonly relatedRecitalCount: number;
   readonly versionNodeCount: number;
   readonly versionEdgeCount: number;
+  readonly expressionMetadataCount: number;
   readonly domainCount: number;
   readonly domainAssignmentCount: number;
   readonly authorityCount: number;
@@ -921,6 +922,18 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "versionEdgeCount"),
         10,
       );
+      this.expressionMetadataCount = Number.parseInt(
+        manifestValue(this.database, "expressionMetadataCount"),
+        10,
+      );
+      const expressionMetadataRows = this.database
+        .prepare("SELECT count(*) AS count FROM document_expression_metadata")
+        .get() as { count: number };
+      if (expressionMetadataRows.count !== this.expressionMetadataCount) {
+        throw new Error(
+          "Runtime Expression metadata count differs from its manifest",
+        );
+      }
       this.domainCount = Number.parseInt(
         manifestValue(this.database, "domainCount"),
         10,

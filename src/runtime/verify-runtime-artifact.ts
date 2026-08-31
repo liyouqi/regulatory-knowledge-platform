@@ -22,6 +22,7 @@ export interface RuntimeArtifactVerification {
   relatedRecitals: number;
   versionNodes: number;
   versionEdges: number;
+  expressionMetadata: number;
   regulatoryDomains: number;
   domainAssignments: number;
   authorities: number;
@@ -86,6 +87,7 @@ export function verifyRuntimeArtifact(
       relatedRecitals: repository.relatedRecitalCount,
       versionNodes: repository.versionNodeCount,
       versionEdges: repository.versionEdgeCount,
+      expressionMetadata: repository.expressionMetadataCount,
       regulatoryDomains: repository.domainCount,
       domainAssignments: repository.domainAssignmentCount,
       authorities: repository.authorityCount,

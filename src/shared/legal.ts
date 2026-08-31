@@ -33,6 +33,12 @@ export const bodyBlockSchema: z.ZodType<BodyBlock> = z.lazy(() =>
     text: z.string(),
     anchor: z.string().min(1),
     sourceLocator: sourceLocatorSchema,
+    orderedContent: z.array(
+      z.discriminatedUnion("type", [
+        z.object({ type: z.literal("text"), text: z.string().min(1) }),
+        z.object({ type: z.literal("child"), childId: z.string().min(1) }),
+      ]),
+    ),
     children: z.array(bodyBlockSchema),
   }),
 );
@@ -52,6 +58,9 @@ export interface BodyBlock {
   text: string;
   anchor: string;
   sourceLocator: z.infer<typeof sourceLocatorSchema>;
+  orderedContent: Array<
+    { type: "text"; text: string } | { type: "child"; childId: string }
+  >;
   children: BodyBlock[];
 }
 

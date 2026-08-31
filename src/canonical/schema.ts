@@ -4,7 +4,7 @@ import { sourceStatusSchema } from "../shared/source-status";
 
 export { sourceLocatorSchema } from "../shared/source-locator";
 
-export const CANONICAL_SCHEMA_VERSION = "1.0.0" as const;
+export const CANONICAL_SCHEMA_VERSION = "1.1.0" as const;
 
 const logicalIdSchema = z
   .string()
@@ -63,6 +63,11 @@ export const provisionKindSchema = z.enum([
   "other",
 ]);
 
+export const orderedProvisionContentEntrySchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("text"), text: z.string().min(1) }),
+  z.object({ type: z.literal("child"), childLogicalId: logicalIdSchema }),
+]);
+
 export const provisionSchema = versionedEntitySchema.extend({
   kind: provisionKindSchema,
   numberRaw: z.string().optional(),
@@ -71,6 +76,7 @@ export const provisionSchema = versionedEntitySchema.extend({
   title: z.string().optional(),
   text: z.string(),
   leadText: z.string().optional(),
+  orderedContent: z.array(orderedProvisionContentEntrySchema).optional(),
   contentHash: sha256Schema,
   parentLogicalId: logicalIdSchema.optional(),
   structuralPath: z.array(structuralPathEntrySchema),

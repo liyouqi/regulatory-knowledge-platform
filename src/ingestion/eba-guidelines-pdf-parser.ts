@@ -8,7 +8,7 @@ import {
   extractTaggedPdfSemanticEvents,
 } from "./tagged-pdf";
 
-export const EBA_GUIDELINES_PDF_PARSER_VERSION = "1.1.0";
+export const EBA_GUIDELINES_PDF_PARSER_VERSION = "1.1.1";
 
 interface MutableProvision {
   logicalId: string;

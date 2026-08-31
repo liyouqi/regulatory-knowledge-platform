@@ -26,9 +26,9 @@ Build and verify the desired Profile first. The exporter does not dynamically ch
 npm run runtime:build -- --profile full-corpus
 npm run runtime:verify
 npm run rag:export -- \
-  --snapshot-id full-corpus-en-2026-08-31 \
+  --snapshot-id full-corpus-en-2026-08-31-r2 \
   --as-of 2026-08-31 \
-  --output exports/full-corpus-en-2026-08-31
+  --output exports/full-corpus-en-2026-08-31-r2
 ```
 
 To export another already-built artifact, pass `--database <path>`. `--snapshot-id`, `--as-of`, and `--output` are mandatory. A snapshot ID uses lowercase letters, digits, `.`, `_`, and `-`. An existing output directory is never overwritten. The exporter writes to a staging directory, verifies the complete result, and only then promotes it to the requested path.
@@ -37,12 +37,14 @@ Run the independent handoff check before copying:
 
 ```bash
 npm run rag:export:verify -- \
-  --input exports/full-corpus-en-2026-08-31
+  --input exports/full-corpus-en-2026-08-31-r2
 ```
 
 Generated snapshots live under ignored `exports/`; they are transfer artifacts, not a second Git-managed legal database.
 
-## Snapshot contract 1.0.0
+The earlier local snapshot `full-corpus-en-2026-08-31` used contract 1.0.0 and is superseded because it did not preserve mixed text/list source order. Do not import it. Immutable snapshots are not repaired in place; the corrected handoff is the separately named `full-corpus-en-2026-08-31-r2` snapshot.
+
+## Snapshot contract 1.1.0
 
 ```text
 regulatory-export-<snapshot-id>/
@@ -61,7 +63,7 @@ Every JSONL line is one complete UTF-8 JSON object. Every file ends in a newline
 - byte size and SHA-256 of every JSONL file;
 - export schema and generator versions.
 
-The current contract is English-only. `documents.jsonl` emits one loaded Legal Work per line and embeds its single English Expression. It preserves Platform stable IDs, CELEX or authority-local identifiers, family, Level, measure type, official source, source snapshot/version, and text-as-of date.
+The current contract is English-only. `documents.jsonl` emits one loaded Legal Work per line and embeds its single English Expression. It preserves Platform stable IDs, CELEX or authority-local identifiers, family, Level, measure type, official source, issuer names, source snapshot/version, and text-as-of date. Every Expression states `text_kind`, `currency_status`, the reviewed version-selection policy, and a fallback reason when the loaded text is not consolidated. `not_assessed` is an explicit review outcome and must not be interpreted as current.
 
 Lifecycle, applicability dates, and legal effect remain `null` when the current Platform record does not assert them. Importers must preserve `null` as “not asserted”; they must not convert it to `active`, `current`, or `binding` by inference. `document_stage=published` only states that the loaded source is a published instrument.
 
@@ -71,12 +73,16 @@ Lifecycle, applicability dates, and legal effect remain `null` when the current 
 - parent and root IDs;
 - Article/paragraph/point/annex coordinates where the source structure supplies them;
 - hierarchy path and exact source locator;
+- a contiguous `document_order` within each Legal Work;
+- `ordered_content_blocks`, interleaving direct text and child Provision references in exact source order;
 - official source URL;
 - `direct_text` for the entity's own source text;
 - `text` for deterministic subtree text when children exist;
 - `text_scope` so a RAG chunker can avoid accidental duplicate indexing.
 
 Root Article records normally have `text_scope=subtree`. Paragraphs containing points also have subtree text; their point records remain independently addressable. A RAG importer should deliberately choose its chunk granularity instead of indexing every `text` field blindly.
+
+The ordered-content contract is required for structures where a paragraph contains introductory text, a nested list, and a trailing subparagraph. The release verifier includes a reviewed semantic case for AMLD IV Article 13(1): its intro, points (a)–(d), and trailing text must remain in that order.
 
 `relationships.jsonl` preserves relationship direction, Platform type, RAG-friendly normalized type, stable endpoints, exact evidence, official source, provenance, builder identity, resolution status, and per-record review status. It includes:
 
@@ -97,7 +103,7 @@ The receiving project should implement the following sequence:
 2. Verify all file hashes, byte sizes, and counts before parsing into a release.
 3. Parse JSONL into a staging area; never mutate an active RAG release in place.
 4. Key Legal Works and provisions by the Platform stable IDs. Keep any legacy RAG ID as an alias/mapping, not as a replacement identity.
-5. Select the RAG corpus explicitly by `document_id`; a relationship must not pull an unselected document into the corpus automatically.
+5. Select the RAG corpus explicitly by `document_id`, always importing a complete Legal Work with its Expression and all Provision records. A relationship must not pull an unselected document into the corpus automatically.
 6. Preserve Expression/source snapshot/version fields with every generated chunk and citation.
 7. Choose chunk granularity using `direct_text`, `text`, parent/root IDs, and `text_scope` to avoid duplicate indexing.
 8. Import only accepted relationship review states. Treat `candidate` as retrieval assistance, not legal fact.
@@ -108,10 +114,12 @@ The RAG importer must not use missing fields or an empty relationship result to 
 
 ## Current handoff strategy
 
-Always export the complete compiled Profile. The receiving RAG project can compare stable IDs with its active release and select the missing works. Platform must not own a changing “RAG-only delta” configuration.
+Always export the complete compiled Profile. The receiving RAG project can compare stable IDs with its active release and select any complete Legal Works it accepts. Platform must not own a changing “RAG-only delta” configuration.
 
-At the current 2026-08-31 boundary, Platform has nine loaded works absent from the RAG release used for the comparison: AI Act, MiCA, NIS2, Data Act, CRD IV, MiCA CASP Authorisation RTS, CSSF Circular 12/552, the CSSF 2025 ICT-risk communication, and EBA/GL/2021/05. The same full snapshot also carries Platform relationship evidence around shared works such as DORA and GDPR, allowing RAG to add semantic data without downloading those legal texts again.
+`manifest.corpus_selection_policy` fixes this behavior as `selection_unit=complete_legal_work`, `auto_include_relationship_targets=false`, and `relationship_boundary=metadata_stub`. After document selection, the importer may retain a relationship crossing the selected boundary only by storing the unselected endpoint as the self-describing metadata stub already carried by the relationship record, or it may omit that relationship from the selected release. It must not create an incomplete full-text Document, invent missing Provision text, reverse the edge, or treat absence from the selected release as proof that the legal relationship does not exist. Relationships whose required selected-side endpoint is absent must be rejected rather than orphaned.
 
-## Deliberate v1 omissions
+This makes selective import safe without weakening snapshot integrity: hash verification still applies to the complete handoff, while corpus selection is a deterministic receiving-project release step.
 
-Snapshot 1.0.0 does not export chunks, embeddings, indexes, answers, UI data, or API/MCP transport. It also does not yet publish multilingual Expressions, the regulatory Domain/Topic taxonomy, applicability projections, or implementation timelines as separate interchange files. Those are future contract additions and must require a schema-version review rather than being smuggled into existing fields.
+## Deliberate 1.1 omissions
+
+Snapshot 1.1.0 does not export chunks, embeddings, indexes, answers, UI data, or API/MCP transport. It also does not yet publish multilingual Expressions, the regulatory Domain/Topic taxonomy, applicability projections, or implementation timelines as separate interchange files. Those are future contract additions and must require a schema-version review rather than being smuggled into existing fields.

@@ -60,6 +60,11 @@ interface DocumentRow {
   regulatoryLevel: "level-1" | "level-2" | "level-3";
   measureType: "primary-act" | "rts" | "its" | "guideline" | "qa" | "other";
   readerPayloadJson: string;
+  issuersJson: string;
+  textKind: RagDocument["expressions"][number]["text_kind"];
+  currencyStatus: RagDocument["expressions"][number]["currency_status"];
+  versionSelectionPolicy: RagDocument["expressions"][number]["version_selection_policy"];
+  fallbackReason: RagDocument["expressions"][number]["fallback_reason"];
 }
 
 interface RelationshipRow {
@@ -115,12 +120,39 @@ function sourceLocatorLabel(locator: { kind: string; value: string }): string {
 }
 
 function blockText(block: BodyBlock): string {
+  const children = new Map(block.children.map((child) => [child.id, child]));
+  const content = block.orderedContent.map((item) => {
+    if (item.type === "text") return item.text;
+    const child = children.get(item.childId);
+    if (!child) {
+      throw new Error(
+        `Body block ${block.id} references missing child ${item.childId}`,
+      );
+    }
+    return blockText(child);
+  });
   return [
-    [block.marker, block.text].filter(Boolean).join(" ").trim(),
-    ...block.children.map(blockText),
+    [block.marker, content[0]].filter(Boolean).join(" ").trim(),
+    ...content.slice(1),
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+function directBlockText(block: BodyBlock): string {
+  return block.orderedContent
+    .flatMap((item) => (item.type === "text" ? [item.text] : []))
+    .join("\n");
+}
+
+function orderedContentBlocks(
+  block: BodyBlock,
+): RagProvision["ordered_content_blocks"] {
+  return block.orderedContent.map((item, order) =>
+    item.type === "text"
+      ? { order, type: "text" as const, text: item.text }
+      : { order, type: "child" as const, provision_id: item.childId },
+  );
 }
 
 function blockReferences(id: string): {
@@ -140,6 +172,7 @@ function exportProvisions(
   const result: RagProvision[] = [];
   const expression = expressionId(document);
   const reviewStatus = document.review_status;
+  let documentOrder = 0;
 
   for (const provision of view.provisions) {
     const rootPath = [
@@ -171,7 +204,15 @@ function exportProvisions(
         hierarchy_path: rootPath,
         source_locator: provision.sourceLocator,
         source_locator_label: sourceLocatorLabel(provision.sourceLocator),
-        direct_text: selfBlock?.text ?? "",
+        document_order: documentOrder++,
+        ordered_content_blocks: selfBlock
+          ? orderedContentBlocks(selfBlock)
+          : provision.blocks.map((block, order) => ({
+              order,
+              type: "child" as const,
+              provision_id: block.id,
+            })),
+        direct_text: selfBlock ? directBlockText(selfBlock) : "",
         text: rootText,
         text_scope: provision.blocks.some(
           (block) => block.id !== provision.id || block.children.length > 0,
@@ -210,7 +251,9 @@ function exportProvisions(
           hierarchy_path: currentHierarchy,
           source_locator: block.sourceLocator,
           source_locator_label: sourceLocatorLabel(block.sourceLocator),
-          direct_text: block.text,
+          document_order: documentOrder++,
+          ordered_content_blocks: orderedContentBlocks(block),
+          direct_text: directBlockText(block),
           text: blockText(block),
           text_scope: block.children.length > 0 ? "subtree" : "direct",
           official_source_url: document.official_page_url,
@@ -604,9 +647,14 @@ function loadDocuments(database: Database.Database): Array<{
         d.last_checked AS lastChecked, d.source_version AS sourceVersion,
         d.canonical_build_id AS canonicalBuildId, d.provenance,
         d.family_id AS familyId, d.regulatory_level AS regulatoryLevel,
-        d.measure_type AS measureType, v.reader_payload_json AS readerPayloadJson
+        d.measure_type AS measureType, v.reader_payload_json AS readerPayloadJson,
+        em.issuers_json AS issuersJson, em.text_kind AS textKind,
+        em.currency_status AS currencyStatus,
+        em.version_selection_policy AS versionSelectionPolicy,
+        em.fallback_reason AS fallbackReason
       FROM documents d
       JOIN document_views v ON v.document_id = d.id
+      JOIN document_expression_metadata em ON em.document_id = d.id
       ORDER BY d.display_order, d.id
     `)
     .all() as DocumentRow[];
@@ -624,6 +672,7 @@ function loadDocuments(database: Database.Database): Array<{
       local_id: row.localId,
       family_ids: [row.familyId],
       aliases: aliases.get(row.id) ?? [],
+      issuers: JSON.parse(row.issuersJson),
       short_title: row.shortName,
       title: row.officialTitle,
       jurisdiction: row.jurisdiction,
@@ -634,7 +683,8 @@ function loadDocuments(database: Database.Database): Array<{
       measure_type: row.measureType.replace("-", "_"),
       document_stage: "published",
       lifecycle_status: null,
-      version_status: null,
+      version_status:
+        row.currencyStatus === "not_assessed" ? null : row.currencyStatus,
       legal_effect: null,
       date_document: row.publicationDate,
       date_entry_into_force: null,
@@ -653,10 +703,10 @@ function loadDocuments(database: Database.Database): Array<{
           document_id: row.id,
           language: "en",
           expression_date: textAsOf,
-          text_kind:
-            status?.basis === "original-oj"
-              ? "original_oj"
-              : (status?.basis ?? "unspecified"),
+          text_kind: row.textKind,
+          currency_status: row.currencyStatus,
+          version_selection_policy: row.versionSelectionPolicy,
+          fallback_reason: row.fallbackReason,
           official_status: row.provenance,
           official_source_url: row.sourceUrl,
           retrieved_at: row.lastChecked,
@@ -756,6 +806,11 @@ export function exportRagSnapshot(options: ExportOptions): RagSnapshotManifest {
       relationship_count: relationships.length,
       review_status: "record_level",
       generator_version: RAG_SNAPSHOT_GENERATOR_VERSION,
+      corpus_selection_policy: {
+        selection_unit: "complete_legal_work",
+        relationship_boundary: "metadata_stub",
+        auto_include_relationship_targets: false,
+      },
       files,
     });
     writeFileSync(
@@ -867,6 +922,8 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
   }
   const provisionIds = new Set<string>();
   const provisionDocumentIds = new Map<string, string>();
+  const provisionParentIds = new Map<string, string | null>();
+  const documentOrders = new Map<string, number[]>();
   for (const provision of provisions) {
     if (provisionIds.has(provision.provision_id)) {
       throw new Error(`Duplicate provision_id: ${provision.provision_id}`);
@@ -883,6 +940,21 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
     }
     provisionIds.add(provision.provision_id);
     provisionDocumentIds.set(provision.provision_id, provision.document_id);
+    provisionParentIds.set(
+      provision.provision_id,
+      provision.parent_provision_id,
+    );
+    const orders = documentOrders.get(provision.document_id) ?? [];
+    orders.push(provision.document_order);
+    documentOrders.set(provision.document_id, orders);
+  }
+  for (const [documentId, orders] of documentOrders) {
+    const sorted = [...orders].sort((left, right) => left - right);
+    if (sorted.some((order, index) => order !== index)) {
+      throw new Error(
+        `Document ${documentId} has duplicate or non-contiguous document_order values`,
+      );
+    }
   }
   for (const provision of provisions) {
     if (
@@ -913,6 +985,61 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
     ) {
       throw new Error(
         `Provision ${provision.provision_id} has a root in another document`,
+      );
+    }
+    for (const [order, block] of provision.ordered_content_blocks.entries()) {
+      if (block.order !== order) {
+        throw new Error(
+          `Provision ${provision.provision_id} has non-contiguous ordered content`,
+        );
+      }
+      if (block.type === "child") {
+        if (!provisionIds.has(block.provision_id)) {
+          throw new Error(
+            `Provision ${provision.provision_id} references missing ordered child ${block.provision_id}`,
+          );
+        }
+        if (
+          provisionParentIds.get(block.provision_id) !== provision.provision_id
+        ) {
+          throw new Error(
+            `Provision ${provision.provision_id} references a non-child ordered provision ${block.provision_id}`,
+          );
+        }
+      }
+    }
+    const orderedDirectText = provision.ordered_content_blocks
+      .flatMap((block) => (block.type === "text" ? [block.text] : []))
+      .join("\n");
+    if (orderedDirectText !== provision.direct_text) {
+      throw new Error(
+        `Provision ${provision.provision_id} direct_text differs from ordered content`,
+      );
+    }
+  }
+  if (documentIds.has("eu:32015L0849")) {
+    const article13Paragraph1 = provisions.find(
+      (provision) =>
+        provision.provision_id === "eu:32015L0849:article:13:paragraph:1",
+    );
+    const expectedChildren = ["a", "b", "c", "d"].map(
+      (point) => `eu:32015L0849:article:13:paragraph:1:point:${point}`,
+    );
+    const orderedChildren = article13Paragraph1?.ordered_content_blocks.flatMap(
+      (block) => (block.type === "child" ? [block.provision_id] : []),
+    );
+    const textBlockCount = article13Paragraph1?.ordered_content_blocks.filter(
+      (block) => block.type === "text",
+    ).length;
+    if (
+      !article13Paragraph1 ||
+      JSON.stringify(orderedChildren) !== JSON.stringify(expectedChildren) ||
+      textBlockCount !== 2 ||
+      article13Paragraph1.ordered_content_blocks[0]?.type !== "text" ||
+      article13Paragraph1.ordered_content_blocks.at(-1)?.type !== "text"
+    ) {
+      throw new Error(
+        "AMLD IV Article 13(1) failed the reviewed ordered-content semantic case",
       );
     }
   }

@@ -12,7 +12,7 @@ import {
   extractTaggedPdfSemanticEvents,
 } from "./tagged-pdf";
 
-export const CSSF_PDF_PARSER_VERSION = "1.1.1";
+export const CSSF_PDF_PARSER_VERSION = "1.1.2";
 
 export type CssfPdfSemanticEvent = TaggedPdfSemanticEvent;
 

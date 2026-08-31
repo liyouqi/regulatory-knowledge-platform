@@ -101,7 +101,20 @@ export function loadRelatedRecitalBenchmark(
 }
 
 function completeBlockText(block: BodyBlock): string {
-  return [block.marker, block.text, ...block.children.map(completeBlockText)]
+  const children = new Map(block.children.map((child) => [child.id, child]));
+  return [
+    block.marker,
+    ...block.orderedContent.map((item) => {
+      if (item.type === "text") return item.text;
+      const child = children.get(item.childId);
+      if (!child) {
+        throw new Error(
+          `Body block ${block.id} references missing child ${item.childId}`,
+        );
+      }
+      return completeBlockText(child);
+    }),
+  ]
     .filter(Boolean)
     .join(" ");
 }

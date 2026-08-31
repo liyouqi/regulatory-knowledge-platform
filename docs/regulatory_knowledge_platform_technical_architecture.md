@@ -1204,11 +1204,11 @@ verified deployment-fixed Runtime/Profile
   → receiving RAG staging import
 ```
 
-`platform-rag-export@1.0.0` 直接投影 Runtime 中已经发布的 DocumentView、stable legal entities 和 normalized relationship tables，但输出 contract 不暴露 SQLite table/column。每个 loaded Legal Work 嵌入当前 English Expression identity；每个 root Provision 与 nested Body Block 保留 parent/root、hierarchy、source locator、direct text 与 deterministic subtree text。Relationship projection 同时覆盖 loaded legal-entity edges、lifecycle external Works、metadata-only CJEU Case edges 和 reviewed Decision findings，以 polymorphic self-describing endpoint 避免把 metadata node 伪装为 full-text Document。
+`platform-rag-export@1.1.0` 直接投影 Runtime 中已经发布的 DocumentView、stable legal entities、reviewed Expression metadata 和 normalized relationship tables，但输出 contract 不暴露 SQLite table/column。每个 loaded Legal Work 嵌入当前 English Expression identity、issuer、`text_kind`、currency status、selection policy 与 fallback reason；每个 root Provision 与 nested Body Block 保留 parent/root、hierarchy、source locator、contiguous document order、交错 text/child 的 ordered content、direct text 与 deterministic subtree text。Relationship projection 同时覆盖 loaded legal-entity edges、lifecycle external Works、metadata-only CJEU Case edges 和 reviewed Decision findings，以 polymorphic self-describing endpoint 避免把 metadata node 伪装为 full-text Document。
 
-Exporter 不接受动态 Profile 选择；调用方先用既有 Runtime build gate 编译目标 Profile，再显式选择该 SQLite artifact。它也不查询接收方 release，因此始终导出完整 Profile，由 RAG importer 按 stable `document_id` 决定 corpus。输出目录先在同 parent staging path 完整构建和验证，再 atomic rename；已存在目录 fail closed。`manifest.json` 绑定 schema/generator、Runtime build/Profile、as-of、counts、bytes 和 file SHA-256。RAG importer 必须先验证，再 staging import、chunk/index/eval，最后 atomic publish；不能在 active release 上原地合并。
+Exporter 不接受动态 Profile 选择；调用方先用既有 Runtime build gate 编译目标 Profile，再显式选择该 SQLite artifact。它也不查询接收方 release，因此始终导出完整 Profile，由 RAG importer 按 stable `document_id` 和 complete-Legal-Work 单元决定 corpus。跨选择边界的 relationship 不自动带入目标法规；接收方只能保留 self-describing metadata stub 或排除该边，不能制造 partial Document、孤立 Provision 或反转关系。输出目录先在同 parent staging path 完整构建和验证，再 atomic rename；已存在目录 fail closed。`manifest.json` 绑定 schema/generator、Runtime build/Profile、selection policy、as-of、counts、bytes 和 file SHA-256。RAG importer 必须先验证，再 staging import、chunk/index/eval，最后 atomic publish；不能在 active release 上原地合并。
 
-Snapshot v1 不承担 chunk、embedding、BM25、vector、query planning 或 answer generation，也不导出尚未纳入 interchange contract 的 Domain/Topic、Applicability 和 Timeline projection。后续增加文件或语义字段必须提升 exchange schema 并进行兼容审查，不能复用空字段偷渡新语义。
+Snapshot 1.1 不承担 chunk、embedding、BM25、vector、query planning 或 answer generation，也不导出尚未纳入 interchange contract 的 Domain/Topic、Applicability 和 Timeline projection。后续增加文件或语义字段必须提升 exchange schema 并进行兼容审查，不能复用空字段偷渡新语义。AMLD IV Article 13(1) 是当前 ordered-content release semantic case；旧 1.0 snapshot 不原地修复，由新的 immutable snapshot ID 替代。
 
 ---
 

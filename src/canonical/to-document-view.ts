@@ -53,6 +53,94 @@ function bodyKind(provision: Provision): BodyBlock["kind"] {
     : "other";
 }
 
+function orderedContent(
+  provision: Provision,
+  children: Provision[],
+): BodyBlock["orderedContent"] {
+  if (provision.orderedContent) {
+    const expectedChildren = children.map((child) => child.logicalId);
+    const referencedChildren = provision.orderedContent.flatMap((entry) =>
+      entry.type === "child" ? [entry.childLogicalId] : [],
+    );
+    if (
+      referencedChildren.length !== expectedChildren.length ||
+      referencedChildren.some(
+        (childId, index) => childId !== expectedChildren[index],
+      )
+    ) {
+      throw new Error(
+        `Canonical ordered content child mismatch for ${provision.logicalId}`,
+      );
+    }
+    return provision.orderedContent.map((entry) =>
+      entry.type === "text"
+        ? entry
+        : { type: "child", childId: entry.childLogicalId },
+    );
+  }
+  if (children.length === 0) {
+    return provision.text.trim()
+      ? [{ type: "text", text: provision.text.trim() }]
+      : [];
+  }
+
+  const childTextsIncluded = children.map((child) =>
+    provision.text.includes(child.text.trim()),
+  );
+  if (childTextsIncluded.every((included) => !included)) {
+    return [
+      ...(provision.text.trim()
+        ? [{ type: "text" as const, text: provision.text.trim() }]
+        : []),
+      ...children.map((child) => ({
+        type: "child" as const,
+        childId: child.logicalId,
+      })),
+    ];
+  }
+  if (childTextsIncluded.some((included) => !included)) {
+    throw new Error(
+      `Cannot preserve ordered content for ${provision.logicalId}: canonical text contains only some child texts`,
+    );
+  }
+
+  const content: BodyBlock["orderedContent"] = [];
+  let cursor = 0;
+  for (const child of children) {
+    const childText = child.text.trim();
+    const childIndex = provision.text.indexOf(childText, cursor);
+    if (childIndex < 0) {
+      throw new Error(
+        `Cannot preserve ordered content for ${provision.logicalId}: child ${child.logicalId} is not present after offset ${cursor}`,
+      );
+    }
+    const leadingText = provision.text.slice(cursor, childIndex).trim();
+    if (leadingText) content.push({ type: "text", text: leadingText });
+    content.push({ type: "child", childId: child.logicalId });
+    cursor = childIndex + childText.length;
+  }
+  const trailingText = provision.text.slice(cursor).trim();
+  if (trailingText) content.push({ type: "text", text: trailingText });
+
+  const reconstructed = content
+    .map((item) =>
+      item.type === "text"
+        ? item.text
+        : children.find((child) => child.logicalId === item.childId)?.text,
+    )
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/gu, " ")
+    .trim();
+  const expected = provision.text.replace(/\s+/gu, " ").trim();
+  if (reconstructed !== expected) {
+    throw new Error(
+      `Ordered content reconstruction drift for ${provision.logicalId}`,
+    );
+  }
+  return content;
+}
+
 function toBodyBlock(
   provision: Provision,
   rootId: string,
@@ -61,6 +149,7 @@ function toBodyBlock(
   const nested = (children.get(provision.logicalId) ?? []).map((child) =>
     toBodyBlock(child, rootId, children),
   );
+  const directChildren = children.get(provision.logicalId) ?? [];
   const marker = ["annex-part", "paragraph", "point", "subpoint"].includes(
     provision.kind,
   )
@@ -78,6 +167,7 @@ function toBodyBlock(
         : provision.text,
     anchor: relativeProvisionAnchor(rootId, provision.logicalId),
     sourceLocator: provision.sourceLocator,
+    orderedContent: orderedContent(provision, directChildren),
     children: nested,
   };
 }

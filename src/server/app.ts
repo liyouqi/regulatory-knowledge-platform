@@ -245,6 +245,7 @@ app.get("/api/health", (_request, response) => {
       relatedRecitals: runtimeRepository.relatedRecitalCount,
       versionNodes: runtimeRepository.versionNodeCount,
       versionEdges: runtimeRepository.versionEdgeCount,
+      expressionMetadata: runtimeRepository.expressionMetadataCount,
       regulatoryDomains: runtimeRepository.domainCount,
       domainAssignments: runtimeRepository.domainAssignmentCount,
       authorities: runtimeRepository.authorityCount,

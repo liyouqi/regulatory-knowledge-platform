@@ -8,7 +8,7 @@ import {
   cssfDocumentLogicalId,
 } from "./cssf-source-registry";
 
-export const CSSF_HTML_PARSER_VERSION = "1.0.0";
+export const CSSF_HTML_PARSER_VERSION = "1.0.1";
 
 type OrderedNode = Record<string, unknown>;
 

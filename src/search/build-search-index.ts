@@ -64,6 +64,7 @@ console.table({
   relatedRecitals: manifest.relatedRecitalCount,
   versionNodes: manifest.versionNodeCount,
   versionEdges: manifest.versionEdgeCount,
+  expressionMetadata: manifest.expressionMetadataCount,
   regulatoryDomains: manifest.domainCount,
   domainAssignments: manifest.domainAssignmentCount,
   authorities: manifest.authorityCount,

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { sourceLocatorSchema } from "../shared/source-locator";
 
-export const RAG_SNAPSHOT_SCHEMA_VERSION = "1.0.0" as const;
+export const RAG_SNAPSHOT_SCHEMA_VERSION = "1.1.0" as const;
 export const RAG_SNAPSHOT_GENERATOR_VERSION =
-  "platform-rag-export@1.0.0" as const;
+  "platform-rag-export@1.1.0" as const;
 
 const nullableDateSchema = z.string().date().nullable();
 const nullableUrlSchema = z.string().url().nullable();
@@ -13,7 +13,17 @@ export const ragExpressionSchema = z.object({
   document_id: z.string().min(1),
   language: z.literal("en"),
   expression_date: z.string().date(),
-  text_kind: z.enum(["original_oj", "consolidated", "unspecified"]),
+  text_kind: z.enum(["original_oj", "consolidated", "original_publication"]),
+  currency_status: z.enum(["current", "historical", "not_assessed"]),
+  version_selection_policy: z.literal(
+    "prefer_reviewed_consolidated_else_reviewed_official_publication",
+  ),
+  fallback_reason: z
+    .enum([
+      "no_reviewed_consolidated_expression_loaded",
+      "consolidation_not_applicable_to_source_type",
+    ])
+    .nullable(),
   official_status: z.enum(["official", "fixture"]),
   official_source_url: z.string().url(),
   retrieved_at: z.string().datetime(),
@@ -29,6 +39,7 @@ export const ragDocumentSchema = z.object({
   local_id: z.string().min(1).nullable(),
   family_ids: z.array(z.string().startsWith("family:")).min(1),
   aliases: z.array(z.string().min(1)),
+  issuers: z.array(z.string().min(1)).min(1),
   short_title: z.string().min(1),
   title: z.string().min(1),
   jurisdiction: z.enum(["EU", "LU"]),
@@ -97,6 +108,21 @@ export const ragProvisionSchema = z.object({
   hierarchy_path: z.array(z.string().min(1)).min(1),
   source_locator: sourceLocatorSchema,
   source_locator_label: z.string().min(1),
+  document_order: z.number().int().nonnegative(),
+  ordered_content_blocks: z.array(
+    z.discriminatedUnion("type", [
+      z.object({
+        order: z.number().int().nonnegative(),
+        type: z.literal("text"),
+        text: z.string().min(1),
+      }),
+      z.object({
+        order: z.number().int().nonnegative(),
+        type: z.literal("child"),
+        provision_id: z.string().min(1),
+      }),
+    ]),
+  ),
   direct_text: z.string(),
   text: z.string(),
   text_scope: z.enum(["direct", "subtree"]),
@@ -177,6 +203,11 @@ export const ragSnapshotManifestSchema = z.object({
   relationship_count: z.number().int().nonnegative(),
   review_status: z.literal("record_level"),
   generator_version: z.literal(RAG_SNAPSHOT_GENERATOR_VERSION),
+  corpus_selection_policy: z.object({
+    selection_unit: z.literal("complete_legal_work"),
+    relationship_boundary: z.literal("metadata_stub"),
+    auto_include_relationship_targets: z.literal(false),
+  }),
   files: z.object({
     "documents.jsonl": ragSnapshotFileSchema,
     "provisions.jsonl": ragSnapshotFileSchema,
