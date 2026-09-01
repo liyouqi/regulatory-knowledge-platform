@@ -584,7 +584,7 @@ kbd {
   font-family: ui-sans-serif, system-ui, sans-serif;
   gap: 10px;
   justify-content: space-between;
-  padding: 8px 10px;
+  padding: 10px 12px;
   text-align: left;
   width: 100%;
 }
@@ -609,7 +609,10 @@ kbd {
 }
 
 .law-picker-trigger strong {
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: 720;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2464,6 +2467,10 @@ kbd {
   background: #2b3127;
   border-color: #485143;
   min-width: 220px;
+}
+
+.law-picker.explorer .law-picker-trigger strong {
+  font-size: 18px;
 }
 
 .explorer-kicker {

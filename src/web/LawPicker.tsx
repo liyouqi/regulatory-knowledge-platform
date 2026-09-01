@@ -153,6 +153,7 @@ export function LawPicker({
   const inputRef = useRef<HTMLInputElement>(null);
   const panelId = useId();
   const current = catalog.find((document) => document.slug === currentSlug);
+  const currentFamily = current ? familyLabel(current.familyId) : undefined;
   const groups = useMemo(
     () => groupLawPickerCatalog(catalog, query),
     [catalog, query],
@@ -180,6 +181,7 @@ export function LawPicker({
         <span>
           <small>
             {variant === "explorer" ? "ACT EXPLORER" : "REGULATION"}
+            {currentFamily ? ` · ${currentFamily}` : ""}
           </small>
           <strong>{current?.shortName ?? "Choose regulation"}</strong>
         </span>
