@@ -36,6 +36,7 @@ import {
   type DocumentRegulatoryContext,
   documentRegulatoryContextSchema,
 } from "../shared/regulatory-context";
+import { LawPicker } from "./LawPicker";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { recordOpenedLaw } from "./opened-laws";
 
@@ -327,22 +328,12 @@ export function ExplorerPage({
 
       <section className="explorer-hero">
         <div className="explorer-hero-topline">
-          <label className="explorer-law-switcher">
-            <span>ACT EXPLORER</span>
-            <select
-              aria-label="Choose regulation"
-              onChange={(event) =>
-                navigate(explorerPath(event.currentTarget.value))
-              }
-              value={document.slug}
-            >
-              {catalog.map((item) => (
-                <option key={item.id} value={item.slug}>
-                  {item.shortName}
-                </option>
-              ))}
-            </select>
-          </label>
+          <LawPicker
+            catalog={catalog}
+            currentSlug={document.slug}
+            onChoose={(item) => navigate(explorerPath(item.slug))}
+            variant="explorer"
+          />
           <a href={document.sourceUrl} rel="noreferrer" target="_blank">
             Official source <ExternalLink aria-hidden="true" size={14} />
           </a>

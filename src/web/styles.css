@@ -564,32 +564,209 @@ kbd {
   -webkit-box-orient: vertical;
 }
 
-.law-switcher {
-  display: block;
+.law-picker {
+  position: relative;
+  z-index: 4;
+}
+
+.law-picker.reader {
   margin-bottom: 18px;
 }
 
-.law-switcher select {
-  appearance: none;
+.law-picker-trigger {
+  align-items: center;
   background: #252a21;
   border: 1px solid #41493a;
-  border-radius: 7px;
+  border-radius: 8px;
   color: #eef0e8;
   cursor: pointer;
+  display: flex;
   font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 8px 30px 8px 10px;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 8px 10px;
+  text-align: left;
   width: 100%;
 }
 
-.law-switcher::after {
+.law-picker-trigger:hover,
+.law-picker-trigger[aria-expanded="true"] {
+  background: #2d3428;
+  border-color: #71805c;
+}
+
+.law-picker-trigger > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.law-picker-trigger small {
   color: #aeb2a4;
-  content: "⌄";
-  float: right;
-  margin: 7px 10px 0 -24px;
-  pointer-events: none;
-  position: relative;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.law-picker-trigger strong {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.law-picker-panel {
+  background: #20251d;
+  border: 1px solid #4b5740;
+  border-radius: 9px;
+  box-shadow: 0 18px 38px rgb(0 0 0 / 30%);
+  left: 0;
+  margin-top: 6px;
+  max-height: min(68vh, 540px);
+  overflow: auto;
+  padding: 8px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+}
+
+.law-picker-search {
+  align-items: center;
+  background: #171b15;
+  border: 1px solid #3e4836;
+  border-radius: 6px;
+  color: #aeb2a4;
+  display: flex;
+  gap: 7px;
+  padding: 0 8px;
+}
+
+.law-picker-search input {
+  background: transparent;
+  border: 0;
+  color: #eef0e8;
+  font: inherit;
+  font-size: 12px;
+  min-width: 0;
+  outline: 0;
+  padding: 9px 0;
+  width: 100%;
+}
+
+.law-picker-search button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #aeb2a4;
+  cursor: pointer;
+  display: flex;
+  padding: 2px;
+}
+
+.law-picker-groups {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.law-picker-group {
+  border-bottom: 1px solid #384032;
+}
+
+.law-picker-group:last-child {
+  border-bottom: 0;
+}
+
+.law-picker-group summary {
+  align-items: center;
+  color: #d9e0d1;
+  cursor: pointer;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 750;
+  justify-content: space-between;
+  letter-spacing: 0.03em;
+  list-style: none;
+  padding: 8px 3px;
+}
+
+.law-picker-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.law-picker-group summary::before {
+  color: #9fa993;
+  content: "›";
+  font-size: 15px;
+  margin-right: 5px;
+  transform: rotate(0deg);
+}
+
+.law-picker-group[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.law-picker-group summary > span {
+  flex: 1;
+}
+
+.law-picker-group summary small {
+  color: #8e9986;
+  font-size: 10px;
+}
+
+.law-picker-group > div {
+  display: grid;
+  gap: 2px;
+  padding: 0 0 7px;
+}
+
+.law-picker-option {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  color: #dce1d7;
+  cursor: pointer;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 7px 8px 7px 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.law-picker-option:hover,
+.law-picker-option.active {
+  background: #303a28;
+}
+
+.law-picker-option > span {
+  display: grid;
+  gap: 2px;
+}
+
+.law-picker-option strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.law-picker-option small {
+  color: #9fa993;
+  font-size: 10px;
+}
+
+.law-picker-option svg {
+  color: #d5e68e;
+  flex: 0 0 auto;
+}
+
+.law-picker-empty {
+  color: #aeb2a4;
+  font-size: 12px;
+  margin: 10px 4px;
 }
 
 .quick-go {
@@ -2271,12 +2448,6 @@ kbd {
   text-decoration: none;
 }
 
-.explorer-law-switcher {
-  display: grid;
-  gap: 8px;
-}
-
-.explorer-law-switcher > span,
 .explorer-kicker {
   color: #a7b09e;
   font-family: ui-sans-serif, system-ui, sans-serif;
@@ -2285,16 +2456,14 @@ kbd {
   letter-spacing: 0.13em;
 }
 
-.explorer-law-switcher select {
+.law-picker.explorer {
+  min-width: min(360px, 100%);
+}
+
+.law-picker.explorer .law-picker-trigger {
   background: #2b3127;
-  border: 1px solid #485143;
-  border-radius: 7px;
-  color: #f1f1e9;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  min-width: 180px;
-  padding: 9px 12px;
+  border-color: #485143;
+  min-width: 220px;
 }
 
 .explorer-kicker {
@@ -3237,18 +3406,47 @@ kbd {
 }
 
 :root[data-theme="light"] .toc-title,
-:root[data-theme="light"] .law-switcher::after,
 :root[data-theme="light"] .eyebrow,
 :root[data-theme="light"] .context-panel dd,
 :root[data-theme="light"] .fixture-notice {
   color: #656b60;
 }
 
-:root[data-theme="light"] .law-switcher select,
 :root[data-theme="light"] .quick-go,
 :root[data-theme="light"] .current-search-results {
   background: #fffef9;
   border-color: #cbc9be;
+  color: #252820;
+}
+
+:root[data-theme="light"] .law-picker-trigger,
+:root[data-theme="light"] .law-picker-panel,
+:root[data-theme="light"] .law-picker-search {
+  background: #fffef9;
+  border-color: #cbc9be;
+  color: #252820;
+}
+
+:root[data-theme="light"] .law-picker-trigger:hover,
+:root[data-theme="light"] .law-picker-trigger[aria-expanded="true"],
+:root[data-theme="light"] .law-picker-option:hover,
+:root[data-theme="light"] .law-picker-option.active {
+  background: #ecebdd;
+  border-color: #a8ad8d;
+}
+
+:root[data-theme="light"] .law-picker-trigger small,
+:root[data-theme="light"] .law-picker-search,
+:root[data-theme="light"] .law-picker-search button,
+:root[data-theme="light"] .law-picker-group summary small,
+:root[data-theme="light"] .law-picker-option small,
+:root[data-theme="light"] .law-picker-empty {
+  color: #656b60;
+}
+
+:root[data-theme="light"] .law-picker-search input,
+:root[data-theme="light"] .law-picker-group summary,
+:root[data-theme="light"] .law-picker-option {
   color: #252820;
 }
 

@@ -83,6 +83,7 @@ import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
 import { ImplementationTimelinePage } from "./ImplementationTimelinePage";
+import { LawPicker } from "./LawPicker";
 import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { RegulatoryPathPage } from "./RegulatoryPathPage";
@@ -1305,24 +1306,11 @@ function ReaderPage({
       <aside className="toc" aria-label="Table of contents">
         <div className="toc-document">
           {catalog.length > 1 ? (
-            <label className="law-switcher">
-              <span className="sr-only">Choose regulation</span>
-              <select
-                onChange={(event) => {
-                  const target = catalog.find(
-                    (document) => document.slug === event.currentTarget.value,
-                  );
-                  if (target) navigate(target.defaultPath);
-                }}
-                value={legalDocument.slug}
-              >
-                {catalog.map((document) => (
-                  <option key={document.id} value={document.slug}>
-                    {document.shortName}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <LawPicker
+              catalog={catalog}
+              currentSlug={legalDocument.slug}
+              onChoose={(document) => navigate(document.defaultPath)}
+            />
           ) : null}
           <p className="eyebrow">
             {legalDocument.jurisdiction}{" "}

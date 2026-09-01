@@ -120,6 +120,17 @@ Always export the complete compiled Profile. The receiving RAG project can compa
 
 This makes selective import safe without weakening snapshot integrity: hash verification still applies to the complete handoff, while corpus selection is a deterministic receiving-project release step.
 
+## Interoperability status and next-snapshot quality queue
+
+Regulatory RAG has accepted Snapshot contract 1.1.0 for deterministic import. This does not change the boundary above: Platform exports the complete compiled Profile, while the receiving project chooses complete Legal Works for its own corpus. The current handoff does not require original PDF/XML files and does not give Platform any responsibility for RAG runtime, framework, API/MCP, vector, or index configuration.
+
+Two non-blocking corrections are queued for the next ordinary Platform data update:
+
+- `document_order` must follow the official reading order in the reviewed source. CSSF 12/552 is a known correction: its Introduction must precede Annex I rather than carrying a later order value.
+- A consolidated Expression must distinguish the legal Work's original `date_document` from the verified consolidated-text cutoff. For CSSF 12/552, the 2012-12-11 document date must not be reused as `text_as_of` or an Expression date for the later consolidated text. When the consolidation cutoff cannot be confirmed from reviewed evidence, retain `currency_status=not_assessed` and do not infer it.
+
+These corrections preserve Work IDs, Provision IDs, and relationship semantics. They must be released as a new complete immutable snapshot ID; never overwrite the existing r2 handoff.
+
 ## Deliberate 1.1 omissions
 
 Snapshot 1.1.0 does not export chunks, embeddings, indexes, answers, UI data, or API/MCP transport. It also does not yet publish multilingual Expressions, the regulatory Domain/Topic taxonomy, applicability projections, or implementation timelines as separate interchange files. Those are future contract additions and must require a schema-version review rather than being smuggled into existing fields.
