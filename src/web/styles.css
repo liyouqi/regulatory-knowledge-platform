@@ -682,14 +682,14 @@ kbd {
 
 .law-picker-group summary {
   align-items: center;
-  color: #d9e0d1;
+  color: #9fa993;
   cursor: pointer;
   display: flex;
   font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 750;
   justify-content: space-between;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.11em;
   list-style: none;
   padding: 8px 3px;
 }
@@ -752,7 +752,7 @@ kbd {
 }
 
 .law-picker-option strong {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
 }
 
@@ -3455,6 +3455,10 @@ kbd {
 :root[data-theme="light"] .law-picker-group summary,
 :root[data-theme="light"] .law-picker-option {
   color: #252820;
+}
+
+:root[data-theme="light"] .law-picker-group summary {
+  color: #656b60;
 }
 
 :root[data-theme="light"] .quick-go input,
