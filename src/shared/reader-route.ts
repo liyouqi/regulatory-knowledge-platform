@@ -66,6 +66,38 @@ export function topicCatalogPath(): string {
   return "/topics";
 }
 
+export function ebaQaCatalogPath(): string {
+  return "/qa";
+}
+
+export function ebaQaDetailPath(publicId: string): string {
+  return `/qa/eba/${encodeURIComponent(publicId)}`;
+}
+
+export function dossierCatalogPath(): string {
+  return "/dossiers";
+}
+
+export function dossierDetailPath(slug: string): string {
+  return `/dossiers/${encodeURIComponent(slug)}`;
+}
+
+export function parseDossierPath(
+  pathname: string,
+): { scope: "catalog" } | { scope: "detail"; slug: string } | null {
+  if (/^\/dossiers\/?$/u.test(pathname)) return { scope: "catalog" };
+  const match = /^\/dossiers\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/u.exec(pathname);
+  return match ? { scope: "detail", slug: match[1] } : null;
+}
+
+export function parseEbaQaPath(
+  pathname: string,
+): { scope: "catalog" } | { scope: "detail"; publicId: string } | null {
+  if (/^\/qa\/?$/u.test(pathname)) return { scope: "catalog" };
+  const match = /^\/qa\/eba\/(\d{4}_\d+)\/?$/u.exec(pathname);
+  return match ? { scope: "detail", publicId: match[1] } : null;
+}
+
 export function regulatoryTopicPath(slug: string): string {
   return `/topics/${encodeURIComponent(slug)}`;
 }

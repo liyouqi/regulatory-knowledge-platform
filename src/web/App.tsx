@@ -56,6 +56,8 @@ import {
   implementationTimelinePath,
   isLevel2MandateQueryPath,
   parseApplicabilityPath,
+  parseDossierPath,
+  parseEbaQaPath,
   parseExplorerPath,
   parseImplementationTimelinePath,
   parseLevel2LibraryPath,
@@ -97,6 +99,16 @@ import { recordOpenedLaw } from "./opened-laws";
 const RelationshipGraphPage = lazy(() =>
   import("./RelationshipGraphPage").then((module) => ({
     default: module.RelationshipGraphPage,
+  })),
+);
+
+const EbaQaPage = lazy(() =>
+  import("./EbaQaPage").then((module) => ({ default: module.EbaQaPage })),
+);
+
+const RegulatoryDossierPage = lazy(() =>
+  import("./RegulatoryDossierPage").then((module) => ({
+    default: module.RegulatoryDossierPage,
   })),
 );
 
@@ -1594,6 +1606,8 @@ function ReaderPage({
 export function App() {
   const location = useLocation();
   const explorer = parseExplorerPath(location.pathname);
+  const ebaQa = parseEbaQaPath(location.pathname);
+  const dossier = parseDossierPath(location.pathname);
   const applicability = parseApplicabilityPath(location.pathname);
   const implementationTimeline = parseImplementationTimelinePath(
     location.pathname,
@@ -1651,6 +1665,36 @@ export function App() {
           }
           theme={theme}
         />
+      ) : dossier ? (
+        <Suspense
+          fallback={
+            <main aria-busy="true" className="loading">
+              Loading Regulatory Dossier…
+            </main>
+          }
+        >
+          <RegulatoryDossierPage
+            onOpenSearch={() => setSearchOpen(true)}
+            onToggleTheme={toggleTheme}
+            selection={dossier}
+            theme={theme}
+          />
+        </Suspense>
+      ) : ebaQa ? (
+        <Suspense
+          fallback={
+            <main aria-busy="true" className="loading">
+              Loading EBA Q&amp;A…
+            </main>
+          }
+        >
+          <EbaQaPage
+            onOpenSearch={() => setSearchOpen(true)}
+            onToggleTheme={toggleTheme}
+            selection={ebaQa}
+            theme={theme}
+          />
+        </Suspense>
       ) : applicability ? (
         <ApplicabilityPage
           onOpenSearch={() => setSearchOpen(true)}

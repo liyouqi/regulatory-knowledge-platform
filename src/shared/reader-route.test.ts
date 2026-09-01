@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   applicabilityPath,
   documentRelationshipGraphPath,
+  dossierCatalogPath,
+  dossierDetailPath,
+  ebaQaCatalogPath,
+  ebaQaDetailPath,
   explorerPath,
   globalRelationshipGraphPath,
   implementationTimelinePath,
@@ -9,6 +13,8 @@ import {
   level2LibraryPath,
   level2MandateQueryPath,
   parseApplicabilityPath,
+  parseDossierPath,
+  parseEbaQaPath,
   parseExplorerPath,
   parseImplementationTimelinePath,
   parseLevel2LibraryPath,
@@ -134,6 +140,24 @@ describe("Reader routes", () => {
       parseRegulatoryTopicPath("/topics/major-ict-incident-reporting"),
     ).toEqual({ scope: "topic", slug: "major-ict-incident-reporting" });
     expect(parseRegulatoryTopicPath("/topics/a/extra")).toBeNull();
+  });
+
+  it("builds and parses independent Q&A and Dossier routes", () => {
+    expect(ebaQaCatalogPath()).toBe("/qa");
+    expect(ebaQaDetailPath("2025_7613")).toBe("/qa/eba/2025_7613");
+    expect(parseEbaQaPath("/qa/eba/2025_7613")).toEqual({
+      scope: "detail",
+      publicId: "2025_7613",
+    });
+    expect(dossierCatalogPath()).toBe("/dossiers");
+    expect(dossierDetailPath("register-of-information")).toBe(
+      "/dossiers/register-of-information",
+    );
+    expect(parseDossierPath("/dossiers/register-of-information")).toEqual({
+      scope: "detail",
+      slug: "register-of-information",
+    });
+    expect(parseDossierPath("/dossiers/not_valid")).toBeNull();
   });
 
   it.each([

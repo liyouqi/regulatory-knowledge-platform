@@ -8,6 +8,7 @@
       "test-results",
       "data/raw",
       "data/artifacts",
+      "data/official-metadata/eba-qa/catalog.json",
       "exports"
     ]
   },

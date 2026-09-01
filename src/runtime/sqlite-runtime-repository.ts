@@ -23,6 +23,14 @@ import {
   documentVersionChainSchema,
 } from "../shared/document-version-chain";
 import {
+  type EbaQaCatalogItem,
+  type EbaQaDetail,
+  type EbaQaResolvedReference,
+  ebaQaCatalogItemSchema,
+  ebaQaDetailSchema,
+  ebaQaResolvedReferenceSchema,
+} from "../shared/eba-qa";
+import {
   type ImplementationTimeline,
   type ImplementationTimelineEvent,
   implementationTimelineSchema,
@@ -59,6 +67,14 @@ import {
   documentRegulatoryContextSchema,
   regulatoryDomainSchema,
 } from "../shared/regulatory-context";
+import {
+  type DossierPreview,
+  type DossierSource,
+  type RegulatoryDossier,
+  dossierPreviewSchema,
+  dossierSourceSchema,
+  regulatoryDossierSchema,
+} from "../shared/regulatory-dossier";
 import {
   type RegulatoryTopic,
   type TopicAssignment,
@@ -125,6 +141,15 @@ interface TopicAssignmentRow {
   rationale: string;
   reviewNote: string;
   evidenceLocator: string;
+}
+
+interface EbaQaCatalogRow extends Omit<EbaQaCatalogItem, "detailAvailable"> {
+  detailAvailable: 0 | 1;
+}
+
+interface EbaQaDetailRow extends Omit<EbaQaDetail, "id" | "publicId"> {
+  id: string;
+  publicId: string;
 }
 
 interface ApplicabilityRuleRow {
@@ -466,6 +491,46 @@ interface LegalNatureRow {
 interface FamilyPrimaryRow {
   familyId: string;
   familyShortName: string;
+}
+
+export interface EbaQaCatalogQueryResult {
+  records: EbaQaCatalogItem[];
+  total: number;
+  legalActs: string[];
+  topics: string[];
+  importedAt: string;
+}
+
+export interface EbaQaDetailRecord {
+  catalog: EbaQaCatalogItem;
+  detail: EbaQaDetail;
+  references: EbaQaResolvedReference[];
+  importedAt: string;
+}
+
+interface DossierRow {
+  id: string;
+  slug: string;
+  title: string;
+  kicker: string;
+  summary: string;
+  audience: string;
+  provenance: "EDITORIAL";
+  reviewStatus: "reviewed";
+  reviewedAt: string;
+}
+
+interface DossierSourceRow extends Omit<DossierSource, "required"> {
+  required: 0 | 1;
+  position: number;
+}
+
+interface DossierSectionRow {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  position: number;
 }
 
 interface Level2MeasureRow {
@@ -832,6 +897,12 @@ export class SqliteRuntimeRepository {
   readonly applicabilityEvidenceCount: number;
   readonly topicCount: number;
   readonly topicAssignmentCount: number;
+  readonly ebaQaCount: number;
+  readonly ebaQaDetailCount: number;
+  readonly ebaQaReferenceCount: number;
+  readonly dossierCount: number;
+  readonly dossierSectionCount: number;
+  readonly dossierSourceCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
 
@@ -978,6 +1049,60 @@ export class SqliteRuntimeRepository {
         manifestValue(this.database, "topicAssignmentCount"),
         10,
       );
+      this.ebaQaCount = Number.parseInt(
+        manifestValue(this.database, "ebaQaCount"),
+        10,
+      );
+      this.ebaQaDetailCount = Number.parseInt(
+        manifestValue(this.database, "ebaQaDetailCount"),
+        10,
+      );
+      this.ebaQaReferenceCount = Number.parseInt(
+        manifestValue(this.database, "ebaQaReferenceCount"),
+        10,
+      );
+      const ebaQaCounts = this.database
+        .prepare(`
+          SELECT
+            (SELECT count(*) FROM eba_qa_catalog) AS catalog,
+            (SELECT count(*) FROM eba_qa_details) AS details,
+            (SELECT count(*) FROM eba_qa_legal_references) AS referenceCount
+        `)
+        .get() as { catalog: number; details: number; referenceCount: number };
+      if (
+        ebaQaCounts.catalog !== this.ebaQaCount ||
+        ebaQaCounts.details !== this.ebaQaDetailCount ||
+        ebaQaCounts.referenceCount !== this.ebaQaReferenceCount
+      ) {
+        throw new Error("Runtime EBA Q&A counts differ from their manifest");
+      }
+      this.dossierCount = Number.parseInt(
+        manifestValue(this.database, "dossierCount"),
+        10,
+      );
+      this.dossierSectionCount = Number.parseInt(
+        manifestValue(this.database, "dossierSectionCount"),
+        10,
+      );
+      this.dossierSourceCount = Number.parseInt(
+        manifestValue(this.database, "dossierSourceCount"),
+        10,
+      );
+      const dossierCounts = this.database
+        .prepare(`
+          SELECT
+            (SELECT count(*) FROM regulatory_dossiers) AS dossiers,
+            (SELECT count(*) FROM dossier_sections) AS sections,
+            (SELECT count(*) FROM dossier_sources) AS sources
+        `)
+        .get() as { dossiers: number; sections: number; sources: number };
+      if (
+        dossierCounts.dossiers !== this.dossierCount ||
+        dossierCounts.sections !== this.dossierSectionCount ||
+        dossierCounts.sources !== this.dossierSourceCount
+      ) {
+        throw new Error("Runtime Dossier counts differ from their manifest");
+      }
       this.unresolvedReferenceCount = Number.parseInt(
         manifestValue(this.database, "unresolvedReferenceCount"),
         10,
@@ -1079,6 +1204,263 @@ export class SqliteRuntimeRepository {
       `)
       .all({ topicId: topicId ?? null }) as TopicAssignmentRow[];
     return topicAssignmentSchema.array().parse(rows);
+  }
+
+  listEbaQaCatalog(options: {
+    page: number;
+    pageSize: number;
+    legalAct?: string;
+    topic?: string;
+  }): EbaQaCatalogQueryResult {
+    const parameters = {
+      legalAct: options.legalAct ?? null,
+      topic: options.topic ?? null,
+      limit: options.pageSize,
+      offset: (options.page - 1) * options.pageSize,
+    };
+    const where = `
+      (@legalAct IS NULL OR legal_act_label = @legalAct)
+      AND (@topic IS NULL OR topic_label = @topic)
+    `;
+    const rows = this.database
+      .prepare(`
+        SELECT
+          id, public_id AS publicId, title, question,
+          legal_act_label AS legalActLabel,
+          associated_measure_label AS associatedMeasureLabel,
+          topic_label AS topicLabel, submitted_at AS submittedAt,
+          published_at AS publishedAt, official_url AS officialUrl,
+          status_at_import AS statusAtImport,
+          detail_available AS detailAvailable
+        FROM eba_qa_catalog
+        WHERE ${where}
+        ORDER BY published_at IS NULL ASC, published_at DESC, public_id DESC
+        LIMIT @limit OFFSET @offset
+      `)
+      .all(parameters) as EbaQaCatalogRow[];
+    const total = (
+      this.database
+        .prepare(`SELECT count(*) AS count FROM eba_qa_catalog WHERE ${where}`)
+        .get(parameters) as { count: number }
+    ).count;
+    const legalActs = this.database
+      .prepare(
+        "SELECT DISTINCT legal_act_label AS value FROM eba_qa_catalog ORDER BY value ASC",
+      )
+      .all()
+      .map((row) => (row as { value: string }).value);
+    const topics = this.database
+      .prepare(
+        "SELECT DISTINCT topic_label AS value FROM eba_qa_catalog ORDER BY value ASC",
+      )
+      .all()
+      .map((row) => (row as { value: string }).value);
+    const importedAt = (
+      this.database
+        .prepare("SELECT imported_at AS value FROM eba_qa_catalog LIMIT 1")
+        .get() as { value: string }
+    ).value;
+    return {
+      records: ebaQaCatalogItemSchema.array().parse(
+        rows.map((row) => ({
+          ...row,
+          detailAvailable: row.detailAvailable === 1,
+        })),
+      ),
+      total,
+      legalActs,
+      topics,
+      importedAt,
+    };
+  }
+
+  findEbaQaDetail(publicId: string): EbaQaDetailRecord | null {
+    const row = this.database
+      .prepare(`
+        SELECT
+          catalog.id, catalog.public_id AS publicId, catalog.title,
+          catalog.question, catalog.legal_act_label AS legalActLabel,
+          catalog.associated_measure_label AS associatedMeasureLabel,
+          catalog.topic_label AS topicLabel,
+          catalog.submitted_at AS submittedAt,
+          catalog.published_at AS publishedAt,
+          catalog.official_url AS officialUrl,
+          catalog.status_at_import AS statusAtImport,
+          catalog.detail_available AS detailAvailable,
+          catalog.imported_at AS importedAt,
+          detail.article_label AS articleLabel,
+          detail.paragraph_label AS paragraphLabel,
+          detail.subparagraph_label AS subparagraphLabel,
+          detail.associated_measure_article_label AS associatedMeasureArticleLabel,
+          detail.background, detail.final_answer AS finalAnswer,
+          detail.answer_prepared_by AS answerPreparedBy,
+          detail.final_status_label AS finalStatusLabel,
+          detail.non_binding_notice AS nonBindingNotice,
+          detail.content_hash AS contentHash
+        FROM eba_qa_catalog catalog
+        JOIN eba_qa_details detail ON detail.qa_id = catalog.id
+        WHERE catalog.public_id = ?
+      `)
+      .get(publicId) as
+      | (EbaQaCatalogRow & EbaQaDetailRow & { importedAt: string })
+      | undefined;
+    if (!row) return null;
+    const catalog = ebaQaCatalogItemSchema.parse({
+      id: row.id,
+      publicId: row.publicId,
+      title: row.title,
+      question: row.question,
+      legalActLabel: row.legalActLabel,
+      associatedMeasureLabel: row.associatedMeasureLabel,
+      topicLabel: row.topicLabel,
+      submittedAt: row.submittedAt,
+      publishedAt: row.publishedAt,
+      officialUrl: row.officialUrl,
+      statusAtImport: row.statusAtImport,
+      detailAvailable: row.detailAvailable === 1,
+    });
+    const detail = ebaQaDetailSchema.parse({
+      id: row.id,
+      publicId: row.publicId,
+      articleLabel: row.articleLabel,
+      paragraphLabel: row.paragraphLabel,
+      subparagraphLabel: row.subparagraphLabel,
+      associatedMeasureArticleLabel: row.associatedMeasureArticleLabel,
+      background: row.background,
+      finalAnswer: row.finalAnswer,
+      answerPreparedBy: row.answerPreparedBy,
+      finalStatusLabel: row.finalStatusLabel,
+      nonBindingNotice: row.nonBindingNotice,
+      contentHash: row.contentHash,
+    });
+    const references = this.database
+      .prepare(`
+        SELECT
+          reference.qa_id AS qaId, reference.role,
+          reference.target_document_id AS targetDocumentId,
+          reference.target_entity_id AS targetEntityId,
+          reference.citation_label AS citationLabel,
+          reference.official_url AS officialUrl,
+          reference.provenance,
+          reference.resolution_status AS resolutionStatus,
+          reference.evidence_locator AS evidenceLocator,
+          entity.label AS targetLabel, entity.title AS targetTitle,
+          entity.path AS targetPath,
+          document.short_name AS targetDocumentShortName
+        FROM eba_qa_legal_references reference
+        LEFT JOIN legal_entities entity ON entity.id = reference.target_entity_id
+        LEFT JOIN documents document ON document.id = reference.target_document_id
+        WHERE reference.qa_id = ?
+        ORDER BY CASE reference.role
+          WHEN 'declared-legal-act' THEN 0
+          WHEN 'declared-provision' THEN 1
+          ELSE 2 END
+      `)
+      .all(row.id) as EbaQaResolvedReference[];
+    return {
+      catalog,
+      detail,
+      references: ebaQaResolvedReferenceSchema.array().parse(references),
+      importedAt: row.importedAt,
+    };
+  }
+
+  listRegulatoryDossiers(): DossierPreview[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          dossier.id, dossier.slug, dossier.title, dossier.kicker,
+          dossier.summary,
+          (SELECT count(*) FROM dossier_sections section
+            WHERE section.dossier_id = dossier.id) AS sectionCount,
+          (SELECT count(*) FROM dossier_sources source
+            WHERE source.dossier_id = dossier.id) AS sourceCount,
+          (SELECT count(*) FROM dossier_sources source
+            WHERE source.dossier_id = dossier.id
+              AND source.kind = 'eba-qa') AS qaCount
+        FROM regulatory_dossiers dossier
+        ORDER BY dossier.title ASC, dossier.id ASC
+      `)
+      .all();
+    return dossierPreviewSchema.array().parse(rows);
+  }
+
+  findRegulatoryDossier(slug: string): RegulatoryDossier | null {
+    const dossier = this.database
+      .prepare(`
+        SELECT id, slug, title, kicker, summary, audience,
+          provenance, review_status AS reviewStatus, reviewed_at AS reviewedAt
+        FROM regulatory_dossiers
+        WHERE slug = ?
+      `)
+      .get(slug) as DossierRow | undefined;
+    if (!dossier) return null;
+    const sources = dossierSourceSchema.array().parse(
+      (
+        this.database
+          .prepare(`
+            SELECT source_id AS id, kind, target_id AS targetId, role, required,
+              target_label AS targetLabel, target_title AS targetTitle,
+              target_path AS targetPath, official_url AS officialUrl,
+              provenance, position
+            FROM dossier_sources
+            WHERE dossier_id = ?
+            ORDER BY position ASC, source_id ASC
+          `)
+          .all(dossier.id) as DossierSourceRow[]
+      ).map(({ position: _position, ...source }) => ({
+        ...source,
+        required: source.required === 1,
+      })),
+    );
+    const sectionRows = this.database
+      .prepare(`
+        SELECT section_id AS id, eyebrow, title, body, position
+        FROM dossier_sections
+        WHERE dossier_id = ?
+        ORDER BY position ASC, section_id ASC
+      `)
+      .all(dossier.id) as DossierSectionRow[];
+    const sectionSources = this.database
+      .prepare(`
+        SELECT section_id AS sectionId, source_id AS sourceId
+        FROM dossier_section_sources
+        WHERE dossier_id = ?
+        ORDER BY section_id ASC, position ASC
+      `)
+      .all(dossier.id) as Array<{ sectionId: string; sourceId: string }>;
+    return regulatoryDossierSchema.parse({
+      ...dossier,
+      sources,
+      sections: sectionRows.map(({ position: _position, ...section }) => ({
+        ...section,
+        sourceIds: sectionSources
+          .filter((source) => source.sectionId === section.id)
+          .map((source) => source.sourceId),
+      })),
+    });
+  }
+
+  listDossiersForQa(qaId: string): DossierPreview[] {
+    const rows = this.database
+      .prepare(`
+        SELECT
+          dossier.id, dossier.slug, dossier.title, dossier.kicker,
+          dossier.summary,
+          (SELECT count(*) FROM dossier_sections section
+            WHERE section.dossier_id = dossier.id) AS sectionCount,
+          (SELECT count(*) FROM dossier_sources item
+            WHERE item.dossier_id = dossier.id) AS sourceCount,
+          (SELECT count(*) FROM dossier_sources item
+            WHERE item.dossier_id = dossier.id
+              AND item.kind = 'eba-qa') AS qaCount
+        FROM regulatory_dossiers dossier
+        JOIN dossier_sources source ON source.dossier_id = dossier.id
+        WHERE source.kind = 'eba-qa' AND source.target_id = ?
+        ORDER BY dossier.title ASC, dossier.id ASC
+      `)
+      .all(qaId);
+    return dossierPreviewSchema.array().parse(rows);
   }
 
   findApplicabilityBySlug(

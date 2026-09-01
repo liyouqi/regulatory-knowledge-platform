@@ -76,6 +76,12 @@ console.table({
   applicabilityEvidence: manifest.applicabilityEvidenceCount,
   regulatoryTopics: manifest.topicCount,
   topicAssignments: manifest.topicAssignmentCount,
+  ebaQaRecords: manifest.ebaQaCount,
+  ebaQaDetails: manifest.ebaQaDetailCount,
+  ebaQaReferences: manifest.ebaQaReferenceCount,
+  dossiers: manifest.dossierCount,
+  dossierSections: manifest.dossierSectionCount,
+  dossierSources: manifest.dossierSourceCount,
   tfidfBenchmark: manifest.tfidfBenchmark?.passed
     ? `${manifest.tfidfBenchmark.passedCaseCount}/${manifest.tfidfBenchmark.caseCount} passed`
     : "not published",

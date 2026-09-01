@@ -42,6 +42,7 @@
     "eba:source:verify": "node --import tsx src/ingestion/eba-cli.ts verify",
     "eba:canonical:build": "node --import tsx src/ingestion/eba-canonical-cli.ts",
     "eba:canonical:inspect": "node --import tsx src/ingestion/eba-canonical-cli.ts --inspect",
+    "eba-qa:fetch": "node --import tsx src/qa/eba-qa-cli.ts fetch",
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
     "corpus:build": "node --import tsx src/corpus/corpus-build-cli.ts",

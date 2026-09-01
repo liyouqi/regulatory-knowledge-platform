@@ -818,4 +818,32 @@ describe("SQLite runtime repository", () => {
     });
     expect(repository?.findRelationshipPreview("eu:unknown")).toBeNull();
   });
+
+  it("keeps Dossiers queryable as a separate source-backed product", () => {
+    expect(repository?.listRegulatoryDossiers()).toHaveLength(3);
+    expect(
+      repository?.findRegulatoryDossier("major-ict-incident-reporting"),
+    ).toMatchObject({
+      id: "dossier:major-ict-incident-reporting",
+      provenance: "EDITORIAL",
+      reviewStatus: "reviewed",
+      sections: expect.arrayContaining([
+        expect.objectContaining({
+          id: "section:event-boundary",
+          sourceIds: expect.arrayContaining(["source:qa-2025-7613"]),
+        }),
+      ]),
+      sources: expect.arrayContaining([
+        expect.objectContaining({
+          targetId: "qa:eba:2025_7613",
+          provenance: "OFFICIAL_QA",
+          targetPath: "/qa/eba/2025_7613",
+        }),
+      ]),
+    });
+    expect(repository?.listDossiersForQa("qa:eba:2025_7613")).toEqual([
+      expect.objectContaining({ slug: "major-ict-incident-reporting" }),
+    ]);
+    expect(repository?.findRegulatoryDossier("not-found")).toBeNull();
+  });
 });

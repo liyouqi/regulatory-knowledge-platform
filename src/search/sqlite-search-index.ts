@@ -24,6 +24,19 @@ import {
   loadSupervisoryDecisionDataset,
 } from "../decisions/supervisory-decision";
 import {
+  REGULATORY_DOSSIER_BUILDER,
+  REGULATORY_DOSSIER_BUILDER_VERSION,
+  buildRegulatoryDossiers,
+  loadRegulatoryDossierDataset,
+} from "../dossiers/regulatory-dossier";
+import {
+  EBA_QA_BUILDER,
+  EBA_QA_BUILDER_VERSION,
+  buildEbaQa,
+  loadEbaQaCatalog,
+  loadEbaQaDetails,
+} from "../qa/eba-qa";
+import {
   DEFAULT_AUTHORITIES_PATH,
   DEFAULT_LEGAL_NATURES_PATH,
   DEFAULT_REGULATORY_DOMAINS_PATH,
@@ -124,7 +137,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.5.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.7.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -167,6 +180,12 @@ export interface RuntimeDatabaseManifest {
   applicabilityEvidenceCount: number;
   topicCount: number;
   topicAssignmentCount: number;
+  ebaQaCount: number;
+  ebaQaDetailCount: number;
+  ebaQaReferenceCount: number;
+  dossierCount: number;
+  dossierSectionCount: number;
+  dossierSourceCount: number;
   tfidfBenchmark: RelatedRecitalEvaluation | null;
   unresolvedReferenceCount: number;
   reviewedInputIssues: ReviewedInputIssue[];
@@ -368,6 +387,9 @@ function runtimeBuildId(
   supervisoryDecisionDataset: ReturnType<typeof loadSupervisoryDecisionDataset>,
   applicabilityRuleDataset: ReturnType<typeof loadApplicabilityRuleDataset>,
   regulatoryTopicDataset: ReturnType<typeof loadRegulatoryTopicDataset>,
+  ebaQaCatalog: ReturnType<typeof loadEbaQaCatalog>,
+  ebaQaDetails: ReturnType<typeof loadEbaQaDetails>,
+  dossierDataset: ReturnType<typeof loadRegulatoryDossierDataset>,
   documentExpressionMetadataDataset: ReturnType<
     typeof loadDocumentExpressionMetadataDataset
   >,
@@ -410,6 +432,11 @@ function runtimeBuildId(
         JSON.stringify(applicabilityRuleDataset),
         `${REGULATORY_TOPIC_BUILDER}@${REGULATORY_TOPIC_BUILDER_VERSION}`,
         JSON.stringify(regulatoryTopicDataset),
+        `${EBA_QA_BUILDER}@${EBA_QA_BUILDER_VERSION}`,
+        JSON.stringify(ebaQaCatalog),
+        JSON.stringify(ebaQaDetails),
+        `${REGULATORY_DOSSIER_BUILDER}@${REGULATORY_DOSSIER_BUILDER_VERSION}`,
+        JSON.stringify(dossierDataset),
         JSON.stringify(documentExpressionMetadataDataset),
         input,
       ].join("\n"),
@@ -558,6 +585,21 @@ export function buildRuntimeDatabase(
     knownDocumentIds,
     regulatoryTopicDataset,
     { mode: reviewValidationMode, issues: reviewedInputIssues },
+  );
+  const ebaQaCatalog = loadEbaQaCatalog();
+  const ebaQaDetails = loadEbaQaDetails();
+  const ebaQaBuild = buildEbaQa(
+    documents,
+    relationshipBuild.entities,
+    ebaQaCatalog,
+    ebaQaDetails,
+  );
+  const dossierDataset = loadRegulatoryDossierDataset();
+  const dossiers = buildRegulatoryDossiers(
+    documents,
+    relationshipBuild.entities,
+    ebaQaBuild,
+    dossierDataset,
   );
   const sourceByIdentifier = new Map(
     sources.flatMap((source) => {
@@ -711,6 +753,9 @@ export function buildRuntimeDatabase(
     supervisoryDecisionDataset,
     applicabilityRuleDataset,
     regulatoryTopicDataset,
+    ebaQaCatalog,
+    ebaQaDetails,
+    dossierDataset,
     documentExpressionMetadataDataset,
   );
   const builtAt = new Date().toISOString();
@@ -958,6 +1003,105 @@ export function buildRuntimeDatabase(
       CREATE INDEX topic_assignments_topic_id ON topic_assignments(topic_id);
       CREATE INDEX topic_assignments_document_id
         ON topic_assignments(target_document_id);
+      CREATE TABLE eba_qa_catalog (
+        id TEXT PRIMARY KEY,
+        public_id TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL,
+        question TEXT NOT NULL,
+        legal_act_label TEXT NOT NULL,
+        associated_measure_label TEXT NOT NULL,
+        topic_label TEXT NOT NULL,
+        submitted_at TEXT NOT NULL,
+        published_at TEXT,
+        official_url TEXT NOT NULL,
+        status_at_import TEXT NOT NULL CHECK (status_at_import = 'Final'),
+        detail_available INTEGER NOT NULL CHECK (detail_available IN (0, 1)),
+        imported_at TEXT NOT NULL
+      ) STRICT;
+      CREATE INDEX eba_qa_catalog_legal_act ON eba_qa_catalog(legal_act_label);
+      CREATE INDEX eba_qa_catalog_topic ON eba_qa_catalog(topic_label);
+      CREATE INDEX eba_qa_catalog_published ON eba_qa_catalog(published_at DESC);
+      CREATE TABLE eba_qa_details (
+        qa_id TEXT PRIMARY KEY REFERENCES eba_qa_catalog(id),
+        article_label TEXT,
+        paragraph_label TEXT,
+        subparagraph_label TEXT,
+        associated_measure_article_label TEXT,
+        background TEXT NOT NULL,
+        final_answer TEXT NOT NULL,
+        answer_prepared_by TEXT,
+        final_status_label TEXT NOT NULL CHECK (final_status_label = 'Final Q&A'),
+        non_binding_notice TEXT NOT NULL,
+        content_hash TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE eba_qa_legal_references (
+        qa_id TEXT NOT NULL REFERENCES eba_qa_catalog(id),
+        role TEXT NOT NULL CHECK (role IN (
+          'declared-legal-act', 'declared-provision', 'associated-measure'
+        )),
+        target_document_id TEXT REFERENCES documents(id),
+        target_entity_id TEXT REFERENCES legal_entities(id),
+        citation_label TEXT NOT NULL,
+        official_url TEXT,
+        provenance TEXT NOT NULL CHECK (provenance = 'OFFICIAL_QA_METADATA'),
+        resolution_status TEXT NOT NULL CHECK (resolution_status IN (
+          'resolved', 'external', 'unresolved'
+        )),
+        evidence_locator TEXT NOT NULL,
+        PRIMARY KEY (qa_id, role, citation_label)
+      ) STRICT;
+      CREATE INDEX eba_qa_references_target_entity
+        ON eba_qa_legal_references(target_entity_id);
+      CREATE TABLE regulatory_dossiers (
+        id TEXT PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL,
+        kicker TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        audience TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
+        review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
+        reviewed_at TEXT NOT NULL
+      ) STRICT;
+      CREATE TABLE dossier_sections (
+        dossier_id TEXT NOT NULL REFERENCES regulatory_dossiers(id),
+        section_id TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        eyebrow TEXT NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        PRIMARY KEY (dossier_id, section_id),
+        UNIQUE (dossier_id, position)
+      ) STRICT;
+      CREATE TABLE dossier_sources (
+        dossier_id TEXT NOT NULL REFERENCES regulatory_dossiers(id),
+        source_id TEXT NOT NULL,
+        kind TEXT NOT NULL CHECK (kind IN ('legal-entity', 'eba-qa')),
+        target_id TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('primary', 'supporting')),
+        required INTEGER NOT NULL CHECK (required IN (0, 1)),
+        target_label TEXT NOT NULL,
+        target_title TEXT,
+        target_path TEXT NOT NULL,
+        official_url TEXT NOT NULL,
+        provenance TEXT NOT NULL CHECK (provenance IN (
+          'OFFICIAL_TEXT', 'OFFICIAL_QA'
+        )),
+        PRIMARY KEY (dossier_id, source_id)
+      ) STRICT;
+      CREATE INDEX dossier_sources_target_id ON dossier_sources(target_id);
+      CREATE TABLE dossier_section_sources (
+        dossier_id TEXT NOT NULL,
+        section_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        PRIMARY KEY (dossier_id, section_id, source_id),
+        FOREIGN KEY (dossier_id, section_id)
+          REFERENCES dossier_sections(dossier_id, section_id),
+        FOREIGN KEY (dossier_id, source_id)
+          REFERENCES dossier_sources(dossier_id, source_id)
+      ) STRICT;
       CREATE TABLE authorities (
         id TEXT PRIMARY KEY,
         official_name TEXT NOT NULL,
@@ -1365,6 +1509,67 @@ export function buildRuntimeDatabase(
         @reviewNote, @evidenceLocator
       )
     `);
+    const insertEbaQaCatalog = database.prepare(`
+      INSERT INTO eba_qa_catalog (
+        id, public_id, title, question, legal_act_label,
+        associated_measure_label, topic_label, submitted_at, published_at,
+        official_url, status_at_import, detail_available, imported_at
+      ) VALUES (
+        @id, @publicId, @title, @question, @legalActLabel,
+        @associatedMeasureLabel, @topicLabel, @submittedAt, @publishedAt,
+        @officialUrl, @statusAtImport, @detailAvailable, @importedAt
+      )
+    `);
+    const insertEbaQaDetail = database.prepare(`
+      INSERT INTO eba_qa_details (
+        qa_id, article_label, paragraph_label, subparagraph_label,
+        associated_measure_article_label, background, final_answer,
+        answer_prepared_by, final_status_label, non_binding_notice, content_hash
+      ) VALUES (
+        @id, @articleLabel, @paragraphLabel, @subparagraphLabel,
+        @associatedMeasureArticleLabel, @background, @finalAnswer,
+        @answerPreparedBy, @finalStatusLabel, @nonBindingNotice, @contentHash
+      )
+    `);
+    const insertEbaQaReference = database.prepare(`
+      INSERT INTO eba_qa_legal_references (
+        qa_id, role, target_document_id, target_entity_id, citation_label,
+        official_url, provenance, resolution_status, evidence_locator
+      ) VALUES (
+        @qaId, @role, @targetDocumentId, @targetEntityId, @citationLabel,
+        @officialUrl, @provenance, @resolutionStatus, @evidenceLocator
+      )
+    `);
+    const insertDossier = database.prepare(`
+      INSERT INTO regulatory_dossiers (
+        id, slug, title, kicker, summary, audience,
+        provenance, review_status, reviewed_at
+      ) VALUES (
+        @id, @slug, @title, @kicker, @summary, @audience,
+        @provenance, @reviewStatus, @reviewedAt
+      )
+    `);
+    const insertDossierSection = database.prepare(`
+      INSERT INTO dossier_sections (
+        dossier_id, section_id, position, eyebrow, title, body
+      ) VALUES (
+        @dossierId, @sectionId, @position, @eyebrow, @title, @body
+      )
+    `);
+    const insertDossierSource = database.prepare(`
+      INSERT INTO dossier_sources (
+        dossier_id, source_id, kind, target_id, position, role, required,
+        target_label, target_title, target_path, official_url, provenance
+      ) VALUES (
+        @dossierId, @sourceId, @kind, @targetId, @position, @role, @required,
+        @targetLabel, @targetTitle, @targetPath, @officialUrl, @provenance
+      )
+    `);
+    const insertDossierSectionSource = database.prepare(`
+      INSERT INTO dossier_section_sources (
+        dossier_id, section_id, source_id, position
+      ) VALUES (@dossierId, @sectionId, @sourceId, @position)
+    `);
     const insertAuthority = database.prepare(`
       INSERT INTO authorities (
         id, official_name, acronym, authority_type, jurisdiction,
@@ -1619,6 +1824,50 @@ export function buildRuntimeDatabase(
       for (const assignment of regulatoryTopicBuild.assignments) {
         insertTopicAssignment.run(assignment);
       }
+      for (const item of ebaQaBuild.catalog.records) {
+        insertEbaQaCatalog.run({
+          ...item,
+          detailAvailable: item.detailAvailable ? 1 : 0,
+          importedAt: ebaQaBuild.catalog.retrievedAt,
+        });
+      }
+      for (const detail of ebaQaBuild.details.records) {
+        insertEbaQaDetail.run(detail);
+      }
+      for (const reference of ebaQaBuild.references) {
+        insertEbaQaReference.run(reference);
+      }
+      for (const dossier of dossiers) {
+        insertDossier.run(dossier);
+        for (const [position, source] of dossier.sources.entries()) {
+          insertDossierSource.run({
+            ...source,
+            dossierId: dossier.id,
+            sourceId: source.id,
+            required: source.required ? 1 : 0,
+            position,
+          });
+        }
+        for (const [position, section] of dossier.sections.entries()) {
+          insertDossierSection.run({
+            ...section,
+            dossierId: dossier.id,
+            sectionId: section.id,
+            position,
+          });
+          for (const [
+            sourcePosition,
+            sourceId,
+          ] of section.sourceIds.entries()) {
+            insertDossierSectionSource.run({
+              dossierId: dossier.id,
+              sectionId: section.id,
+              sourceId,
+              position: sourcePosition,
+            });
+          }
+        }
+      }
       for (const authority of regulatoryContextBuild.authorities) {
         insertAuthority.run(authority);
       }
@@ -1727,6 +1976,22 @@ export function buildRuntimeDatabase(
         ),
         topicCount: String(regulatoryTopicBuild.topics.length),
         topicAssignmentCount: String(regulatoryTopicBuild.assignments.length),
+        ebaQaCount: String(ebaQaBuild.catalog.records.length),
+        ebaQaDetailCount: String(ebaQaBuild.details.records.length),
+        ebaQaReferenceCount: String(ebaQaBuild.references.length),
+        dossierCount: String(dossiers.length),
+        dossierSectionCount: String(
+          dossiers.reduce(
+            (count, dossier) => count + dossier.sections.length,
+            0,
+          ),
+        ),
+        dossierSourceCount: String(
+          dossiers.reduce(
+            (count, dossier) => count + dossier.sources.length,
+            0,
+          ),
+        ),
         tfidfBenchmark: JSON.stringify(relatedRecitalBuild?.evaluation ?? null),
         officialMappingCount: String(officialMappings.length),
         unresolvedReferenceCount: String(relationshipBuild.unresolvedCount),
@@ -1779,6 +2044,12 @@ export function buildRuntimeDatabase(
         ]),
         topicBuilders: JSON.stringify([
           `${REGULATORY_TOPIC_BUILDER}@${REGULATORY_TOPIC_BUILDER_VERSION}`,
+        ]),
+        ebaQaBuilders: JSON.stringify([
+          `${EBA_QA_BUILDER}@${EBA_QA_BUILDER_VERSION}`,
+        ]),
+        dossierBuilders: JSON.stringify([
+          `${REGULATORY_DOSSIER_BUILDER}@${REGULATORY_DOSSIER_BUILDER_VERSION}`,
         ]),
         documentBuilds: JSON.stringify(
           documents.map((document) => ({
@@ -1861,6 +2132,18 @@ export function buildRuntimeDatabase(
     applicabilityEvidenceCount: applicabilityRuleBuild.evidence.length,
     topicCount: regulatoryTopicBuild.topics.length,
     topicAssignmentCount: regulatoryTopicBuild.assignments.length,
+    ebaQaCount: ebaQaBuild.catalog.records.length,
+    ebaQaDetailCount: ebaQaBuild.details.records.length,
+    ebaQaReferenceCount: ebaQaBuild.references.length,
+    dossierCount: dossiers.length,
+    dossierSectionCount: dossiers.reduce(
+      (count, dossier) => count + dossier.sections.length,
+      0,
+    ),
+    dossierSourceCount: dossiers.reduce(
+      (count, dossier) => count + dossier.sources.length,
+      0,
+    ),
     tfidfBenchmark: relatedRecitalBuild?.evaluation ?? null,
     unresolvedReferenceCount: relationshipBuild.unresolvedCount,
     reviewedInputIssues,

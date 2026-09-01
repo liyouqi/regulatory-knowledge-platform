@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
+import { RegulatoryDossierService } from "../dossiers/regulatory-dossier-service";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import {
   PublicApiAccessController,
@@ -11,6 +12,7 @@ import {
 import { createPublicApiDocumentationRouter } from "../public-api/public-api-documentation-router";
 import { createPublicApiRouter } from "../public-api/public-api-router";
 import { PublicApiService } from "../public-api/public-api-service";
+import { EbaQaService } from "../qa/eba-qa-service";
 import {
   toDocumentRelationshipGraph,
   toGlobalRelationshipGraph,
@@ -43,6 +45,10 @@ const citationRetrievalService = new CitationRetrievalService(
 );
 const regulatoryPathService = new RegulatoryPathService(runtimeRepository);
 const regulatoryTopicService = new RegulatoryTopicService(runtimeRepository);
+const ebaQaService = new EbaQaService(runtimeRepository);
+const regulatoryDossierService = new RegulatoryDossierService(
+  runtimeRepository,
+);
 const publicApiService = new PublicApiService(
   runtimeRepository,
   lawSearchRecords,
@@ -116,6 +122,27 @@ export function listRegulatoryTopics() {
 
 export function findRegulatoryTopic(slug: string) {
   return regulatoryTopicService.findBySlug(slug);
+}
+
+export function listEbaQa(options: {
+  page?: number;
+  pageSize?: number;
+  legalAct?: string;
+  topic?: string;
+}) {
+  return ebaQaService.list(options);
+}
+
+export function findEbaQa(publicId: string) {
+  return ebaQaService.find(publicId);
+}
+
+export function listRegulatoryDossiers() {
+  return regulatoryDossierService.list();
+}
+
+export function findRegulatoryDossier(slug: string) {
+  return regulatoryDossierService.find(slug);
 }
 
 export function findExplorerBySlug(slug: string) {
@@ -258,6 +285,12 @@ app.get("/api/health", (_request, response) => {
       applicabilityEvidence: runtimeRepository.applicabilityEvidenceCount,
       regulatoryTopics: runtimeRepository.topicCount,
       topicAssignments: runtimeRepository.topicAssignmentCount,
+      ebaQaRecords: runtimeRepository.ebaQaCount,
+      ebaQaDetails: runtimeRepository.ebaQaDetailCount,
+      ebaQaReferences: runtimeRepository.ebaQaReferenceCount,
+      dossiers: runtimeRepository.dossierCount,
+      dossierSections: runtimeRepository.dossierSectionCount,
+      dossierSources: runtimeRepository.dossierSourceCount,
       unresolvedReferences: runtimeRepository.unresolvedReferenceCount,
     },
     publicApi: publicApiAccessController.snapshot(),
@@ -365,6 +398,59 @@ app.get("/api/topics/:slug", (request, response) => {
     return;
   }
   response.json(topic);
+});
+
+app.get("/api/qa", (request, response) => {
+  const integerQuery = (name: string) => {
+    const value = request.query[name];
+    return typeof value === "string" ? Number.parseInt(value, 10) : undefined;
+  };
+  const stringQuery = (name: string) => {
+    const value = request.query[name];
+    return typeof value === "string" && value.trim()
+      ? value.trim().slice(0, 300)
+      : undefined;
+  };
+  response.json(
+    listEbaQa({
+      page: integerQuery("page"),
+      pageSize: integerQuery("pageSize"),
+      legalAct: stringQuery("legalAct"),
+      topic: stringQuery("topic"),
+    }),
+  );
+});
+
+app.get("/api/qa/:publicId", (request, response) => {
+  const publicId = request.params.publicId.slice(0, 40);
+  if (!/^\d{4}_\d+$/u.test(publicId)) {
+    response.status(404).json({ error: "EBA Q&A not found" });
+    return;
+  }
+  const result = findEbaQa(publicId);
+  if (!result) {
+    response.status(404).json({ error: "EBA Q&A detail not found" });
+    return;
+  }
+  response.json(result);
+});
+
+app.get("/api/dossiers", (_request, response) => {
+  response.json(listRegulatoryDossiers());
+});
+
+app.get("/api/dossiers/:slug", (request, response) => {
+  const slug = request.params.slug.slice(0, 120);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug)) {
+    response.status(404).json({ error: "Regulatory Dossier not found" });
+    return;
+  }
+  const result = findRegulatoryDossier(slug);
+  if (!result) {
+    response.status(404).json({ error: "Regulatory Dossier not found" });
+    return;
+  }
+  response.json(result);
 });
 
 function sendFamilyLevel2(

@@ -10,6 +10,7 @@ import {
   findDocumentRelationshipGraph,
   findDocumentSupervisoryDecisions,
   findDocumentVersionChain,
+  findEbaQa,
   findExplorerBySlug,
   findFamilyLevel2,
   findGlobalRelationshipGraph,
@@ -17,15 +18,54 @@ import {
   findLaws,
   findLevel2Mandates,
   findProvisionRelationships,
+  findRegulatoryDossier,
   findRegulatoryPath,
   findRegulatoryTopic,
   findRelationshipGraph,
   findRelationshipPreview,
   listDocumentDefinitions,
+  listEbaQa,
+  listRegulatoryDossiers,
   listRegulatoryTopics,
 } from "./app";
 
 describe("Document lookup", () => {
+  it("serves official Q&A separately from reviewed Dossier synthesis", () => {
+    const qaCatalog = listEbaQa({ page: 1, pageSize: 10 });
+    const qa = findEbaQa("2025_7613");
+    const dossiers = listRegulatoryDossiers();
+    const dossier = findRegulatoryDossier("major-ict-incident-reporting");
+
+    expect(qaCatalog.total).toBe(2709);
+    expect(qaCatalog.records).toHaveLength(10);
+    expect(qa).toMatchObject({
+      catalog: { id: "qa:eba:2025_7613", statusAtImport: "Final" },
+      detail: { finalStatusLabel: "Final Q&A" },
+      dossiers: [
+        expect.objectContaining({ slug: "major-ict-incident-reporting" }),
+      ],
+    });
+    expect(dossiers).toMatchObject({
+      provenance: "EDITORIAL",
+      records: expect.arrayContaining([
+        expect.objectContaining({ slug: "major-ict-incident-reporting" }),
+      ]),
+    });
+    expect(dossier).toMatchObject({
+      dossier: {
+        provenance: "EDITORIAL",
+        sources: expect.arrayContaining([
+          expect.objectContaining({
+            targetId: "qa:eba:2025_7613",
+            provenance: "OFFICIAL_QA",
+          }),
+        ]),
+      },
+    });
+    expect(findEbaQa("2025_0000")).toBeNull();
+    expect(findRegulatoryDossier("unknown")).toBeNull();
+  });
+
   it("serves the reviewed Topic catalog and cross-file detail", () => {
     const catalog = listRegulatoryTopics();
     const topic = findRegulatoryTopic("major-ict-incident-reporting");

@@ -34,6 +34,12 @@ export interface RuntimeArtifactVerification {
   applicabilityEvidence: number;
   regulatoryTopics: number;
   topicAssignments: number;
+  ebaQaRecords: number;
+  ebaQaDetails: number;
+  ebaQaReferences: number;
+  dossiers: number;
+  dossierSections: number;
+  dossierSources: number;
   unresolvedReferences: number;
   bytes: number;
   input: string;
@@ -99,6 +105,12 @@ export function verifyRuntimeArtifact(
       applicabilityEvidence: repository.applicabilityEvidenceCount,
       regulatoryTopics: repository.topicCount,
       topicAssignments: repository.topicAssignmentCount,
+      ebaQaRecords: repository.ebaQaCount,
+      ebaQaDetails: repository.ebaQaDetailCount,
+      ebaQaReferences: repository.ebaQaReferenceCount,
+      dossiers: repository.dossierCount,
+      dossierSections: repository.dossierSectionCount,
+      dossierSources: repository.dossierSourceCount,
       unresolvedReferences: repository.unresolvedReferenceCount,
       bytes: statSync(databasePath).size,
       input: databasePath,
