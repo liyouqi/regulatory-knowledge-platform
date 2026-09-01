@@ -107,7 +107,7 @@ function LawPickerFamilyGroup({
       open={open}
     >
       <summary>
-        <span>Family · {group.label}</span>
+        <span>{group.label}</span>
         <small>{group.documents.length}</small>
       </summary>
       <div>
