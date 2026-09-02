@@ -12,7 +12,7 @@ import {
 } from "../shared/regulatory-dossier";
 
 export const REGULATORY_DOSSIER_BUILDER = "regulatory-dossier";
-export const REGULATORY_DOSSIER_BUILDER_VERSION = "1.0.0";
+export const REGULATORY_DOSSIER_BUILDER_VERSION = "1.1.0";
 export const DEFAULT_REGULATORY_DOSSIERS_PATH = resolve(
   process.cwd(),
   "data/editorial/dossiers.json",
@@ -39,6 +39,32 @@ export function buildRegulatoryDossiers(
   );
   const qaDetailIds = new Set(ebaQa.details.records.map((detail) => detail.id));
 
+  const legalSourceDisplay = (
+    entity: LegalEntityRecord,
+    document: DocumentView,
+  ) => {
+    const root = entity.rootProvisionId
+      ? entityById.get(entity.rootProvisionId)
+      : null;
+    const childLabel =
+      entity.kind === "paragraph" && /^\d+\.$/u.test(entity.label)
+        ? `(${entity.label.slice(0, -1)})`
+        : entity.label;
+    const legalLabel =
+      root?.id !== entity.id && childLabel.startsWith("(")
+        ? `${root?.label ?? ""}${childLabel}`
+        : [root?.label, root?.id === entity.id ? null : childLabel]
+            .filter(Boolean)
+            .join(" ");
+    return {
+      targetLabel:
+        entity.kind === "document"
+          ? document.shortName
+          : `${document.shortName} ${legalLabel}`,
+      targetTitle: entity.title ?? root?.title ?? null,
+    };
+  };
+
   return dataset.dossiers.flatMap((input) => {
     const resolvedSources: DossierSource[] = [];
     let missingRequiredSource = false;
@@ -50,10 +76,10 @@ export function buildRegulatoryDossiers(
           missingRequiredSource ||= source.required;
           continue;
         }
+        const display = legalSourceDisplay(entity, document);
         resolvedSources.push({
           ...source,
-          targetLabel: entity.label,
-          targetTitle: entity.title,
+          ...display,
           targetPath: entity.path,
           officialUrl: document.sourceUrl,
           provenance: "OFFICIAL_TEXT",
@@ -78,20 +104,20 @@ export function buildRegulatoryDossiers(
     const availableSourceIds = new Set(
       resolvedSources.map((source) => source.id),
     );
-    const sections = input.sections.map((section) => ({
-      ...section,
-      sourceIds: section.sourceIds.filter((sourceId) =>
-        availableSourceIds.has(sourceId),
-      ),
-    }));
-    if (sections.some((section) => section.sourceIds.length === 0)) return [];
+    if (
+      input.sections.some((section) =>
+        section.sourceIds.some((sourceId) => !availableSourceIds.has(sourceId)),
+      )
+    ) {
+      return [];
+    }
     return [
       regulatoryDossierSchema.parse({
         ...input,
         provenance: dataset.provenance,
         reviewStatus: dataset.reviewStatus,
         sources: resolvedSources,
-        sections,
+        sections: input.sections,
       }),
     ];
   });

@@ -21,6 +21,7 @@ import {
   dossierCatalogResponseSchema,
   dossierDetailResponseSchema,
 } from "../shared/regulatory-dossier";
+import { DossierModuleRenderer } from "./DossierModules";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 
 interface RegulatoryDossierPageProps {
@@ -134,6 +135,7 @@ function Detail({
 }: Omit<RegulatoryDossierPageProps, "selection"> & { slug: string }) {
   const [data, setData] = useState<DossierDetailResponse | null>(null);
   const [error, setError] = useState("");
+  const [selectedSectionId, setSelectedSectionId] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     void fetch(`/api/dossiers/${encodeURIComponent(slug)}`, {
@@ -161,6 +163,23 @@ function Detail({
   if (!data)
     return <main className="loading">Loading Regulatory Dossier…</main>;
   const { dossier } = data;
+  const activeSectionId = dossier.sections.some(
+    (section) => section.id === selectedSectionId,
+  )
+    ? selectedSectionId
+    : dossier.presentation.items[0].sectionId;
+  const activeSection = dossier.sections.find(
+    (section) => section.id === activeSectionId,
+  );
+  if (!activeSection) {
+    return (
+      <main className="loading error-state">Dossier section not found</main>
+    );
+  }
+  const activeSources = activeSection.sourceIds.flatMap((sourceId) => {
+    const source = sourcesById.get(sourceId);
+    return source ? [source] : [];
+  });
   return (
     <main className="qa-shell dossier-shell dossier-detail-shell">
       <DossierHeader {...props} />
@@ -185,30 +204,41 @@ function Detail({
               text and EBA answers for the controlling wording.
             </p>
           </header>
-          {dossier.sections.map((section) => (
-            <section key={section.id}>
-              <small>{section.eyebrow}</small>
-              <h2>{section.title}</h2>
-              <p>{section.body}</p>
-              <div className="dossier-inline-sources">
-                {section.sourceIds.map((sourceId) => {
-                  const source = sourcesById.get(sourceId);
-                  return source ? (
-                    <Link key={source.id} to={source.targetPath}>
-                      {source.targetLabel} <ArrowUpRight size={12} />
-                    </Link>
-                  ) : null;
-                })}
-              </div>
-            </section>
-          ))}
+          <DossierModuleRenderer
+            activeSectionId={activeSectionId}
+            dossier={dossier}
+            onSelect={setSelectedSectionId}
+          />
+          <section className="dossier-active-analysis" key={activeSection.id}>
+            <small>{activeSection.eyebrow}</small>
+            <h2>{activeSection.title}</h2>
+            <p>{activeSection.body}</p>
+            {activeSection.timeSensitivity ? (
+              <aside className="dossier-time-warning">
+                <ShieldCheck aria-hidden="true" size={17} />
+                <span>{activeSection.timeSensitivity.note}</span>
+              </aside>
+            ) : null}
+            <div className="dossier-inline-sources">
+              {activeSources.map((source) => (
+                <Link key={source.id} to={source.targetPath}>
+                  {source.targetLabel} <ArrowUpRight size={12} />
+                </Link>
+              ))}
+            </div>
+          </section>
         </article>
         <aside className="dossier-source-rail">
           <span>
-            <LibraryBig aria-hidden="true" size={18} /> SOURCE SET
+            <LibraryBig aria-hidden="true" size={18} /> CURRENT EVIDENCE
           </span>
-          <h2>{dossier.sources.length} reviewed anchors</h2>
-          {dossier.sources.map((source) => (
+          <h2>{activeSources.length} anchors for this step</h2>
+          <p className="dossier-evidence-nature">
+            {activeSection.nature === "source-synthesis"
+              ? "Source synthesis"
+              : "Platform workflow"}
+          </p>
+          {activeSources.map((source) => (
             <Link
               className="dossier-source"
               key={source.id}
@@ -224,6 +254,19 @@ function Detail({
               <ArrowRight aria-hidden="true" size={15} />
             </Link>
           ))}
+          <details className="dossier-full-source-index">
+            <summary>Full source index · {dossier.sources.length}</summary>
+            <div>
+              {dossier.sources.map((source) => (
+                <Link key={source.id} to={source.targetPath}>
+                  <small>
+                    {source.provenance === "OFFICIAL_QA" ? "EBA Q&A" : "LAW"}
+                  </small>
+                  <span>{source.targetLabel}</span>
+                </Link>
+              ))}
+            </div>
+          </details>
           <p>
             Reviewed {new Date(dossier.reviewedAt).toLocaleDateString("en-GB")}
           </p>

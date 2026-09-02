@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "datasetVersion": "2026-09-01",
+  "datasetVersion": "2026-09-02",
   "provenance": "EDITORIAL",
   "reviewStatus": "reviewed",
-  "reviewedAt": "2026-09-01T21:45:00.000Z",
+  "reviewedAt": "2026-09-02T00:00:00.000Z",
   "dossiers": [
     {
       "id": "dossier:major-ict-incident-reporting",
@@ -12,8 +12,30 @@
       "kicker": "From event boundary to reporting channel",
       "summary": "A source-backed route through DORA classification, economic-impact inputs and the reporting path for major ICT-related incidents.",
       "audience": "Operational resilience, incident response and regulatory reporting teams",
-      "reviewedAt": "2026-09-01T21:45:00.000Z",
+      "reviewedAt": "2026-09-02T00:00:00.000Z",
+      "presentation": {
+        "kind": "incident-flow",
+        "items": [
+          { "sectionId": "section:event-boundary", "stage": "boundary" },
+          {
+            "sectionId": "section:major-thresholds",
+            "stage": "thresholds"
+          },
+          { "sectionId": "section:economic-impact", "stage": "impact" },
+          {
+            "sectionId": "section:reporting-channel",
+            "stage": "reporting"
+          }
+        ]
+      },
       "sources": [
+        {
+          "id": "source:dora-incident-definition",
+          "kind": "legal-entity",
+          "targetId": "eu:32022R2554:article:3:subparagraph:1:point:8",
+          "role": "primary",
+          "required": true
+        },
         {
           "id": "source:dora-article-18",
           "kind": "legal-entity",
@@ -29,9 +51,23 @@
           "required": true
         },
         {
-          "id": "source:incident-rts",
+          "id": "source:incident-rts-economic-impact",
           "kind": "legal-entity",
-          "targetId": "eu:32024R1772",
+          "targetId": "eu:32024R1772:article:7",
+          "role": "supporting",
+          "required": true
+        },
+        {
+          "id": "source:incident-rts-major-incidents",
+          "kind": "legal-entity",
+          "targetId": "eu:32024R1772:article:8",
+          "role": "supporting",
+          "required": true
+        },
+        {
+          "id": "source:incident-rts-thresholds",
+          "kind": "legal-entity",
+          "targetId": "eu:32024R1772:article:9",
           "role": "supporting",
           "required": true
         },
@@ -63,21 +99,42 @@
           "eyebrow": "01 · Qualify the event",
           "title": "Start with impact on the financial entity's services",
           "body": "A phishing attack confined to a customer's private sphere is not, by itself, an ICT-related incident of the financial entity. The assessment changes when the entity is targeted and the event compromises its network and information systems in a way that adversely affects service availability, authenticity, integrity or confidentiality. Classification thresholds still have to be tested before major-incident reporting follows.",
-          "sourceIds": ["source:dora-article-18", "source:qa-2025-7613"]
+          "sourceIds": [
+            "source:dora-incident-definition",
+            "source:qa-2025-7613"
+          ],
+          "nature": "source-synthesis"
+        },
+        {
+          "id": "section:major-thresholds",
+          "eyebrow": "02 · Test materiality",
+          "title": "Apply the major-incident criteria and materiality thresholds",
+          "body": "After an event meets the ICT-related incident boundary, it still has to be classified under DORA Article 18. The incident-classification RTS specifies how major incidents and their materiality thresholds are determined; reaching the event boundary alone does not complete that assessment.",
+          "sourceIds": [
+            "source:dora-article-18",
+            "source:incident-rts-major-incidents",
+            "source:incident-rts-thresholds"
+          ],
+          "nature": "source-synthesis"
         },
         {
           "id": "section:economic-impact",
-          "eyebrow": "02 · Measure impact",
+          "eyebrow": "03 · Measure impact",
           "title": "Separate incident work from preventive training",
           "body": "For the economic-impact assessment, staff costs can include overtime and the time staff allocate to managing the incident. Preventive training costs are outside that incident-cost calculation. The official answer does not prescribe one calculation method, so the entity should retain a consistent and explainable method for its estimate.",
-          "sourceIds": ["source:incident-rts", "source:qa-2025-7439"]
+          "sourceIds": [
+            "source:incident-rts-economic-impact",
+            "source:qa-2025-7439"
+          ],
+          "nature": "source-synthesis"
         },
         {
           "id": "section:reporting-channel",
-          "eyebrow": "03 · Route the report",
+          "eyebrow": "04 · Route the report",
           "title": "DORA is the incident-reporting framework for significant institutions",
           "body": "For significant institutions, incidents that qualify as major under DORA are classified and reported under DORA and its related standards. The EBA answer says this avoids duplicate reporting through the earlier ECB SSM cyber-incident framework.",
-          "sourceIds": ["source:dora-article-19", "source:qa-2024-7050"]
+          "sourceIds": ["source:dora-article-19", "source:qa-2024-7050"],
+          "nature": "source-synthesis"
         }
       ]
     },
@@ -88,19 +145,33 @@
       "kicker": "Classify the service before mapping the chain",
       "summary": "A practical boundary map for deciding when a service is an ICT service and when a subcontractor enters the DORA register perimeter.",
       "audience": "Third-party risk, procurement, outsourcing and register owners",
-      "reviewedAt": "2026-09-01T21:45:00.000Z",
+      "reviewedAt": "2026-09-02T00:00:00.000Z",
+      "presentation": {
+        "kind": "service-chain",
+        "items": [
+          { "sectionId": "section:function-test", "state": "direct-ict" },
+          {
+            "sectionId": "section:non-ict-chain-default",
+            "state": "non-ict-subcontractor"
+          },
+          {
+            "sectionId": "section:critical-function-reassessment",
+            "state": "reassessment"
+          }
+        ]
+      },
       "sources": [
         {
-          "id": "source:dora-article-3",
+          "id": "source:dora-ict-service-definition",
           "kind": "legal-entity",
-          "targetId": "eu:32022R2554:article:3",
+          "targetId": "eu:32022R2554:article:3:subparagraph:1:point:21",
           "role": "primary",
           "required": true
         },
         {
-          "id": "source:dora-article-28",
+          "id": "source:dora-register-duty",
           "kind": "legal-entity",
-          "targetId": "eu:32022R2554:article:28",
+          "targetId": "eu:32022R2554:article:28:paragraph:3",
           "role": "primary",
           "required": true
         },
@@ -125,26 +196,31 @@
           "eyebrow": "01 · Test the service",
           "title": "Apply the statutory ICT-service definition to the actual service",
           "body": "A provider's label does not settle the classification. Payment-processing or infrastructure services can be ICT services when they satisfy DORA Article 3(21), but this does not make every service supplied by that provider an ICT service. The official answer identifies services without a prevailing ICT component, including certain clearing and settlement activities, as a boundary that requires attention.",
-          "sourceIds": ["source:dora-article-3", "source:qa-2024-7290"]
-        },
-        {
-          "id": "section:chain-test",
-          "eyebrow": "02 · Map the chain",
-          "title": "A non-ICT provider's ICT subcontractor is not automatically in scope",
-          "body": "The EBA answer states that an ICT subcontractor of a non-ICT service provider is normally outside the register of information. The result can change if the financial entity's assessment shows that the subcontracted service is effectively equivalent to a direct ICT service supporting a critical or important function.",
-          "sourceIds": ["source:dora-article-28", "source:qa-2024-7089"]
-        },
-        {
-          "id": "section:control-point",
-          "eyebrow": "03 · Record the reasoning",
-          "title": "Make classification a documented control, not a vendor-category shortcut",
-          "body": "Taken together, the sources point to a service-by-service control: record the supplied function, test it against the legal definition, identify its role in critical or important functions, and preserve the reasoning used to include or exclude the contractual chain.",
           "sourceIds": [
-            "source:dora-article-3",
-            "source:dora-article-28",
-            "source:qa-2024-7290",
+            "source:dora-ict-service-definition",
+            "source:qa-2024-7290"
+          ],
+          "nature": "source-synthesis"
+        },
+        {
+          "id": "section:non-ict-chain-default",
+          "eyebrow": "02 · Follow the default boundary",
+          "title": "A non-ICT provider's ICT subcontractor is not automatically in scope",
+          "body": "The EBA answer states that an ICT subcontractor of a non-ICT service provider is normally outside the register of information. The presence of technology somewhere in the supply chain does not, by itself, turn the direct service into an ICT service for register purposes.",
+          "sourceIds": ["source:dora-register-duty", "source:qa-2024-7089"],
+          "nature": "source-synthesis"
+        },
+        {
+          "id": "section:critical-function-reassessment",
+          "eyebrow": "03 · Reassess the functional reality",
+          "title": "Equivalent direct ICT support can change the boundary",
+          "body": "The default result can change when the financial entity's assessment shows that the subcontracted ICT service is effectively equivalent to direct ICT support for a critical or important function. Record the supplied function and the reasoning used to include or exclude the contractual chain; a vendor-category label is not enough.",
+          "sourceIds": [
+            "source:dora-ict-service-definition",
+            "source:dora-register-duty",
             "source:qa-2024-7089"
-          ]
+          ],
+          "nature": "editorial-workflow"
         }
       ]
     },
@@ -155,7 +231,42 @@
       "kicker": "Obligation, perimeter and submission mechanics",
       "summary": "A compact operating view of who maintains the DORA register, what consolidated scope means, and how annual submission fields are handled.",
       "audience": "Register owners, data governance, third-party risk and reporting teams",
-      "reviewedAt": "2026-09-01T21:45:00.000Z",
+      "reviewedAt": "2026-09-02T00:00:00.000Z",
+      "presentation": {
+        "kind": "register-duty-board",
+        "items": [
+          {
+            "sectionId": "section:obligation",
+            "view": "duties",
+            "cadence": "continuous"
+          },
+          {
+            "sectionId": "section:annual-submission",
+            "view": "duties",
+            "cadence": "annual"
+          },
+          {
+            "sectionId": "section:on-request",
+            "view": "duties",
+            "cadence": "on-request"
+          },
+          {
+            "sectionId": "section:event-driven-notification",
+            "view": "duties",
+            "cadence": "event-driven"
+          },
+          {
+            "sectionId": "section:perimeter",
+            "view": "perimeter",
+            "cadence": "continuous"
+          },
+          {
+            "sectionId": "section:packaging",
+            "view": "package",
+            "cadence": "source-dated"
+          }
+        ]
+      },
       "sources": [
         {
           "id": "source:dora-article-16",
@@ -165,9 +276,9 @@
           "required": true
         },
         {
-          "id": "source:dora-article-28",
+          "id": "source:dora-register-duty",
           "kind": "legal-entity",
-          "targetId": "eu:32022R2554:article:28",
+          "targetId": "eu:32022R2554:article:28:paragraph:3",
           "role": "primary",
           "required": true
         },
@@ -222,34 +333,58 @@
           "body": "Entities using the Article 16 simplified ICT risk-management framework still maintain the register required by Article 28. Proportionality may affect the complexity of implementation, but the EBA answer does not treat it as an exemption from the obligation.",
           "sourceIds": [
             "source:dora-article-16",
-            "source:dora-article-28",
+            "source:dora-register-duty",
             "source:qa-2025-7388"
-          ]
+          ],
+          "nature": "source-synthesis"
         },
         {
-          "id": "section:submission",
-          "eyebrow": "02 · Distinguish recurring and event-driven duties",
+          "id": "section:annual-submission",
+          "eyebrow": "02 · Annual",
           "title": "Annual submission generally fulfils the annual communication",
-          "body": "The annual register submission generally fulfils the annual communication in Article 28(3), so a second duplicate annual report is not required. This does not replace the duty to provide the register on request or to notify planned contractual arrangements supporting critical or important functions in a timely way.",
-          "sourceIds": ["source:dora-article-28", "source:qa-2025-7309"]
+          "body": "The annual register submission generally fulfils the annual communication in Article 28(3), so a second duplicate annual report is not required.",
+          "sourceIds": ["source:dora-register-duty", "source:qa-2025-7309"],
+          "nature": "source-synthesis"
+        },
+        {
+          "id": "section:on-request",
+          "eyebrow": "03 · On request",
+          "title": "Keep the current register available to the competent authority",
+          "body": "Article 28(3) requires financial entities to make the full register of information, or requested sections of it, available to the competent authority upon request. The annual submission does not replace this separate access duty.",
+          "sourceIds": ["source:dora-register-duty", "source:qa-2025-7309"],
+          "nature": "source-synthesis"
+        },
+        {
+          "id": "section:event-driven-notification",
+          "eyebrow": "04 · Event-driven",
+          "title": "Notify planned critical arrangements in a timely manner",
+          "body": "The annual submission also does not replace the duty to inform the competent authority in a timely manner about planned contractual arrangements for ICT services supporting critical or important functions, or when an existing function becomes critical or important.",
+          "sourceIds": ["source:dora-register-duty", "source:qa-2025-7309"],
+          "nature": "source-synthesis"
         },
         {
           "id": "section:perimeter",
-          "eyebrow": "03 · Set the perimeter",
+          "eyebrow": "05 · Who and perimeter",
           "title": "Use the consolidation scope for consolidated registers",
           "body": "For a register maintained at consolidated or sub-consolidated level, the official answer links the reporting perimeter to the entities and branches included in the applicable consolidation scope, rather than drawing a simple EU-versus-non-EU subsidiary line.",
-          "sourceIds": ["source:dora-article-28", "source:qa-2024-7098"]
+          "sourceIds": ["source:dora-register-duty", "source:qa-2024-7098"],
+          "nature": "source-synthesis"
         },
         {
           "id": "section:packaging",
-          "eyebrow": "04 · Package the submission",
+          "eyebrow": "06 · Submission package",
           "title": "Treat reference period and template codes as controlled reporting data",
           "body": "For the 2025 exercise, the official answer sets the reference period to 31 March 2025; from 2026 onward it is 31 December of the preceding year. A separate answer corrects the B_06.01 template numbering and points reporters to the codes in the reporting package. These operational values should be checked against the current official package for each submission cycle.",
           "sourceIds": [
             "source:register-its",
             "source:qa-2025-7387",
             "source:qa-2025-7313"
-          ]
+          ],
+          "nature": "source-synthesis",
+          "timeSensitivity": {
+            "kind": "source-dated",
+            "note": "Reference periods, template numbering and reporting-package codes are source-dated. Recheck the current official package before each submission cycle."
+          }
         }
       ]
     }

@@ -69,6 +69,21 @@ Every published conclusion or decision block must have at least one exact
 source item. The UI labels Dossier prose as platform analysis and keeps the
 official wording accessible through its source links.
 
+### Topic-specific presentation
+
+Dossiers share one detail shell, evidence panel and source index. A validated
+`presentation` union selects one thin, data-driven module:
+
+- `incident-flow`: a guided evidence path, never an incident classifier;
+- `service-chain`: factual service-chain boundary scenarios;
+- `register-duty-board`: recurring, requested, event-driven and source-dated
+  duties.
+
+Modules can select and arrange existing sections, but cannot contain new legal
+conclusion text. Section prose remains reviewed editorial data, and the shared
+evidence panel always displays every source declared for the active section.
+Source-dated operational material must carry an explicit recheck warning.
+
 ## Edition/Profile rule
 
 The EBA Final Q&A catalogue is a global official-reference directory and is not
@@ -146,7 +161,9 @@ npm run dev
 - Every detail record exists in the catalogue and matches `detailAvailable`.
 - Resolved DORA references exact-match loaded stable IDs.
 - Every required Dossier source resolves or the Dossier is omitted/fails under
-  the declared Profile rule.
+  the declared Profile rule. In addition, every source cited by a section must
+  resolve even if that source is marked optional; sources are never silently
+  removed from a published conclusion.
 - UI and API tests distinguish official non-binding Q&A content from reviewed
   platform-authored Dossier content.
 - Dedicated fixtures, `npm run check`, `npm test` and `npm run build` pass.

@@ -36,6 +36,17 @@ describe("Regulatory Dossier build", () => {
           ["OFFICIAL_TEXT", "OFFICIAL_QA"].includes(source.provenance),
         ),
     ).toBe(true);
+    expect(dossiers.map((dossier) => dossier.presentation.kind)).toEqual([
+      "incident-flow",
+      "service-chain",
+      "register-duty-board",
+    ]);
+    expect(dossiers[0].sources).toContainEqual(
+      expect.objectContaining({
+        targetId: "eu:32024R1772:article:7",
+        targetLabel: "DORA RTS Incident Classification Article 7",
+      }),
+    );
   });
 
   it("omits profile-incompatible Dossiers instead of weakening source gates", () => {
@@ -55,5 +66,26 @@ describe("Regulatory Dossier build", () => {
     expect(dossiers.map((dossier) => dossier.slug)).toEqual([
       "ict-third-party-service-scope",
     ]);
+  });
+
+  it("does not silently drop an unresolved optional source used by a section", () => {
+    const documents = loadDocumentViews();
+    const relationships = buildExplicitReferences(documents);
+    const dataset = structuredClone(loadRegulatoryDossierDataset());
+    const source = dataset.dossiers[0]?.sources[0];
+    if (!source) throw new Error("Dossier source fixture is unavailable");
+    source.required = false;
+    source.targetId = "eu:unknown";
+
+    const dossiers = buildRegulatoryDossiers(
+      documents,
+      relationships.entities,
+      buildEbaQa(documents, relationships.entities),
+      dataset,
+    );
+
+    expect(dossiers.map((dossier) => dossier.slug)).not.toContain(
+      "major-ict-incident-reporting",
+    );
   });
 });

@@ -515,6 +515,7 @@ interface DossierRow {
   kicker: string;
   summary: string;
   audience: string;
+  presentationJson: string;
   provenance: "EDITORIAL";
   reviewStatus: "reviewed";
   reviewedAt: string;
@@ -530,6 +531,8 @@ interface DossierSectionRow {
   eyebrow: string;
   title: string;
   body: string;
+  nature: "source-synthesis" | "editorial-workflow";
+  timeSensitivityJson: string | null;
   position: number;
 }
 
@@ -1389,6 +1392,7 @@ export class SqliteRuntimeRepository {
     const dossier = this.database
       .prepare(`
         SELECT id, slug, title, kicker, summary, audience,
+          presentation_json AS presentationJson,
           provenance, review_status AS reviewStatus, reviewed_at AS reviewedAt
         FROM regulatory_dossiers
         WHERE slug = ?
@@ -1415,7 +1419,8 @@ export class SqliteRuntimeRepository {
     );
     const sectionRows = this.database
       .prepare(`
-        SELECT section_id AS id, eyebrow, title, body, position
+        SELECT section_id AS id, eyebrow, title, body, position, nature,
+          time_sensitivity_json AS timeSensitivityJson
         FROM dossier_sections
         WHERE dossier_id = ?
         ORDER BY position ASC, section_id ASC
@@ -1429,15 +1434,22 @@ export class SqliteRuntimeRepository {
         ORDER BY section_id ASC, position ASC
       `)
       .all(dossier.id) as Array<{ sectionId: string; sourceId: string }>;
+    const { presentationJson, ...dossierRecord } = dossier;
     return regulatoryDossierSchema.parse({
-      ...dossier,
+      ...dossierRecord,
+      presentation: JSON.parse(presentationJson),
       sources,
-      sections: sectionRows.map(({ position: _position, ...section }) => ({
-        ...section,
-        sourceIds: sectionSources
-          .filter((source) => source.sectionId === section.id)
-          .map((source) => source.sourceId),
-      })),
+      sections: sectionRows.map(
+        ({ position: _position, timeSensitivityJson, ...section }) => ({
+          ...section,
+          ...(timeSensitivityJson
+            ? { timeSensitivity: JSON.parse(timeSensitivityJson) }
+            : {}),
+          sourceIds: sectionSources
+            .filter((source) => source.sectionId === section.id)
+            .map((source) => source.sourceId),
+        }),
+      ),
     });
   }
 

@@ -137,7 +137,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.7.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.8.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -1059,6 +1059,7 @@ export function buildRuntimeDatabase(
         kicker TEXT NOT NULL,
         summary TEXT NOT NULL,
         audience TEXT NOT NULL,
+        presentation_json TEXT NOT NULL,
         provenance TEXT NOT NULL CHECK (provenance = 'EDITORIAL'),
         review_status TEXT NOT NULL CHECK (review_status = 'reviewed'),
         reviewed_at TEXT NOT NULL
@@ -1070,6 +1071,10 @@ export function buildRuntimeDatabase(
         eyebrow TEXT NOT NULL,
         title TEXT NOT NULL,
         body TEXT NOT NULL,
+        nature TEXT NOT NULL CHECK (nature IN (
+          'source-synthesis', 'editorial-workflow'
+        )),
+        time_sensitivity_json TEXT,
         PRIMARY KEY (dossier_id, section_id),
         UNIQUE (dossier_id, position)
       ) STRICT;
@@ -1542,18 +1547,20 @@ export function buildRuntimeDatabase(
     `);
     const insertDossier = database.prepare(`
       INSERT INTO regulatory_dossiers (
-        id, slug, title, kicker, summary, audience,
+        id, slug, title, kicker, summary, audience, presentation_json,
         provenance, review_status, reviewed_at
       ) VALUES (
-        @id, @slug, @title, @kicker, @summary, @audience,
+        @id, @slug, @title, @kicker, @summary, @audience, @presentationJson,
         @provenance, @reviewStatus, @reviewedAt
       )
     `);
     const insertDossierSection = database.prepare(`
       INSERT INTO dossier_sections (
-        dossier_id, section_id, position, eyebrow, title, body
+        dossier_id, section_id, position, eyebrow, title, body,
+        nature, time_sensitivity_json
       ) VALUES (
-        @dossierId, @sectionId, @position, @eyebrow, @title, @body
+        @dossierId, @sectionId, @position, @eyebrow, @title, @body,
+        @nature, @timeSensitivityJson
       )
     `);
     const insertDossierSource = database.prepare(`
@@ -1838,7 +1845,10 @@ export function buildRuntimeDatabase(
         insertEbaQaReference.run(reference);
       }
       for (const dossier of dossiers) {
-        insertDossier.run(dossier);
+        insertDossier.run({
+          ...dossier,
+          presentationJson: JSON.stringify(dossier.presentation),
+        });
         for (const [position, source] of dossier.sources.entries()) {
           insertDossierSource.run({
             ...source,
@@ -1854,6 +1864,9 @@ export function buildRuntimeDatabase(
             dossierId: dossier.id,
             sectionId: section.id,
             position,
+            timeSensitivityJson: section.timeSensitivity
+              ? JSON.stringify(section.timeSensitivity)
+              : null,
           });
           for (const [
             sourcePosition,

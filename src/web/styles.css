@@ -6341,3 +6341,397 @@ kbd {
     justify-content: space-between;
   }
 }
+
+/* Dossier topic modules */
+.dossier-analysis > .dossier-module {
+  padding: 38px 0 30px;
+  border-bottom: 0;
+}
+
+.dossier-module > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dossier-module > header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #dc9a70;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 760;
+  letter-spacing: 0.13em;
+}
+
+.dossier-module > header p {
+  margin: 0;
+  color: #838a96;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.72rem;
+}
+
+.incident-flow-track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid rgb(255 255 255 / 11%);
+}
+
+.incident-flow-step {
+  position: relative;
+  min-width: 0;
+}
+
+.incident-flow-step > svg {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: -9px;
+  color: #646b76;
+  pointer-events: none;
+}
+
+.incident-flow-step button {
+  width: 100%;
+  min-height: 170px;
+  padding: 18px;
+  color: #afb4be;
+  text-align: left;
+  border: 0;
+  border-right: 1px solid rgb(255 255 255 / 11%);
+  background: transparent;
+  cursor: pointer;
+}
+
+.incident-flow-step:last-child button {
+  border-right: 0;
+}
+
+.incident-flow-step button.active {
+  color: #f0ece7;
+  background: linear-gradient(145deg, rgb(220 154 112 / 17%), transparent 70%);
+  box-shadow: inset 0 -2px #dc9a70;
+}
+
+.incident-flow-step button small,
+.incident-flow-step button strong,
+.incident-flow-step button span {
+  display: block;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.incident-flow-step button small {
+  margin-bottom: 38px;
+  color: #dc9a70;
+  font-size: 0.63rem;
+}
+
+.incident-flow-step button strong {
+  font-size: 0.76rem;
+}
+
+.incident-flow-step button span {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 7px;
+  color: #7f8692;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.service-chain-scenarios {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.service-chain-scenarios button,
+.register-duty-tabs button,
+.register-duty-grid button {
+  color: #a8aeb9;
+  font-family: Inter, system-ui, sans-serif;
+  text-align: left;
+  border: 1px solid rgb(255 255 255 / 11%);
+  background: rgb(255 255 255 / 2%);
+  cursor: pointer;
+}
+
+.service-chain-scenarios button {
+  min-height: 92px;
+  padding: 14px;
+}
+
+.service-chain-scenarios button.active,
+.register-duty-grid button.active {
+  color: #f0ece7;
+  border-color: rgb(220 154 112 / 58%);
+  background: rgb(220 154 112 / 10%);
+}
+
+.service-chain-scenarios small,
+.service-chain-scenarios strong {
+  display: block;
+}
+
+.service-chain-scenarios small {
+  margin-bottom: 12px;
+  color: #dc9a70;
+  font-size: 0.61rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-chain-scenarios strong {
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.service-chain-visual {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr 24px 1.25fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid rgb(255 255 255 / 11%);
+  background: radial-gradient(
+    circle at 90% 50%,
+    rgb(73 114 108 / 13%),
+    transparent 50%
+  );
+}
+
+.service-chain-visual > svg {
+  color: #646b76;
+  transform: rotate(-90deg);
+}
+
+.service-chain-visual > div {
+  min-height: 88px;
+  padding: 15px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: #11151c;
+}
+
+.service-chain-visual small,
+.service-chain-visual strong {
+  display: block;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.service-chain-visual small {
+  margin-bottom: 25px;
+  color: #777f8b;
+  font-size: 0.6rem;
+}
+
+.service-chain-visual strong {
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.service-chain-visual .chain-boundary-node {
+  border-color: rgb(220 154 112 / 38%);
+}
+
+.service-chain-visual.state-non-ict-subcontractor .chain-boundary-node {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.service-chain-visual.state-reassessment .chain-boundary-node {
+  border-color: rgb(222 178 88 / 62%);
+  background: rgb(222 178 88 / 8%);
+}
+
+.register-duty-tabs {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.register-duty-tabs button {
+  padding: 9px 12px;
+  font-size: 0.68rem;
+  border-radius: 999px;
+}
+
+.register-duty-tabs button.active {
+  color: #121419;
+  border-color: #dc9a70;
+  background: #dc9a70;
+}
+
+.register-duty-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.register-duty-grid button {
+  position: relative;
+  min-height: 118px;
+  padding: 18px 42px 18px 18px;
+}
+
+.register-duty-grid button small,
+.register-duty-grid button strong {
+  display: block;
+}
+
+.register-duty-grid button small {
+  margin-bottom: 17px;
+  color: #dc9a70;
+  font-size: 0.61rem;
+  font-weight: 740;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.register-duty-grid button strong {
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.register-duty-grid button svg {
+  position: absolute;
+  right: 17px;
+  bottom: 17px;
+  color: #dc9a70;
+}
+
+.dossier-analysis > .dossier-active-analysis {
+  padding-top: 42px;
+  animation: dossier-analysis-in 180ms ease-out;
+}
+
+@keyframes dossier-analysis-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dossier-time-warning {
+  display: flex;
+  gap: 9px;
+  max-width: 720px;
+  padding: 13px 15px;
+  margin-top: 22px;
+  color: #d9bb83;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  border: 1px solid rgb(217 187 131 / 30%);
+  background: rgb(217 187 131 / 7%);
+}
+
+.dossier-time-warning svg {
+  flex: none;
+}
+
+.dossier-source-rail .dossier-evidence-nature {
+  margin: -14px 0 18px;
+  color: #dc9a70;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dossier-full-source-index {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(255 255 255 / 11%);
+}
+
+.dossier-full-source-index summary {
+  color: #aab0bb;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.dossier-full-source-index > div {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.dossier-full-source-index a {
+  display: flex;
+  gap: 8px;
+  color: #9ea5b0;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.67rem;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.dossier-full-source-index a small {
+  flex: none;
+  color: #dc9a70;
+  font-size: 0.57rem;
+}
+
+@media (max-width: 900px) {
+  .incident-flow-track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .incident-flow-step:nth-child(2) button {
+    border-right: 0;
+  }
+
+  .incident-flow-step > svg {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .dossier-module > header {
+    display: grid;
+  }
+
+  .incident-flow-track,
+  .service-chain-scenarios,
+  .register-duty-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .incident-flow-step button {
+    min-height: 130px;
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 11%);
+  }
+
+  .incident-flow-step button small {
+    margin-bottom: 24px;
+  }
+
+  .service-chain-visual {
+    grid-template-columns: 1fr;
+  }
+
+  .service-chain-visual > svg {
+    justify-self: center;
+    transform: none;
+  }
+
+  .register-duty-tabs {
+    overflow-x: auto;
+  }
+
+  .register-duty-tabs button {
+    flex: none;
+  }
+}

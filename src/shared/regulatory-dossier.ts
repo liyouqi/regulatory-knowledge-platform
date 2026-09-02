@@ -21,8 +21,79 @@ const dossierSectionInputSchema = z
     title: z.string().min(1),
     body: z.string().min(1),
     sourceIds: z.array(sourceIdSchema).min(1),
+    nature: z.enum(["source-synthesis", "editorial-workflow"]),
+    timeSensitivity: z
+      .object({
+        kind: z.literal("source-dated"),
+        note: z.string().min(1),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
+
+const presentationItemBase = {
+  sectionId: z.string().regex(/^section:[a-z0-9-]+$/u),
+};
+
+export const dossierPresentationSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("incident-flow"),
+      items: z
+        .array(
+          z
+            .object({
+              ...presentationItemBase,
+              stage: z.enum(["boundary", "thresholds", "impact", "reporting"]),
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("service-chain"),
+      items: z
+        .array(
+          z
+            .object({
+              ...presentationItemBase,
+              state: z.enum([
+                "direct-ict",
+                "non-ict-subcontractor",
+                "reassessment",
+              ]),
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("register-duty-board"),
+      items: z
+        .array(
+          z
+            .object({
+              ...presentationItemBase,
+              view: z.enum(["duties", "perimeter", "package"]),
+              cadence: z.enum([
+                "continuous",
+                "annual",
+                "on-request",
+                "event-driven",
+                "source-dated",
+              ]),
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
+]);
 
 const dossierInputObjectSchema = z
   .object({
@@ -33,6 +104,7 @@ const dossierInputObjectSchema = z
     summary: z.string().min(1),
     audience: z.string().min(1),
     reviewedAt: z.string().datetime(),
+    presentation: dossierPresentationSchema,
     sources: z.array(dossierSourceInputSchema).min(1),
     sections: z.array(dossierSectionInputSchema).min(1),
   })
@@ -58,6 +130,14 @@ function validateDossier(
     });
   }
   const knownSources = new Set(sourceIds);
+  const sectionIds = dossier.sections.map((section) => section.id);
+  if (new Set(sectionIds).size !== sectionIds.length) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["sections"],
+      message: "Dossier section IDs must be unique",
+    });
+  }
   for (const [index, section] of dossier.sections.entries()) {
     for (const sourceId of section.sourceIds) {
       if (!knownSources.has(sourceId)) {
@@ -65,6 +145,50 @@ function validateDossier(
           code: z.ZodIssueCode.custom,
           path: ["sections", index, "sourceIds"],
           message: `Section references unknown source ${sourceId}`,
+        });
+      }
+    }
+  }
+  const knownSections = new Set(sectionIds);
+  const presentationIds = dossier.presentation.items.map(
+    (item) => item.sectionId,
+  );
+  if (new Set(presentationIds).size !== presentationIds.length) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["presentation", "items"],
+      message: "Presentation section IDs must be unique",
+    });
+  }
+  for (const sectionId of sectionIds) {
+    if (!presentationIds.includes(sectionId)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["presentation", "items"],
+        message: `Presentation omits section ${sectionId}`,
+      });
+    }
+  }
+  for (const [index, item] of dossier.presentation.items.entries()) {
+    if (!knownSections.has(item.sectionId)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["presentation", "items", index, "sectionId"],
+        message: `Presentation references unknown section ${item.sectionId}`,
+      });
+    }
+  }
+  if (dossier.presentation.kind === "register-duty-board") {
+    for (const [index, item] of dossier.presentation.items.entries()) {
+      if (
+        item.cadence === "source-dated" &&
+        dossier.sections.find((section) => section.id === item.sectionId)
+          ?.timeSensitivity?.kind !== "source-dated"
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["presentation", "items", index, "cadence"],
+          message: "Source-dated presentation item requires a time warning",
         });
       }
     }
@@ -151,6 +275,8 @@ export const dossierDetailResponseSchema = z
 export type DossierDataset = z.infer<typeof dossierDatasetSchema>;
 export type DossierInput = z.infer<typeof dossierInputSchema>;
 export type DossierSource = z.infer<typeof dossierSourceSchema>;
+export type DossierPresentation = z.infer<typeof dossierPresentationSchema>;
+export type DossierSection = z.infer<typeof dossierSectionSchema>;
 export type RegulatoryDossier = z.infer<typeof regulatoryDossierSchema>;
 export type DossierPreview = z.infer<typeof dossierPreviewSchema>;
 export type DossierCatalogResponse = z.infer<
