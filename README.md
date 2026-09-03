@@ -231,7 +231,7 @@ To publish a verified image to Cloud Run, create or select a billed GCP project,
 
 ```bash
 gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
+gcloud config set project YOUR_PROJECT_ID  [regulatory  project id regulatory-507508]
 gcloud services enable run.googleapis.com artifactregistry.googleapis.com
 gcloud artifacts repositories create regulatory \
   --repository-format=docker \
@@ -264,6 +264,7 @@ For every release, use a new immutable tag. On Apple Silicon, Cloud Run requires
 
 ```bash
 RELEASE_ID="$(git rev-parse --short HEAD)"
+#project id regulatory-507508
 IMAGE="europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:${RELEASE_ID}"
 docker buildx build --platform linux/amd64 --tag "$IMAGE" --push .
 gcloud run deploy regulatory-knowledge-platform \
