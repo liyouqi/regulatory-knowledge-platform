@@ -267,7 +267,18 @@ For every release, use a new immutable tag. On Apple Silicon, Cloud Run requires
 ```bash
 RELEASE_ID="$(git rev-parse --short HEAD)"
 #project id regulatory-507508
+
 IMAGE="europe-west1-docker.pkg.dev/YOUR_PROJECT_ID/regulatory/regulatory-knowledge-platform:${RELEASE_ID}"
+docker buildx build --platform linux/amd64 --tag "$IMAGE" --push .
+gcloud run deploy regulatory-knowledge-platform \
+  --image "$IMAGE" \
+  --region europe-west1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --memory 1Gi \
+  --max-instances 1
+
+IMAGE="europe-west1-docker.pkg.dev/regulatory-507508/regulatory/regulatory-knowledge-platform:${RELEASE_ID}"
 docker buildx build --platform linux/amd64 --tag "$IMAGE" --push .
 gcloud run deploy regulatory-knowledge-platform \
   --image "$IMAGE" \
