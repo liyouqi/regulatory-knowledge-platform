@@ -40,7 +40,7 @@ export class EbaQaService {
       topic: options.topic,
     });
     return ebaQaCatalogResponseSchema.parse({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       runtime: this.runtime(),
       importedAt: result.importedAt,
       sourceUrl: EBA_QA_SOURCE_URL,
@@ -48,6 +48,11 @@ export class EbaQaService {
       pageSize,
       pageCount: Math.max(1, Math.ceil(result.total / pageSize)),
       total: result.total,
+      overview: {
+        detailTotal: result.detailTotal,
+        legalActs: result.legalActFacets,
+        topics: result.topicFacets,
+      },
       filters: {
         legalActs: result.legalActs,
         topics: result.topics,

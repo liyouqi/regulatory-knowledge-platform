@@ -25,6 +25,7 @@ import {
 import {
   type EbaQaCatalogItem,
   type EbaQaDetail,
+  type EbaQaFacet,
   type EbaQaResolvedReference,
   ebaQaCatalogItemSchema,
   ebaQaDetailSchema,
@@ -498,6 +499,9 @@ export interface EbaQaCatalogQueryResult {
   total: number;
   legalActs: string[];
   topics: string[];
+  legalActFacets: EbaQaFacet[];
+  topicFacets: EbaQaFacet[];
+  detailTotal: number;
   importedAt: string;
 }
 
@@ -1258,6 +1262,31 @@ export class SqliteRuntimeRepository {
       )
       .all()
       .map((row) => (row as { value: string }).value);
+    const legalActFacets = this.database
+      .prepare(`
+        SELECT legal_act_label AS label, count(*) AS count,
+          sum(detail_available) AS detailCount
+        FROM eba_qa_catalog
+        GROUP BY legal_act_label
+        ORDER BY count DESC, legal_act_label ASC
+      `)
+      .all() as EbaQaFacet[];
+    const topicFacets = this.database
+      .prepare(`
+        SELECT topic_label AS label, count(*) AS count,
+          sum(detail_available) AS detailCount
+        FROM eba_qa_catalog
+        GROUP BY topic_label
+        ORDER BY count DESC, topic_label ASC
+      `)
+      .all() as EbaQaFacet[];
+    const detailTotal = (
+      this.database
+        .prepare(
+          "SELECT count(*) AS count FROM eba_qa_catalog WHERE detail_available = 1",
+        )
+        .get() as { count: number }
+    ).count;
     const importedAt = (
       this.database
         .prepare("SELECT imported_at AS value FROM eba_qa_catalog LIMIT 1")
@@ -1273,6 +1302,9 @@ export class SqliteRuntimeRepository {
       total,
       legalActs,
       topics,
+      legalActFacets,
+      topicFacets,
+      detailTotal,
       importedAt,
     };
   }

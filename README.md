@@ -89,6 +89,8 @@ For a first product tour, open these pages in order: **Regulatory Topics** → *
 
 | Product surface | Example URL | Purpose |
 | --- | --- | --- |
+| EBA Q&A Library | `http://localhost:5173/qa` | Browse the complete imported Final Q&A catalogue by legal act or topic; 25 DORA records include full internal answer views. |
+| Regulatory Dossiers | `http://localhost:5173/dossiers` | Open reviewed, source-backed issue files that combine exact legal provisions with official EBA answers. |
 | Regulatory Topics | `http://localhost:5173/topics` | Main cross-file entry: browse reviewed subjects spanning primary law, RTS/ITS, authority guidance, and national material. |
 | Topic Detail | `http://localhost:5173/topics/major-ict-incident-reporting` | Follow one reviewed Topic to exact provisions and existing evidence-bearing official mappings. |
 | Regulatory Path | `http://localhost:5173/domains/banking-governance-internal-control` | Follow the reviewed CRD → EBA → CSSF path with explicit direction and exact relationship evidence. |

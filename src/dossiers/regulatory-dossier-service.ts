@@ -32,9 +32,29 @@ export class RegulatoryDossierService {
     const dossier = this.repository.findRegulatoryDossier(slug);
     return dossier
       ? dossierDetailResponseSchema.parse({
-          schemaVersion: "1.0.0",
+          schemaVersion: "1.1.0",
           runtime: this.runtime(),
           dossier,
+          qaEvidence: dossier.sources.flatMap((source) => {
+            if (source.kind !== "eba-qa") return [];
+            const publicId = source.targetId.replace(/^qa:eba:/u, "");
+            const qa = this.repository.findEbaQaDetail(publicId);
+            return qa
+              ? [
+                  {
+                    sourceId: source.id,
+                    qaId: qa.catalog.id,
+                    publicId: qa.catalog.publicId,
+                    title: qa.catalog.title,
+                    question: qa.catalog.question,
+                    finalAnswer: qa.detail.finalAnswer,
+                    publishedAt: qa.catalog.publishedAt,
+                    officialUrl: qa.catalog.officialUrl,
+                    nonBindingNotice: qa.detail.nonBindingNotice,
+                  },
+                ]
+              : [];
+          }),
         })
       : null;
   }

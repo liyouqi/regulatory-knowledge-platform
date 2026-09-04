@@ -84,6 +84,13 @@ conclusion text. Section prose remains reviewed editorial data, and the shared
 evidence panel always displays every source declared for the active section.
 Source-dated operational material must carry an explicit recheck warning.
 
+The Dossier detail response also joins each referenced full-detail Q&A from the
+same Runtime artifact. The active analysis step displays the official question
+and Final Answer verbatim with its publication date, currentness notice,
+internal evidence record and official EBA URL. This is evidence presentation,
+not new editorial prose; Q&A content remains outside the legal relationship
+graph.
+
 ## Edition/Profile rule
 
 The EBA Final Q&A catalogue is a global official-reference directory and is not
@@ -109,6 +116,13 @@ GET /api/qa/:publicId
 GET /api/dossiers
 GET /api/dossiers/:slug
 ```
+
+Q&A catalogue response 1.1.0 adds deterministic Legal Act and Topic facets
+with record counts and full-detail counts. `/qa` uses those Runtime-derived
+facets as its catalogue homepage; count order is not described as popularity,
+importance or a legal ranking. Dossier detail response 1.1.0 adds the Q&A
+evidence payload used by active sections. These additions do not modify the
+normalized source datasets or SQLite storage model.
 
 Q&A/Dossier input hashes, builder versions and published counts participate in
 the Runtime build identity and verification manifest.

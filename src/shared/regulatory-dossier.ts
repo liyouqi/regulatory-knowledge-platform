@@ -264,11 +264,40 @@ export const dossierCatalogResponseSchema = z
   })
   .strict();
 
+export const dossierQaEvidenceSchema = z
+  .object({
+    sourceId: sourceIdSchema,
+    qaId: z.string().regex(/^qa:eba:\d{4}_\d+$/u),
+    publicId: z.string().regex(/^\d{4}_\d+$/u),
+    title: z.string().min(1),
+    question: z.string().min(1),
+    finalAnswer: z.string().min(1),
+    publishedAt: z.string().date().nullable(),
+    officialUrl: z
+      .string()
+      .url()
+      .refine((value) => new URL(value).hostname === "www.eba.europa.eu", {
+        message: "Expected an official www.eba.europa.eu URL",
+      }),
+    nonBindingNotice: z.string().min(1),
+  })
+  .strict()
+  .superRefine((evidence, context) => {
+    if (evidence.qaId !== `qa:eba:${evidence.publicId}`) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["qaId"],
+        message: "Dossier Q&A evidence ID does not match public ID",
+      });
+    }
+  });
+
 export const dossierDetailResponseSchema = z
   .object({
-    schemaVersion: z.literal("1.0.0"),
+    schemaVersion: z.literal("1.1.0"),
     runtime: runtimeIdentitySchema,
     dossier: regulatoryDossierSchema,
+    qaEvidence: z.array(dossierQaEvidenceSchema),
   })
   .strict();
 
@@ -279,6 +308,7 @@ export type DossierPresentation = z.infer<typeof dossierPresentationSchema>;
 export type DossierSection = z.infer<typeof dossierSectionSchema>;
 export type RegulatoryDossier = z.infer<typeof regulatoryDossierSchema>;
 export type DossierPreview = z.infer<typeof dossierPreviewSchema>;
+export type DossierQaEvidence = z.infer<typeof dossierQaEvidenceSchema>;
 export type DossierCatalogResponse = z.infer<
   typeof dossierCatalogResponseSchema
 >;

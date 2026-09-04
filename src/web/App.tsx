@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Check,
   Copy,
+  FileQuestion,
   Landmark,
   Link2,
   Map as MapIcon,
@@ -52,6 +53,7 @@ import {
 } from "../shared/legal";
 import {
   applicabilityPath,
+  ebaQaCatalogPath,
   explorerPath,
   implementationTimelinePath,
   isLevel2MandateQueryPath,
@@ -1267,6 +1269,10 @@ function ReaderPage({
         </Link>
         <div className="topbar-actions">
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
+          <Link className="view-switch" to={ebaQaCatalogPath()}>
+            <FileQuestion aria-hidden="true" size={15} />
+            Q&amp;A
+          </Link>
           <Link
             className="view-switch"
             to={`${explorerPath(legalDocument.slug)}#${activeProvision.explorerAnchor}`}

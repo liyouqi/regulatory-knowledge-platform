@@ -31,6 +31,15 @@ interface RegulatoryDossierPageProps {
   theme: ThemeMode;
 }
 
+function formatDate(value: string | null): string {
+  if (!value) return "date not stated";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
 function DossierHeader({
   onOpenSearch,
   onToggleTheme,
@@ -89,7 +98,7 @@ function Catalog(props: Omit<RegulatoryDossierPageProps, "selection">) {
         <span>
           <FileStack aria-hidden="true" size={18} /> REVIEWED PLATFORM ANALYSIS
         </span>
-        <h1>Follow the issue, not the document list.</h1>
+        <h1>Reviewed DORA issue files.</h1>
         <p>
           Dossiers connect controlling provisions with official EBA answers and
           turn them into a source-visible operating view. Analysis is editorial;
@@ -180,6 +189,9 @@ function Detail({
     const source = sourcesById.get(sourceId);
     return source ? [source] : [];
   });
+  const activeQaEvidence = data.qaEvidence.filter((evidence) =>
+    activeSection.sourceIds.includes(evidence.sourceId),
+  );
   return (
     <main className="qa-shell dossier-shell dossier-detail-shell">
       <DossierHeader {...props} />
@@ -218,6 +230,43 @@ function Detail({
                 <ShieldCheck aria-hidden="true" size={17} />
                 <span>{activeSection.timeSensitivity.note}</span>
               </aside>
+            ) : null}
+            {activeQaEvidence.length > 0 ? (
+              <div className="dossier-qa-evidence-list">
+                {activeQaEvidence.map((evidence) => (
+                  <article className="dossier-qa-evidence" key={evidence.qaId}>
+                    <header>
+                      <small>OFFICIAL EBA FINAL Q&amp;A</small>
+                      <span>
+                        {evidence.publicId} · {formatDate(evidence.publishedAt)}
+                      </span>
+                    </header>
+                    <h3>{evidence.question}</h3>
+                    <div>
+                      <small>FINAL ANSWER</small>
+                      <p>{evidence.finalAnswer}</p>
+                    </div>
+                    <details>
+                      <summary>Currentness notice</summary>
+                      <p>{evidence.nonBindingNotice}</p>
+                    </details>
+                    <footer>
+                      <Link
+                        to={`/qa/eba/${encodeURIComponent(evidence.publicId)}`}
+                      >
+                        Open evidence record <ArrowRight size={13} />
+                      </Link>
+                      <a
+                        href={evidence.officialUrl}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        EBA source <ArrowUpRight size={13} />
+                      </a>
+                    </footer>
+                  </article>
+                ))}
+              </div>
             ) : null}
             <div className="dossier-inline-sources">
               {activeSources.map((source) => (

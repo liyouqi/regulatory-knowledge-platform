@@ -14,6 +14,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   type EbaQaCatalogResponse,
   type EbaQaDetailResponse,
+  type EbaQaFacet,
   ebaQaCatalogResponseSchema,
   ebaQaDetailResponseSchema,
 } from "../shared/eba-qa";
@@ -66,6 +67,38 @@ function formatDate(value: string | null): string {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
+function QaFacetList({
+  eyebrow,
+  facets,
+  onSelect,
+  title,
+}: {
+  eyebrow: string;
+  facets: EbaQaFacet[];
+  onSelect: (label: string) => void;
+  title: string;
+}) {
+  return (
+    <section className="qa-facet-panel">
+      <header>
+        <small>{eyebrow}</small>
+        <h2>{title}</h2>
+      </header>
+      <ol>
+        {facets.map((facet) => (
+          <li key={facet.label}>
+            <button onClick={() => onSelect(facet.label)} type="button">
+              <span>{facet.label}</span>
+              <strong>{facet.count.toLocaleString("en")}</strong>
+              <ArrowRight aria-hidden="true" size={14} />
+            </button>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function Catalogue({
   onOpenSearch,
   onToggleTheme,
@@ -78,6 +111,7 @@ function Catalogue({
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
   const legalAct = params.get("legalAct") ?? "";
   const topic = params.get("topic") ?? "";
+  const showOverview = page === 1 && !legalAct && !topic;
   const endpoint = useMemo(() => {
     const query = new URLSearchParams({ page: String(page), pageSize: "24" });
     if (legalAct) query.set("legalAct", legalAct);
@@ -122,6 +156,9 @@ function Catalogue({
       <main className="loading">Loading the EBA Final Q&amp;A catalogue…</main>
     );
   }
+  const detailCollection = data.overview.legalActs.find(
+    (facet) => facet.detailCount > 0,
+  );
   return (
     <main className="qa-shell">
       <QaHeader
@@ -135,7 +172,7 @@ function Catalogue({
             <ShieldCheck aria-hidden="true" size={18} /> OFFICIAL REFERENCE
             LIBRARY
           </span>
-          <h1>Questions that make the rulebook operational.</h1>
+          <h1>EBA Final Q&amp;A catalogue.</h1>
           <p>
             Browse every Final Q&amp;A in the imported EBA catalogue. DORA
             records open into evidence-linked platform views; the remaining
@@ -149,7 +186,15 @@ function Catalogue({
           </div>
           <div>
             <dt>Internal DORA views</dt>
-            <dd>25</dd>
+            <dd>{data.overview.detailTotal.toLocaleString("en")}</dd>
+          </div>
+          <div>
+            <dt>Legal acts</dt>
+            <dd>{data.overview.legalActs.length.toLocaleString("en")}</dd>
+          </div>
+          <div>
+            <dt>Topics</dt>
+            <dd>{data.overview.topics.length.toLocaleString("en")}</dd>
           </div>
           <div>
             <dt>Imported</dt>
@@ -168,6 +213,58 @@ function Catalogue({
         <a href={data.sourceUrl} rel="noreferrer" target="_blank">
           Official catalogue <ArrowUpRight aria-hidden="true" size={14} />
         </a>
+      </section>
+      {showOverview ? (
+        <section className="qa-overview" aria-label="Browse EBA Q&A">
+          <header className="qa-overview-heading">
+            <span>CATALOGUE MAP</span>
+            <h2>Browse by legal act or topic.</h2>
+            <p>
+              These lists are calculated from the imported Final Q&amp;A
+              catalogue. Counts describe this snapshot, not editorial popularity
+              or legal importance.
+            </p>
+          </header>
+          {detailCollection ? (
+            <button
+              className="qa-detail-collection"
+              onClick={() => update({ legalAct: detailCollection.label })}
+              type="button"
+            >
+              <small>FULL PLATFORM COLLECTION</small>
+              <strong>DORA questions with complete answer views</strong>
+              <span>
+                {detailCollection.detailCount} official questions, final answers
+                and declared legal anchors available inside the platform.
+              </span>
+              <em>
+                Open collection <ArrowRight aria-hidden="true" size={16} />
+              </em>
+            </button>
+          ) : null}
+          <div className="qa-facet-grid">
+            <QaFacetList
+              eyebrow="BY RULEBOOK"
+              facets={data.overview.legalActs.slice(0, 8)}
+              onSelect={(label) => update({ legalAct: label })}
+              title={`${data.overview.legalActs.length} legal acts`}
+            />
+            <QaFacetList
+              eyebrow="BY SUBJECT"
+              facets={data.overview.topics.slice(0, 10)}
+              onSelect={(label) => update({ topic: label })}
+              title="Largest topic collections"
+            />
+          </div>
+        </section>
+      ) : null}
+      <section className="qa-directory-heading">
+        <span>{showOverview ? "LATEST FINAL Q&A" : "FILTERED DIRECTORY"}</span>
+        <h2>
+          {showOverview
+            ? "Recent entries in the official catalogue"
+            : `${data.total.toLocaleString("en")} matching questions`}
+        </h2>
       </section>
       <section className="qa-controls" aria-label="Filter EBA Q&A catalogue">
         <label>

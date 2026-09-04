@@ -161,9 +161,17 @@ const runtimeIdentitySchema = z
   })
   .strict();
 
+export const ebaQaFacetSchema = z
+  .object({
+    label: z.string().min(1),
+    count: z.number().int().nonnegative(),
+    detailCount: z.number().int().nonnegative(),
+  })
+  .strict();
+
 export const ebaQaCatalogResponseSchema = z
   .object({
-    schemaVersion: z.literal("1.0.0"),
+    schemaVersion: z.literal("1.1.0"),
     runtime: runtimeIdentitySchema,
     importedAt: z.string().datetime(),
     sourceUrl: officialEbaUrlSchema,
@@ -171,6 +179,13 @@ export const ebaQaCatalogResponseSchema = z
     pageSize: z.number().int().min(1).max(100),
     pageCount: z.number().int().positive(),
     total: z.number().int().nonnegative(),
+    overview: z
+      .object({
+        detailTotal: z.number().int().nonnegative(),
+        legalActs: z.array(ebaQaFacetSchema),
+        topics: z.array(ebaQaFacetSchema),
+      })
+      .strict(),
     filters: z
       .object({
         legalActs: z.array(z.string().min(1)),
@@ -212,6 +227,7 @@ export type EbaQaCatalogDataset = z.infer<typeof ebaQaCatalogDatasetSchema>;
 export type EbaQaDetail = z.infer<typeof ebaQaDetailSchema>;
 export type EbaQaDetailDataset = z.infer<typeof ebaQaDetailDatasetSchema>;
 export type EbaQaLegalReference = z.infer<typeof ebaQaLegalReferenceSchema>;
+export type EbaQaFacet = z.infer<typeof ebaQaFacetSchema>;
 export type EbaQaCatalogResponse = z.infer<typeof ebaQaCatalogResponseSchema>;
 export type EbaQaDetailResponse = z.infer<typeof ebaQaDetailResponseSchema>;
 export type EbaQaResolvedReference = z.infer<

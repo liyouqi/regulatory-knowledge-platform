@@ -37,7 +37,17 @@ describe("Document lookup", () => {
     const dossier = findRegulatoryDossier("major-ict-incident-reporting");
 
     expect(qaCatalog.total).toBe(2709);
+    expect(qaCatalog.schemaVersion).toBe("1.1.0");
     expect(qaCatalog.records).toHaveLength(10);
+    expect(qaCatalog.overview.detailTotal).toBe(25);
+    expect(qaCatalog.overview.legalActs).toContainEqual(
+      expect.objectContaining({
+        label: "Regulation (EU) No 2022/2554 (DORA Reg)",
+        count: 25,
+        detailCount: 25,
+      }),
+    );
+    expect(qaCatalog.overview.topics[0]?.count).toBeGreaterThan(0);
     expect(qa).toMatchObject({
       catalog: { id: "qa:eba:2025_7613", statusAtImport: "Final" },
       detail: { finalStatusLabel: "Final Q&A" },
@@ -52,6 +62,7 @@ describe("Document lookup", () => {
       ]),
     });
     expect(dossier).toMatchObject({
+      schemaVersion: "1.1.0",
       dossier: {
         provenance: "EDITORIAL",
         sources: expect.arrayContaining([
@@ -61,6 +72,15 @@ describe("Document lookup", () => {
           }),
         ]),
       },
+      qaEvidence: expect.arrayContaining([
+        expect.objectContaining({
+          sourceId: "source:qa-2025-7613",
+          qaId: "qa:eba:2025_7613",
+          publicId: "2025_7613",
+          question: expect.stringContaining("phishing"),
+          finalAnswer: expect.stringContaining("private sphere"),
+        }),
+      ]),
     });
     expect(findEbaQa("2025_0000")).toBeNull();
     expect(findRegulatoryDossier("unknown")).toBeNull();

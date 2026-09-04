@@ -3,6 +3,7 @@ import {
   BookOpen,
   CalendarDays,
   ExternalLink,
+  FileQuestion,
   Landmark,
   Layers3,
   ListTree,
@@ -25,6 +26,7 @@ import {
 import {
   applicabilityPath,
   documentRelationshipGraphPath,
+  ebaQaCatalogPath,
   explorerPath,
   implementationTimelinePath,
   level2LibraryPath,
@@ -256,6 +258,10 @@ export function ExplorerPage({
         </Link>
         <div className="topbar-actions">
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
+          <Link className="view-switch" to={ebaQaCatalogPath()}>
+            <FileQuestion aria-hidden="true" size={15} />
+            Q&amp;A
+          </Link>
           <span className="view-switch active">
             <ListTree aria-hidden="true" size={15} />
             Explore
