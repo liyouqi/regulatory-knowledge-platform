@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "eu-banking-10",
+  "version": "0.1.0",
+  "displayName": "EU Banking 10",
+  "description": "Editorial pilot scope for the first Official EU Regulatory Earth build; membership is not a legal applicability determination.",
+  "provenance": "EDITORIAL",
+  "language": "ENG",
+  "expressionPolicy": "english-celex-expression",
+  "relationshipPolicy": {
+    "includeOfficialOneHopBoundary": true
+  },
+  "members": [
+    { "celex": "32022R2554", "label": "DORA" },
+    { "celex": "32016R0679", "label": "GDPR" },
+    { "celex": "32022L2555", "label": "NIS2" },
+    { "celex": "32013L0036", "label": "CRD IV" },
+    { "celex": "32015L0849", "label": "AMLD IV" },
+    { "celex": "32023R1113", "label": "Transfer of Funds Regulation" },
+    { "celex": "32023R1114", "label": "MiCA" },
+    { "celex": "32024R1689", "label": "AI Act" },
+    { "celex": "32023R2854", "label": "Data Act" },
+    { "celex": "32022L2556", "label": "DORA Amending Directive" }
+  ]
+}

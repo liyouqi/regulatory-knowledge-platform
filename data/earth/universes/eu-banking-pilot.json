@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "0.1.0",
+  "id": "eu-banking-pilot",
+  "version": "0.1.0",
+  "displayName": "EU Banking Pilot",
+  "description": "Editorial one-law scope for validating the official-source Earth pipeline; membership is not a legal applicability determination.",
+  "provenance": "EDITORIAL",
+  "language": "ENG",
+  "expressionPolicy": "english-celex-expression",
+  "relationshipPolicy": {
+    "includeOfficialOneHopBoundary": true
+  },
+  "members": [{ "celex": "32022R2554", "label": "DORA" }]
+}

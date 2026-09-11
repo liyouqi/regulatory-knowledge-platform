@@ -7,6 +7,7 @@ import {
   Check,
   Copy,
   FileQuestion,
+  Globe2,
   Landmark,
   Link2,
   Map as MapIcon,
@@ -28,6 +29,7 @@ import {
   useState,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { EarthPage } from "../earth/web/EarthPage";
 import {
   type CurrentDocumentSearchResult,
   buildCurrentDocumentSearchIndex,
@@ -1269,6 +1271,9 @@ function ReaderPage({
         </Link>
         <div className="topbar-actions">
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
+          <Link className="view-switch" to="/earth">
+            <Globe2 aria-hidden="true" size={15} /> Earth
+          </Link>
           <Link className="view-switch" to={ebaQaCatalogPath()}>
             <FileQuestion aria-hidden="true" size={15} />
             Q&amp;A
@@ -1611,6 +1616,8 @@ function ReaderPage({
 
 export function App() {
   const location = useLocation();
+  const earth =
+    location.pathname === "/earth" || location.pathname.startsWith("/earth/");
   const explorer = parseExplorerPath(location.pathname);
   const ebaQa = parseEbaQaPath(location.pathname);
   const dossier = parseDossierPath(location.pathname);
@@ -1671,6 +1678,8 @@ export function App() {
           }
           theme={theme}
         />
+      ) : earth ? (
+        <EarthPage />
       ) : dossier ? (
         <Suspense
           fallback={

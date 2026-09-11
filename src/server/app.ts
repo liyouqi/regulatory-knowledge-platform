@@ -4,6 +4,11 @@ import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import { RegulatoryDossierService } from "../dossiers/regulatory-dossier-service";
+import { createEarthRouter } from "../earth/api/earth-router";
+import {
+  DEFAULT_EARTH_ARTIFACT_PATH,
+  EarthRepository,
+} from "../earth/runtime/earth-repository";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import {
   PublicApiAccessController,
@@ -296,6 +301,25 @@ app.get("/api/health", (_request, response) => {
     publicApi: publicApiAccessController.snapshot(),
   });
 });
+
+const earthArtifactPath =
+  process.env.EARTH_ARTIFACT_PATH ?? DEFAULT_EARTH_ARTIFACT_PATH;
+if (existsSync(resolve(process.cwd(), earthArtifactPath))) {
+  app.use(
+    "/api/earth",
+    createEarthRouter(new EarthRepository(earthArtifactPath)),
+  );
+} else {
+  app.use("/api/earth", (_request, response) => {
+    response.status(503).json({
+      error: {
+        code: "earth_artifact_unavailable",
+        message:
+          "The verified Earth artifact is not available in this deployment",
+      },
+    });
+  });
+}
 
 app.use("/api", createPublicApiDocumentationRouter(runtimeRepository.buildId));
 
