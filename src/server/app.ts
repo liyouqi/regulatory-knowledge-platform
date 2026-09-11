@@ -3,6 +3,11 @@ import { resolve } from "node:path";
 import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
+import { createCopilotRouter } from "../copilot/api/copilot-router";
+import { CopilotContextResolver } from "../copilot/context/copilot-context-resolver";
+import { ConfiguredPrivateAiProvider } from "../copilot/providers/configured-private-ai-provider";
+import { loadPrivateAiConfig } from "../copilot/providers/private-ai-config";
+import { CopilotService } from "../copilot/service/copilot-service";
 import { RegulatoryDossierService } from "../dossiers/regulatory-dossier-service";
 import { createEarthRouter } from "../earth/api/earth-router";
 import {
@@ -62,6 +67,13 @@ const publicApiService = new PublicApiService(
 const publicApiAccessController = new PublicApiAccessController(
   loadPublicApiAccessConfig(),
 );
+const privateAiConfig = loadPrivateAiConfig();
+const copilotService = privateAiConfig.available
+  ? new CopilotService(
+      new CopilotContextResolver(runtimeRepository),
+      new ConfiguredPrivateAiProvider(privateAiConfig.config),
+    )
+  : null;
 
 export function findDocument(documentId: string) {
   return runtimeRepository.findDocument(documentId);
@@ -301,6 +313,8 @@ app.get("/api/health", (_request, response) => {
     publicApi: publicApiAccessController.snapshot(),
   });
 });
+
+app.use("/api/copilot", createCopilotRouter({ service: copilotService }));
 
 const earthArtifactPath =
   process.env.EARTH_ARTIFACT_PATH ?? DEFAULT_EARTH_ARTIFACT_PATH;

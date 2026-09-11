@@ -15,6 +15,7 @@ import {
   Route as RouteIcon,
   Search,
   ShieldCheck,
+  Sparkles,
   Undo2,
   X,
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
   useState,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ReaderCopilot } from "../copilot/web/ReaderCopilot";
 import { EarthPage } from "../earth/web/EarthPage";
 import {
   type CurrentDocumentSearchResult,
@@ -204,11 +206,16 @@ function LegalBlock({
     block.children.map((child) => [child.id, child]),
   );
   const orderedRuns: Array<
-    { type: "text"; text: string } | { type: "children"; children: BodyBlock[] }
+    | { type: "text"; text: string; textRun: number }
+    | {
+        type: "children";
+        children: BodyBlock[];
+      }
   > = [];
+  let textRun = 0;
   for (const item of block.orderedContent) {
     if (item.type === "text") {
-      orderedRuns.push(item);
+      orderedRuns.push({ ...item, textRun: textRun++ });
       continue;
     }
     const child = childrenById.get(item.childId);
@@ -279,7 +286,10 @@ function LegalBlock({
             ) : (
               <div aria-hidden="true" />
             )}
-            <p>
+            <p
+              data-copilot-entity-id={block.id}
+              data-copilot-text-run={run.textRun}
+            >
               <AnnotatedLegalText
                 definitions={definitions}
                 onDefinitionPreview={onDefinitionPreview}
@@ -367,6 +377,7 @@ function AnnotatedLegalText({
             </button>
             <span
               className="inline-definition-tooltip"
+              data-copilot-ignore-selection="true"
               id={tooltipId}
               role="tooltip"
             >
@@ -1002,6 +1013,8 @@ function ReaderPage({
     useState<DocumentRegulatoryContext | null>(null);
   const [provisionDecisions, setProvisionDecisions] =
     useState<DocumentSupervisoryDecisionsResponse | null>(null);
+  const [copilotOpen, setCopilotOpen] = useState(false);
+  const legalTextRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1271,6 +1284,13 @@ function ReaderPage({
         </Link>
         <div className="topbar-actions">
           <ThemeToggle onToggle={onToggleTheme} theme={theme} />
+          <button
+            className="view-switch"
+            onClick={() => setCopilotOpen(true)}
+            type="button"
+          >
+            <Sparkles aria-hidden="true" size={15} /> Copilot
+          </button>
           <Link className="view-switch" to="/earth">
             <Globe2 aria-hidden="true" size={15} /> Earth
           </Link>
@@ -1379,6 +1399,7 @@ function ReaderPage({
         aria-labelledby="provision-title"
         className="legal-text"
         id="main-content"
+        ref={legalTextRef}
         tabIndex={-1}
       >
         <div className="breadcrumb">
@@ -1598,6 +1619,14 @@ function ReaderPage({
           </p>
         ) : null}
       </aside>
+      <ReaderCopilot
+        document={legalDocument}
+        legalTextRef={legalTextRef}
+        onClose={() => setCopilotOpen(false)}
+        onOpen={() => setCopilotOpen(true)}
+        open={copilotOpen}
+        provision={activeProvision}
+      />
       {previewRelationship ? (
         <ReferencePeek
           onClose={() => setPreviewRelationship(null)}
