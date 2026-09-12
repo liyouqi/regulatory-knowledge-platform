@@ -101,6 +101,19 @@ function scopeLabel(response: CopilotRespondResponse) {
   return "Based on current context";
 }
 
+function CopilotThinking() {
+  return (
+    <output aria-label="Thinking" className="copilot-thinking">
+      <span>Thinking</span>
+      <span aria-hidden="true" className="copilot-thinking-dots">
+        <i />
+        <i />
+        <i />
+      </span>
+    </output>
+  );
+}
+
 export function ReaderCopilot({
   document,
   provision,
@@ -378,9 +391,7 @@ export function ReaderCopilot({
             </button>
           </header>
           <blockquote>“{quickExplain.selection.text}”</blockquote>
-          {quickExplain.status === "loading" ? (
-            <p className="copilot-thinking">Understanding current context…</p>
-          ) : null}
+          {quickExplain.status === "loading" ? <CopilotThinking /> : null}
           {quickExplain.status === "error" ? (
             <p className="copilot-error" role="alert">
               {quickExplain.message}
@@ -483,9 +494,7 @@ export function ReaderCopilot({
                 ) : null}
               </article>
             ))}
-            {pending ? (
-              <p className="copilot-thinking">Understanding current context…</p>
-            ) : null}
+            {pending ? <CopilotThinking /> : null}
             {error ? (
               <p className="copilot-error" role="alert">
                 {error}

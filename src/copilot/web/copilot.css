@@ -322,7 +322,55 @@
 }
 
 .copilot-thinking {
+  align-items: center;
   color: #aab69e;
+  display: flex;
+  gap: 6px;
+}
+
+.copilot-thinking-dots {
+  align-items: center;
+  display: inline-flex;
+  gap: 3px;
+}
+
+.copilot-thinking-dots i {
+  animation: copilot-thinking-pulse 1.15s ease-in-out infinite;
+  background: currentcolor;
+  border-radius: 50%;
+  display: block;
+  height: 4px;
+  opacity: 0.35;
+  width: 4px;
+}
+
+.copilot-thinking-dots i:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.copilot-thinking-dots i:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes copilot-thinking-pulse {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copilot-thinking-dots i {
+    animation: none;
+    opacity: 0.75;
+  }
 }
 
 .copilot-error {

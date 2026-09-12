@@ -94,6 +94,12 @@ describe("ConfiguredPrivateAiProvider", () => {
     });
     const body = JSON.parse(String(request?.body));
     expect(body.thinking).toEqual({ type: "disabled" });
+    expect(body.messages[0].content).toContain(
+      "make the first sentence a direct plain-language identification or definition",
+    );
+    expect(body.messages[0].content).toContain(
+      "if it is ambiguous, state what it means in the current context",
+    );
     expect(body.messages[1].content).toContain("shall act");
     expect(body.messages[1].content).not.toContain("test-secret");
   });
