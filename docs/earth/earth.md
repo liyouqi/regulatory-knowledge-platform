@@ -1,4 +1,4 @@
-# Official EU Regulatory Earth — v0.2
+# Official EU Regulatory Earth — v0.3
 
 > Status: approved product and implementation requirements
 > Scope: an official-source, exploratory regulation graph for a bounded EU regulatory Universe
@@ -7,6 +7,8 @@
 ## 1. Decision summary
 
 Earth is a feature in the same TypeScript/Node application and deployment as the Regulatory Knowledge Platform, but it is **not** a view over that Platform's `DocumentView`, `RuntimeRepository`, or runtime SQLite artifact.
+
+Earth is also a visually independent product surface. It may share the application entry point and restrained brand cues, but it must not reuse the Reader's multi-column page composition, dense panels, or ordinary catalogue layout. `/earth` is a full-viewport, immersive 3D globe experience.
 
 Earth has its own directory boundary, source manifest, build pipeline, read model, read-only artifact, repository, and HTTP routes. At build time it acquires official material from EUR-Lex/CELLAR/Formex; at runtime it reads only its verified Earth artifact. The browser and Earth API never fetch official sources live.
 
@@ -18,6 +20,7 @@ Existing tested acquisition and Formex parsing code may be reused as a library d
 
 Earth presents a navigable regulatory world:
 
+- the primary view is a rotatable 3D globe, not a flat force-directed or concentric graph;
 - a law is a Work-level cluster;
 - a selected official Expression supplies the visible hierarchy (Title, Chapter, Section, Article);
 - exact official relations are retained as evidence-bearing facts;
@@ -98,7 +101,7 @@ The build is deterministic from its reviewed manifest and verified snapshots:
 3. parse the expression hierarchy without modifying legal text;
 4. collect only supported official relation records and their evidence;
 5. compile and verify an Earth-specific SQLite artifact in a staging path;
-6. promote only the verified artifact for runtime use.
+6. write the verified local Earth artifact for runtime use.
 
 Build failure, a changed hash, an unresolved Work/Expression, or a failed parser/relationship quality gate must fail the Earth build rather than silently substituting Platform data or a different official version. Raw snapshots and generated artifacts are not committed to Git.
 
@@ -224,15 +227,27 @@ type EarthRendererProps = {
 type EarthRenderer = React.ComponentType<EarthRendererProps>
 ```
 
-The first candidate is a **Reagraph spike**, isolated under `src/earth/web/renderers/reagraph/`. It proves real-data rendering, bounded expansion, selection/focus, camera/navigation, aggregate/exact projection compatibility, and the performance budget before it becomes the production renderer. Reagraph mechanics may be used, but its default visual treatment is not a product constraint.
+The existing **Reagraph spike**, isolated under `src/earth/web/renderers/reagraph/`, proved that the real artifact, selection, focus, progressive hierarchy, and bounded exact-neighbourhood model work in WebGL. Its `concentric2d` presentation is not the Earth product and must not remain the default renderer.
+
+The production renderer presents one actual 3D sphere with a restrained dark surface, soft atmosphere, law nodes positioned on or just above the globe, and curved relationship arcs. The first release does not need geographic legal meaning: positions may be deterministic presentation coordinates and must not imply jurisdiction, applicability, or institutional location. The renderer stays behind the existing pure `EarthRenderModel` boundary so this visual change does not reopen the API or legal-data model.
+
+The visual surface is deliberately simple:
+
+- one full-viewport globe;
+- a small title/navigation control rather than the existing site header and page chrome;
+- drag to rotate, wheel/pinch to zoom, click or keyboard action to select;
+- selected and connected laws remain bright while unrelated nodes recede;
+- official relations appear as clear, restrained arcs;
+- one lightweight floating detail card for identity, relation evidence, and source links;
+- no dashboard grid, permanent multi-column rail, dense filter panel, or developer-facing graph controls in the default view.
 
 Earth must have an accessible non-WebGL fallback from the same render model: keyboard-operable law/relationship list or 2D structured view, focus/selection announcements, text alternatives for relation counts and evidence, visible focus, and no interaction that relies only on color, drag, or hover. Failure to initialize WebGL selects the fallback without losing navigation or official provenance.
 
 ## 9. Interaction model
 
-The initial Universe view shows law clusters and aggregate cross-law relations, not every Article. Selecting a law focuses it, keeps its connected clusters legible, dims unrelated clusters, and opens a detail panel with official identity and source/version information. Expanding a law requests its hierarchy incrementally. Selecting a relation shows its type, provenance, exact evidence locator, and source link.
+The initial Universe view shows law clusters and aggregate cross-law relations on the 3D globe, not every Article. The globe fills the available viewport and starts at a readable overview angle. Dragging rotates it, zooming changes exploration scale, and selecting a law brings it toward the visual focus without disorienting camera jumps. Connected clusters remain legible, unrelated clusters recede, and a compact floating card shows official identity and source/version information. Expanding a law requests its hierarchy incrementally. Selecting a relation highlights its arc and shows its type, provenance, exact evidence locator, and source link.
 
-Visual guidance is restrained: a Work has one color family, hierarchy depth changes visual weight, boundary nodes are distinct but not deceptive, and exact-mode density is an intentional user-selected exploration state. The product avoids a default “sci-fi” aesthetic, arbitrary coordinates, saved user graph edits, VR/AR, custom shaders, and generated explanations in the initial release.
+Visual guidance is restrained: a Work has one color family, hierarchy depth changes visual weight, boundary nodes are distinct but not deceptive, and exact-mode density is an intentional user-selected exploration state. The product should feel calm and spatial rather than like a generic network-analysis tool. It avoids neon “sci-fi” decoration, geographic claims from presentation coordinates, saved user graph edits, VR/AR, complex custom shaders, and generated explanations in the initial release.
 
 ## 10. Delivery phases and acceptance gates
 
@@ -241,38 +256,40 @@ Visual guidance is restrained: a Work has one color family, hierarchy depth chan
 | 0 — contracts | Earth-only directory skeleton, Universe manifest schema, Work/Expression/edge contracts, artifact schema and tests | No Earth import of Platform runtime/view paths; stable IDs and relation semantics receive high-intensity review. |
 | 1 — official vertical slice | A small reviewed EU Banking Universe is acquired from official snapshots, parsed, compiled, and opened through EarthRepository | Build records hashes and Expression identity; raw/derived outputs remain ignored; artifact verification and source/parser fixtures pass. |
 | 2 — bounded explorer | Read-only Earth API, overview, detail, hierarchy children, boundary nodes, aggregate projection and accessible fallback | No request triggers official fetch or parsing; API responses preserve provenance/evidence; keyboard fallback completes the same basic navigation. |
-| 3 — Reagraph spike | Isolated Reagraph adapter using the Phase 2 render model | It passes real-artifact focus, selection, bounded expansion and exact-neighbourhood tests within the agreed performance budget; otherwise replace only the adapter. |
-| 4 — production interactions | Focus, drill-down, exact loaded-neighbourhood mode, relation evidence panel, renderer decision | Progressive-load limits are enforced server-side and client-side; no global unbounded reveal; regression and accessibility tests pass. |
-| 5 — scale and release | Expand reviewed Universe coverage toward 100/200/400 Works | Synthetic and representative artifact benchmarks cover initial load, focus, expand, relation mode switch, and fallback; a verified immutable artifact is promoted with rollback metadata. |
+| 3 — renderer spike | Isolated Reagraph adapter using the Phase 2 render model | The spike proves the render-model boundary and interactions; its 2D presentation is explicitly evaluated rather than adopted by default. |
+| 4 — immersive globe | Full-viewport 3D sphere, rotation/zoom/select, relationship arcs, floating evidence card, and structured fallback | The result is visually independent from the Reader, keeps interactions obvious, preserves bounded loading, and passes focused desktop/mobile visual checks. |
+| 5 — measured expansion | Expand only after the Banking 10 globe is simple, attractive, and usable | Representative measurements cover initial load, focus, selection, relation display, and fallback; broader official coverage remains an editorial decision. |
 
 Every parser, identity, relation-semantic, and artifact-schema change requires targeted fixtures/evaluations plus `npm run check` and `npm test`. Canonical contracts, stable IDs, relationship direction/provenance, and release gates require Sol-high review before merge, as required by repository policy.
 
-### Current implementation status — 2026-09-11
+### Current implementation status — 2026-09-12
 
 - Phase 0 is complete: Earth contracts and directories are isolated from the existing Platform data and runtime paths.
 - Phase 1 is complete for the reviewed Banking 10 vertical slice: ten official English CELLAR contents are stored as immutable, verified source snapshots and compiled into the standalone Earth artifact.
 - Phase 2 is complete for Banking 10: the read-only API, progressive hierarchy, aggregate relations, non-recursive boundary Works, exact evidence panel, and keyboard-operable structured view run entirely from the artifact.
 - Official relationship acquisition currently publishes 103 reviewed one-hop lifecycle facts: 48 `AMENDS` facts and 55 `CORRECTS` facts. The verified artifact contains ten included Works, 95 boundary Works, 1,108 nodes, and 806 Articles. A boundary title remains absent when CELLAR supplies no English title; Earth does not manufacture one.
-- Phase 3 is complete: Reagraph is lazy-loaded behind the renderer boundary and consumes only the pure `EarthRenderModel`. The real Banking 10 artifact passes graph focus, selection, progressive hierarchy, and structured-view checks. Chromium test-only 100/200/400 Work fixtures all reach a WebGL frame inside the eight-second release gate with no page errors, so Reagraph remains the current renderer candidate.
-- Phase 4 is complete: boundary results are server-bounded to 100 by default and 200 maximum, with CELEX/official-title filtering, offset paging, total counts, and a matching structured UI. A selected included node can explicitly request an exact depth-one neighbourhood capped at 100 nodes and 150 edges, inspect official evidence, and return to the default aggregate view. Exact loaded relations never reference an omitted node, and there is no global reveal action.
-- Phase 5 is in progress: automated Chromium fixtures cover 100/200/400 included Works, a paged 205-Work boundary, and aggregate/exact mode switching. Actual reviewed coverage remains Banking 10; promotion, rollback metadata, and representative larger official Universes remain release work.
+- Phase 3 technical validation is complete: Reagraph is lazy-loaded behind the renderer boundary and consumes only the pure `EarthRenderModel`. It proved graph focus, selection, progressive hierarchy, structured fallback, and synthetic scale, but the current `concentric2d` result is visually rejected as the product renderer.
+- Phase 4 data and interaction mechanics are present: boundary results are bounded and searchable, exact neighbourhoods are capped, and evidence remains available. The immersive visual delivery is not complete because the current page still inherits too much of the existing site structure and does not render a 3D globe.
+- The active work is the smallest useful visual replacement: keep the existing Earth API/domain state and replace the page composition and renderer with a simple full-viewport 3D globe. Release automation, rollback machinery, broader corpus expansion, and additional operational gates are deferred.
 
-## 11. Explicit non-goals for v0.2
+## 11. Explicit non-goals for v0.3
 
 - Earth does not replace or migrate the existing Platform pipeline.
 - Earth does not read or write the existing Platform Runtime artifact.
 - Runtime does not query EUR-Lex, CELLAR, SPARQL, Formex, or raw snapshots.
 - No Neo4j, Redis, message queue, GraphQL, WebSocket, second Node service, or second deployment is introduced.
 - No unrestricted graph query, recursive boundary traversal, whole-Universe exact reveal, AI relation, or semantic-inference relation is published.
-- No second renderer is built before the Reagraph spike has a measured decision.
+- No generic 2D graph is presented as a 3D Earth merely because it uses WebGL.
 
 ## 12. Success condition
 
-Earth succeeds when a user can open a verified `EU Banking` Universe, understand the law-level landscape, focus a Work, progressively enter its official selected Expression hierarchy, inspect a bounded set of exact official relations with their evidence, and return to an accessible non-WebGL representation when needed. The same artifact and interaction model must remain viable when the editorial Universe grows from 10 to hundreds of laws.
+Earth succeeds when a user can open a verified `EU Banking` Universe and immediately understand that they are exploring a spatial regulatory world: rotate and zoom a real 3D globe, select a Work, see its relationships as arcs, inspect exact official evidence in a lightweight card, progressively enter its hierarchy, and return to an accessible non-WebGL representation when needed. The experience must first be simple, attractive, and usable for Banking 10 before broader coverage is considered.
 
 ## 13. Pause and continuation record — 2026-09-11
 
 Earth development is intentionally paused after the Phase 4 interaction milestone so that work can move to Contextual Regulatory Copilot. This section is the hand-off record for resuming Earth without reconstructing decisions from chat history. The Git commit containing this section is the pause checkpoint; locate it with `git log -- docs/earth/earth.md`.
+
+Sections 13.1–13.3 preserve the historical checkpoint evidence. The product-direction revision dated 2026-09-12 in the current status and section 13.4 supersedes its former 2D-renderer and release-work priorities.
 
 ### 13.1 Checkpoint state
 
@@ -315,13 +332,13 @@ From the repository root:
 
 ### 13.4 Next bounded work package
 
-Resume with artifact release mechanics, not with additional UI features:
+Resume with the immersive Earth surface, not release infrastructure or corpus expansion:
 
-1. Define an Earth-only release manifest containing artifact hash, build ID, schema version, Universe ID/version, source snapshot IDs, creation time, and previous promoted release.
-2. Add staged verification followed by atomic promotion to an immutable release path and a small current-release pointer. Define rollback as selecting an already verified prior release; never mutate an artifact in place.
-3. Test failed verification, missing artifact, incompatible schema, promotion, restart, and rollback. Treat release-gate or contract changes as high-intensity review work.
-4. Measure a representative larger **official** Universe only after its membership is editorially reviewed. Synthetic 100/200/400 fixtures prove renderer scale but do not authorize or define legal coverage.
-5. Re-evaluate Reagraph after representative-device measurements. If it fails the agreed budget, replace only `src/earth/web/renderers/reagraph/`; preserve the Earth API, domain state, and pure render model.
+1. Replace the default `concentric2d` Reagraph view with a controlled 3D globe renderer behind the existing `EarthRenderModel` boundary.
+2. Give `/earth` a full-viewport composition with minimal navigation and one floating detail card; do not reuse the Reader's multi-column page layout.
+3. Implement only the primary interactions: rotate, zoom, select a law, highlight connected laws/arcs, inspect a relation, and return to the overview.
+4. Keep Banking 10 and the existing bounded API. Do not add laws, graph semantics, filters, workflows, release management, or operational machinery as part of this visual replacement.
+5. Check the real page at desktop and mobile widths, retain the structured accessibility fallback, and judge success primarily by clarity, visual quality, and interaction feel.
 
 ### 13.5 Decisions that must not be reopened accidentally
 
@@ -330,5 +347,8 @@ Resume with artifact release mechanics, not with additional UI features:
 - Aggregate overview is the default. Exact relations load only through an explicit, server-bounded neighbourhood request; there is no global reveal.
 - Boundary nodes are one-hop, metadata-only, paged, searchable, and non-recursive.
 - The UI consumes only Earth API/domain projections. It does not import acquisition, parsing, SQLite, or official-source adapters.
+- Earth is visually independent from the Reader and catalogue surfaces. Shared deployment does not require shared page composition.
+- The default visual is an actual 3D globe, not a flat graph, dashboard, or WebGL-labelled 2D canvas.
+- Keep the first experience simple: one globe, a few obvious controls, and one lightweight information surface.
 - Missing titles, hierarchy, evidence, or source material fail closed or remain visibly absent; they are never invented or silently repaired.
 - Expanding from Banking 10 to 100/200/400 actual laws is an editorial/legal coverage decision, not a technical auto-discovery step.
