@@ -14,6 +14,8 @@ import {
   DEFAULT_EARTH_ARTIFACT_PATH,
   EarthRepository,
 } from "../earth/runtime/earth-repository";
+import { MonitorAiService } from "../monitor/monitor-ai";
+import { createMonitorRouter } from "../monitor/monitor-router";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import {
   PublicApiAccessController,
@@ -73,6 +75,9 @@ const copilotService = privateAiConfig.available
       new CopilotContextResolver(runtimeRepository),
       new ConfiguredPrivateAiProvider(privateAiConfig.config),
     )
+  : null;
+const monitorAiService = privateAiConfig.available
+  ? new MonitorAiService(privateAiConfig.config)
   : null;
 
 export function findDocument(documentId: string) {
@@ -315,6 +320,7 @@ app.get("/api/health", (_request, response) => {
 });
 
 app.use("/api/copilot", createCopilotRouter({ service: copilotService }));
+app.use("/api/monitor", createMonitorRouter({ aiService: monitorAiService }));
 
 const earthArtifactPath =
   process.env.EARTH_ARTIFACT_PATH ?? DEFAULT_EARTH_ARTIFACT_PATH;

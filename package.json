@@ -43,6 +43,7 @@
     "eba:canonical:build": "node --import tsx src/ingestion/eba-canonical-cli.ts",
     "eba:canonical:inspect": "node --import tsx src/ingestion/eba-canonical-cli.ts --inspect",
     "eba-qa:fetch": "node --import tsx src/qa/eba-qa-cli.ts fetch",
+    "monitor:refresh": "node --import tsx src/monitor/monitor-refresh-cli.ts",
     "earth:source:list": "node --import tsx src/earth/acquisition/cli.ts list",
     "earth:source:fetch": "node --import tsx src/earth/acquisition/cli.ts fetch",
     "earth:source:verify": "node --import tsx src/earth/acquisition/cli.ts verify",

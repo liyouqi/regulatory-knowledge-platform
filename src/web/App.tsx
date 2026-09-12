@@ -32,6 +32,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ReaderCopilot } from "../copilot/web/ReaderCopilot";
 import { EarthPage } from "../earth/web/EarthPage";
+import { MonitorPage } from "../monitor/web/MonitorPage";
 import {
   type CurrentDocumentSearchResult,
   buildCurrentDocumentSearchIndex,
@@ -1645,6 +1646,9 @@ function ReaderPage({
 
 export function App() {
   const location = useLocation();
+  const monitor =
+    location.pathname === "/monitor" ||
+    location.pathname.startsWith("/monitor/");
   const earth =
     location.pathname === "/earth" || location.pathname.startsWith("/earth/");
   const explorer = parseExplorerPath(location.pathname);
@@ -1698,7 +1702,9 @@ export function App() {
 
   return (
     <>
-      {regulatoryTopic ? (
+      {monitor ? (
+        <MonitorPage />
+      ) : regulatoryTopic ? (
         <RegulatoryTopicPage
           onOpenSearch={() => setSearchOpen(true)}
           onToggleTheme={toggleTheme}

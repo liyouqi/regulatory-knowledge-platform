@@ -10,5 +10,7 @@ test-results/
 !.env.example
 data/raw/
 data/artifacts/
+data/monitor/*
+!data/monitor/default.json
 exports/
 .DS_Store

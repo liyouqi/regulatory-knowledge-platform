@@ -1,0 +1,239 @@
+{
+  "schemaVersion": "monitor-feed@1.0.0",
+  "month": "2025-09",
+  "generatedAt": "2026-09-12T00:00:00.000Z",
+  "sources": [
+    {
+      "source": "EUR-Lex",
+      "url": "https://eur-lex.europa.eu/",
+      "eventCount": 1
+    },
+    {
+      "source": "CSSF",
+      "url": "https://www.cssf.lu/en/news/",
+      "eventCount": 1
+    },
+    {
+      "source": "EBA",
+      "url": "https://www.eba.europa.eu/publications-and-media/press-releases",
+      "eventCount": 4
+    }
+  ],
+  "events": [
+    {
+      "id": "monitor:cssf:aml-cft-market-entry-form-update",
+      "source": {
+        "authority": "CSSF",
+        "title": "Communication regarding the update of the eDesk procedure: AML/CFT Market Entry Form (Funds and IFMs)",
+        "url": "https://www.cssf.lu/en/2025/09/communication-regarding-the-update-of-the-edesk-procedure-aml-cft-market-entry-form-funds-and-ifms/",
+        "publishedAt": "2025-09-30"
+      },
+      "classification": {
+        "topic": "AML & financial crime",
+        "eventType": "Publication",
+        "status": "Procedure updated",
+        "affectedEntities": ["Investment fund managers", "Investment funds"]
+      },
+      "analysis": {
+        "summary": "The CSSF announced updates to the AML/CFT Market Entry Form workflow for funds and investment fund managers.",
+        "keyPoints": [
+          "The communication clarifies which requests trigger a Market Entry Form submission.",
+          "Portfolio Manager and Investment Advisor sections were removed for authorised and registered IFMs."
+        ],
+        "businessTakeaways": [
+          "The change affects the information prepared for market-entry requests rather than creating a new firm-wide AML programme.",
+          "Teams using saved forms or internal filing instructions may now be working from an outdated workflow."
+        ],
+        "suggestedActions": [
+          "Compare current eDesk instructions and internal checklists with the updated procedure.",
+          "Review draft or reopened submissions to confirm that removed sections are no longer being populated."
+        ],
+        "potentiallyAffectedFunctions": [
+          "AML Compliance",
+          "Fund Governance",
+          "Regulatory Operations"
+        ]
+      }
+    },
+    {
+      "id": "monitor:eba:2025-transparency-exercise",
+      "source": {
+        "authority": "EBA",
+        "title": "The EBA launches its 2025 EU-wide transparency exercise",
+        "url": "https://www.eba.europa.eu/publications-and-media/press-releases/eba-launches-its-2025-eu-wide-transparency-exercise",
+        "publishedAt": "2025-09-29"
+      },
+      "classification": {
+        "topic": "Prudential supervision",
+        "eventType": "Publication",
+        "status": "Exercise launched",
+        "affectedEntities": ["EU credit institutions"]
+      },
+      "analysis": {
+        "summary": "The EBA launched its annual transparency exercise using supervisory reporting data from more than 100 major EU banks.",
+        "keyPoints": [
+          "The exercise covers capital, financial assets, risk exposures, sovereign exposures and asset quality.",
+          "Results were scheduled for publication with the EBA Risk Assessment Report."
+        ],
+        "businessTakeaways": [
+          "Participating banks should expect their supervisory reporting data to be presented in a comparable public dataset.",
+          "Data consistency and the explanation of visible movements may matter to finance and investor-relations teams."
+        ],
+        "suggestedActions": [
+          "Confirm which submitted reporting periods and templates feed the exercise.",
+          "Prepare an internal reconciliation and narrative for material changes before results are published."
+        ],
+        "potentiallyAffectedFunctions": [
+          "Regulatory Reporting",
+          "Finance",
+          "Investor Relations"
+        ]
+      }
+    },
+    {
+      "id": "monitor:eba:its-validation-rules-september",
+      "source": {
+        "authority": "EBA",
+        "title": "EBA issues revised list of ITS validation rules",
+        "url": "https://www.eba.europa.eu/publications-and-media/press-releases/eba-issues-revised-list-its-validation-rules-35",
+        "publishedAt": "2025-09-15"
+      },
+      "classification": {
+        "topic": "Supervisory reporting",
+        "eventType": "Publication",
+        "status": "Rules updated",
+        "affectedEntities": ["EU credit institutions", "Competent authorities"]
+      },
+      "analysis": {
+        "summary": "The EBA identified ITS validation rules that should be deactivated because of inaccuracies or technical problems.",
+        "keyPoints": [
+          "Affected submissions should not be formally validated against deactivated rules.",
+          "A supporting package was published for consistent taxonomy and DPM updates."
+        ],
+        "businessTakeaways": [
+          "Continuing to enforce a deactivated rule can create false submission failures and unnecessary remediation work.",
+          "The update is operationally relevant to both reporting logic and the supporting data model package."
+        ],
+        "suggestedActions": [
+          "Identify the revised and deactivated rules in the EBA package.",
+          "Update local validation configuration and record the package version used for the next submission."
+        ],
+        "potentiallyAffectedFunctions": [
+          "Regulatory Reporting",
+          "Data Management",
+          "Technology"
+        ]
+      }
+    },
+    {
+      "id": "monitor:eba:mrel-reporting-amendments",
+      "source": {
+        "authority": "EBA",
+        "title": "The EBA publishes draft amendments to the framework for reporting of MREL decisions by resolution authorities to the EBA",
+        "url": "https://www.eba.europa.eu/publications-and-media/press-releases/eba-publishes-draft-amendments-framework-reporting-mrel-decisions-resolution-authorities-eba",
+        "publishedAt": "2025-09-12",
+        "reference": "Final draft ITS"
+      },
+      "classification": {
+        "topic": "Resolution & MREL",
+        "eventType": "Publication",
+        "status": "Final draft",
+        "affectedEntities": ["Resolution authorities", "EU credit institutions"]
+      },
+      "analysis": {
+        "summary": "Final draft amendments introduce more frequent MREL-decision reporting and update the reporting templates and methodology.",
+        "keyPoints": [
+          "The proposed cycle becomes semi-annual instead of annual.",
+          "The amendments add detail on discretionary elements and reflect recent BRRD changes."
+        ],
+        "businessTakeaways": [
+          "More frequent reporting can shorten the time available to reconcile MREL decisions and supporting data.",
+          "Template changes may affect established exchanges between resolution, treasury and reporting teams."
+        ],
+        "suggestedActions": [
+          "Compare the draft templates and reporting frequency with the current internal process.",
+          "Identify data owners for the additional discretionary-element information."
+        ],
+        "potentiallyAffectedFunctions": [
+          "Resolution Planning",
+          "Regulatory Reporting",
+          "Treasury"
+        ]
+      }
+    },
+    {
+      "id": "monitor:eur-lex:32025r2180",
+      "source": {
+        "authority": "EUR-Lex",
+        "title": "Commission Delegated Regulation (EU) 2025/2180 of 12 September 2025 supplementing Regulation (EU) 2023/2631 as regards external reviewers",
+        "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2180",
+        "publishedAt": "2025-09-12",
+        "reference": "CELEX 32025R2180"
+      },
+      "classification": {
+        "topic": "EU green bonds",
+        "eventType": "Publication",
+        "status": "Delegated regulation",
+        "affectedEntities": [
+          "External reviewers",
+          "Capital market participants"
+        ]
+      },
+      "analysis": {
+        "summary": "The delegated act specifies regulatory technical standards for registration, governance, staff expertise and outsourcing by external reviewers.",
+        "keyPoints": [
+          "The act supplements the European Green Bond Regulation.",
+          "Requirements cover registration assessment and outsourcing conditions."
+        ],
+        "businessTakeaways": [
+          "External reviewers may need to evidence governance, expertise and outsourcing arrangements during registration and ongoing supervision.",
+          "Firms relying on an external reviewer may want to understand whether the reviewer's operating model is affected."
+        ],
+        "suggestedActions": [
+          "Map the standards against current registration and governance documentation.",
+          "Review outsourced activities, oversight arrangements and supporting records."
+        ],
+        "potentiallyAffectedFunctions": [
+          "Sustainable Finance",
+          "Compliance",
+          "Third-party Risk"
+        ]
+      }
+    },
+    {
+      "id": "monitor:eba:sfdr-pai-disclosures",
+      "source": {
+        "authority": "EBA",
+        "title": "The ESAs note greater effort from financial market participants in their disclosure of principal adverse impacts",
+        "url": "https://www.eba.europa.eu/publications-and-media/press-releases/esas-note-greater-effort-financial-market-participants-their-disclosure-principal-adverse-impacts",
+        "publishedAt": "2025-09-09"
+      },
+      "classification": {
+        "topic": "Sustainable finance",
+        "eventType": "Publication",
+        "status": "Annual report",
+        "affectedEntities": ["Asset managers", "Insurers", "Pension providers"]
+      },
+      "analysis": {
+        "summary": "The ESAs reported a general improvement in voluntary principal-adverse-impact disclosures under SFDR.",
+        "keyPoints": [
+          "The review covered entity and product-level PAI statements.",
+          "The report includes recommendations for supervisors and the European Commission."
+        ],
+        "businessTakeaways": [
+          "The report provides a supervisory benchmark for the clarity and completeness of current PAI disclosures.",
+          "Improvement across the market can raise expectations even where the publication itself does not create a new rule."
+        ],
+        "suggestedActions": [
+          "Compare current entity- and product-level statements with the practices highlighted in the report.",
+          "Record disclosure gaps for the next SFDR reporting cycle and confirm ownership."
+        ],
+        "potentiallyAffectedFunctions": [
+          "Sustainability",
+          "Product Governance",
+          "Disclosure"
+        ]
+      }
+    }
+  ]
+}
