@@ -26,11 +26,11 @@
 
 .monitor-site-header {
   border-top: 5px solid var(--monitor-ink);
+  border-bottom: 1px solid var(--monitor-ink);
   background: var(--monitor-yellow);
 }
 
 .monitor-utility,
-.monitor-nav,
 .monitor-page,
 .monitor-footer {
   width: min(1180px, calc(100% - 40px));
@@ -93,29 +93,6 @@
   text-decoration: none;
 }
 
-.monitor-nav {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  border-top: 1px solid var(--monitor-line);
-  border-bottom: 1px solid var(--monitor-ink);
-}
-
-.monitor-nav a {
-  padding: 11px 0 9px;
-  color: var(--monitor-muted);
-  border-bottom: 3px solid transparent;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.monitor-nav a:hover,
-.monitor-nav a.active {
-  color: var(--monitor-ink);
-  border-bottom-color: var(--monitor-ink);
-}
-
 .monitor-page {
   padding: 0 24px;
   background: #fff;
@@ -123,44 +100,8 @@
   border-left: 1px solid var(--monitor-faint-line);
 }
 
-.monitor-edition-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 46px 0 30px;
-  border-bottom: 1px solid var(--monitor-ink);
-}
-
-.monitor-edition-heading p {
-  margin: 0 0 8px;
-  color: var(--monitor-accent);
-  font-size: 0.69rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.monitor-edition-heading h1 {
-  margin: 0;
-  font-family: var(--monitor-serif);
-  font-size: clamp(2.15rem, 4.5vw, 3.45rem);
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
-}
-
-.monitor-edition-heading > div > span {
-  display: block;
-  max-width: 640px;
-  margin-top: 12px;
-  color: var(--monitor-muted);
-  font-size: 0.86rem;
-  line-height: 1.45;
-}
-
 .monitor-month-select {
-  min-width: 184px;
+  min-width: 0;
 }
 
 .monitor-month-select > span:first-child,
@@ -248,7 +189,7 @@
 
 .monitor-filter-controls {
   display: grid;
-  grid-template-columns: 0.7fr 1fr 1.3fr;
+  grid-template-columns: 0.9fr 0.7fr 1fr 1.3fr;
   gap: 24px;
 }
 
@@ -260,7 +201,7 @@
   border-bottom: 3px solid var(--monitor-ink);
 }
 
-.monitor-feed-heading h2,
+.monitor-feed-heading h1,
 .monitor-summary-rail h2 {
   margin: 0;
   font-family: var(--monitor-serif);
@@ -1003,9 +944,14 @@
   }
 }
 
+@media (max-width: 1100px) and (min-width: 681px) {
+  .monitor-filter-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 680px) {
   .monitor-utility,
-  .monitor-nav,
   .monitor-page,
   .monitor-footer {
     width: min(100% - 28px, 1180px);
@@ -1026,26 +972,6 @@
   .monitor-masthead {
     margin-block: 22px 18px;
     font-size: 2.05rem;
-  }
-
-  .monitor-nav {
-    justify-content: flex-start;
-    gap: 22px;
-    overflow-x: auto;
-  }
-
-  .monitor-nav a {
-    white-space: nowrap;
-  }
-
-  .monitor-edition-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-top: 34px;
-  }
-
-  .monitor-month-select {
-    width: 100%;
   }
 
   .monitor-filterbar {
@@ -1103,7 +1029,6 @@
 
 @media print {
   .monitor-utility,
-  .monitor-nav,
   .monitor-filterbar,
   .monitor-detail-layer,
   .monitor-summary-rail,

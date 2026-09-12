@@ -528,47 +528,11 @@ export function MonitorPage() {
         <a className="monitor-masthead" href="/monitor">
           Regulatory Monitor
         </a>
-        <nav className="monitor-nav" aria-label="Monitor sections">
-          <a className="active" href="#updates">
-            Updates
-          </a>
-          <a href="#summary">Monthly summary</a>
-          <a href="#sources">Sources</a>
-        </nav>
       </header>
 
       <div className="monitor-page">
-        <section className="monitor-edition-heading" id="updates">
-          <div>
-            <p>European financial regulation</p>
-            <h1>Latest regulatory updates</h1>
-            <span>
-              A concise monthly view of publications from selected EU and
-              Luxembourg authorities.
-            </span>
-          </div>
-          <label className="monitor-month-select">
-            <span>Edition</span>
-            <span className="monitor-select-wrap">
-              <select
-                value={selectedMonth || feed?.month || ""}
-                onChange={(event) => setSelectedMonth(event.target.value)}
-              >
-                {(months.length > 0 ? months : feed ? [feed.month] : []).map(
-                  (month) => (
-                    <option key={month} value={month}>
-                      {displayMonth(month)}
-                    </option>
-                  ),
-                )}
-              </select>
-              <ChevronDown aria-hidden="true" size={15} />
-            </span>
-          </label>
-        </section>
-
         <div className="monitor-content-grid">
-          <section className="monitor-feed-column">
+          <section className="monitor-feed-column" id="updates">
             <div className="monitor-filterbar">
               <div className="monitor-filter-title">
                 <SlidersHorizontal aria-hidden="true" size={15} />
@@ -576,6 +540,27 @@ export function MonitorPage() {
                 {activeFilterCount > 0 ? <b>{activeFilterCount}</b> : null}
               </div>
               <div className="monitor-filter-controls">
+                <label className="monitor-filter monitor-month-select">
+                  <span>Edition</span>
+                  <span className="monitor-select-wrap">
+                    <select
+                      value={selectedMonth || feed?.month || ""}
+                      onChange={(event) => setSelectedMonth(event.target.value)}
+                    >
+                      {(months.length > 0
+                        ? months
+                        : feed
+                          ? [feed.month]
+                          : []
+                      ).map((month) => (
+                        <option key={month} value={month}>
+                          {displayMonth(month)}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown aria-hidden="true" size={15} />
+                  </span>
+                </label>
                 <FilterSelect
                   label="Source"
                   onChange={(source) =>
@@ -604,7 +589,7 @@ export function MonitorPage() {
             </div>
 
             <div className="monitor-feed-heading">
-              <h2>Updates</h2>
+              <h1>Updates</h1>
               <p>
                 Showing {filteredEvents.length} of {feed?.events.length ?? 0}
               </p>

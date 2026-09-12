@@ -12,6 +12,11 @@ void refreshMonitor({ month, outputDirectory: option("--output") }).then(
     console.log(
       `Monitor refresh complete: ${feed.events.length} events for ${feed.month} (${feed.sources.map((source) => `${source.source}: ${source.eventCount}`).join(", ")})`,
     );
+    console.log(
+      feed.enrichment?.mode === "configured-ai"
+        ? `AI enrichment: ${feed.enrichment.completed} completed, ${feed.enrichment.failed} kept as basic entries`
+        : "AI enrichment: skipped because PRIVATE_AI_* is not configured",
+    );
   },
   (error: unknown) => {
     console.error(error instanceof Error ? error.message : error);

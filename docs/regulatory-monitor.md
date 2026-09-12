@@ -36,7 +36,7 @@ The first usable page contains:
 
 The report action belongs in the interface from the first release. Until report generation is implemented, it may provide a small, honest in-product message without introducing a report service.
 
-The visual reference is the Financial Times topic/myFT feed, adapted into a more energetic palette: a warm-white reading surface, yellow masthead, deep teal text, coral accents, compact navigation, dense headline-led updates, and a useful summary rail. It does not copy FT branding or assets. The page avoids landing-page hero typography, metric walls, decorative cards, pill-heavy metadata, and staged entrance animation.
+The visual reference is the Financial Times topic/myFT feed, adapted into a more energetic palette: a warm-white reading surface, yellow masthead, deep teal text, coral accents, dense headline-led updates, and a useful summary rail. It does not copy FT branding or assets. The page avoids a second hero heading beneath the masthead, same-page navigation that looks like tabs, landing-page typography, metric walls, decorative cards, pill-heavy metadata, and staged entrance animation.
 
 Each event row must contain enough substance to be useful without opening the detail panel:
 
@@ -164,10 +164,11 @@ If a publication does not provide evidence of a before/after comparison, the int
 The command:
 
 1. requests recent items from each enabled source;
-2. converts the useful fields into the Monitor event shape;
-3. applies small deterministic topic/entity hints where useful;
-4. writes one fresh JSON feed for the UI;
-5. records source failures in refresh metadata while keeping successful source items.
+2. opens each matching official publication page and extracts readable source text;
+3. when `PRIVATE_AI_*` is configured, uses the configured model and the Monitor-owned enrichment prompt to create the summary, status, topic, affected population, business takeaways, suggested checks, and explicit important dates;
+4. without AI configuration, keeps a basic listing-derived event rather than blocking the refresh;
+5. writes one fresh JSON feed for the UI;
+6. records source failures in refresh metadata while keeping successful source items.
 
 This is not the Platform corpus pipeline and does not call `corpus:refresh`.
 
@@ -199,6 +200,8 @@ Monitor Copilot explains one complete regulatory event. It deliberately does not
 - the panel shows an obvious `Thinking` animation while waiting.
 
 This interaction is separate from the Reader Copilot. It does not reuse Reader selection, exact provision context, conversation storage, or visual components. It may reuse the same server-configured model connection. The server resolves the submitted event ID from the current Monitor feed before sending the event brief, so the browser does not provide authoritative event content.
+
+Refresh-time enrichment uses that same `.env` model configuration, not a development-time Codex model. Its prompt is local to `src/monitor/monitor-enrichment.ts`, so the monitoring questions and output shape can evolve without changing Reader Copilot or relying on an external prompt service. The prompt is designed around the questions regulatory teams actually triage: legal status, concrete change, affected population, important dates, operational implications, and the next internal checks.
 
 The generated answer is based on source metadata and Monitor analysis, not the full official publication. The panel says this directly and links back to the official source. It does not present the result as legal advice or a final applicability determination.
 
@@ -242,9 +245,9 @@ The route should look intentional when opened directly. A small back link may le
 
 ### Slice 3 — source expansion
 
-- optional Cloud Scheduler trigger;
 - ESMA and AMLA collectors;
-- optional AI enrichment and real report generation.
+- optional Cloud Scheduler trigger;
+- real report generation after source collection and enrichment are complete.
 
 ## 11. Acceptance criteria
 

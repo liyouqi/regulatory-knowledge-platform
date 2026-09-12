@@ -50,6 +50,11 @@ export type MonitorFeed = {
   schemaVersion: "monitor-feed@1.0.0";
   month: string;
   generatedAt: string;
+  enrichment?: {
+    mode: "basic" | "configured-ai";
+    completed: number;
+    failed: number;
+  };
   sources: MonitorSourceStatus[];
   events: MonitorEvent[];
 };

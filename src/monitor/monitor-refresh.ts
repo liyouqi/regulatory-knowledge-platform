@@ -1,11 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { loadPrivateAiConfig } from "../copilot/providers/private-ai-config";
 import type {
   MonitorEvent,
   MonitorFeed,
   MonitorSource,
   MonitorSourceStatus,
 } from "./monitor-contract";
+import { MonitorEnrichmentService } from "./monitor-enrichment";
 
 type FeedItem = {
   title: string;
@@ -37,6 +39,17 @@ function decode(value: string): string {
     .replace(/&gt;/g, ">")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function publicationText(html: string): string {
+  const withoutNoise = html
+    .replace(/<(script|style|svg|noscript)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<(nav|header|footer)[^>]*>[\s\S]*?<\/\1>/gi, " ");
+  const main = withoutNoise.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1];
+  const article = withoutNoise.match(
+    /<article[^>]*>([\s\S]*?)<\/article>/i,
+  )?.[1];
+  return decode(main ?? article ?? withoutNoise).slice(0, 24_000);
 }
 
 function tag(block: string, name: string): string | undefined {
@@ -202,21 +215,54 @@ export async function refreshMonitor(options: {
     ).length,
     ...("error" in result ? { error: result.error } : {}),
   }));
-  const eventById = new Map<string, MonitorEvent>();
+  const eventById = new Map<string, { event: MonitorEvent; item: FeedItem }>();
   for (const result of results) {
     for (const item of result.items) {
       if (item.publishedAt.startsWith(options.month)) {
         const event = toEvent(result.adapter.source, item);
-        eventById.set(event.id, event);
+        eventById.set(event.id, { event, item });
       }
     }
   }
+  const aiConfig = loadPrivateAiConfig();
+  const enrichmentService = aiConfig.available
+    ? new MonitorEnrichmentService(aiConfig.config)
+    : null;
+  const candidates = [...eventById.values()];
+  let completed = 0;
+  let failed = 0;
+  const events: MonitorEvent[] = [];
+
+  for (let index = 0; index < candidates.length; index += 3) {
+    const batch = candidates.slice(index, index + 3);
+    const enriched = await Promise.all(
+      batch.map(async ({ event, item }) => {
+        if (!enrichmentService) return event;
+        try {
+          const sourceText = publicationText(await fetchText(item.url));
+          const result = await enrichmentService.enrich(event, sourceText);
+          completed += 1;
+          return result;
+        } catch {
+          failed += 1;
+          return event;
+        }
+      }),
+    );
+    events.push(...enriched);
+  }
+
   const feed: MonitorFeed = {
     schemaVersion: "monitor-feed@1.0.0",
     month: options.month,
     generatedAt: new Date().toISOString(),
+    enrichment: {
+      mode: enrichmentService ? "configured-ai" : "basic",
+      completed,
+      failed,
+    },
     sources,
-    events: [...eventById.values()].sort((a, b) =>
+    events: events.sort((a, b) =>
       b.source.publishedAt.localeCompare(a.source.publishedAt),
     ),
   };
