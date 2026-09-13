@@ -293,3 +293,86 @@ V1 is accepted when:
 - ordinary project type checking and build complete successfully.
 
 No broader test matrix, rollback subsystem, migration framework, or release gate is required for this feature.
+
+## 13. Development handoff — 2026-09-13
+
+This section is the restart point for continuing Monitor work on another computer.
+
+### Current implementation state
+
+- implementation baseline commit: `071147a feat: broaden monitor coverage and static access`;
+- the baseline is on `origin/main`;
+- the working tree was clean after that commit;
+- the Monitor UI, current-year timeline, month grouping, 20-item `Load more`, source/topic/sector filters, event brief, whole-event Copilot, and local read-only MCP entry are implemented;
+- enabled sources are CSSF, EBA, joint ESAs publications, ESMA, EIOPA, AMLA, European Commission Finance, and the EUR-Lex public feed;
+- the last local refresh produced 303 AI-enriched events across January–September 2026, with no basic/fallback events;
+- generated Monitor data is ignored by Git and is not part of the Platform corpus, Runtime SQLite, or Earth artifact.
+
+The company-report source set is covered: CSSF, ESAs, EBA, ESMA, AMLA, and European Commission/Official Journal-facing material. EIOPA adds insurance and pensions. The current unresolved source gap is full current-year Official Journal history: the latest EUR-Lex public RSS refresh returned zero matching items and does not backfill the year.
+
+### Recommended transfer from the old computer
+
+Clone the code; do not copy the repository itself:
+
+```bash
+git clone git@github.com:liyouqi/regulatory-knowledge-platform.git
+cd regulatory-knowledge-platform
+npm install
+git log -1 --oneline
+```
+
+Node.js 24 or newer and npm 11 or newer are expected.
+
+Copy these local-only files/directories securely from the old computer:
+
+```text
+.env
+data/artifacts/canonical/
+data/artifacts/earth/earth.sqlite
+data/monitor/                         # optional but recommended; about 940 KB
+```
+
+Why:
+
+- `.env` contains `PRIVATE_AI_*` and is intentionally not in Git;
+- `data/artifacts/canonical/` lets the normal `npm run dev` pre-step rebuild Runtime SQLite without downloading the legal corpus again;
+- `data/artifacts/earth/earth.sqlite` preserves the locally built Earth view;
+- copying `data/monitor/` preserves the current 303 enriched records and avoids immediately repeating external LLM calls. It may instead be omitted and rebuilt with `npm run monitor:refresh`.
+
+Do not copy `node_modules/`, `dist/`, `data/artifacts/corpus-builds/`, `data/artifacts/runtime/`, or `data/artifacts/search/`. Runtime and search artifacts are rebuilt from Canonical. `data/raw/` is also unnecessary for normal UI development; copy it only when continuing source acquisition or parser work.
+
+### Restart commands
+
+With the recommended files in place:
+
+```bash
+npm run check
+npm run dev
+```
+
+Open the Vite URL printed by the terminal, normally `http://localhost:5173/monitor`. Port `3000` is the API, not the browser UI.
+
+To replace the copied Monitor cache or rebuild without copying it:
+
+```bash
+npm run monitor:refresh
+```
+
+The command is current-year only. With `PRIVATE_AI_*` configured it automatically enriches new events, reuses existing enriched records, and prints simple per-item and batch progress. Without that configuration it still writes basic source-derived events.
+
+### Verification at handoff
+
+- `npm run check`: passed;
+- `npm run build`: passed;
+- MCP integration test: 8/8 passed;
+- browser check: annual feed, financial-sector filter, responsive MCP panel, initial Copilot explanation, and direct Chinese follow-up passed;
+- full `npm test`: 311/312 passed. The unrelated existing failure is `src/release/verify-corpus.test.ts`, whose local assertion expects 28 raw snapshots while this machine contains 98.
+
+### Continue in this order
+
+1. Add a simple public, no-login EUR-Lex/Official Journal current-year backfill so delegated and implementing acts are not dependent on the latest RSS window.
+2. Review the real 303-event page visually and make only concrete usability refinements; keep the Monitor UI independent from the main website.
+3. Implement `Generate Monthly Report` after source coverage and browsing UX are accepted.
+4. Consider Cloud Scheduler and remote MCP only later. Keep MCP static and read-only; do not expose Monitor AI through MCP.
+
+RAG, text selection, workflow/task management, persistence infrastructure, rollback machinery, and historical years remain intentionally out of scope.
