@@ -7,15 +7,27 @@ function option(name: string): string | undefined {
 
 const requestedYear = option("--year");
 const requestedMonth = option("--month");
+const currentYear = new Date().toISOString().slice(0, 4);
 const outputDirectory = option("--output");
 const onProgress = (message: string) => console.log(message);
 
 if (requestedYear && requestedMonth) {
   console.error("Use either --year or --month, not both");
   process.exitCode = 1;
-} else if (requestedYear) {
+} else if (requestedYear && requestedYear !== currentYear) {
+  console.error(
+    `Monitor refresh is limited to the current year (${currentYear})`,
+  );
+  process.exitCode = 1;
+} else if (requestedMonth && !requestedMonth.startsWith(`${currentYear}-`)) {
+  console.error(
+    `Monitor refresh is limited to the current year (${currentYear})`,
+  );
+  process.exitCode = 1;
+} else if (!requestedMonth) {
+  const year = requestedYear ?? currentYear;
   void refreshMonitorYear({
-    year: requestedYear,
+    year,
     outputDirectory,
     onProgress,
   }).then((feeds) => {
@@ -29,14 +41,14 @@ if (requestedYear && requestedMonth) {
       0,
     );
     console.log(
-      `Monitor year refresh complete: ${events} events across ${feeds.length} months for ${requestedYear}`,
+      `Monitor year refresh complete: ${events} events across ${feeds.length} months for ${year}`,
     );
     console.log(
       `AI enrichment: ${enriched} completed, ${failed} kept as basic entries`,
     );
   }, reportFailure);
 } else {
-  const month = requestedMonth ?? new Date().toISOString().slice(0, 7);
+  const month = requestedMonth;
   void refreshMonitor({ month, outputDirectory, onProgress }).then((feed) => {
     console.log(
       `Monitor refresh complete: ${feed.events.length} events for ${feed.month} (${feed.sources.map((source) => `${source.source}: ${source.eventCount}`).join(", ")})`,

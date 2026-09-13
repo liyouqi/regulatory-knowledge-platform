@@ -1,4 +1,12 @@
-export type MonitorSource = "EUR-Lex" | "CSSF" | "EBA";
+export type MonitorSource =
+  | "CSSF"
+  | "EBA"
+  | "ESAs"
+  | "ESMA"
+  | "EIOPA"
+  | "AMLA"
+  | "European Commission"
+  | "EUR-Lex";
 
 export type MonitorEvent = {
   id: string;

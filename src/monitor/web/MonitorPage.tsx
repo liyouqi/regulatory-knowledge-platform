@@ -5,8 +5,10 @@ import {
   Check,
   ChevronDown,
   ChevronLeft,
+  Copy,
   ExternalLink,
   FileDown,
+  Network,
   Send,
   SlidersHorizontal,
   Sparkles,
@@ -34,13 +36,41 @@ type Filters = {
   month: string;
   source: string;
   topic: string;
-  entity: string;
+  sector: string;
 };
-
-type MonitorYears = { years: string[] };
 
 const ALL = "All";
 const PAGE_SIZE = 20;
+const CURRENT_YEAR = new Date().getUTCFullYear().toString();
+const SOURCE_ORDER = [
+  "CSSF",
+  "ESAs",
+  "EBA",
+  "ESMA",
+  "AMLA",
+  "EUR-Lex",
+  "European Commission",
+  "EIOPA",
+];
+const SECTOR_ORDER = [
+  "Banking",
+  "Funds & asset management",
+  "Insurance & pensions",
+  "Securities & markets",
+  "Payments & e-money",
+  "Crypto-assets",
+  "AML/CFT",
+  "Cross-sector",
+];
+const MCP_CONFIG = `{
+  "mcpServers": {
+    "regulatory-monitor": {
+      "command": "npm",
+      "args": ["run", "--silent", "mcp"],
+      "cwd": "/path/to/regulatory-knowledge-platform"
+    }
+  }
+}`;
 
 function unique(items: string[]): string[] {
   return [...new Set(items)].sort((left, right) => left.localeCompare(right));
@@ -68,6 +98,34 @@ function eventSummary(event: RegulatoryEvent): string {
     event.analysis.summary ??
     "Open the official publication for the complete regulatory update."
   );
+}
+
+function eventSectors(event: RegulatoryEvent): string[] {
+  const text = [
+    event.source.title,
+    event.classification.topic,
+    ...event.classification.affectedEntities,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const sectors = [
+    [/bank|credit institution|prudential|crr|crd/, "Banking"],
+    [
+      /fund|ucits|aifm|asset manag|investment manag/,
+      "Funds & asset management",
+    ],
+    [/insur|reinsur|pension|iorp|solvency/, "Insurance & pensions"],
+    [
+      /investment firm|broker|securit|trading venue|market infrastructure|\bccp\b|\bcsd\b|emir|mifid/,
+      "Securities & markets",
+    ],
+    [/payment|e-money|electronic money/, "Payments & e-money"],
+    [/crypto|mica|token/, "Crypto-assets"],
+    [/aml|money laundering|financial crime|obliged entit/, "AML/CFT"],
+  ]
+    .filter(([pattern]) => (pattern as RegExp).test(text))
+    .map(([, sector]) => sector as string);
+  return sectors.length > 0 ? sectors : ["Cross-sector"];
 }
 
 function FilterSelect({
@@ -420,12 +478,10 @@ function DetailPanel({
 
 export function MonitorPage() {
   const [feed, setFeed] = useState<MonitorTimeline | null>(null);
-  const [years, setYears] = useState<string[]>([]);
-  const [selectedYear, setSelectedYear] = useState(
-    new Date().getUTCFullYear().toString(),
-  );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [error, setError] = useState("");
+  const [mcpOpen, setMcpOpen] = useState(false);
+  const [mcpCopied, setMcpCopied] = useState(false);
   const [selected, setSelected] = useState<{
     event: RegulatoryEvent;
     mode: "brief" | "copilot";
@@ -434,30 +490,22 @@ export function MonitorPage() {
     month: ALL,
     source: ALL,
     topic: ALL,
-    entity: ALL,
+    sector: ALL,
   });
 
   useEffect(() => {
     const controller = new AbortController();
     setError("");
-    void Promise.all([
-      fetch(`/api/monitor/timeline?year=${encodeURIComponent(selectedYear)}`, {
-        signal: controller.signal,
-      }),
-      fetch("/api/monitor/years", { signal: controller.signal }),
-    ])
-      .then(async ([feedResponse, yearsResponse]) => {
+    void fetch(`/api/monitor/timeline?year=${CURRENT_YEAR}`, {
+      signal: controller.signal,
+    })
+      .then(async (feedResponse) => {
         if (!feedResponse.ok)
           throw new Error("The Monitor feed is unavailable.");
-        const nextFeed = (await feedResponse.json()) as MonitorTimeline;
-        const nextYears = yearsResponse.ok
-          ? ((await yearsResponse.json()) as MonitorYears).years
-          : [];
-        return { nextFeed, nextYears };
+        return (await feedResponse.json()) as MonitorTimeline;
       })
-      .then(({ nextFeed, nextYears }) => {
+      .then((nextFeed) => {
         setFeed(nextFeed);
-        setYears(nextYears);
         setVisibleCount(PAGE_SIZE);
       })
       .catch((caught: unknown) => {
@@ -470,7 +518,7 @@ export function MonitorPage() {
         }
       });
     return () => controller.abort();
-  }, [selectedYear]);
+  }, []);
 
   const options = useMemo(() => {
     const events = feed?.events ?? [];
@@ -478,10 +526,13 @@ export function MonitorPage() {
       months: unique(
         events.map((event) => event.source.publishedAt.slice(0, 7)),
       ).reverse(),
-      sources: unique(events.map((event) => event.source.authority)),
+      sources: unique(events.map((event) => event.source.authority)).sort(
+        (left, right) =>
+          SOURCE_ORDER.indexOf(left) - SOURCE_ORDER.indexOf(right),
+      ),
       topics: unique(events.map((event) => event.classification.topic)),
-      entities: unique(
-        events.flatMap((event) => event.classification.affectedEntities),
+      sectors: SECTOR_ORDER.filter((sector) =>
+        events.some((event) => eventSectors(event).includes(sector)),
       ),
     };
   }, [feed]);
@@ -496,8 +547,8 @@ export function MonitorPage() {
             event.source.authority === filters.source) &&
           (filters.topic === ALL ||
             event.classification.topic === filters.topic) &&
-          (filters.entity === ALL ||
-            event.classification.affectedEntities.includes(filters.entity)),
+          (filters.sector === ALL ||
+            eventSectors(event).includes(filters.sector)),
       ),
     [feed, filters],
   );
@@ -535,19 +586,71 @@ export function MonitorPage() {
               ? `Last refreshed ${new Date(feed.generatedAt).toLocaleDateString("en-GB")}`
               : "Loading latest edition"}
           </span>
-          <button
-            className="monitor-report-button"
-            onClick={() => globalThis.print()}
-            type="button"
-          >
-            <FileDown aria-hidden="true" size={15} />
-            Generate Monthly Report
-          </button>
+          <div className="monitor-utility-actions">
+            <button
+              className="monitor-mcp-button"
+              onClick={() => setMcpOpen((current) => !current)}
+              type="button"
+            >
+              <Network aria-hidden="true" size={15} /> MCP access
+            </button>
+            <button
+              className="monitor-report-button"
+              onClick={() => globalThis.print()}
+              type="button"
+            >
+              <FileDown aria-hidden="true" size={15} />
+              Generate Monthly Report
+            </button>
+          </div>
         </div>
         <a className="monitor-masthead" href="/monitor">
           Regulatory Monitor
         </a>
       </header>
+
+      {mcpOpen ? (
+        <dialog
+          aria-label="Monitor MCP access"
+          className="monitor-mcp-panel"
+          open
+        >
+          <div className="monitor-mcp-panel-heading">
+            <div>
+              <span>Local, read-only access</span>
+              <h2>Monitor MCP</h2>
+            </div>
+            <button
+              aria-label="Close MCP access"
+              onClick={() => setMcpOpen(false)}
+              type="button"
+            >
+              <X aria-hidden="true" size={17} />
+            </button>
+          </div>
+          <p>
+            Query stored current-year updates with{" "}
+            <code>list_monitor_updates</code> and{" "}
+            <code>get_monitor_update</code>. No MCP tool can call AI.
+          </p>
+          <pre>{MCP_CONFIG}</pre>
+          <button
+            className="monitor-mcp-copy"
+            onClick={() => {
+              void navigator.clipboard.writeText(MCP_CONFIG);
+              setMcpCopied(true);
+            }}
+            type="button"
+          >
+            {mcpCopied ? (
+              <Check aria-hidden="true" size={14} />
+            ) : (
+              <Copy aria-hidden="true" size={14} />
+            )}
+            {mcpCopied ? "Copied" : "Copy configuration"}
+          </button>
+        </dialog>
+      ) : null}
 
       <div className="monitor-page">
         <div className="monitor-content-grid">
@@ -559,33 +662,6 @@ export function MonitorPage() {
                 {activeFilterCount > 0 ? <b>{activeFilterCount}</b> : null}
               </div>
               <div className="monitor-filter-controls">
-                <label className="monitor-filter monitor-year-select">
-                  <span>Year</span>
-                  <span className="monitor-select-wrap">
-                    <select
-                      value={selectedYear}
-                      onChange={(event) => {
-                        setSelectedYear(event.target.value);
-                        setFilters({
-                          month: ALL,
-                          source: ALL,
-                          topic: ALL,
-                          entity: ALL,
-                        });
-                        setVisibleCount(PAGE_SIZE);
-                      }}
-                    >
-                      {(years.length > 0 ? years : [selectedYear]).map(
-                        (year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                    <ChevronDown aria-hidden="true" size={15} />
-                  </span>
-                </label>
                 <FilterSelect
                   label="Month"
                   onChange={(month) => updateFilter("month", month)}
@@ -606,10 +682,10 @@ export function MonitorPage() {
                   values={options.topics}
                 />
                 <FilterSelect
-                  label="Affected entity"
-                  onChange={(entity) => updateFilter("entity", entity)}
-                  value={filters.entity}
-                  values={options.entities}
+                  label="Sector"
+                  onChange={(sector) => updateFilter("sector", sector)}
+                  value={filters.sector}
+                  values={options.sectors}
                 />
               </div>
             </div>
@@ -724,7 +800,7 @@ export function MonitorPage() {
                       month: ALL,
                       source: ALL,
                       topic: ALL,
-                      entity: ALL,
+                      sector: ALL,
                     });
                     setVisibleCount(PAGE_SIZE);
                   }}
@@ -738,7 +814,7 @@ export function MonitorPage() {
 
           <aside className="monitor-summary-rail" id="summary">
             <section>
-              <h2>Selected year</h2>
+              <h2>{CURRENT_YEAR} overview</h2>
               <dl>
                 <div>
                   <dt>Updates</dt>

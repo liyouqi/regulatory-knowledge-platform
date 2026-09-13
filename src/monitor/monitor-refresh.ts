@@ -15,6 +15,8 @@ type FeedItem = {
   publishedAt: string;
   summary?: string;
   publicationType?: string;
+  sourceText?: string;
+  authority?: MonitorSource;
   key: string;
 };
 
@@ -39,6 +41,13 @@ const EUR_LEX_RSS = "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=162";
 const CSSF_PUBLICATIONS = "https://www.cssf.lu/en/publication-data/";
 const EBA_PRESS_RELEASES =
   "https://www.eba.europa.eu/publications-and-media/press-releases";
+const ESMA_PRESS_RELEASES =
+  "https://www.esma.europa.eu/press-news/press-releases";
+const ESMA_CONSULTATIONS =
+  "https://www.esma.europa.eu/cs/press-news/consultations";
+const EIOPA_NEWS = "https://www.eiopa.europa.eu/media/news_en";
+const AMLA_SITEMAP = "https://www.amla.europa.eu/sitemap.xml";
+const EC_FINANCE_NEWS = "https://finance.ec.europa.eu/news_en";
 
 function decode(value: string): string {
   return value
@@ -113,6 +122,12 @@ function isRelevantEurLex(item: FeedItem): boolean {
   );
 }
 
+function isAdministrativeNoise(title: string): boolean {
+  return /\bappoints?\b|\belects?\b|term of office|board of appeal|candidate.*(?:chair|board)|vacanc|job opportunit|proposal to appoint/i.test(
+    title,
+  );
+}
+
 async function fetchText(url: string): Promise<string> {
   const response = await fetch(url, {
     headers: { "user-agent": "Regulatory-Monitor/0.1 (+local refresh)" },
@@ -147,6 +162,7 @@ function ebaListingItems(html: string): FeedItem[] {
         url,
         publishedAt,
         ...(summary ? { summary: decode(summary[1]) } : {}),
+        ...(jointAuthority(title) ? { authority: "ESAs" as const } : {}),
         key: url,
       },
     ];
@@ -184,6 +200,143 @@ function cssfListingItems(html: string): FeedItem[] {
         },
       ];
     });
+}
+
+function jointAuthority(title: string): MonitorSource | undefined {
+  return /\bESAs\b|European Supervisory Authorities|EBA, EIOPA and ESMA/i.test(
+    title,
+  )
+    ? "ESAs"
+    : undefined;
+}
+
+function esmaPressItems(html: string): FeedItem[] {
+  return [...html.matchAll(/<tr(?:\s[^>]*)?>([\s\S]*?)<\/tr>/gi)].flatMap(
+    ([, block]) => {
+      const date = block.match(/<time[^>]+datetime="([^"]+)"/i);
+      const link = block.match(
+        /headers="view-title-table-column"[^>]*>[\s\S]*?<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i,
+      );
+      const publishedAt = date ? dateOnly(date[1]) : undefined;
+      if (!link || !publishedAt) return [];
+      const title = decode(link[2]);
+      const url = new URL(link[1], ESMA_PRESS_RELEASES).toString();
+      return [
+        {
+          title,
+          url,
+          publishedAt,
+          publicationType: "Press release",
+          ...(jointAuthority(title) ? { authority: "ESAs" as const } : {}),
+          key: url,
+        },
+      ];
+    },
+  );
+}
+
+function esmaConsultationItems(html: string): FeedItem[] {
+  return [...html.matchAll(/<tr(?:\s[^>]*)?>([\s\S]*?)<\/tr>/gi)].flatMap(
+    ([, block]) => {
+      const date = block.match(
+        /headers="view-field-consultation-date-1-table-column"[^>]*>\s*From\s+(\d{2})\/(\d{2})\/(20\d{2})/i,
+      );
+      const link = block.match(
+        /headers="view-title-table-column"[^>]*>[\s\S]*?<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i,
+      );
+      if (!date || !link) return [];
+      const title = decode(link[2]);
+      const url = new URL(link[1], ESMA_CONSULTATIONS).toString();
+      return [
+        {
+          title,
+          url,
+          publishedAt: `${date[3]}-${date[2]}-${date[1]}`,
+          publicationType: "Consultation",
+          ...(jointAuthority(title) ? { authority: "ESAs" as const } : {}),
+          key: url,
+        },
+      ];
+    },
+  );
+}
+
+function eclNewsItems(html: string, baseUrl: string): FeedItem[] {
+  return [
+    ...html.matchAll(/<article(?:\s[^>]*)?>([\s\S]*?)<\/article>/gi),
+  ].flatMap(([, block]) => {
+    const date = block.match(/<time[^>]+datetime="([^"]+)"/i);
+    const link = block.match(
+      /class="ecl-content-block__title"[^>]*>[\s\S]*?<a[^>]+href="([^"]+)"[^>]*data-ecl-title-link[^>]*>([\s\S]*?)<\/a>/i,
+    );
+    const publishedAt = date ? dateOnly(date[1]) : undefined;
+    if (!link || !publishedAt) return [];
+    const title = decode(link[2]);
+    if (
+      /\bappoints?\b|\belects?\b|term of office|board of appeal|vacanc|job opportunit/i.test(
+        title,
+      )
+    ) {
+      return [];
+    }
+    const url = new URL(link[1], baseUrl).toString();
+    return [
+      {
+        title,
+        url,
+        publishedAt,
+        ...(jointAuthority(title) ? { authority: "ESAs" as const } : {}),
+        key: url,
+      },
+    ];
+  });
+}
+
+async function amlaItems(since: string): Promise<FeedItem[]> {
+  const sitemap = await fetchText(AMLA_SITEMAP);
+  const candidates = [
+    ...sitemap.matchAll(
+      /<url><loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod>/gi,
+    ),
+  ]
+    .map(([, url, modified]) => ({
+      url: decode(url),
+      publishedAt: dateOnly(modified),
+    }))
+    .filter(
+      (item): item is { url: string; publishedAt: string } =>
+        Boolean(item.publishedAt && item.publishedAt >= since) &&
+        /\/policy\/public-consultations\/|\/press-release-|\/amla-(?:consult|launch|take|final|introduc)|\/news-media\/news-articles\/(?:updated-taxonomy|amla-launches-survey)/i.test(
+          item.url,
+        ),
+    );
+  const items = await Promise.all(
+    candidates.map(async (candidate): Promise<FeedItem | null> => {
+      const html = await fetchText(candidate.url);
+      const titleMatch = html.match(
+        /<meta[^>]+property="og:title"[^>]+content="([^"]+)"/i,
+      );
+      if (!titleMatch) return null;
+      const pageDate = html.match(/<time[^>]+datetime="([^"]+)"/i);
+      const description = html.match(
+        /<meta[^>]+name="description"[^>]+content="([^"]+)"/i,
+      );
+      return {
+        title: decode(titleMatch[1]),
+        url: candidate.url,
+        publishedAt: pageDate
+          ? (dateOnly(pageDate[1]) ?? candidate.publishedAt)
+          : candidate.publishedAt,
+        ...(description ? { summary: decode(description[1]) } : {}),
+        publicationType: candidate.url.includes("/public-consultations/")
+          ? "Consultation"
+          : "Publication",
+        sourceText: publicationText(html),
+        key: candidate.url,
+      };
+    }),
+  );
+  return items.filter((item): item is FeedItem => item !== null);
 }
 
 async function collectArchive(
@@ -233,6 +386,9 @@ const adapters: SourceAdapter[] = [
         (item) =>
           !/^(warning|list|statistics|agenda|newsletter|form|internal organisation)$/i.test(
             item.publicationType ?? "",
+          ) &&
+          !/administrative sanction|proposal to appoint|\bappointment\b|basic statistical data|global situation of|population concerned by the enforcement|investment policy of UCIs|origin of UCI initiators|breakdown according to currency|development of net assets and number of UCIs|list of fund units|issuers of securities whose home Member State|dissolution and judicial liquidation/i.test(
+            item.title,
           ),
       );
     },
@@ -251,6 +407,63 @@ const adapters: SourceAdapter[] = [
       );
     },
   },
+  {
+    source: "ESMA",
+    url: ESMA_PRESS_RELEASES,
+    async collect(since) {
+      const [pressReleases, consultations] = await Promise.all([
+        collectArchive(
+          since,
+          (page) =>
+            page === 0
+              ? ESMA_PRESS_RELEASES
+              : `${ESMA_PRESS_RELEASES}?page=${page}`,
+          esmaPressItems,
+        ),
+        collectArchive(
+          since,
+          (page) =>
+            page === 0
+              ? ESMA_CONSULTATIONS
+              : `${ESMA_CONSULTATIONS}?page=${page}`,
+          esmaConsultationItems,
+        ),
+      ]);
+      return [
+        ...new Map(
+          [...pressReleases, ...consultations].map((item) => [item.key, item]),
+        ).values(),
+      ];
+    },
+  },
+  {
+    source: "EIOPA",
+    url: EIOPA_NEWS,
+    async collect(since) {
+      return collectArchive(
+        since,
+        (page) => (page === 0 ? EIOPA_NEWS : `${EIOPA_NEWS}?page=${page}`),
+        (html) => eclNewsItems(html, EIOPA_NEWS),
+      );
+    },
+  },
+  {
+    source: "AMLA",
+    url: AMLA_SITEMAP,
+    collect: amlaItems,
+  },
+  {
+    source: "European Commission",
+    url: EC_FINANCE_NEWS,
+    async collect(since) {
+      return collectArchive(
+        since,
+        (page) =>
+          page === 0 ? EC_FINANCE_NEWS : `${EC_FINANCE_NEWS}?page=${page}`,
+        (html) => eclNewsItems(html, EC_FINANCE_NEWS),
+      );
+    },
+  },
 ];
 
 async function collectSources(
@@ -260,7 +473,9 @@ async function collectSources(
   return Promise.all(
     adapters.map(async (adapter) => {
       try {
-        const items = await adapter.collect(since);
+        const items = (await adapter.collect(since)).filter(
+          (item) => !isAdministrativeNoise(item.title),
+        );
         onProgress?.(
           `${adapter.source}: collected ${items.length} listing items`,
         );
@@ -326,6 +541,22 @@ async function buildMonitorFeed(
   options: RefreshOptions & { month: string },
   results: SourceCollection[],
 ): Promise<MonitorFeed> {
+  const outputDirectory =
+    options.outputDirectory ?? resolve(process.cwd(), "data/monitor");
+  const existingFeed = await readFile(
+    resolve(outputDirectory, `${options.month}.json`),
+    "utf8",
+  )
+    .then((content) => JSON.parse(content) as MonitorFeed)
+    .catch(() => null);
+  const existingById = new Map(
+    (existingFeed?.events ?? [])
+      .filter(
+        (event) =>
+          event.analysis.summary && event.analysis.keyPoints.length > 0,
+      )
+      .map((event) => [event.id, event] as const),
+  );
   const sources: MonitorSourceStatus[] = results.map((result) => ({
     source: result.adapter.source,
     url: result.adapter.url,
@@ -338,8 +569,16 @@ async function buildMonitorFeed(
   for (const result of results) {
     for (const item of result.items) {
       if (item.publishedAt.startsWith(options.month)) {
-        const event = toEvent(result.adapter.source, item);
-        eventById.set(event.id, { event, item });
+        const event = toEvent(item.authority ?? result.adapter.source, item);
+        const normalisedTitle = event.source.title
+          .toLowerCase()
+          .replace(/\W+/g, " ")
+          .trim();
+        const identity =
+          event.source.authority === "ESAs"
+            ? `ESAs:${normalisedTitle}`
+            : `${event.source.authority}:${event.source.publishedAt}:${normalisedTitle}`;
+        eventById.set(identity, { event, item });
       }
     }
   }
@@ -351,6 +590,14 @@ async function buildMonitorFeed(
   options.onProgress?.(
     `${options.month}: ${candidates.length} events queued for enrichment`,
   );
+  const reusableCount = candidates.filter(({ event }) =>
+    existingById.has(event.id),
+  ).length;
+  if (reusableCount > 0) {
+    options.onProgress?.(
+      `${options.month}: reusing ${reusableCount} existing AI briefs; only new items will call the model`,
+    );
+  }
   let completed = 0;
   let failed = 0;
   const events: MonitorEvent[] = [];
@@ -358,17 +605,26 @@ async function buildMonitorFeed(
   for (let index = 0; index < candidates.length; index += 3) {
     const batch = candidates.slice(index, index + 3);
     const enriched = await Promise.all(
-      batch.map(async ({ event, item }) => {
+      batch.map(async ({ event, item }, batchIndex) => {
         if (!enrichmentService) return event;
+        const existing = existingById.get(event.id);
+        if (existing) {
+          completed += 1;
+          return existing;
+        }
         try {
-          const sourceText = publicationText(await fetchText(item.url));
+          options.onProgress?.(
+            `${options.month}: AI ${index + batchIndex + 1}/${candidates.length} · ${event.source.authority} · ${event.source.title.slice(0, 90)}`,
+          );
+          const sourceText =
+            item.sourceText ?? publicationText(await fetchText(item.url));
           const result = await enrichmentService.enrich(event, sourceText);
           completed += 1;
           return result;
-        } catch (error) {
+        } catch {
           failed += 1;
           options.onProgress?.(
-            `${options.month}: kept basic event ${event.source.title.slice(0, 80)} (${error instanceof Error ? error.message : "enrichment failed"})`,
+            `${options.month}: kept basic event ${event.source.title.slice(0, 80)} (AI request or response failed)`,
           );
           return event;
         }
@@ -394,8 +650,6 @@ async function buildMonitorFeed(
       b.source.publishedAt.localeCompare(a.source.publishedAt),
     ),
   };
-  const outputDirectory =
-    options.outputDirectory ?? resolve(process.cwd(), "data/monitor");
   await mkdir(outputDirectory, { recursive: true });
   const body = `${JSON.stringify(feed, null, 2)}\n`;
   const latestPath = resolve(outputDirectory, "latest.json");

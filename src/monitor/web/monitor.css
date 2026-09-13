@@ -60,10 +60,16 @@
   color: var(--monitor-muted);
 }
 
-.monitor-report-button {
+.monitor-utility-actions {
+  display: flex;
+  justify-self: end;
+  gap: 8px;
+}
+
+.monitor-report-button,
+.monitor-mcp-button {
   display: inline-flex;
   align-items: center;
-  justify-self: end;
   gap: 7px;
   min-height: 32px;
   padding: 0 12px;
@@ -76,8 +82,101 @@
   cursor: pointer;
 }
 
-.monitor-report-button:hover {
+.monitor-mcp-button {
+  color: var(--monitor-ink);
+  background: transparent;
+  border: 1px solid var(--monitor-ink);
+}
+
+.monitor-report-button:hover,
+.monitor-mcp-button:hover {
   background: #092832;
+}
+
+.monitor-mcp-button:hover {
+  color: #fff;
+}
+
+.monitor-mcp-panel {
+  position: fixed;
+  z-index: 120;
+  top: 62px;
+  right: max(20px, calc((100vw - 1180px) / 2));
+  width: min(430px, calc(100vw - 40px));
+  padding: 22px;
+  color: var(--monitor-ink);
+  background: #fff;
+  border-top: 4px solid var(--monitor-teal);
+  box-shadow: 0 14px 42px rgb(23 60 70 / 24%);
+}
+
+.monitor-mcp-panel-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.monitor-mcp-panel-heading span {
+  color: var(--monitor-accent);
+  font-size: 0.61rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.monitor-mcp-panel h2 {
+  margin: 4px 0 0;
+  font-family: var(--monitor-serif);
+  font-size: 1.45rem;
+}
+
+.monitor-mcp-panel-heading > button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--monitor-line);
+  cursor: pointer;
+}
+
+.monitor-mcp-panel p {
+  margin: 18px 0 14px;
+  color: var(--monitor-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.monitor-mcp-panel code {
+  color: var(--monitor-teal);
+  font-size: 0.7rem;
+}
+
+.monitor-mcp-panel pre {
+  padding: 14px;
+  overflow-x: auto;
+  color: #d8f3ee;
+  background: var(--monitor-ink);
+  font-size: 0.65rem;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.monitor-mcp-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0;
+  color: var(--monitor-accent);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .monitor-masthead {
@@ -189,7 +288,7 @@
 
 .monitor-filter-controls {
   display: grid;
-  grid-template-columns: 0.55fr 0.9fr 0.65fr 1fr 1.25fr;
+  grid-template-columns: 0.9fr 0.7fr 1fr 1.25fr;
   gap: 18px;
 }
 
@@ -1016,6 +1115,13 @@
 
   .monitor-report-button {
     font-size: 0.66rem;
+  }
+
+  .monitor-mcp-button {
+    width: 32px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .monitor-masthead {

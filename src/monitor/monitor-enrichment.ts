@@ -15,7 +15,7 @@ const enrichmentSchema = z.object({
   important_dates: z.array(
     z.object({
       label: z.string().trim().min(1),
-      date: z.string().trim(),
+      date: z.string().trim().nullable(),
     }),
   ),
 });
@@ -83,7 +83,11 @@ export class MonitorEnrichmentService {
     );
     const enriched = enrichmentSchema.parse(extractJson(answer));
     const importantDates = enriched.important_dates
-      .filter((item) => /^20\d{2}-\d{2}-\d{2}$/.test(item.date))
+      .filter(
+        (item): item is { label: string; date: string } =>
+          typeof item.date === "string" &&
+          /^20\d{2}-\d{2}-\d{2}$/.test(item.date),
+      )
       .slice(0, 5)
       .map((item) => ({
         label: item.label.slice(0, 160),

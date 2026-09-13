@@ -42,7 +42,7 @@ afterAll(async () => {
 });
 
 describe("Regulatory MCP server", () => {
-  it("publishes only the four bounded read-only tools", async () => {
+  it("publishes six bounded read-only tools without AI generation", async () => {
     const result = await client?.listTools();
 
     expect(result?.tools.map((tool) => tool.name)).toEqual([
@@ -50,6 +50,8 @@ describe("Regulatory MCP server", () => {
       "get_law_structure",
       "get_provision",
       "get_relationships",
+      "list_monitor_updates",
+      "get_monitor_update",
     ]);
     for (const tool of result?.tools ?? []) {
       expect(tool.annotations).toMatchObject({
@@ -63,6 +65,24 @@ describe("Regulatory MCP server", () => {
         additionalProperties: false,
       });
     }
+  });
+
+  it("queries only stored current-year Monitor records", async () => {
+    const result = await client?.callTool({
+      name: "list_monitor_updates",
+      arguments: { limit: 5 },
+    });
+    const payload = result?.structuredContent as {
+      year?: string;
+      matchedCount?: number;
+      updates?: unknown[];
+    };
+
+    expect(result?.isError).not.toBe(true);
+    expect(payload.year).toBe(new Date().toISOString().slice(0, 4));
+    expect(payload.matchedCount).toEqual(expect.any(Number));
+    expect(payload.updates).toEqual(expect.any(Array));
+    expect(payload.updates?.length ?? 0).toBeLessThanOrEqual(5);
   });
 
   it("applies bounded resolve filters without widening the Profile", async () => {

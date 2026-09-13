@@ -3,6 +3,10 @@ import {
   McpServer,
   fromJsonSchema,
 } from "@modelcontextprotocol/server";
+import {
+  findMonitorUpdate,
+  queryMonitorUpdates,
+} from "../monitor/monitor-data";
 import type {
   PublicApiOperation,
   PublicApiService,
@@ -16,7 +20,7 @@ import {
 } from "../shared/public-api";
 
 export const REGULATORY_MCP_SERVER_NAME = "regulatory-knowledge-platform";
-export const REGULATORY_MCP_SERVER_VERSION = "0.3.0";
+export const REGULATORY_MCP_SERVER_VERSION = "0.4.0";
 
 type ResolveLawInput = PublicLawResolveFilters & {
   query: string;
@@ -31,6 +35,18 @@ type GetLawStructureInput = {
 type GetProvisionInput = {
   entityId: string;
   profileId?: string;
+};
+
+type ListMonitorUpdatesInput = {
+  month?: string;
+  source?: string;
+  topic?: string;
+  query?: string;
+  limit?: number;
+};
+
+type GetMonitorUpdateInput = {
+  eventId: string;
 };
 
 const profileIdProperty = {
@@ -125,6 +141,56 @@ const getRelationshipsInputSchema = fromJsonSchema<GetProvisionInput>({
   },
 });
 
+const listMonitorUpdatesInputSchema = fromJsonSchema<ListMonitorUpdatesInput>({
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    month: {
+      type: "string",
+      pattern: "^20[0-9]{2}-(0[1-9]|1[0-2])$",
+      description: "Optional month within the current year, in YYYY-MM.",
+    },
+    source: {
+      type: "string",
+      minLength: 1,
+      maxLength: 80,
+      description: "Optional exact Monitor authority name.",
+    },
+    topic: {
+      type: "string",
+      minLength: 1,
+      maxLength: 100,
+      description: "Optional exact stored Monitor topic.",
+    },
+    query: {
+      type: "string",
+      minLength: 1,
+      maxLength: 200,
+      description: "Optional plain-text match over stored titles and briefs.",
+    },
+    limit: {
+      type: "integer",
+      minimum: 1,
+      maximum: 50,
+      description: "Maximum number of current-year updates to return.",
+    },
+  },
+});
+
+const getMonitorUpdateInputSchema = fromJsonSchema<GetMonitorUpdateInput>({
+  type: "object",
+  additionalProperties: false,
+  required: ["eventId"],
+  properties: {
+    eventId: {
+      type: "string",
+      minLength: 1,
+      maxLength: 500,
+      description: "Exact Monitor event ID returned by list_monitor_updates.",
+    },
+  },
+});
+
 const readOnlyAnnotations = {
   readOnlyHint: true,
   destructiveHint: false,
@@ -142,6 +208,14 @@ function toolResult(operation: PublicApiOperation<unknown>): CallToolResult {
   };
 }
 
+function staticToolResult(value: Record<string, unknown>): CallToolResult {
+  const text = JSON.stringify(value);
+  return {
+    content: [{ type: "text", text }],
+    structuredContent: JSON.parse(text) as Record<string, unknown>,
+  };
+}
+
 export function createRegulatoryMcpServer(service: PublicApiService) {
   const server = new McpServer(
     {
@@ -150,7 +224,7 @@ export function createRegulatoryMcpServer(service: PublicApiService) {
     },
     {
       instructions:
-        "Return only deterministic data from the loaded reviewed regulatory artifact. Do not treat an empty result as proof that a law or relationship does not exist. These tools retrieve official text and identifiers; they do not generate legal interpretation or advice.",
+        "Return only deterministic data from the loaded reviewed regulatory artifact or static current-year Monitor JSON. Do not treat an empty result as proof that a law, relationship, or update does not exist. No MCP tool calls an AI model or generates legal interpretation or advice.",
     },
   );
 
@@ -218,6 +292,37 @@ export function createRegulatoryMcpServer(service: PublicApiService) {
     },
     async ({ entityId, profileId }) =>
       toolResult(service.getProvisionRelationships(entityId, profileId)),
+  );
+
+  server.registerTool(
+    "list_monitor_updates",
+    {
+      title: "List Monitor updates",
+      description:
+        "Query the static current-year Regulatory Monitor JSON by month, authority, topic, or text. This tool never calls an AI model; it only returns already stored records.",
+      inputSchema: listMonitorUpdatesInputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async (filters) => staticToolResult(queryMonitorUpdates(filters)),
+  );
+
+  server.registerTool(
+    "get_monitor_update",
+    {
+      title: "Get Monitor update",
+      description:
+        "Get one exact static current-year Monitor record by event ID. This tool never calls an AI model.",
+      inputSchema: getMonitorUpdateInputSchema,
+      annotations: readOnlyAnnotations,
+    },
+    async ({ eventId }) => {
+      const update = findMonitorUpdate(eventId);
+      return staticToolResult({
+        eventId,
+        found: Boolean(update),
+        update: update ?? null,
+      });
+    },
   );
 
   return server;

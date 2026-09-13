@@ -1,7 +1,7 @@
-# Regulatory Monitor — Product and Technical Design v1.2
+# Regulatory Monitor — Product and Technical Design v1.3
 
 > Status: approved implementation baseline
-> Date: 2026-09-12
+> Date: 2026-09-13
 > Product surface: `/monitor`
 > Product language: English
 > Design goal: simple, visually independent regulatory change monitoring with an easily repeatable data refresh pipeline
@@ -26,8 +26,8 @@ The Monitor is deliberately independent from the Regulatory Knowledge Platform R
 
 The first usable page contains:
 
-1. a compact product header and selected-year summary;
-2. filters for year, month, source, topic, and affected entity;
+1. a compact product header and current-year summary;
+2. filters for month, source, topic, and financial sector;
 3. a reverse-chronological annual event feed grouped by month;
 4. an event brief with deeper business impact and next-step content;
 5. a direct link to the official source;
@@ -53,21 +53,24 @@ The content pattern is based on the supplied company monthly report. Its most us
 
 ## 3. V1 scope
 
-Initial sources:
+Enabled official sources:
 
 - EUR-Lex;
 - CSSF;
-- EBA.
+- EBA and joint European Supervisory Authorities publications;
+- ESMA press releases and consultations;
+- EIOPA news;
+- AMLA consultations and regulatory publications;
+- European Commission financial-services news.
 
-ESMA and AMLA are next-source additions after the first refresh path and page are working.
+This mix intentionally covers Luxembourg first, followed by banking, investment funds and securities markets, insurance and pensions, AML/CFT, and cross-sector EU financial policy. More sources remain additive adapters rather than a new pipeline.
 
 Initial filters:
 
-- year;
 - month;
 - source;
 - topic;
-- affected entity.
+- financial sector.
 
 Shown but not required as a V1 filter:
 
@@ -88,7 +91,7 @@ Explicitly outside V1:
 ## 4. Architecture
 
 ```text
-EUR-Lex / CSSF / EBA
+CSSF / EBA / ESMA / EIOPA / AMLA / EC / EUR-Lex
           |
           v
   npm run monitor:refresh
@@ -133,7 +136,7 @@ One event separates downloaded facts from lightweight interpretation without cre
 type RegulatoryEvent = {
   id: string
   source: {
-    authority: 'EUR-Lex' | 'CSSF' | 'EBA' | 'ESMA' | 'AMLA'
+    authority: 'EUR-Lex' | 'CSSF' | 'EBA' | 'ESAs' | 'ESMA' | 'EIOPA' | 'AMLA' | 'European Commission'
     title: string
     url: string
     publishedAt: string
@@ -162,14 +165,15 @@ If a publication does not provide evidence of a before/after comparison, the int
 
 ## 6. Refresh pipeline
 
-`npm run monitor:refresh` is the single refresh entry point. It accepts either a month or a year:
+`npm run monitor:refresh` is the single refresh entry point. With no arguments it rebuilds every available month in the current year. A current-year month may be used for a smaller incremental refresh:
 
 ```bash
+npm run monitor:refresh
 npm run monitor:refresh -- --month 2026-09
 npm run monitor:refresh -- --year 2026
 ```
 
-The yearly command walks the EBA and CSSF official archive pages until it reaches the prior year, reads the current EUR-Lex feed, partitions matching events into monthly files, and enriches each event once. It does not run twelve independent monthly downloads.
+Past years are rejected. The yearly command walks the enabled official archive pages until it reaches the prior year, reads the current EUR-Lex public feed, partitions matching events into monthly files, and enriches each event once. It does not run twelve independent monthly downloads. The public-source path does not require an EUR-Lex web-service account; the registered SOAP service is deliberately not part of this simple pipeline.
 
 The CLI accepts either one month or a year. Annual refresh still writes separate monthly JSON files; the runtime timeline aggregates those files without creating a database or one large persistent document.
 
@@ -178,10 +182,12 @@ The command:
 1. requests the relevant listing/archive pages from each enabled source;
    EUR-Lex's general feed is narrowed to financial-sector publications so unrelated EU budget and agency notices do not fill the product timeline;
 2. opens each matching official publication page and extracts readable source text;
-3. when `PRIVATE_AI_*` is configured, uses the configured model and the Monitor-owned enrichment prompt to create the summary, status, topic, affected population, business takeaways, suggested checks, and explicit important dates;
+3. when `PRIVATE_AI_*` is configured, automatically uses that external model and the Monitor-owned enrichment prompt to create the summary, status, topic, affected population, business takeaways, suggested checks, and explicit important dates;
 4. without AI configuration, keeps a basic listing-derived event rather than blocking the refresh;
 5. writes one fresh JSON feed for the UI;
 6. records source failures in refresh metadata while keeping successful source items.
+
+During enrichment the CLI prints the month, AI item number, authority, abbreviated title, and completed batch count. It does not print the source body, prompt, API key, or model response.
 
 This is not the Platform corpus pipeline and does not call `corpus:refresh`.
 
@@ -199,9 +205,11 @@ Monitor data is isolated by location and ownership.
 - large downloads and transient responses are not committed;
 - a small default/demo feed may be shipped with the application so `/monitor` is useful before the first refresh.
 
-The annual API aggregates the available monthly files at read time. Pagination is browser-side because a year of Monitor events remains a small payload; no pagination store or cursor service is introduced.
+The annual API aggregates the available monthly files at read time. Pagination is browser-side because a year of Monitor events remains a small payload; no pagination store or cursor service is introduced. The sector filter uses a small readable set such as banking, funds and asset management, insurance and pensions, securities and markets, payments, crypto-assets, and AML/CFT; exact affected populations remain visible in each event brief.
 
 The refreshed feed can be replaced at any time. It is a rebuildable product cache, not the authoritative legal record.
+
+On a new computer, copy or clone the code, install dependencies, configure the private model variables if enrichment is wanted, and run `npm run monitor:refresh`. The generated `data/monitor` files do not need to be copied from the old computer or committed to Git.
 
 ## 8. Monitor Copilot and AI enrichment
 
@@ -220,13 +228,19 @@ Refresh-time enrichment uses that same `.env` model configuration, not a develop
 
 The generated answer is based on source metadata and Monitor analysis, not the full official publication. The panel says this directly and links back to the official source. It does not present the result as legal advice or a final applicability determination.
 
+The current user question is the primary instruction to Monitor Copilot. A narrow follow-up is answered directly instead of regenerating the default four-part explanation. RAG and full-document retrieval remain later work.
+
 AI enrichment is optional and follows the working page and refresh pipeline.
 
 V1 does not require an LLM to collect or display events. When `PRIVATE_AI_*` is configured, enrichment creates summaries, one controlled topic, affected-entity hints, and potentially affected functions. These fields remain analysis, never official legal text.
 
 No regulatory content is sent to an external model unless that provider has been explicitly configured and authorised.
 
-## 9. UI independence
+## 9. Static MCP access
+
+The page header exposes a small `MCP access` panel with the local stdio configuration. MCP adds two read-only tools: `list_monitor_updates` and `get_monitor_update`. They search or return the already stored current-year JSON and never invoke the enrichment model or Monitor Copilot. This is a local entry point, not a remotely hosted MCP endpoint.
+
+## 10. UI independence
 
 Monitor owns its CSS under `src/monitor/web/`. It does not use the main Reader shell, header, cards, theme toggle, or page composition.
 
@@ -240,14 +254,14 @@ It may share only low-level application infrastructure:
 
 The route should look intentional when opened directly. A small back link may lead to the Platform, but the Monitor brand and navigation remain self-contained.
 
-## 10. Delivery order
+## 11. Delivery order
 
 ### Slice 1 — working product surface
 
 - isolated `/monitor` page;
 - small shipped feed;
-- year timeline with month grouping and client-side `Load more` pagination;
-- year, month, source, topic, and affected-entity filters;
+- current-year timeline with month grouping and client-side `Load more` pagination;
+- month, source, topic, and financial-sector filters;
 - event detail view and official links;
 - report button;
 - responsive layout.
@@ -255,17 +269,17 @@ The route should look intentional when opened directly. A small back link may le
 ### Slice 2 — repeatable refresh
 
 - `npm run monitor:refresh`;
-- three source collectors;
+- official source collectors covering Luxembourg and the main EU financial sectors;
 - JSON output consumed by the same API and page;
 - simple refresh metadata and partial-source reporting.
 
-### Slice 3 — source expansion
+### Slice 3 — access and later output
 
-- ESMA and AMLA collectors;
+- read-only static Monitor MCP tools;
 - optional Cloud Scheduler trigger;
 - real report generation after source collection and enrichment are complete.
 
-## 11. Acceptance criteria
+## 12. Acceptance criteria
 
 V1 is accepted when:
 

@@ -1,10 +1,10 @@
 # MCP server
 
-The Phase 4 MCP adapter exposes deterministic regulatory retrieval to local MCP hosts without introducing AI generation, vector search, GraphDB, another corpus, or another business repository. It opens the same verified read-only Runtime artifact and reuses the same versioned external service outputs as Public API v1; it does not call the REST endpoint or read raw/Canonical/editorial files directly.
+The Phase 4 MCP adapter exposes deterministic regulatory retrieval to local MCP hosts without introducing AI generation, vector search, GraphDB, another corpus, or another business repository. Legal tools open the same verified read-only Runtime artifact and reuse the same versioned external service outputs as Public API v1. Monitor tools read the isolated current-year `data/monitor` JSON. The adapter does not call the REST endpoint or read raw/Canonical/editorial files directly.
 
 ## Current scope
 
-Server identity: `regulatory-knowledge-platform@0.3.0`.
+Server identity: `regulatory-knowledge-platform@0.4.0`.
 
 | Tool | Required input | Optional input | Output boundary |
 |---|---|---|---|
@@ -12,10 +12,12 @@ Server identity: `regulatory-knowledge-platform@0.3.0`.
 | `get_law_structure` | `documentId` (1–180 characters) | deployment-fixed `profileId` | Document source/version identity and table of contents without legal body text. |
 | `get_provision` | root Provision `entityId` (1–260 characters) | deployment-fixed `profileId` | One exact Provision, official-text block tree, source locators, and source/version identity. |
 | `get_relationships` | root Provision `entityId` (1–260 characters) | deployment-fixed `profileId` | All relationship groups published for that Provision, with directed stable endpoints, provenance, evidence, builder identity, and optional score. |
+| `list_monitor_updates` | none | current-year `month`; exact `source`; exact `topic`; plain-text `query`; `limit` from 1–50 | Matching records from stored current-year Monitor JSON. |
+| `get_monitor_update` | exact Monitor `eventId` | none | One exact stored current-year Monitor record, or an explicit not-found result. |
 
 All tools are declared read-only, non-destructive, idempotent, and closed-world over the loaded artifact. Every success and service error contains the same `meta.apiVersion`, external contract version, Runtime build, and Profile identity used by Public API v1. Tool results provide both a JSON text content block for broad client compatibility and equivalent `structuredContent`.
 
-The `resolve_law` filter values match the [Public API resolve contract](public-api-v1.md#resolve-filters). They are combined with AND, narrow only the loaded Profile, and are not legal-applicability conclusions. An empty `resolve_law` result means “no match in the current artifact and filters,” not “the law does not exist.” An empty relationship group means only that no edge of that group is published for the Provision in the loaded Profile. The adapter retrieves official text, identifiers, and reviewed relationships; it does not generate legal interpretation, conclusions, or advice.
+The `resolve_law` filter values match the [Public API resolve contract](public-api-v1.md#resolve-filters). They are combined with AND, narrow only the loaded Profile, and are not legal-applicability conclusions. An empty `resolve_law` result means “no match in the current artifact and filters,” not “the law does not exist.” An empty relationship group means only that no edge of that group is published for the Provision in the loaded Profile. The adapter retrieves official text, identifiers, reviewed relationships, and already stored Monitor analysis; it does not call an AI model or generate legal interpretation, conclusions, or advice.
 
 ## Build and connect
 
@@ -39,6 +41,8 @@ Configure a local MCP host to spawn the process from the repository root:
   }
 }
 ```
+
+The same configuration is available from the `MCP access` button in the Monitor header. The Monitor tools become useful after `npm run monitor:refresh`; they do not trigger refresh or AI enrichment themselves.
 
 Some hosts use a different outer configuration key or do not support `cwd`; in that case use the host's equivalent working-directory setting or an absolute command/argument path. The host must launch the process—it should not connect to a separately started TCP port. `--silent` prevents npm's banner from corrupting stdout, which is reserved exclusively for MCP JSON-RPC. Diagnostics go to stderr.
 
@@ -73,6 +77,6 @@ This is not yet a remotely hosted MCP endpoint. Streamable HTTP, remote authenti
 
 ## Compatibility
 
-- Tool names, documented input meaning, stable IDs, Profile isolation, and structured output semantics form the MCP `0.3.0` contract.
+- Tool names, documented input meaning, stable IDs, Profile isolation, and structured output semantics form the MCP `0.4.0` contract.
 - Compatible tools or optional fields may be added during `0.x`; incompatible input/output changes require an MCP server version change and migration note.
 - MCP and REST remain separate transports. Neither transport owns legal business logic or a second regulatory dataset.

@@ -1,56 +1,13 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { resolve } from "node:path";
 import express from "express";
 import { MonitorAiTimeoutError, MonitorAiUnavailableError } from "./monitor-ai";
 import type { MonitorAiService } from "./monitor-ai";
-import type { MonitorAiMessage, MonitorFeed } from "./monitor-contract";
+import type { MonitorAiMessage } from "./monitor-contract";
+import {
+  availableMonitorFeeds,
+  readCurrentMonitorTimeline,
+  readMonitorFeed,
+} from "./monitor-data";
 import { refreshMonitor } from "./monitor-refresh";
-
-const monitorDirectory = resolve(process.cwd(), "data/monitor");
-
-function availableFeeds(): MonitorFeed[] {
-  const files = readdirSync(monitorDirectory).filter(
-    (name) =>
-      name === "default.json" ||
-      name === "latest.json" ||
-      /^20\d{2}-\d{2}\.json$/.test(name),
-  );
-  const feeds = files.map(
-    (name) =>
-      JSON.parse(
-        readFileSync(resolve(monitorDirectory, name), "utf8"),
-      ) as MonitorFeed,
-  );
-  const byMonth = new Map<string, MonitorFeed>();
-  for (const feed of feeds) {
-    const current = byMonth.get(feed.month);
-    if (!current || feed.generatedAt > current.generatedAt) {
-      byMonth.set(feed.month, feed);
-    }
-  }
-  return [...byMonth.values()].sort((left, right) =>
-    right.month.localeCompare(left.month),
-  );
-}
-
-export function readMonitorFeed(month?: string): MonitorFeed {
-  if (month && /^20\d{2}-(0[1-9]|1[0-2])$/.test(month)) {
-    const monthly = resolve(monitorDirectory, `${month}.json`);
-    if (existsSync(monthly)) {
-      return JSON.parse(readFileSync(monthly, "utf8")) as MonitorFeed;
-    }
-  }
-  const fallback = resolve(monitorDirectory, "default.json");
-  if (month && existsSync(fallback)) {
-    const defaultFeed = JSON.parse(
-      readFileSync(fallback, "utf8"),
-    ) as MonitorFeed;
-    if (defaultFeed.month === month) return defaultFeed;
-  }
-  const latest = resolve(monitorDirectory, "latest.json");
-  const path = existsSync(latest) ? latest : fallback;
-  return JSON.parse(readFileSync(path, "utf8")) as MonitorFeed;
-}
 
 export function createMonitorRouter(
   options: {
@@ -61,7 +18,7 @@ export function createMonitorRouter(
 
   router.get("/months", (_request, response) => {
     try {
-      const feeds = availableFeeds();
+      const feeds = availableMonitorFeeds();
       response.json({
         months: [...new Set(feeds.map((feed) => feed.month))].sort().reverse(),
       });
@@ -70,64 +27,9 @@ export function createMonitorRouter(
     }
   });
 
-  router.get("/years", (_request, response) => {
+  router.get("/timeline", (_request, response) => {
     try {
-      const currentYear = new Date().toISOString().slice(0, 4);
-      response.json({
-        years: [
-          ...new Set([
-            currentYear,
-            ...availableFeeds().map((feed) => feed.month.slice(0, 4)),
-          ]),
-        ]
-          .sort()
-          .reverse(),
-      });
-    } catch {
-      response.json({ years: [new Date().toISOString().slice(0, 4)] });
-    }
-  });
-
-  router.get("/timeline", (request, response) => {
-    const requestedYear =
-      typeof request.query.year === "string" &&
-      /^20\d{2}$/.test(request.query.year)
-        ? request.query.year
-        : new Date().toISOString().slice(0, 4);
-    try {
-      const feeds = availableFeeds().filter((feed) =>
-        feed.month.startsWith(requestedYear),
-      );
-      const events = [
-        ...new Map(
-          feeds
-            .flatMap((feed) => feed.events)
-            .map((event) => [event.id, event]),
-        ).values(),
-      ].sort((left, right) =>
-        right.source.publishedAt.localeCompare(left.source.publishedAt),
-      );
-      const sourceByName = new Map(
-        feeds.flatMap((feed) =>
-          feed.sources.map((source) => [source.source, source] as const),
-        ),
-      );
-      response.json({
-        schemaVersion: "monitor-timeline@1.0.0",
-        year: requestedYear,
-        generatedAt:
-          feeds
-            .map((feed) => feed.generatedAt)
-            .sort()
-            .at(-1) ?? new Date().toISOString(),
-        sources: [...sourceByName.values()].map((source) => ({
-          ...source,
-          eventCount: events.filter(
-            (event) => event.source.authority === source.source,
-          ).length,
-        })),
-        events,
-      });
+      response.json(readCurrentMonitorTimeline());
     } catch {
       response
         .status(503)
