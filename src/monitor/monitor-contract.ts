@@ -58,3 +58,11 @@ export type MonitorFeed = {
   sources: MonitorSourceStatus[];
   events: MonitorEvent[];
 };
+
+export type MonitorTimeline = {
+  schemaVersion: "monitor-timeline@1.0.0";
+  year: string;
+  generatedAt: string;
+  sources: MonitorSourceStatus[];
+  events: MonitorEvent[];
+};

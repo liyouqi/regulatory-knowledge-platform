@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   type FormEvent,
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -24,20 +25,22 @@ import { Link } from "react-router-dom";
 import type {
   MonitorAiMessage,
   MonitorExplainResponse,
-  MonitorFeed,
+  MonitorTimeline,
   MonitorEvent as RegulatoryEvent,
 } from "../monitor-contract";
 import "./monitor.css";
 
 type Filters = {
+  month: string;
   source: string;
   topic: string;
   entity: string;
 };
 
-type MonitorMonths = { months: string[] };
+type MonitorYears = { years: string[] };
 
 const ALL = "All";
+const PAGE_SIZE = 20;
 
 function unique(items: string[]): string[] {
   return [...new Set(items)].sort((left, right) => left.localeCompare(right));
@@ -72,11 +75,13 @@ function FilterSelect({
   value,
   values,
   onChange,
+  renderValue = (item) => item,
 }: {
   label: string;
   value: string;
   values: string[];
   onChange: (value: string) => void;
+  renderValue?: (value: string) => string;
 }) {
   return (
     <label className="monitor-filter">
@@ -89,7 +94,7 @@ function FilterSelect({
           <option value={ALL}>{ALL}</option>
           {values.map((item) => (
             <option key={item} value={item}>
-              {item}
+              {renderValue(item)}
             </option>
           ))}
         </select>
@@ -414,15 +419,19 @@ function DetailPanel({
 }
 
 export function MonitorPage() {
-  const [feed, setFeed] = useState<MonitorFeed | null>(null);
-  const [months, setMonths] = useState<string[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [feed, setFeed] = useState<MonitorTimeline | null>(null);
+  const [years, setYears] = useState<string[]>([]);
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getUTCFullYear().toString(),
+  );
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<{
     event: RegulatoryEvent;
     mode: "brief" | "copilot";
   } | null>(null);
   const [filters, setFilters] = useState<Filters>({
+    month: ALL,
     source: ALL,
     topic: ALL,
     entity: ALL,
@@ -430,28 +439,26 @@ export function MonitorPage() {
 
   useEffect(() => {
     const controller = new AbortController();
+    setError("");
     void Promise.all([
-      fetch(
-        selectedMonth
-          ? `/api/monitor/feed?month=${encodeURIComponent(selectedMonth)}`
-          : "/api/monitor/feed",
-        { signal: controller.signal },
-      ),
-      fetch("/api/monitor/months", { signal: controller.signal }),
+      fetch(`/api/monitor/timeline?year=${encodeURIComponent(selectedYear)}`, {
+        signal: controller.signal,
+      }),
+      fetch("/api/monitor/years", { signal: controller.signal }),
     ])
-      .then(async ([feedResponse, monthsResponse]) => {
+      .then(async ([feedResponse, yearsResponse]) => {
         if (!feedResponse.ok)
           throw new Error("The Monitor feed is unavailable.");
-        const nextFeed = (await feedResponse.json()) as MonitorFeed;
-        const nextMonths = monthsResponse.ok
-          ? ((await monthsResponse.json()) as MonitorMonths).months
+        const nextFeed = (await feedResponse.json()) as MonitorTimeline;
+        const nextYears = yearsResponse.ok
+          ? ((await yearsResponse.json()) as MonitorYears).years
           : [];
-        return { nextFeed, nextMonths };
+        return { nextFeed, nextYears };
       })
-      .then(({ nextFeed, nextMonths }) => {
+      .then(({ nextFeed, nextYears }) => {
         setFeed(nextFeed);
-        setMonths(nextMonths);
-        if (!selectedMonth) setSelectedMonth(nextFeed.month);
+        setYears(nextYears);
+        setVisibleCount(PAGE_SIZE);
       })
       .catch((caught: unknown) => {
         if ((caught as DOMException).name !== "AbortError") {
@@ -463,11 +470,14 @@ export function MonitorPage() {
         }
       });
     return () => controller.abort();
-  }, [selectedMonth]);
+  }, [selectedYear]);
 
   const options = useMemo(() => {
     const events = feed?.events ?? [];
     return {
+      months: unique(
+        events.map((event) => event.source.publishedAt.slice(0, 7)),
+      ).reverse(),
       sources: unique(events.map((event) => event.source.authority)),
       topics: unique(events.map((event) => event.classification.topic)),
       entities: unique(
@@ -480,6 +490,8 @@ export function MonitorPage() {
     () =>
       (feed?.events ?? []).filter(
         (event) =>
+          (filters.month === ALL ||
+            event.source.publishedAt.startsWith(filters.month)) &&
           (filters.source === ALL ||
             event.source.authority === filters.source) &&
           (filters.topic === ALL ||
@@ -489,6 +501,12 @@ export function MonitorPage() {
       ),
     [feed, filters],
   );
+  const visibleEvents = filteredEvents.slice(0, visibleCount);
+
+  function updateFilter(name: keyof Filters, value: string) {
+    setFilters((current) => ({ ...current, [name]: value }));
+    setVisibleCount(PAGE_SIZE);
+  }
 
   const activeFilterCount = Object.values(filters).filter(
     (value) => value !== ALL,
@@ -503,6 +521,7 @@ export function MonitorPage() {
       (event) => event.source.authority === source,
     ).length,
   }));
+  const currentMonth = new Date().toISOString().slice(0, 7);
 
   return (
     <main className="monitor-root">
@@ -540,48 +559,55 @@ export function MonitorPage() {
                 {activeFilterCount > 0 ? <b>{activeFilterCount}</b> : null}
               </div>
               <div className="monitor-filter-controls">
-                <label className="monitor-filter monitor-month-select">
-                  <span>Edition</span>
+                <label className="monitor-filter monitor-year-select">
+                  <span>Year</span>
                   <span className="monitor-select-wrap">
                     <select
-                      value={selectedMonth || feed?.month || ""}
-                      onChange={(event) => setSelectedMonth(event.target.value)}
+                      value={selectedYear}
+                      onChange={(event) => {
+                        setSelectedYear(event.target.value);
+                        setFilters({
+                          month: ALL,
+                          source: ALL,
+                          topic: ALL,
+                          entity: ALL,
+                        });
+                        setVisibleCount(PAGE_SIZE);
+                      }}
                     >
-                      {(months.length > 0
-                        ? months
-                        : feed
-                          ? [feed.month]
-                          : []
-                      ).map((month) => (
-                        <option key={month} value={month}>
-                          {displayMonth(month)}
-                        </option>
-                      ))}
+                      {(years.length > 0 ? years : [selectedYear]).map(
+                        (year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ),
+                      )}
                     </select>
                     <ChevronDown aria-hidden="true" size={15} />
                   </span>
                 </label>
                 <FilterSelect
+                  label="Month"
+                  onChange={(month) => updateFilter("month", month)}
+                  renderValue={displayMonth}
+                  value={filters.month}
+                  values={options.months}
+                />
+                <FilterSelect
                   label="Source"
-                  onChange={(source) =>
-                    setFilters((current) => ({ ...current, source }))
-                  }
+                  onChange={(source) => updateFilter("source", source)}
                   value={filters.source}
                   values={options.sources}
                 />
                 <FilterSelect
                   label="Topic"
-                  onChange={(topic) =>
-                    setFilters((current) => ({ ...current, topic }))
-                  }
+                  onChange={(topic) => updateFilter("topic", topic)}
                   value={filters.topic}
                   values={options.topics}
                 />
                 <FilterSelect
                   label="Affected entity"
-                  onChange={(entity) =>
-                    setFilters((current) => ({ ...current, entity }))
-                  }
+                  onChange={(entity) => updateFilter("entity", entity)}
                   value={filters.entity}
                   values={options.entities}
                 />
@@ -591,81 +617,117 @@ export function MonitorPage() {
             <div className="monitor-feed-heading">
               <h1>Updates</h1>
               <p>
-                Showing {filteredEvents.length} of {feed?.events.length ?? 0}
+                Showing {visibleEvents.length} of {filteredEvents.length}
               </p>
             </div>
 
             {error ? <p className="monitor-state">{error}</p> : null}
             {!feed && !error ? (
               <p aria-live="polite" className="monitor-state">
-                Loading this month's updates…
+                Loading this year's updates…
               </p>
             ) : null}
 
             <div className="monitor-event-list">
-              {filteredEvents.map((event) => (
-                <article className="monitor-event" key={event.id}>
-                  <button
-                    className="monitor-event-open"
-                    onClick={() => setSelected({ event, mode: "brief" })}
-                    type="button"
-                  >
-                    <span className="monitor-event-meta">
-                      <strong>{event.source.authority}</strong>
-                      <span>{displayDate(event.source.publishedAt)}</span>
-                      <span>{event.classification.eventType}</span>
-                    </span>
-                    <span className="monitor-event-copy">
-                      <strong>{event.source.title}</strong>
-                      <p>{eventSummary(event)}</p>
-                      {event.analysis.keyPoints.length > 0 ? (
-                        <span className="monitor-event-takeaways">
-                          <b>What changed</b>
-                          <ul>
-                            {event.analysis.keyPoints
-                              .slice(0, 2)
-                              .map((point) => (
-                                <li key={point}>{point}</li>
-                              ))}
-                          </ul>
-                        </span>
-                      ) : null}
-                      <span className="monitor-event-event-meta">
-                        <i>{event.classification.topic}</i>
-                        {event.classification.status ? (
-                          <i>{event.classification.status}</i>
+              {visibleEvents.map((event, index) => {
+                const month = event.source.publishedAt.slice(0, 7);
+                const previousMonth = visibleEvents[
+                  index - 1
+                ]?.source.publishedAt.slice(0, 7);
+                return (
+                  <Fragment key={event.id}>
+                    {month !== previousMonth ? (
+                      <div className="monitor-month-divider">
+                        <h2>{displayMonth(month)}</h2>
+                        {month === currentMonth ? (
+                          <span>In progress</span>
                         ) : null}
-                        <i>
-                          {event.classification.affectedEntities[0] ??
-                            "Broad market"}
-                        </i>
-                      </span>
-                    </span>
-                    <ArrowUpRight
-                      className="monitor-event-arrow"
-                      aria-hidden="true"
-                      size={18}
-                    />
-                  </button>
-                  <button
-                    className="monitor-event-ai"
-                    onClick={() => setSelected({ event, mode: "copilot" })}
-                    type="button"
-                  >
-                    <Sparkles aria-hidden="true" size={14} /> Explain with AI
-                  </button>
-                </article>
-              ))}
+                      </div>
+                    ) : null}
+                    <article className="monitor-event">
+                      <button
+                        className="monitor-event-open"
+                        onClick={() => setSelected({ event, mode: "brief" })}
+                        type="button"
+                      >
+                        <span className="monitor-event-meta">
+                          <strong>{event.source.authority}</strong>
+                          <span>{displayDate(event.source.publishedAt)}</span>
+                          <span>{event.classification.eventType}</span>
+                        </span>
+                        <span className="monitor-event-copy">
+                          <strong>{event.source.title}</strong>
+                          <p>{eventSummary(event)}</p>
+                          {event.analysis.keyPoints.length > 0 ? (
+                            <span className="monitor-event-takeaways">
+                              <b>What changed</b>
+                              <ul>
+                                {event.analysis.keyPoints
+                                  .slice(0, 2)
+                                  .map((point) => (
+                                    <li key={point}>{point}</li>
+                                  ))}
+                              </ul>
+                            </span>
+                          ) : null}
+                          <span className="monitor-event-event-meta">
+                            <i>{event.classification.topic}</i>
+                            {event.classification.status ? (
+                              <i>{event.classification.status}</i>
+                            ) : null}
+                            <i>
+                              {event.classification.affectedEntities[0] ??
+                                "Broad market"}
+                            </i>
+                          </span>
+                        </span>
+                        <ArrowUpRight
+                          className="monitor-event-arrow"
+                          aria-hidden="true"
+                          size={18}
+                        />
+                      </button>
+                      <button
+                        className="monitor-event-ai"
+                        onClick={() => setSelected({ event, mode: "copilot" })}
+                        type="button"
+                      >
+                        <Sparkles aria-hidden="true" size={14} /> Explain with
+                        AI
+                      </button>
+                    </article>
+                  </Fragment>
+                );
+              })}
             </div>
+
+            {visibleEvents.length < filteredEvents.length ? (
+              <button
+                className="monitor-load-more"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+                type="button"
+              >
+                Load more
+                <span>
+                  {filteredEvents.length - visibleEvents.length} remaining
+                </span>
+              </button>
+            ) : null}
 
             {feed && filteredEvents.length === 0 ? (
               <div className="monitor-empty">
                 <CalendarDays aria-hidden="true" size={21} />
                 <p>No updates match these filters.</p>
                 <button
-                  onClick={() =>
-                    setFilters({ source: ALL, topic: ALL, entity: ALL })
-                  }
+                  onClick={() => {
+                    setFilters({
+                      month: ALL,
+                      source: ALL,
+                      topic: ALL,
+                      entity: ALL,
+                    });
+                    setVisibleCount(PAGE_SIZE);
+                  }}
                   type="button"
                 >
                   Clear filters
@@ -676,7 +738,7 @@ export function MonitorPage() {
 
           <aside className="monitor-summary-rail" id="summary">
             <section>
-              <h2>This month</h2>
+              <h2>Selected year</h2>
               <dl>
                 <div>
                   <dt>Updates</dt>
@@ -724,7 +786,7 @@ export function MonitorPage() {
           event={selected.event}
           initialMode={selected.mode}
           key={`${selected.event.id}-${selected.mode}`}
-          month={feed?.month ?? ""}
+          month={selected.event.source.publishedAt.slice(0, 7)}
           onClose={() => setSelected(null)}
         />
       ) : null}

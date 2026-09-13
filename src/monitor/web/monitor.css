@@ -189,8 +189,8 @@
 
 .monitor-filter-controls {
   display: grid;
-  grid-template-columns: 0.9fr 0.7fr 1fr 1.3fr;
-  gap: 24px;
+  grid-template-columns: 0.55fr 0.9fr 0.65fr 1fr 1.25fr;
+  gap: 18px;
 }
 
 .monitor-feed-heading {
@@ -214,6 +214,29 @@
   margin: 0;
   color: var(--monitor-muted);
   font-size: 0.7rem;
+}
+
+.monitor-month-divider {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 26px 0 9px;
+  border-bottom: 3px solid var(--monitor-ink);
+}
+
+.monitor-month-divider h2 {
+  margin: 0;
+  font-family: var(--monitor-serif);
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.monitor-month-divider span {
+  color: var(--monitor-accent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .monitor-event {
@@ -380,6 +403,32 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.monitor-load-more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 24px;
+  color: #fff;
+  background: var(--monitor-ink);
+  border: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.monitor-load-more:hover {
+  background: #092832;
+}
+
+.monitor-load-more span {
+  color: rgb(255 255 255 / 68%);
+  font-size: 0.63rem;
+  font-weight: 400;
 }
 
 .monitor-summary-rail {

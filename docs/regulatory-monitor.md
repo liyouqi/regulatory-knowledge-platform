@@ -12,7 +12,7 @@ Regulatory Monitor answers one practical question:
 
 > What changed recently, and which changes may matter to my organisation?
 
-It is a lightweight monitoring product, not a GRC workflow. The first release presents a month of regulatory events from selected official sources, supports a small set of useful filters, and opens a focused event brief with a link to the official publication.
+It is a lightweight monitoring product, not a GRC workflow. The first release presents the current year of regulatory events from selected official sources, grouped by month, supports a small set of useful filters, and opens a focused event brief with a link to the official publication.
 
 The Monitor is deliberately independent from the Regulatory Knowledge Platform Reader and Earth:
 
@@ -26,13 +26,15 @@ The Monitor is deliberately independent from the Regulatory Knowledge Platform R
 
 The first usable page contains:
 
-1. a compact product header and current-month summary;
-2. filters for month, source, topic, and affected entity;
-3. a chronological event feed;
+1. a compact product header and selected-year summary;
+2. filters for year, month, source, topic, and affected entity;
+3. a reverse-chronological annual event feed grouped by month;
 4. an event brief with deeper business impact and next-step content;
 5. a direct link to the official source;
 6. a visible `Generate Monthly Report` action.
 7. a whole-event `Explain with AI` action when the configured provider is available.
+
+The current year is the default period. The current month is visibly marked `In progress`. The browser initially shows 20 matching events and `Load more` advances through the already loaded annual feed in explicit pages of 20. Automatic infinite-scroll fetching is not used.
 
 The report action belongs in the interface from the first release. Until report generation is implemented, it may provide a small, honest in-product message without introducing a report service.
 
@@ -61,6 +63,7 @@ ESMA and AMLA are next-source additions after the first refresh path and page ar
 
 Initial filters:
 
+- year;
 - month;
 - source;
 - topic;
@@ -159,11 +162,21 @@ If a publication does not provide evidence of a before/after comparison, the int
 
 ## 6. Refresh pipeline
 
-`npm run monitor:refresh` is the single refresh entry point.
+`npm run monitor:refresh` is the single refresh entry point. It accepts either a month or a year:
+
+```bash
+npm run monitor:refresh -- --month 2026-09
+npm run monitor:refresh -- --year 2026
+```
+
+The yearly command walks the EBA and CSSF official archive pages until it reaches the prior year, reads the current EUR-Lex feed, partitions matching events into monthly files, and enriches each event once. It does not run twelve independent monthly downloads.
+
+The CLI accepts either one month or a year. Annual refresh still writes separate monthly JSON files; the runtime timeline aggregates those files without creating a database or one large persistent document.
 
 The command:
 
-1. requests recent items from each enabled source;
+1. requests the relevant listing/archive pages from each enabled source;
+   EUR-Lex's general feed is narrowed to financial-sector publications so unrelated EU budget and agency notices do not fill the product timeline;
 2. opens each matching official publication page and extracts readable source text;
 3. when `PRIVATE_AI_*` is configured, uses the configured model and the Monitor-owned enrichment prompt to create the summary, status, topic, affected population, business takeaways, suggested checks, and explicit important dates;
 4. without AI configuration, keeps a basic listing-derived event rather than blocking the refresh;
@@ -186,6 +199,8 @@ Monitor data is isolated by location and ownership.
 - large downloads and transient responses are not committed;
 - a small default/demo feed may be shipped with the application so `/monitor` is useful before the first refresh.
 
+The annual API aggregates the available monthly files at read time. Pagination is browser-side because a year of Monitor events remains a small payload; no pagination store or cursor service is introduced.
+
 The refreshed feed can be replaced at any time. It is a rebuildable product cache, not the authoritative legal record.
 
 ## 8. Monitor Copilot and AI enrichment
@@ -207,7 +222,7 @@ The generated answer is based on source metadata and Monitor analysis, not the f
 
 AI enrichment is optional and follows the working page and refresh pipeline.
 
-V1 does not require an LLM to collect or display events. When enrichment is enabled later, it may create summaries, topics, affected-entity hints, and potentially affected functions. These fields remain analysis, never official legal text.
+V1 does not require an LLM to collect or display events. When `PRIVATE_AI_*` is configured, enrichment creates summaries, one controlled topic, affected-entity hints, and potentially affected functions. These fields remain analysis, never official legal text.
 
 No regulatory content is sent to an external model unless that provider has been explicitly configured and authorised.
 
@@ -231,7 +246,8 @@ The route should look intentional when opened directly. A small back link may le
 
 - isolated `/monitor` page;
 - small shipped feed;
-- four filters;
+- year timeline with month grouping and client-side `Load more` pagination;
+- year, month, source, topic, and affected-entity filters;
 - event detail view and official links;
 - report button;
 - responsive layout.
