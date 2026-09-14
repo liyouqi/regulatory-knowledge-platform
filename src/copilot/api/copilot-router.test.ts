@@ -106,4 +106,35 @@ describe("Copilot API router", () => {
     });
     info.mockRestore();
   });
+
+  it("logs selected text instead of the internal explanation instruction", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    await appRequest(null, "POST", "/api/copilot/respond", {
+      schemaVersion: "0.1.0",
+      requestId: "selection-request",
+      mode: "explain",
+      context: {
+        documentId: "document-1",
+        provisionId: "article-5",
+        entityId: "article-5:p1",
+        selection: {
+          entityId: "article-5:p1",
+          textRun: 0,
+          start: 0,
+          end: 15,
+          text: "Regulation (EC)",
+        },
+      },
+      messages: [],
+      question: "Explain the selected text in its current legal context.",
+    });
+
+    expect(JSON.parse(String(info.mock.calls[0]?.[0]))).toMatchObject({
+      surface: "reader_copilot",
+      interaction: "automatic_explain",
+      query: "Regulation (EC)",
+      entityId: "article-5:p1",
+    });
+    info.mockRestore();
+  });
 });

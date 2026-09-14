@@ -80,11 +80,19 @@ export function createCopilotRouter(options: CopilotRouterOptions) {
       );
       return;
     }
+    const selectedText = parsed.data.context.selection?.text;
+    const automaticSelectionExplanation =
+      selectedText !== undefined &&
+      parsed.data.question ===
+        "Explain the selected text in its current legal context.";
     logUserQuery({
       surface: "reader_copilot",
-      interaction:
-        parsed.data.mode === "chat" ? "user_question" : "automatic_explain",
-      query: parsed.data.question,
+      interaction: automaticSelectionExplanation
+        ? "automatic_explain"
+        : "user_question",
+      query: automaticSelectionExplanation
+        ? (selectedText ?? parsed.data.question)
+        : parsed.data.question,
       requestId: parsed.data.requestId,
       metadata: {
         mode: parsed.data.mode,

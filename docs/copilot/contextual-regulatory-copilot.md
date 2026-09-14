@@ -377,7 +377,7 @@ The current API includes a schema version, request ID, citations, and evidence s
 - The provider base URL comes only from trusted server configuration and never from a request.
 - Browser requests are abortable; navigation cancels obsolete work.
 - The server maps provider failures to stable errors without leaking response bodies or configuration.
-- A validated Copilot request emits one structured `copilot_query` line to standard output. It records the current question, request ID, interaction type, `reader_copilot` surface, and stable context IDs; it does not record selected legal text, conversation history, generated answers, authentication values, cookies, or client identity.
+- A validated Copilot request emits one structured `copilot_query` line to standard output. It records the user's current question, or the actual selected text for an automatic selection explanation, together with request ID, interaction type, `reader_copilot` surface, and stable context IDs. It does not record conversation history, generated answers, authentication values, cookies, or client identity.
 - Cloud Run may retain the logged question as user-provided content. Before enabling Copilot beyond trusted use, disclose this operational logging, review the Cloud Logging retention/access policy and provider retention, and add authenticated identity and quotas without expanding the logged content.
 - Generated answers render as text in Milestone A. Markdown/HTML rendering is deferred until a sanitizer and link policy are selected.
 - The UI identifies generated content and provides a non-advice limitation without repeating a disruptive disclaimer on every short answer.
