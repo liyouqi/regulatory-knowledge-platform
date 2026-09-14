@@ -1,7 +1,7 @@
-# Regulatory Monitor — Product and Technical Design v1.3
+# Regulatory Monitor — Product and Technical Design v1.4
 
-> Status: approved implementation baseline
-> Date: 2026-09-13
+> Status: V1 implementation complete
+> Date: 2026-09-14
 > Product surface: `/monitor`
 > Product language: English
 > Design goal: simple, visually independent regulatory change monitoring with an easily repeatable data refresh pipeline
@@ -36,7 +36,7 @@ The first usable page contains:
 
 The current year is the default period. The current month is visibly marked `In progress`. The browser initially shows 20 matching events and `Load more` advances through the already loaded annual feed in explicit pages of 20. Automatic infinite-scroll fetching is not used.
 
-The report action belongs in the interface from the first release. Until report generation is implemented, it may provide a small, honest in-product message without introducing a report service.
+The report action opens a lightweight monthly report built directly from the loaded Monitor timeline. The report follows `topic → event → status/date → explanation → business takeaways → deadline/effective date → source`, supports month selection, and uses the browser print flow for printing or saving as PDF. It does not introduce a report service or persist a second report representation.
 
 The visual reference is the Financial Times topic/myFT feed, adapted into a more energetic palette: a warm-white reading surface, yellow masthead, deep teal text, coral accents, dense headline-led updates, and a useful summary rail. It does not copy FT branding or assets. The page avoids a second hero heading beneath the masthead, same-page navigation that looks like tabs, landing-page typography, metric walls, decorative cards, pill-heavy metadata, and staged entrance animation.
 
@@ -277,7 +277,7 @@ The route should look intentional when opened directly. A small back link may le
 
 - read-only static Monitor MCP tools;
 - optional Cloud Scheduler trigger;
-- real report generation after source collection and enrichment are complete.
+- client-side monthly report generation with browser print/save-PDF output.
 
 ## 12. Acceptance criteria
 
@@ -376,3 +376,34 @@ The command is current-year only. With `PRIVATE_AI_*` configured it automaticall
 4. Consider Cloud Scheduler and remote MCP only later. Keep MCP static and read-only; do not expose Monitor AI through MCP.
 
 RAG, text selection, workflow/task management, persistence infrastructure, rollback machinery, and historical years remain intentionally out of scope.
+
+## 14. Completion handoff — 2026-09-14
+
+The V1 work listed in the previous handoff is now complete in the working implementation.
+
+### Completed after the 2026-09-13 handoff
+
+- EUR-Lex now uses the public Publications Office Cellar SPARQL endpoint as its primary, no-login current-year backfill. The existing RSS collector remains a best-effort latest-publication supplement.
+- The backfill is bounded by year, page size, maximum page count, English expression, legal-work CELEX shape, and financial-regulation title/reference terms. It remains an isolated Monitor source adapter and does not enter the Platform corpus or Runtime SQLite.
+- EUR-Lex events retain the stable CELEX reference and expose their actual document type, such as Regulation or Decision, instead of flattening every item to `Publication`.
+- The tracked fallback feed now contains a small current-year official baseline, so a fresh clone does not render an empty current-year Monitor before the first local refresh.
+- `Generate Monthly Report` is implemented as a client-side report over the already loaded read-only timeline. It supports month selection, grouped report content, official links, important-date counts, printing, and browser `Save as PDF` without another backend or stored report format.
+- Desktop browser review confirms the browsing page and monthly report preserve the independent warm-white/yellow/deep-teal visual system and keep the report content readable. Narrow-screen behavior is covered by browser automation.
+- Annual-list behavior is covered with a synthetic 45-event browser test: the UI reveals 20, then 40, then all 45 records. This verifies the paging interaction without claiming that the old computer's local-only 303-event cache was available on this machine.
+
+### Verification at completion
+
+Completed on 2026-09-14:
+
+```bash
+npm run check                                                    # passed
+npm test                                                         # 79 files, 317 tests passed
+npm run build                                                     # passed
+CI=1 npx playwright test e2e/monitor.spec.ts --project=chromium  # 3 passed
+```
+
+The EUR-Lex adapter also has targeted tests for bounded query construction, result mapping, and absence of authentication headers. The monthly report has unit tests for month filtering, ordering, grouping, and invalid input.
+
+### Remaining optional operations
+
+No required V1 development item remains. Cloud Scheduler deployment and remote MCP exposure are separate operational decisions and remain deferred. MCP stays local, static, and read-only. Historical-year collection, RAG, workflow/task management, and report persistence still require a separate scoped product decision rather than being added implicitly to V1.

@@ -30,6 +30,7 @@ import type {
   MonitorTimeline,
   MonitorEvent as RegulatoryEvent,
 } from "../monitor-contract";
+import { MonthlyReport } from "./MonthlyReport";
 import "./monitor.css";
 
 type Filters = {
@@ -482,6 +483,7 @@ export function MonitorPage() {
   const [error, setError] = useState("");
   const [mcpOpen, setMcpOpen] = useState(false);
   const [mcpCopied, setMcpCopied] = useState(false);
+  const [reportMonth, setReportMonth] = useState<string | null>(null);
   const [selected, setSelected] = useState<{
     event: RegulatoryEvent;
     mode: "brief" | "copilot";
@@ -596,7 +598,14 @@ export function MonitorPage() {
             </button>
             <button
               className="monitor-report-button"
-              onClick={() => globalThis.print()}
+              disabled={!feed || options.months.length === 0}
+              onClick={() =>
+                setReportMonth(
+                  filters.month !== ALL
+                    ? filters.month
+                    : (options.months[0] ?? currentMonth),
+                )
+              }
               type="button"
             >
               <FileDown aria-hidden="true" size={15} />
@@ -730,6 +739,9 @@ export function MonitorPage() {
                           <strong>{event.source.authority}</strong>
                           <span>{displayDate(event.source.publishedAt)}</span>
                           <span>{event.classification.eventType}</span>
+                          {event.source.reference ? (
+                            <span>{event.source.reference}</span>
+                          ) : null}
                         </span>
                         <span className="monitor-event-copy">
                           <strong>{event.source.title}</strong>
@@ -864,6 +876,15 @@ export function MonitorPage() {
           key={`${selected.event.id}-${selected.mode}`}
           month={selected.event.source.publishedAt.slice(0, 7)}
           onClose={() => setSelected(null)}
+        />
+      ) : null}
+      {feed && reportMonth ? (
+        <MonthlyReport
+          month={reportMonth}
+          months={options.months}
+          onClose={() => setReportMonth(null)}
+          onMonthChange={setReportMonth}
+          timeline={feed}
         />
       ) : null}
     </main>

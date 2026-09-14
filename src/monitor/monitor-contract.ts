@@ -19,7 +19,7 @@ export type MonitorEvent = {
   };
   classification: {
     topic: string;
-    eventType: "Publication";
+    eventType: string;
     status?: string;
     affectedEntities: string[];
   };

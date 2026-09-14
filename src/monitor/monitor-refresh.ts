@@ -8,6 +8,10 @@ import type {
   MonitorSourceStatus,
 } from "./monitor-contract";
 import { MonitorEnrichmentService } from "./monitor-enrichment";
+import {
+  EUR_LEX_CELLAR_SPARQL,
+  collectEurLexCellarBackfill,
+} from "./sources/eurlex-cellar";
 
 type FeedItem = {
   title: string;
@@ -15,6 +19,7 @@ type FeedItem = {
   publishedAt: string;
   summary?: string;
   publicationType?: string;
+  reference?: string;
   sourceText?: string;
   authority?: MonitorSource;
   key: string;
@@ -117,7 +122,7 @@ function isRelevantEurLex(item: FeedItem): boolean {
   if (/^celex:[^:]+$/i.test(item.title)) return false;
   if (/closure of the accounts|discharge in respect of.*budget/.test(title))
     return false;
-  return /bank|credit institution|investment firm|financial service|financial market|insurance|payment service|electronic money|crypto.asset|securit|investment fund|money laundering|terrorist financing|capital requirement|prudential|market abuse|prospectus|deposit guarantee|resolution|covered bond|operational resilience|sustainability disclosure|accounting standard|audit/.test(
+  return /bank|credit institution|investment firm|financial service|financial market|insurance|reinsurance|pension|payment service|electronic money|crypto.asset|securities|securitisation|investment fund|money laundering|terrorist financing|capital requirement|own funds|prudential|market abuse|prospectus|deposit guarantee|bank resolution|covered bond|operational resilience|sustainability disclosure|accounting standard|statutory audit|2022\/2554|2023\/1114|575\/2013|2013\/36|2014\/65|600\/2014|648\/2012|2015\/2366|2009\/138|2011\/61|2009\/65|2024\/1620|2024\/1624/.test(
     title,
   );
 }
@@ -365,9 +370,17 @@ async function collectArchive(
 const adapters: SourceAdapter[] = [
   {
     source: "EUR-Lex",
-    url: EUR_LEX_RSS,
-    async collect() {
-      return rssItems(await fetchText(EUR_LEX_RSS)).filter(isRelevantEurLex);
+    url: EUR_LEX_CELLAR_SPARQL,
+    async collect(since) {
+      const backfill = await collectEurLexCellarBackfill(since);
+      const latest = await fetchText(EUR_LEX_RSS)
+        .then((xml) => rssItems(xml).filter(isRelevantEurLex))
+        .catch(() => []);
+      return [
+        ...new Map(
+          [...backfill, ...latest].map((item) => [item.key, item] as const),
+        ).values(),
+      ];
     },
   },
   {
@@ -522,10 +535,11 @@ function toEvent(source: MonitorSource, item: FeedItem): MonitorEvent {
       title: item.title,
       url: item.url,
       publishedAt: item.publishedAt,
+      ...(item.reference ? { reference: item.reference } : {}),
     },
     classification: {
       topic: classification(source, item.title).topic,
-      eventType: "Publication",
+      eventType: item.publicationType ?? "Publication",
       affectedEntities: classification(source, item.title).affectedEntities,
     },
     analysis: {
