@@ -25,6 +25,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=web-build /app/dist ./dist
 COPY src ./src
 COPY data/artifacts/runtime/regulatory.sqlite ./data/artifacts/runtime/regulatory.sqlite
+COPY data/artifacts/earth/earth.sqlite ./data/artifacts/earth/earth.sqlite
 COPY data/monitor ./data/monitor
 
 EXPOSE 8080
