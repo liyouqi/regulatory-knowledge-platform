@@ -1,4 +1,5 @@
 import express from "express";
+import { logUserQuery } from "../shared/user-query-log";
 import { MonitorAiTimeoutError, MonitorAiUnavailableError } from "./monitor-ai";
 import type { MonitorAiService } from "./monitor-ai";
 import type { MonitorAiMessage } from "./monitor-contract";
@@ -94,6 +95,19 @@ export function createMonitorRouter(
       response.status(400).json({ error: "Event and question are required." });
       return;
     }
+    const automaticExplanation =
+      messages.length === 0 &&
+      question.startsWith("Explain this regulatory update.");
+    logUserQuery({
+      surface: "monitor_copilot",
+      interaction: automaticExplanation ? "automatic_explain" : "user_question",
+      query: question,
+      metadata: {
+        mode: automaticExplanation ? "explain" : "chat",
+        eventId,
+        month,
+      },
+    });
     if (!options.aiService) {
       response
         .status(503)

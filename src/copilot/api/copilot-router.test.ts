@@ -1,5 +1,5 @@
 import express from "express";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { CopilotService } from "../service/copilot-service";
 import { createCopilotRouter } from "./copilot-router";
 
@@ -78,5 +78,32 @@ describe("Copilot API router", () => {
       requestId: "bad",
       error: { code: "invalid_request" },
     });
+  });
+
+  it("logs a validated Reader question with its stable context", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const response = await appRequest(null, "POST", "/api/copilot/respond", {
+      schemaVersion: "0.1.0",
+      requestId: "reader-request",
+      mode: "chat",
+      context: {
+        documentId: "document-1",
+        provisionId: "article-5",
+      },
+      messages: [],
+      question: "Does this apply to payment institutions?",
+    });
+
+    expect(response.status).toBe(503);
+    expect(JSON.parse(String(info.mock.calls[0]?.[0]))).toMatchObject({
+      event: "copilot_query",
+      surface: "reader_copilot",
+      interaction: "user_question",
+      requestId: "reader-request",
+      documentId: "document-1",
+      provisionId: "article-5",
+      query: "Does this apply to payment institutions?",
+    });
+    info.mockRestore();
   });
 });

@@ -1,5 +1,6 @@
 import express from "express";
 import { ZodError } from "zod";
+import { logUserQuery } from "../../shared/user-query-log";
 import {
   CopilotContextMismatchError,
   CopilotContextNotFoundError,
@@ -79,6 +80,19 @@ export function createCopilotRouter(options: CopilotRouterOptions) {
       );
       return;
     }
+    logUserQuery({
+      surface: "reader_copilot",
+      interaction:
+        parsed.data.mode === "chat" ? "user_question" : "automatic_explain",
+      query: parsed.data.question,
+      requestId: parsed.data.requestId,
+      metadata: {
+        mode: parsed.data.mode,
+        documentId: parsed.data.context.documentId,
+        provisionId: parsed.data.context.provisionId,
+        entityId: parsed.data.context.entityId,
+      },
+    });
     if (!options.service) {
       sendError(
         response,

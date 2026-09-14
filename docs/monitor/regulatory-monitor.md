@@ -230,6 +230,8 @@ The generated answer is based on source metadata and Monitor analysis, not the f
 
 The current user question is the primary instruction to Monitor Copilot. A narrow follow-up is answered directly instead of regenerating the default four-part explanation. RAG and full-document retrieval remain later work.
 
+Validated Monitor Copilot requests use the same small structured query logger as Reader Copilot. The `surface` is `monitor_copilot`; event ID, month, interaction type, and current question are recorded, while conversation history, generated answers, event content, authentication values, and client identity are not. Automatic first explanations are distinguishable from user-written follow-ups.
+
 AI enrichment is optional and follows the working page and refresh pipeline.
 
 V1 does not require an LLM to collect or display events. When `PRIVATE_AI_*` is configured, enrichment creates summaries, one controlled topic, affected-entity hints, and potentially affected functions. These fields remain analysis, never official legal text.
