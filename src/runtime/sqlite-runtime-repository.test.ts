@@ -322,6 +322,7 @@ describe("SQLite runtime repository", () => {
   it("returns a bounded, normalized version chain only for reviewed status", () => {
     const chain = repository?.findDocumentVersionChain("eu:32024R2956");
     const crdChain = repository?.findDocumentVersionChain("eu:32013L0036");
+    const crrChain = repository?.findDocumentVersionChain("eu:32013R0575");
     const amldChain = repository?.findDocumentVersionChain("eu:32015L0849");
     const highRiskChain = repository?.findDocumentVersionChain("eu:32016R1675");
 
@@ -377,6 +378,20 @@ describe("SQLite runtime repository", () => {
       "HAS_CORRIGENDUM",
       "HAS_CORRIGENDUM",
     ]);
+    expect(crrChain).toMatchObject({
+      documentId: "eu:32013R0575",
+      coverage: "source-status-only",
+      checkedAt: "2026-09-25T00:00:00Z",
+      loadedVersionId: "version:eu:32013R0575:original-oj:2013-06-27",
+    });
+    expect(crrChain?.nodes).toHaveLength(6);
+    expect(crrChain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+      "HAS_CORRIGENDUM",
+      "HAS_CORRIGENDUM",
+      "HAS_CORRIGENDUM",
+      "HAS_CORRIGENDUM",
+    ]);
     expect(amldChain).toMatchObject({
       documentId: "eu:32015L0849",
       coverage: "source-status-only",
@@ -399,12 +414,14 @@ describe("SQLite runtime repository", () => {
     expect(repository?.versionNodeCount).toBe(
       (chain?.nodes.length ?? 0) +
         (crdChain?.nodes.length ?? 0) +
+        (crrChain?.nodes.length ?? 0) +
         (amldChain?.nodes.length ?? 0) +
         (highRiskChain?.nodes.length ?? 0),
     );
     expect(repository?.versionEdgeCount).toBe(
       (chain?.edges.length ?? 0) +
         (crdChain?.edges.length ?? 0) +
+        (crrChain?.edges.length ?? 0) +
         (amldChain?.edges.length ?? 0) +
         (highRiskChain?.edges.length ?? 0),
     );

@@ -5,9 +5,9 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(24);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(24);
-    expect(sources.slice(0, 7).map((source) => source.shortName)).toEqual([
+    expect(sources).toHaveLength(25);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(25);
+    expect(sources.slice(0, 8).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
       "AI Act",
@@ -15,6 +15,7 @@ describe("EU source registry", () => {
       "NIS2",
       "Data Act",
       "CRD IV",
+      "CRR",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
     expect(
@@ -50,6 +51,21 @@ describe("EU source registry", () => {
         basis: "original-oj",
         textAsOf: "2013-06-27",
         corrections: [{ date: "2013-08-02" }, { date: "2017-01-25" }],
+      },
+    });
+    expect(
+      sources.find((source) => source.celex === "32013R0575"),
+    ).toMatchObject({
+      familyId: "family:crr",
+      quality: {
+        articleCount: 521,
+        annexCount: 4,
+        maximumWarnings: 2,
+      },
+      sourceStatus: {
+        basis: "original-oj",
+        textAsOf: "2013-06-27",
+        currentVersionUrl: "https://eur-lex.europa.eu/eli/reg/2013/575",
       },
     });
     expect(

@@ -221,6 +221,62 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng"
   },
   {
+    "familyId": "family:crr",
+    "shortName": "CRR",
+    "aliases": [
+      "Capital Requirements Regulation",
+      "Regulation (EU) No 575/2013",
+      "CRR I"
+    ],
+    "celex": "32013R0575",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2013-06-27",
+    "quality": {
+      "articleCount": 521,
+      "recitalCount": 136,
+      "annexCount": 4,
+      "paragraphCount": 1694,
+      "pointCount": 2956,
+      "structuralNodeCount": 161,
+      "maximumWarnings": 2,
+      "textHashes": {
+        "eu:32013R0575:recital:1": "sha256:c46673089f1099ea73cd60c5f891ce44ec37b8bf395ef2ba82f2cf4c5530933a",
+        "eu:32013R0575:article:1:subparagraph:1": "sha256:41dcdd89f459d016083f2ffd76d0b6bb03988635fcf46c5a40b242ceae39ad14",
+        "eu:32013R0575:article:521:paragraph:2": "sha256:e69c71edf5db89f157c33bbd4fe8d5f9a92aaa1fc3818ed23341e7be5e5f68c7",
+        "eu:32013R0575:annex:i": "sha256:23a9b66c3a1b83540da2407dd50b93f70b1fc7907afcb791c28dee3e8e9f11dd",
+        "eu:32013R0575:annex:iv": "sha256:c73549b7a3a9af466af4b0187f449247bda8a819c9244348af4768125e149a6e"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2013-06-27",
+      "checkedAt": "2026-09-25T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2013/575",
+      "corrections": [
+        {
+          "date": "2013-08-02",
+          "url": "https://eur-lex.europa.eu/eli/reg/2013/575/corrigendum/2013-08-02/oj/eng"
+        },
+        {
+          "date": "2013-11-30",
+          "url": "https://eur-lex.europa.eu/eli/reg/2013/575/corrigendum/2013-11-30/oj/eng"
+        },
+        {
+          "date": "2017-01-25",
+          "url": "https://eur-lex.europa.eu/eli/reg/2013/575/corrigendum/2017-01-25/oj/eng"
+        },
+        {
+          "date": "2020-10-13",
+          "url": "https://eur-lex.europa.eu/eli/reg/2013/575/corrigendum/2020-10-13/oj/eng"
+        }
+      ]
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/575/oj/eng"
+  },
+  {
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Risk Management",
     "aliases": [

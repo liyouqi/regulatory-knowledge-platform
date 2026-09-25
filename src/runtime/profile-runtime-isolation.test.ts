@@ -72,16 +72,16 @@ describe("banking-default runtime isolation", () => {
   it("reports one Profile identity across Reader and Search services", () => {
     expect(repository).toMatchObject({
       profileId: "banking-default",
-      profileVersion: "1.0.0",
+      profileVersion: "1.1.0",
     });
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 26,
+      documentCount: 27,
     });
   });
 
-  it("includes the AML and CRD sources across Reader and Search", () => {
+  it("includes the AML, CRD, and CRR sources across Reader and Search", () => {
     expect(repository?.findDocumentBySlug("amld-iv")?.id).toBe("eu:32015L0849");
     expect(
       search
@@ -97,6 +97,12 @@ describe("banking-default runtime isolation", () => {
     expect(
       search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
     ).toHaveLength(68);
+    expect(repository?.findDocumentBySlug("crr")?.id).toBe("eu:32013R0575");
+    expect(
+      search
+        ?.search("own funds requirements")
+        .results.some((result) => result.documentId === "eu:32013R0575"),
+    ).toBe(true);
     expect(
       repository?.findDocumentRegulatoryContext(
         "eu:32013L0036",

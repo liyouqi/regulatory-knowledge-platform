@@ -203,6 +203,12 @@ describe("Document lookup", () => {
     expect(findLaws("Regulation (EU) 2022/2554").bestMatch?.id).toBe(
       "eu:32022R2554",
     );
+    expect(findLaws("CRR").bestMatch).toMatchObject({
+      id: "eu:32013R0575",
+      matchReason: "exact-alias",
+      readerPath: "/read/crr/articles/1",
+    });
+    expect(findLaws("32013R0575").bestMatch?.id).toBe("eu:32013R0575");
   });
 
   it("resolves a compound law and provision query without returning body data", () => {
@@ -403,7 +409,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      28,
+      29,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({

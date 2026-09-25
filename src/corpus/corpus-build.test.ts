@@ -14,7 +14,7 @@ describe("corpus build manifest", () => {
     const sources = validateCorpusBuildManifestSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
-    expect(sources).toHaveLength(28);
+    expect(sources).toHaveLength(29);
     expect(sources).toContainEqual(
       expect.objectContaining({
         manifest: expect.objectContaining({
@@ -22,6 +22,16 @@ describe("corpus build manifest", () => {
           identifier: "eba-gl-2021-05",
         }),
         parserVersion: "eba-pdf-1.1.1",
+      }),
+    );
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eur-lex",
+          identifier: "32013R0575",
+          snapshotId:
+            "snapshot:cellar:32013R0575:0ba6d826235f517ad18bad2026d775d994b09af087cc8816119672db5257af16",
+        }),
       }),
     );
     expect(sources).toContainEqual(

@@ -53,6 +53,9 @@ describe("Edition/Profile compilation", () => {
       "eu:32013L0036",
     );
     expect(banking.documents.map((document) => document.id)).toContain(
+      "eu:32013R0575",
+    );
+    expect(banking.documents.map((document) => document.id)).toContain(
       "eu:eba:gl:2021:05",
     );
     expect(banking.documents.map((document) => document.id)).not.toContain(
