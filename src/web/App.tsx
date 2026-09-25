@@ -7,11 +7,11 @@ import {
   Check,
   Copy,
   FileQuestion,
-  Globe2,
   Landmark,
   Link2,
   Map as MapIcon,
   Network,
+  Newspaper,
   Route as RouteIcon,
   Search,
   ShieldCheck,
@@ -1292,8 +1292,8 @@ function ReaderPage({
           >
             <Sparkles aria-hidden="true" size={15} /> Copilot
           </button>
-          <Link className="view-switch" to="/earth">
-            <Globe2 aria-hidden="true" size={15} /> Earth
+          <Link className="view-switch" to="/monitor">
+            <Newspaper aria-hidden="true" size={15} /> Monitor
           </Link>
           <Link className="view-switch" to={ebaQaCatalogPath()}>
             <FileQuestion aria-hidden="true" size={15} />

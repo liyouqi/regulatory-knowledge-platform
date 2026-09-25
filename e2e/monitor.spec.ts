@@ -1,8 +1,47 @@
-import { expect, test } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { type Page, expect, test } from "@playwright/test";
+
+async function useBaselineTimeline(page: Page) {
+  const feed = JSON.parse(
+    await readFile(
+      new URL("../data/monitor/default.json", import.meta.url),
+      "utf8",
+    ),
+  ) as {
+    generatedAt: string;
+    sources: unknown[];
+    events: unknown[];
+  };
+  await page.route("**/api/monitor/timeline?year=2026", async (route) => {
+    await route.fulfill({
+      contentType: "application/json",
+      json: {
+        schemaVersion: "monitor-timeline@1.0.0",
+        year: "2026",
+        generatedAt: feed.generatedAt,
+        sources: feed.sources,
+        events: feed.events,
+      },
+    });
+  });
+}
+
+test("Reader top navigation promotes Monitor and hides Earth", async ({
+  page,
+}) => {
+  await page.goto("/read/dora/articles/1");
+
+  await expect(page.getByRole("link", { name: "Monitor" })).toHaveAttribute(
+    "href",
+    "/monitor",
+  );
+  await expect(page.getByRole("link", { name: "Earth" })).toHaveCount(0);
+});
 
 test("Monitor baseline can be filtered, inspected, and printed as a monthly report", async ({
   page,
 }) => {
+  await useBaselineTimeline(page);
   await page.addInitScript(() => {
     Object.defineProperty(globalThis, "print", {
       configurable: true,
@@ -68,6 +107,7 @@ test("Monitor baseline can be filtered, inspected, and printed as a monthly repo
 });
 
 test("Monthly report remains usable on a narrow screen", async ({ page }) => {
+  await useBaselineTimeline(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/monitor");
   await page.getByRole("button", { name: "Generate Monthly Report" }).click();
