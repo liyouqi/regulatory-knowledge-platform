@@ -209,6 +209,5 @@ A new document is onboarded only when:
 - semantic mappings are reviewed or explicitly absent;
 - intended Profile inclusion/exclusion is tested;
 - Runtime build, verification, ordinary gates, and dedicated gates pass;
-- a new complete Platform-to-RAG snapshot for the released Profile is exported and independently verified;
 - the build report records source, parser, schema, Profile, relationship, and Runtime identities;
 - known limitations and deferred 1→100 work are added to `docs/coverage-backlog.md`.
