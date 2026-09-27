@@ -1,0 +1,11 @@
+{
+  "description": "Initial EU financial discovery scope. All English legal acts in these directory categories, plus explicitly tagged cross-sector seeds. Not a claim of all European/national financial law coverage.",
+  "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+  "directories": {
+    "06202010": "Insurance",
+    "06202020": "Banks",
+    "06202025": "Securities markets"
+  },
+  "language": "ENG",
+  "pageSize": 500
+}

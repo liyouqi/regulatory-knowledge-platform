@@ -19,15 +19,21 @@ import {
   type EarthOfficialSnapshot,
   readVerifiedEarthSnapshot,
 } from "../acquisition/earth-snapshot";
+import { EARTH_READING_SCHEMA_VERSION } from "../contract/article-reading";
 import type { EarthUniverse } from "../universe/earth-universe";
+import {
+  type AuditedArticle,
+  auditArticleReadings,
+} from "./article-source-audit";
 import {
   type EarthReviewedSourceMetadata,
   type EarthReviewedSourceMetadataEntry,
   earthReviewedSourceMetadataEntrySchema,
 } from "./earth-source-metadata";
+import { verifyArticleReadings } from "./verify-article-readings";
 
-export const EARTH_ARTIFACT_SCHEMA_VERSION = "0.2.0" as const;
-export const EARTH_COMPILER_VERSION = "0.2.0" as const;
+export const EARTH_ARTIFACT_SCHEMA_VERSION = EARTH_READING_SCHEMA_VERSION;
+export const EARTH_COMPILER_VERSION = "0.3.0" as const;
 
 export const earthArtifactManifestSchema = z
   .object({
@@ -46,6 +52,8 @@ export const earthArtifactManifestSchema = z
         boundaryWorks: z.number().int().nonnegative(),
         nodes: z.number().int().nonnegative(),
         relationships: z.number().int().nonnegative(),
+        articlesWithReading: z.number().int().nonnegative(),
+        readingBlocks: z.number().int().nonnegative(),
       })
       .strict(),
   })
@@ -81,6 +89,8 @@ type CompiledWork = {
   metadata: EarthReviewedSourceMetadataEntry;
   parsed: FormexParseResult;
   workId: string;
+  xmlMember: string;
+  readings: AuditedArticle[];
 };
 
 type CompiledBoundaryWork = {
@@ -182,7 +192,8 @@ function writeSchema(database: Database.Database): void {
       expression_uri TEXT NOT NULL,
       manifestation_uri TEXT NOT NULL,
       content_url TEXT NOT NULL,
-      tree_notice_url TEXT NOT NULL
+      tree_notice_url TEXT NOT NULL,
+      language TEXT NOT NULL CHECK (language = 'en')
     ) STRICT;
     CREATE TABLE relation_snapshots (
       snapshot_id TEXT PRIMARY KEY,
@@ -239,6 +250,19 @@ function writeSchema(database: Database.Database): void {
     ) STRICT;
     CREATE INDEX nodes_work_display_order ON nodes(work_id, display_order);
     CREATE INDEX nodes_parent_id ON nodes(parent_id);
+    CREATE TABLE article_readings (
+      article_node_id TEXT PRIMARY KEY REFERENCES nodes(id),
+      source_path TEXT NOT NULL,
+      xml_member TEXT NOT NULL,
+      block_count INTEGER NOT NULL CHECK (block_count BETWEEN 1 AND 500)
+    ) STRICT;
+    CREATE TABLE article_reading_blocks (
+      id TEXT PRIMARY KEY,
+      article_node_id TEXT NOT NULL REFERENCES article_readings(article_node_id),
+      parent_id TEXT REFERENCES article_reading_blocks(id) DEFERRABLE INITIALLY DEFERRED,
+      block_json TEXT NOT NULL
+    ) STRICT;
+    CREATE INDEX article_reading_blocks_article ON article_reading_blocks(article_node_id);
     CREATE TABLE official_relationships (
       id TEXT PRIMARY KEY CHECK (id LIKE 'relationship:%'),
       source_node_id TEXT NOT NULL REFERENCES nodes(id),
@@ -283,6 +307,7 @@ function verifyStagingArtifact(
   ) {
     throw new Error("Earth staging counts do not match its manifest");
   }
+  verifyArticleReadings(database, manifest.counts);
   const persistedManifest = database
     .prepare("SELECT value FROM build_manifest WHERE key = 'manifest_json'")
     .get() as { value?: string } | undefined;
@@ -532,16 +557,23 @@ function compileWorks(
     const packageContents = extractFormexPackage(contentBytes);
     const reviewedMetadata =
       earthReviewedSourceMetadataEntrySchema.parse(metadata);
+    const parsed = parseFormexAct(
+      packageContents.act.xml,
+      sourceForParser(snapshot, member.label, reviewedMetadata),
+      snapshotForParser(snapshot),
+      packageContents.annexes,
+    );
+    const readings = auditArticleReadings(
+      packageContents.act.xml,
+      parsed.document.provisions,
+    );
     return {
       input,
       label: member.label,
       metadata: reviewedMetadata,
-      parsed: parseFormexAct(
-        packageContents.act.xml,
-        sourceForParser(snapshot, member.label, reviewedMetadata),
-        snapshotForParser(snapshot),
-        packageContents.annexes,
-      ),
+      parsed,
+      xmlMember: packageContents.act.fileName,
+      readings,
       workId: `earth:work:${snapshot.celex}`,
     };
   });
@@ -582,6 +614,19 @@ export async function compileEarthArtifact(
         compiledRelations.boundaries.length,
       ),
       relationships: compiledRelations.relationships.length,
+      articlesWithReading: compiledWorks.reduce(
+        (total, work) => total + work.readings.length,
+        0,
+      ),
+      readingBlocks: compiledWorks.reduce(
+        (total, work) =>
+          total +
+          work.readings.reduce(
+            (sum, article) => sum + article.blocks.length,
+            0,
+          ),
+        0,
+      ),
     },
   });
   mkdirSync(dirname(outputPath), { recursive: true });
@@ -599,8 +644,8 @@ export async function compileEarthArtifact(
     const insertSnapshot = database.prepare(`
       INSERT INTO source_snapshots (
         snapshot_id, celex, content_sha256, retrieved_at, work_uri, expression_uri,
-        manifestation_uri, content_url, tree_notice_url
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        manifestation_uri, content_url, tree_notice_url, language
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const insertRelationSnapshot = database.prepare(`
       INSERT INTO relation_snapshots (
@@ -631,6 +676,12 @@ export async function compileEarthArtifact(
         evidence_text, evidence_locator, evidence_source_url
       ) VALUES (?, ?, ?, ?, 'CELLAR_METADATA', ?, ?, ?)
     `);
+    const insertReading = database.prepare(
+      "INSERT INTO article_readings VALUES (?, ?, ?, ?)",
+    );
+    const insertBlock = database.prepare(
+      "INSERT INTO article_reading_blocks VALUES (?, ?, ?, ?)",
+    );
     const compile = database.transaction(() => {
       insertManifest.run("manifest_json", JSON.stringify(manifest));
       if (compiledRelations.snapshot) {
@@ -647,7 +698,15 @@ export async function compileEarthArtifact(
           relationSnapshot.recordCount,
         );
       }
-      for (const { input, label, metadata, parsed, workId } of compiledWorks) {
+      for (const {
+        input,
+        label,
+        metadata,
+        parsed,
+        workId,
+        xmlMember,
+        readings,
+      } of compiledWorks) {
         const { snapshot } = input;
         insertSnapshot.run(
           snapshot.snapshotId,
@@ -659,6 +718,7 @@ export async function compileEarthArtifact(
           snapshot.manifestationUri,
           snapshot.content.url,
           snapshot.treeNoticeUrl,
+          snapshot.language,
         );
         insertWork.run(
           workId,
@@ -725,6 +785,22 @@ export async function compileEarthArtifact(
             article.displayOrder,
           );
           nodeCount += 1;
+        }
+        for (const reading of readings) {
+          const articleId = nodeId(reading.article.logicalId);
+          insertReading.run(
+            articleId,
+            reading.sourcePath,
+            xmlMember,
+            reading.blocks.length,
+          );
+          for (const block of reading.blocks)
+            insertBlock.run(
+              block.id,
+              articleId,
+              block.parentId,
+              JSON.stringify(block),
+            );
         }
       }
       for (const boundary of compiledRelations.boundaries) {

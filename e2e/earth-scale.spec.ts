@@ -165,6 +165,7 @@ test("Earth pages and filters a test-only 205-Work boundary", async ({
   });
 
   await page.goto("/earth");
+  await page.locator(".earth-boundary-disclosure summary").click();
   await expect(page.getByText("1–100 of 205", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Next" }).click();
   await expect(

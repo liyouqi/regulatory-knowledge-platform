@@ -45,6 +45,10 @@
     "eba-qa:fetch": "node --import tsx src/qa/eba-qa-cli.ts fetch",
     "monitor:refresh": "node --import tsx src/monitor/monitor-refresh-cli.ts",
     "earth:source:list": "node --import tsx src/earth/acquisition/cli.ts list",
+    "earth:census": "node --import tsx src/earth/acquisition/census-cli.ts",
+    "earth:refresh": "node --import tsx src/earth/acquisition/refresh-cli.ts",
+    "earth:graph:refresh": "node --import tsx src/earth/acquisition/metadata-graph-cli.ts",
+    "earth:inventory": "node --import tsx src/earth/build/inventory-cli.ts",
     "earth:source:fetch": "node --import tsx src/earth/acquisition/cli.ts fetch",
     "earth:source:verify": "node --import tsx src/earth/acquisition/cli.ts verify",
     "earth:relations:fetch": "node --import tsx src/earth/acquisition/cli.ts relations:fetch",
@@ -87,6 +91,7 @@
     "react-router-dom": "^7.1.0",
     "reagraph": "^4.32.0",
     "swagger-ui-dist": "5.32.14",
+    "three": "^0.184.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {
@@ -98,6 +103,7 @@
     "@types/node": "24.3.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^4.3.4",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",

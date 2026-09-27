@@ -14,7 +14,9 @@ async function createFixture() {
   const database = new Database(path);
   database.exec(`
     CREATE TABLE build_manifest (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
-    CREATE TABLE source_snapshots (snapshot_id TEXT PRIMARY KEY, celex TEXT NOT NULL, content_sha256 TEXT NOT NULL, retrieved_at TEXT NOT NULL, work_uri TEXT NOT NULL, expression_uri TEXT NOT NULL, manifestation_uri TEXT NOT NULL, content_url TEXT NOT NULL, tree_notice_url TEXT NOT NULL) STRICT;
+    CREATE TABLE source_snapshots (snapshot_id TEXT PRIMARY KEY, celex TEXT NOT NULL, content_sha256 TEXT NOT NULL, retrieved_at TEXT NOT NULL, work_uri TEXT NOT NULL, expression_uri TEXT NOT NULL, manifestation_uri TEXT NOT NULL, content_url TEXT NOT NULL, tree_notice_url TEXT NOT NULL, language TEXT NOT NULL DEFAULT 'en') STRICT;
+    CREATE TABLE article_readings (article_node_id TEXT PRIMARY KEY, source_path TEXT NOT NULL, xml_member TEXT NOT NULL, block_count INTEGER NOT NULL) STRICT;
+    CREATE TABLE article_reading_blocks (id TEXT PRIMARY KEY, article_node_id TEXT NOT NULL, parent_id TEXT, block_json TEXT NOT NULL) STRICT;
     CREATE TABLE works (id TEXT PRIMARY KEY, celex TEXT NOT NULL, work_uri TEXT NOT NULL, expression_uri TEXT NOT NULL, manifestation_uri TEXT NOT NULL, measure_type TEXT NOT NULL, metadata_source_url TEXT NOT NULL, official_title TEXT NOT NULL, snapshot_id TEXT NOT NULL REFERENCES source_snapshots(snapshot_id)) STRICT;
     CREATE TABLE boundary_works (id TEXT PRIMARY KEY, celex TEXT NOT NULL, work_uri TEXT NOT NULL, official_title TEXT NOT NULL, source_url TEXT NOT NULL) STRICT;
     CREATE TABLE nodes (id TEXT PRIMARY KEY, work_id TEXT REFERENCES works(id), boundary_work_id TEXT REFERENCES boundary_works(id), parent_id TEXT REFERENCES nodes(id), entity_kind TEXT NOT NULL, logical_id TEXT NOT NULL, label TEXT NOT NULL, title TEXT, text TEXT, content_hash TEXT, source_locator TEXT, display_order INTEGER NOT NULL) STRICT;
@@ -23,7 +25,7 @@ async function createFixture() {
   database.prepare("INSERT INTO build_manifest VALUES (?, ?)").run(
     "manifest_json",
     JSON.stringify({
-      schemaVersion: "0.1.0",
+      schemaVersion: "0.3.0",
       buildId: "earth-test",
       builtAt: "2026-09-10T00:00:00.000Z",
       universeId: "eu-banking-10",
@@ -34,7 +36,9 @@ async function createFixture() {
     }),
   );
   database
-    .prepare("INSERT INTO source_snapshots VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+    .prepare(
+      "INSERT INTO source_snapshots (snapshot_id, celex, content_sha256, retrieved_at, work_uri, expression_uri, manifestation_uri, content_url, tree_notice_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
     .run(
       "snap-1",
       "32022R2554",

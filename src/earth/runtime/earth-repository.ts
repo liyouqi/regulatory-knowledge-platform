@@ -1,12 +1,14 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import Database from "better-sqlite3";
+import { EARTH_READING_SCHEMA_VERSION } from "../contract/article-reading";
 import {
   type EarthNode,
   earthMeasureTypeSchema,
   earthOfficialProvenanceSchema,
   earthRelationshipTypeSchema,
 } from "../contract/earth-contract";
+import { readArticleReading } from "./article-reading-query";
 
 export const DEFAULT_EARTH_ARTIFACT_PATH = "data/artifacts/earth/earth.sqlite";
 
@@ -264,15 +266,40 @@ export class EarthRepository {
       readonly: true,
       fileMustExist: true,
     });
-    this.database.pragma("query_only = ON");
-    const row = this.database
-      .prepare("SELECT value FROM build_manifest WHERE key = ?")
-      .get("manifest_json") as { value?: DatabaseValue } | undefined;
-    if (!row || typeof row.value !== "string") {
+    try {
+      this.database.pragma("query_only = ON");
+      const row = this.database
+        .prepare("SELECT value FROM build_manifest WHERE key = ?")
+        .get("manifest_json") as { value?: DatabaseValue } | undefined;
+      if (!row || typeof row.value !== "string") {
+        throw new Error("Earth artifact has no build manifest");
+      }
+      this.manifest = parseManifest(row.value);
+      if (this.manifest.schemaVersion !== EARTH_READING_SCHEMA_VERSION)
+        throw new Error(
+          "Earth artifact schema is incompatible; rebuild it with earth:build",
+        );
+      this.database
+        .prepare(
+          "SELECT article_node_id, source_path, xml_member, block_count FROM article_readings LIMIT 0",
+        )
+        .all();
+      this.database
+        .prepare(
+          "SELECT id, parent_id, block_json FROM article_reading_blocks LIMIT 0",
+        )
+        .all();
+      this.database
+        .prepare("SELECT language FROM source_snapshots LIMIT 0")
+        .all();
+    } catch (error) {
       this.database.close();
-      throw new Error("Earth artifact has no build manifest");
+      throw error;
     }
-    this.manifest = parseManifest(row.value);
+  }
+
+  articleReading(articleId: string) {
+    return readArticleReading(this.database, articleId);
   }
 
   close() {

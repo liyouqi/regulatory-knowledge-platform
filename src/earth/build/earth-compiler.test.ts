@@ -5,6 +5,7 @@ import { join } from "node:path";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
 import { acquireEarthCellarRelations } from "../acquisition/cellar-relation-source";
+import { EarthRepository } from "../runtime/earth-repository";
 import { compileEarthArtifact } from "./earth-compiler";
 import { verifyEarthArtifact } from "./verify-earth-artifact";
 
@@ -163,6 +164,8 @@ describe("Earth artifact compiler", () => {
         boundaryWorks: 0,
         nodes: 3,
         relationships: 0,
+        articlesWithReading: 1,
+        readingBlocks: 1,
       });
       const repeat = await compileEarthArtifact({
         universe,
@@ -197,6 +200,38 @@ describe("Earth artifact compiler", () => {
       } finally {
         database.close();
       }
+      const repository = new EarthRepository(outputPath);
+      const articleId = "earth:eu:39999R9999:article:1";
+      expect(repository.articleReading(articleId)).toMatchObject({
+        articleId,
+        source: {
+          xmlMember: "source.fmx4.xml",
+          language: "en",
+          officialSourceUrl: sourceMetadata["39999R9999"].evidenceUrl,
+        },
+        blocks: [
+          {
+            kind: "subparagraph",
+            content: [{ type: "text", text: "Test-only text." }],
+          },
+        ],
+      });
+      expect(
+        repository.articleReading("earth:work:39999R9999"),
+      ).toBeUndefined();
+      const tampered = new Database(outputPath);
+      tampered.prepare("UPDATE article_readings SET block_count = 2").run();
+      tampered.close();
+      try {
+        expect(() => repository.articleReading(articleId)).toThrow(
+          "Incomplete Earth Article reading",
+        );
+      } finally {
+        repository.close();
+      }
+      expect(() => verifyEarthArtifact(outputPath)).toThrow(
+        "Incomplete Earth Article reading",
+      );
     } finally {
       await rm(root, { recursive: true, force: true });
     }

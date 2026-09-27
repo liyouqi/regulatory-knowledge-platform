@@ -46,6 +46,8 @@ function fakeRepository() {
         ? { root: { id }, nodes: [{ id }], relationships: [], options }
         : undefined,
     relationshipDetail: () => undefined,
+    articleReading: (id: string) =>
+      id === "article" ? { articleId: id } : undefined,
   } as unknown as EarthRepository;
 }
 
@@ -75,6 +77,15 @@ async function request(path: string) {
 describe("Earth API router", () => {
   it("uses an injected reader and enforces request budgets", async () => {
     expect((await request("/api/earth/universes")).status).toBe(200);
+    expect((await request("/api/earth/articles/article/reading")).status).toBe(
+      200,
+    );
+    expect((await request("/api/earth/articles/node/reading")).status).toBe(
+      404,
+    );
+    expect((await request("/api/earth/articles/unknown/reading")).status).toBe(
+      404,
+    );
     expect(
       (await request("/api/earth/nodes/node/children?limit=101")).status,
     ).toBe(400);

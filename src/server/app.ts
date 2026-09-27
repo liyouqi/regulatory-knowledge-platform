@@ -9,11 +9,9 @@ import { ConfiguredPrivateAiProvider } from "../copilot/providers/configured-pri
 import { loadPrivateAiConfig } from "../copilot/providers/private-ai-config";
 import { CopilotService } from "../copilot/service/copilot-service";
 import { RegulatoryDossierService } from "../dossiers/regulatory-dossier-service";
-import { createEarthRouter } from "../earth/api/earth-router";
-import {
-  DEFAULT_EARTH_ARTIFACT_PATH,
-  EarthRepository,
-} from "../earth/runtime/earth-repository";
+import { createEarthFeatureRouter } from "../earth/api/earth-feature-router";
+import { createMetadataGraphRouter } from "../earth/api/metadata-graph-router";
+import { DEFAULT_EARTH_ARTIFACT_PATH } from "../earth/runtime/earth-repository";
 import { MonitorAiService } from "../monitor/monitor-ai";
 import { createMonitorRouter } from "../monitor/monitor-router";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
@@ -324,22 +322,8 @@ app.use("/api/monitor", createMonitorRouter({ aiService: monitorAiService }));
 
 const earthArtifactPath =
   process.env.EARTH_ARTIFACT_PATH ?? DEFAULT_EARTH_ARTIFACT_PATH;
-if (existsSync(resolve(process.cwd(), earthArtifactPath))) {
-  app.use(
-    "/api/earth",
-    createEarthRouter(new EarthRepository(earthArtifactPath)),
-  );
-} else {
-  app.use("/api/earth", (_request, response) => {
-    response.status(503).json({
-      error: {
-        code: "earth_artifact_unavailable",
-        message:
-          "The verified Earth artifact is not available in this deployment",
-      },
-    });
-  });
-}
+app.use("/api/earth", createMetadataGraphRouter());
+app.use("/api/earth", createEarthFeatureRouter(earthArtifactPath));
 
 app.use("/api", createPublicApiDocumentationRouter(runtimeRepository.buildId));
 

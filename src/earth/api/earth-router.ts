@@ -100,6 +100,21 @@ export function createEarthRouter(repository: EarthRepository) {
     if (!node) return notFound(response, "Node");
     return response.json({ node });
   });
+  router.get("/articles/:articleId/reading", (request, response) => {
+    try {
+      const reading = repository.articleReading(request.params.articleId);
+      if (!reading) return notFound(response, "Article reading");
+      return response.json(reading);
+    } catch {
+      return response.status(503).json({
+        error: {
+          code: "earth_reading_unavailable",
+          message:
+            "The verified Article reading is unavailable; rebuild and verify the Earth artifact.",
+        },
+      });
+    }
+  });
   router.get("/nodes/:nodeId/children", (request, response) => {
     const limit = positiveInteger(
       queryString(request.query.limit),

@@ -4,23 +4,19 @@ import {
   type ReactNode,
   Suspense,
   lazy,
+  useEffect,
 } from "react";
-import type { EarthRenderModel } from "./render-model";
+import type { EarthNebulaRendererProps } from "./renderers/nebula/EarthNebulaRenderer";
 
-const EarthReagraphRenderer = lazy(async () => {
-  const module = await import("./renderers/reagraph/EarthReagraphRenderer");
-  return { default: module.EarthReagraphRenderer };
+const EarthNebulaRenderer = lazy(async () => {
+  const module = await import("./renderers/nebula/EarthNebulaRenderer");
+  return { default: module.EarthNebulaRenderer };
 });
 
-interface EarthGraphViewProps {
-  model: EarthRenderModel;
-  selectedNodeId?: string;
-  onSelectNode(id: string): void;
-  onSelectEdge(id: string): void;
-}
+type EarthGraphViewProps = EarthNebulaRendererProps;
 
 class EarthRendererBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; onUnavailable(): void },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -31,6 +27,7 @@ class EarthRendererBoundary extends Component<
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
     console.error("Earth WebGL renderer failed", error);
+    this.props.onUnavailable();
   }
 
   render() {
@@ -48,25 +45,24 @@ class EarthRendererBoundary extends Component<
 function supportsWebGl(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+    const context = canvas.getContext("webgl2");
+    context?.getExtension("WEBGL_lose_context")?.loseContext();
+    return Boolean(context);
   } catch {
     return false;
   }
 }
 
 export function EarthGraphView(props: EarthGraphViewProps) {
-  if (!supportsWebGl()) {
-    return (
-      <output className="earth-renderer-fallback">
-        <strong>WebGL is unavailable.</strong>
-        <span>Use Structured view for the same laws and relationships.</span>
-      </output>
-    );
-  }
+  useEffect(() => {
+    if (!supportsWebGl()) props.onUnavailable();
+  }, [props.onUnavailable]);
   return (
-    <EarthRendererBoundary>
-      <Suspense fallback={<p className="earth-loading">Opening graph…</p>}>
-        <EarthReagraphRenderer {...props} />
+    <EarthRendererBoundary onUnavailable={props.onUnavailable}>
+      <Suspense
+        fallback={<p className="earth-loading">Opening your universe…</p>}
+      >
+        <EarthNebulaRenderer {...props} />
       </Suspense>
     </EarthRendererBoundary>
   );

@@ -10,6 +10,7 @@ import {
   type EarthArtifactManifest,
   earthArtifactManifestSchema,
 } from "./earth-compiler";
+import { verifyArticleReadings } from "./verify-article-readings";
 
 export interface EarthArtifactVerification {
   artifactPath: string;
@@ -44,6 +45,7 @@ export function verifyEarthArtifact(
       .get() as { value?: string } | undefined;
     if (!row?.value) throw new Error("Earth artifact manifest is missing");
     const manifest = earthArtifactManifestSchema.parse(JSON.parse(row.value));
+    verifyArticleReadings(database, manifest.counts);
     const count = (table: string, condition = "") =>
       (
         database

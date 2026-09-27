@@ -1,0 +1,102 @@
+{
+  "description": "Editorial navigation tags, not legal applicability. A Work may have several sectors. Unclassified Works stay visible and grey under a filter.",
+  "sectors": {
+    "banking": "Banking",
+    "insurance": "Insurance",
+    "funds": "Funds",
+    "payments": "Payments",
+    "crypto": "Crypto"
+  },
+  "families": {
+    "dora": { "label": "DORA", "color": "#ebc78c" },
+    "crd": { "label": "CRR / CRD", "color": "#b2a7d2" },
+    "solvency": { "label": "Solvency II", "color": "#c5a9cf" },
+    "ucits": { "label": "UCITS", "color": "#97bbbd" },
+    "aifmd": { "label": "AIFMD", "color": "#8fbba4" },
+    "mifid": { "label": "MiFID / MiFIR", "color": "#a8b8d0" },
+    "psd": { "label": "PSD", "color": "#cdb69c" },
+    "emir": { "label": "EMIR", "color": "#a4bfa0" },
+    "brrd": { "label": "BRRD", "color": "#c2a596" },
+    "aml": { "label": "AML", "color": "#d2a3a1" },
+    "mica": { "label": "MiCA", "color": "#a5c796" },
+    "gdpr": { "label": "GDPR", "color": "#83afc8" },
+    "nis2": { "label": "NIS2", "color": "#89bdaf" },
+    "ai-act": { "label": "AI Act", "color": "#9baed7" },
+    "data-act": { "label": "Data Act", "color": "#cca97e" }
+  },
+  "works": {
+    "32013R0575": { "label": "CRR", "family": "crd", "sectors": ["banking"] },
+    "32009L0138": {
+      "label": "Solvency II",
+      "family": "solvency",
+      "sectors": ["insurance"]
+    },
+    "32009L0065": {
+      "label": "UCITS",
+      "family": "ucits",
+      "sectors": ["funds", "securities"]
+    },
+    "32011L0061": {
+      "label": "AIFMD",
+      "family": "aifmd",
+      "sectors": ["funds", "securities"]
+    },
+    "32014L0065": {
+      "label": "MiFID II",
+      "family": "mifid",
+      "sectors": ["banking", "securities"]
+    },
+    "32014R0600": {
+      "label": "MiFIR",
+      "family": "mifid",
+      "sectors": ["banking", "securities"]
+    },
+    "32015L2366": {
+      "label": "PSD2",
+      "family": "psd",
+      "sectors": ["banking", "payments"]
+    },
+    "32012R0648": {
+      "label": "EMIR",
+      "family": "emir",
+      "sectors": ["banking", "funds", "securities"]
+    },
+    "32014L0059": { "label": "BRRD", "family": "brrd", "sectors": ["banking"] },
+    "32022R2554": {
+      "family": "dora",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    },
+    "32022L2556": {
+      "family": "dora",
+      "sectors": ["banking", "insurance", "funds", "payments"],
+      "color": "#dfbd8e"
+    },
+    "32013L0036": { "family": "crd", "sectors": ["banking"] },
+    "32015L0849": {
+      "family": "aml",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    },
+    "32023R1113": {
+      "family": "aml",
+      "sectors": ["banking", "payments", "crypto"],
+      "color": "#c79ba0"
+    },
+    "32023R1114": { "family": "mica", "sectors": ["banking", "crypto"] },
+    "32016R0679": {
+      "family": "gdpr",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    },
+    "32022L2555": {
+      "family": "nis2",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    },
+    "32024R1689": {
+      "family": "ai-act",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    },
+    "32023R2854": {
+      "family": "data-act",
+      "sectors": ["banking", "insurance", "funds", "payments", "crypto"]
+    }
+  }
+}

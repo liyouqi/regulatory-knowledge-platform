@@ -1,5 +1,17 @@
 import type { EarthEdge, EarthNode } from "../contract/earth-contract";
 
+/** Presentation-only institution source; not a legal Work or a hierarchy node. */
+export interface EarthInstitutionNode {
+  id: string;
+  label: string;
+  title?: string;
+  membership: "included";
+  entityKind: "institution";
+  workId: string;
+  officialIdentity: { workUri: string; celex?: string };
+}
+export type EarthVisualNode = EarthNode | EarthInstitutionNode;
+
 export interface EarthOverviewAggregate {
   id: string;
   source: string;
@@ -15,7 +27,11 @@ export interface EarthRenderNode {
   label: string;
   subLabel: string;
   membership: EarthNode["membership"];
-  source: EarthNode;
+  source: EarthVisualNode;
+  group?: string;
+  anchor?: boolean;
+  detail?: boolean;
+  satelliteOf?: string;
 }
 
 export interface EarthRenderEdge {

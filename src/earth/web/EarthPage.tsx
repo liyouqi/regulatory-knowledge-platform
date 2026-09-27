@@ -7,9 +7,11 @@ import {
   ListTree,
   Network,
   Orbit,
+  X,
 } from "lucide-react";
 import {
   type CSSProperties,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -25,13 +27,25 @@ import {
   earthOfficialProvenanceSchema,
   earthRelationshipTypeSchema,
 } from "../contract/earth-contract";
+import { EarthArticleReading } from "./EarthArticleReading";
 import { EarthGraphView } from "./EarthGraphView";
+import {
+  createEarthDisplay,
+  earthFamilies,
+  earthNodeDisplay,
+  earthSectors,
+} from "./display-tags";
 import {
   type EarthRenderModel,
   projectEarthExactNeighbourhood,
   projectEarthOverview,
 } from "./render-model";
 import "./earth.css";
+import {
+  type MetadataGraph,
+  metadataGraphSchema,
+} from "../contract/metadata-graph";
+import { EarthUniversePage } from "./EarthUniversePage";
 
 const universeSchema = z
   .object({
@@ -112,6 +126,43 @@ function kindLabel(node: EarthNode): string {
 }
 
 export function EarthPage() {
+  const [graph, setGraph] = useState<MetadataGraph | null>(null);
+  const [pending, setPending] = useState(true);
+  const reading =
+    new URLSearchParams(window.location.search).get("view") === "reading";
+  useEffect(() => {
+    if (reading) return;
+    const controller = new AbortController();
+    void fetch("/api/earth/graph", { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((value) => {
+        if (value) setGraph(metadataGraphSchema.parse(value));
+      })
+      .catch(() => {})
+      .finally(() => setPending(false));
+    return () => controller.abort();
+  }, [reading]);
+  if (reading) return <EarthLegacyPage />;
+  if (pending)
+    return (
+      <main className="earth-shell">
+        <p className="earth-loading">Opening financial universe…</p>
+      </main>
+    );
+  return graph ? (
+    <EarthUniversePage graph={graph} />
+  ) : (
+    <>
+      <EarthLegacyPage />
+      <p className="earth-alert">
+        Financial metadata graph unavailable · showing the existing 10-law
+        article collection.
+      </p>
+    </>
+  );
+}
+
+function EarthLegacyPage() {
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [selected, setSelected] = useState<EarthNode | null>(null);
@@ -130,6 +181,14 @@ export function EarthPage() {
   const [boundaryQuery, setBoundaryQuery] = useState("");
   const [loadingBoundary, setLoadingBoundary] = useState(false);
   const [error, setError] = useState("");
+  const [boundaryOpen, setBoundaryOpen] = useState(false);
+  const [sectorFilter, setSectorFilter] = useState("");
+  const [familyFilter, setFamilyFilter] = useState("");
+  const [webGlUnavailable, setWebGlUnavailable] = useState(false);
+  const useStructuredFallback = useCallback(() => {
+    setWebGlUnavailable(true);
+    setViewMode("structured");
+  }, []);
   const childRequest = useRef(0);
   const overviewRequest = useRef(0);
   const exactRequest = useRef(0);
@@ -172,6 +231,26 @@ export function EarthPage() {
   );
   const activeRenderModel =
     relationMode === "exact" && exactModel ? exactModel : renderModel;
+  const display = useMemo(
+    () =>
+      createEarthDisplay(
+        activeRenderModel,
+        overview?.works ?? [],
+        sectorFilter,
+        familyFilter,
+      ),
+    [activeRenderModel, overview?.works, sectorFilter, familyFilter],
+  );
+  const matchedLawCount = activeRenderModel.nodes.filter(
+    (node) => earthNodeDisplay(display, node.source).matched,
+  ).length;
+  const renderBranch = useMemo(
+    () =>
+      selected?.membership === "included"
+        ? { parent: selected, children }
+        : undefined,
+    [selected, children],
+  );
   const connectedEdges = useMemo(
     () =>
       selected
@@ -331,17 +410,29 @@ export function EarthPage() {
   }
 
   function selectRenderedNode(nodeId: string) {
+    const child = children.find(({ id }) => id === nodeId);
+    if (child) {
+      void enterNode(child, [...trail, child]);
+      return;
+    }
     const node = activeRenderModel.nodes.find(
       ({ id }) => id === nodeId,
     )?.source;
-    if (node) void enterNode(node, [node], relationMode === "exact");
+    if (node && node.entityKind !== "institution")
+      void enterNode(node, [node], relationMode === "exact");
   }
 
   function selectRenderedEdge(edgeId: string) {
-    const relationshipId = activeRenderModel.edges.find(
-      ({ id }) => id === edgeId,
-    )?.relationshipIds[0];
-    if (relationshipId) void inspectRelationship(relationshipId);
+    const edge = activeRenderModel.edges.find(({ id }) => id === edgeId);
+    if (!edge) return;
+    if (!selected) {
+      const node = activeRenderModel.nodes.find(
+        ({ id }) => id === edge.source,
+      )?.source;
+      if (node && node.entityKind !== "institution")
+        void enterNode(node, [node], relationMode === "exact");
+    }
+    void inspectRelationship(edge.relationshipIds[0]);
   }
 
   function stepBack() {
@@ -358,43 +449,111 @@ export function EarthPage() {
   }
 
   return (
-    <main className="earth-shell">
+    <main className={`earth-shell${selected ? " has-selection" : ""}`}>
       <header className="earth-header">
         <Link className="earth-back" to="/law/dora/articles/1">
           <ArrowLeft aria-hidden="true" size={15} /> Reader
         </Link>
         <div className="earth-mark">
           <Globe2 aria-hidden="true" size={18} />
-          <span>Official EU Regulatory Earth</span>
+          <span>Earth</span>
         </div>
-        <span className="earth-status">Official sources · read only</span>
+        <div className="earth-view-switch" aria-label="Earth view">
+          <button
+            aria-pressed={viewMode === "graph"}
+            disabled={webGlUnavailable}
+            onClick={() => setViewMode("graph")}
+            type="button"
+          >
+            <Orbit aria-hidden="true" size={14} /> Universe
+          </button>
+          <button
+            aria-pressed={viewMode === "structured"}
+            onClick={() => setViewMode("structured")}
+            type="button"
+          >
+            <ListTree aria-hidden="true" size={14} /> Structured
+          </button>
+        </div>
       </header>
 
       <section className="earth-hero">
         <div>
-          <p className="earth-kicker">A bounded regulatory universe</p>
-          <h1>{overview?.universe.displayName ?? "Regulatory Earth"}</h1>
-          <p>
-            Start with laws. Enter one only when you need its official
-            structure. No generated links, hidden applicability claims, or
-            global reveal.
+          <p className="earth-kicker">
+            {overview?.universe.displayName ?? "Official EU regulatory Earth"}
           </p>
+          <h1>A European legal universe.</h1>
+          <p>Explore the laws. Follow their connections.</p>
         </div>
         <dl className="earth-metrics">
           <div>
-            <dt>Works</dt>
+            <dt>Laws</dt>
             <dd>{overview?.works.length ?? "—"}</dd>
           </div>
           <div>
-            <dt>Exact relations</dt>
+            <dt>Official relations</dt>
             <dd>{overview ? exactRelationCount : "—"}</dd>
           </div>
           <div>
-            <dt>Boundary works</dt>
+            <dt>Connected laws</dt>
             <dd>{overview?.boundary.nodeCount ?? "—"}</dd>
           </div>
         </dl>
       </section>
+
+      {overview ? (
+        <section className="earth-filters" aria-label="Universe filters">
+          <div>
+            <label>
+              <span>Sector</span>
+              <select
+                aria-label="Sector"
+                value={sectorFilter}
+                onChange={(event) => setSectorFilter(event.target.value)}
+              >
+                <option value="">All sectors</option>
+                {Object.entries(earthSectors).map(([id, label]) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Regs</span>
+              <select
+                aria-label="Regs"
+                value={familyFilter}
+                onChange={(event) => setFamilyFilter(event.target.value)}
+              >
+                <option value="">All families</option>
+                {Object.entries(earthFamilies).map(([id, family]) => (
+                  <option key={id} value={id}>
+                    {family.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {display.filtered ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSectorFilter("");
+                  setFamilyFilter("");
+                }}
+              >
+                Reset
+              </button>
+            ) : null}
+          </div>
+          <output>
+            {display.filtered
+              ? `${matchedLawCount} / ${activeRenderModel.nodes.length} loaded nodes highlighted · `
+              : ""}
+            Editorial tags · grey keeps context
+          </output>
+        </section>
+      ) : null}
 
       {error ? (
         <p className="earth-alert" role="alert">
@@ -404,64 +563,49 @@ export function EarthPage() {
 
       <section className="earth-workspace" aria-label="Earth explorer">
         <div className="earth-map">
-          <div className="earth-orbit" aria-hidden="true">
-            <span />
-          </div>
-          <div className="earth-map-heading">
-            <span>
-              {relationMode === "exact"
-                ? "Exact loaded neighbourhood"
-                : "Universe overview"}
-            </span>
-            <div className="earth-view-switch" aria-label="Earth view">
-              <button
-                aria-pressed={viewMode === "graph"}
-                onClick={() => setViewMode("graph")}
-                type="button"
-              >
-                <Orbit aria-hidden="true" size={13} /> Graph
-              </button>
-              <button
-                aria-pressed={viewMode === "structured"}
-                onClick={() => setViewMode("structured")}
-                type="button"
-              >
-                <ListTree aria-hidden="true" size={13} /> Structured
-              </button>
-            </div>
-          </div>
           {viewMode === "graph" && overview ? (
             <div
               className="earth-graph-stage"
               data-earth-node-count={activeRenderModel.nodes.length}
               data-earth-relation-mode={relationMode}
-              aria-label="Interactive law graph"
+              data-earth-matched-count={matchedLawCount}
+              data-earth-filtered={display.filtered}
+              aria-label="Interactive European legal nebula"
             >
               <EarthGraphView
                 model={activeRenderModel}
+                display={display}
+                branch={renderBranch}
                 onSelectEdge={selectRenderedEdge}
                 onSelectNode={selectRenderedNode}
                 selectedNodeId={selected?.id}
+                selectedEdgeId={
+                  activeRenderModel.edges.find(
+                    (edge) =>
+                      selectedRelationship &&
+                      edge.relationshipIds.includes(selectedRelationship.id),
+                  )?.id
+                }
+                onUnavailable={useStructuredFallback}
               />
-              <div className="earth-graph-legend" aria-hidden="true">
-                <span>
-                  <i /> Included
-                </span>
-                <span>
-                  <i /> Boundary
-                </span>
-              </div>
             </div>
           ) : viewMode === "structured" ? (
-            <>
+            <div className="earth-structured">
+              {webGlUnavailable ? (
+                <output className="earth-fallback-notice">
+                  3D is unavailable on this device. Explore the same laws and
+                  official relationships here.
+                </output>
+              ) : null}
               <div className="earth-law-grid" aria-label="Included laws">
                 {overview?.works.map((work, index) => (
                   <button
-                    className={
+                    className={`${
                       selected?.id === work.id
                         ? "earth-law active"
                         : "earth-law"
-                    }
+                    }${earthNodeDisplay(display, work).matched ? "" : " filtered-out"}`}
+                    data-earth-match={earthNodeDisplay(display, work).matched}
                     key={work.id}
                     onClick={() => void enterNode(work, [work])}
                     style={{ "--earth-index": index } as CSSProperties}
@@ -482,6 +626,12 @@ export function EarthPage() {
                   <span>Connected outside this Universe</span>
                   {overview.boundary.nodes.map((work) => (
                     <button
+                      className={
+                        earthNodeDisplay(display, work).matched
+                          ? ""
+                          : "filtered-out"
+                      }
+                      data-earth-match={earthNodeDisplay(display, work).matched}
                       key={work.id}
                       onClick={() => void enterNode(work, [work])}
                       type="button"
@@ -491,78 +641,109 @@ export function EarthPage() {
                   ))}
                 </div>
               ) : null}
-            </>
+            </div>
           ) : null}
           {overview ? (
-            <form
-              className="earth-boundary-controls"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void loadBoundaryPage(0, boundaryDraft.trim());
-              }}
+            <details
+              className="earth-boundary-disclosure"
+              open={boundaryOpen}
+              onToggle={(event) => setBoundaryOpen(event.currentTarget.open)}
             >
-              <label>
-                <span>Find boundary Work</span>
-                <input
-                  aria-label="Find boundary Work by CELEX or official title"
-                  maxLength={80}
-                  onChange={(event) => setBoundaryDraft(event.target.value)}
-                  placeholder="Filter boundary Works"
-                  type="search"
-                  value={boundaryDraft}
-                />
-              </label>
-              <button disabled={loadingBoundary} type="submit">
-                {loadingBoundary ? "Loading…" : "Find"}
-              </button>
-              <small>
-                {overview.boundary.returnedCount
-                  ? `${overview.boundary.offset + 1}–${overview.boundary.offset + overview.boundary.returnedCount}`
-                  : "0"}{" "}
-                of {overview.boundary.matchCount}
-                {boundaryQuery
-                  ? ` matches (${overview.boundary.nodeCount} total)`
-                  : ""}
-              </small>
-              <div>
-                <button
-                  disabled={loadingBoundary || overview.boundary.offset === 0}
-                  onClick={() =>
-                    void loadBoundaryPage(
-                      Math.max(
-                        0,
-                        overview.boundary.offset - overview.boundary.limit,
-                      ),
-                      boundaryQuery,
-                    )
-                  }
-                  type="button"
-                >
-                  Previous
+              <summary>
+                Connected laws <span>{overview.boundary.nodeCount}</span>
+              </summary>
+              <form
+                className="earth-boundary-controls"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void loadBoundaryPage(0, boundaryDraft.trim());
+                }}
+              >
+                <label>
+                  <span>Find boundary Work</span>
+                  <input
+                    aria-label="Find boundary Work by CELEX or official title"
+                    maxLength={80}
+                    onChange={(event) => setBoundaryDraft(event.target.value)}
+                    placeholder="Filter boundary Works"
+                    type="search"
+                    value={boundaryDraft}
+                  />
+                </label>
+                <button disabled={loadingBoundary} type="submit">
+                  {loadingBoundary ? "Loading…" : "Find"}
                 </button>
-                <button
-                  disabled={loadingBoundary || !overview.boundary.hasMore}
-                  onClick={() =>
-                    void loadBoundaryPage(
-                      overview.boundary.offset + overview.boundary.limit,
-                      boundaryQuery,
-                    )
-                  }
-                  type="button"
-                >
-                  Next
-                </button>
-              </div>
-            </form>
+                <small>
+                  {overview.boundary.returnedCount
+                    ? `${overview.boundary.offset + 1}–${overview.boundary.offset + overview.boundary.returnedCount}`
+                    : "0"}{" "}
+                  of {overview.boundary.matchCount}
+                  {boundaryQuery
+                    ? ` matches (${overview.boundary.nodeCount} total)`
+                    : ""}
+                </small>
+                <div>
+                  <button
+                    disabled={loadingBoundary || overview.boundary.offset === 0}
+                    onClick={() =>
+                      void loadBoundaryPage(
+                        Math.max(
+                          0,
+                          overview.boundary.offset - overview.boundary.limit,
+                        ),
+                        boundaryQuery,
+                      )
+                    }
+                    type="button"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    disabled={loadingBoundary || !overview.boundary.hasMore}
+                    onClick={() =>
+                      void loadBoundaryPage(
+                        overview.boundary.offset + overview.boundary.limit,
+                        boundaryQuery,
+                      )
+                    }
+                    type="button"
+                  >
+                    Next
+                  </button>
+                </div>
+              </form>
+              <p>
+                Official one-hop connections outside{" "}
+                {overview.universe.displayName}. These laws cannot expand.
+              </p>
+            </details>
           ) : null}
           {!overview && !error ? (
             <p className="earth-loading">Opening verified Earth artifact…</p>
           ) : null}
         </div>
 
-        <aside className="earth-inspector" aria-live="polite">
-          {selected ? (
+        {selected ? (
+          <aside
+            className="earth-inspector"
+            aria-live="polite"
+            aria-label="Selected law details"
+          >
             <>
+              <button
+                className="earth-close"
+                type="button"
+                aria-label="Close law details"
+                onClick={() => {
+                  childRequest.current += 1;
+                  setSelected(null);
+                  setTrail([]);
+                  setChildren([]);
+                  showAggregateOverview();
+                }}
+              >
+                <X size={17} />
+              </button>
               <button
                 className="earth-level-back"
                 onClick={stepBack}
@@ -599,13 +780,15 @@ export function EarthPage() {
                     <ExternalLink aria-hidden="true" size={13} />
                   </a>
                 </div>
-              ) : "sourceLocator" in selected ? (
+              ) : selected.entityKind !== "article" &&
+                "sourceLocator" in selected ? (
                 <div className="earth-identity">
                   <span>{selected.sourceLocator}</span>
                 </div>
               ) : null}
 
-              {selected.membership === "included" ? (
+              {selected.membership === "included" &&
+              selected.entityKind !== "article" ? (
                 <div className="earth-relation-mode">
                   {relationMode === "exact" && exactModel ? (
                     <>
@@ -632,15 +815,18 @@ export function EarthPage() {
               ) : null}
 
               {connectedEdges.length ? (
-                <div className="earth-relations">
-                  <div className="earth-children-heading">
+                <details
+                  className="earth-relations"
+                  open={relationMode === "exact"}
+                >
+                  <summary className="earth-children-heading">
                     <span>
-                      <Network aria-hidden="true" size={15} /> Official
+                      <Network aria-hidden="true" size={15} />
                       {relationMode === "exact" ? "Exact" : "Loaded official"}
                       {" relations"}
                     </span>
                     <small>{connectedEdges.length}</small>
-                  </div>
+                  </summary>
                   {connectedEdges.map((edge) => {
                     const otherNodeId =
                       edge.source === selected.id ? edge.target : edge.source;
@@ -672,7 +858,7 @@ export function EarthPage() {
                       </button>
                     );
                   })}
-                </div>
+                </details>
               ) : null}
 
               {selectedRelationship?.projection === "exact" ? (
@@ -693,6 +879,10 @@ export function EarthPage() {
                       <dd>{selectedRelationship.evidence.text}</dd>
                     </div>
                   </dl>
+                  <details className="earth-reading-location">
+                    <summary>Evidence locator</summary>
+                    <code>{selectedRelationship.evidence.locator}</code>
+                  </details>
                   <a
                     href={selectedRelationship.evidence.sourceUrl}
                     rel="noreferrer"
@@ -704,7 +894,15 @@ export function EarthPage() {
                 </section>
               ) : null}
 
-              {selected.membership === "included" ? (
+              {selected.entityKind === "article" ? (
+                <EarthArticleReading
+                  key={selected.id}
+                  articleId={selected.id}
+                />
+              ) : null}
+
+              {selected.membership === "included" &&
+              selected.entityKind !== "article" ? (
                 <>
                   <div className="earth-children-heading">
                     <span>
@@ -735,24 +933,31 @@ export function EarthPage() {
                 </>
               ) : null}
             </>
-          ) : (
-            <div className="earth-empty-selection">
-              <Network aria-hidden="true" size={28} />
-              <h2>Select a law</h2>
-              <p>
-                Its hierarchy is requested one level at a time and remains tied
-                to the verified official Expression.
-              </p>
-            </div>
-          )}
-        </aside>
+          </aside>
+        ) : null}
       </section>
 
       {overview ? (
-        <footer className="earth-build-note">
-          <span>Artifact {overview.build.buildId.slice(0, 24)}…</span>
+        <footer className="earth-footnote">
+          <div className="earth-graph-legend">
+            <span>
+              <i /> Family colors
+            </span>
+            <span>
+              <i /> Untagged connections
+            </span>
+            {display.filtered ? <span>Grey · outside filter</span> : null}
+            {selected?.membership === "included" ? (
+              <span className="earth-structure-key">··· Legal structure</span>
+            ) : null}
+          </div>
           <span>
-            {`${overview.build.sourceSnapshotIds.length} verified source snapshot${overview.build.sourceSnapshotIds.length === 1 ? "" : "s"}`}
+            {viewMode === "graph"
+              ? "Drag to rotate · Scroll to zoom · Select a law"
+              : "Select a law to explore its structure and relationships"}
+          </span>
+          <span className="earth-coordinate-note">
+            Official sources · Positions are illustrative
           </span>
         </footer>
       ) : null}
