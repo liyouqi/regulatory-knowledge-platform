@@ -357,6 +357,159 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2024/1619/oj/eng"
   },
   {
+    "familyId": "family:brrd",
+    "shortName": "BRRD",
+    "aliases": [
+      "Bank Recovery and Resolution Directive",
+      "Directive 2014/59/EU",
+      "BRRD I"
+    ],
+    "celex": "32014L0059",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "quality": {
+      "articleCount": 132,
+      "recitalCount": 133,
+      "annexCount": 1,
+      "paragraphCount": 652,
+      "pointCount": 955,
+      "structuralNodeCount": 35,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014L0059:recital:1": "sha256:a10cb26464ad57f4607819b287a6c257b2d627aa8a1d4e75a83d62e318ee9e09",
+        "eu:32014L0059:article:1:paragraph:1": "sha256:c8dc461bc65570bf841750076490c5060caa205e54801164d2532b1942cea9b3",
+        "eu:32014L0059:article:132:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32014L0059:annex:1": "sha256:c02429873b6f41a2496834103bbf122ce7a3a9a513cbfe9113b539b02b364b58"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-06-12",
+      "checkedAt": "2026-09-28T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/59",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/59/oj/eng"
+  },
+  {
+    "familyId": "family:srmr",
+    "shortName": "SRMR",
+    "aliases": [
+      "Single Resolution Mechanism Regulation",
+      "Regulation (EU) No 806/2014",
+      "SRM Regulation"
+    ],
+    "celex": "32014R0806",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-07-30",
+    "quality": {
+      "articleCount": 99,
+      "recitalCount": 124,
+      "annexCount": 0,
+      "paragraphCount": 455,
+      "pointCount": 431,
+      "structuralNodeCount": 22,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0806:recital:1": "sha256:b7f907df05e538302c7901188f7af62a7ea978e7245d51612ba2baaf363da3a0",
+        "eu:32014R0806:article:1:subparagraph:1": "sha256:5bf87cd75cebd93c5ed9e79817eab300adb4b81f948fc638ef71935be36ec908",
+        "eu:32014R0806:article:99:paragraph:6": "sha256:eb4e1554ec8cb76369a0baa45742fe7976b74c0b90309becc5ad7de19b104eea"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-07-30",
+      "checkedAt": "2026-09-28T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/806",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/806/oj/eng"
+  },
+  {
+    "familyId": "family:dgsd",
+    "shortName": "DGSD",
+    "aliases": [
+      "Deposit Guarantee Schemes Directive",
+      "Directive 2014/49/EU",
+      "DGS Directive"
+    ],
+    "celex": "32014L0049",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "quality": {
+      "articleCount": 23,
+      "recitalCount": 56,
+      "annexCount": 3,
+      "paragraphCount": 115,
+      "pointCount": 87,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014L0049:recital:1": "sha256:40abc7ca7a28b7601b59ac6e20f67a3ec1f6ba6dd23a0b6677828d031ccade12",
+        "eu:32014L0049:article:1:paragraph:1": "sha256:126e4338abf1974474757ed3b5b0ecc53a8967767e160c16860be6290b188dc1",
+        "eu:32014L0049:article:23:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32014L0049:annex:i": "sha256:cf4c721ccd1a7754d7909e5d51edf61c25322b863e10887b2991668dffe31f56",
+        "eu:32014L0049:annex:iii": "sha256:fc2a6cb7a392ccc8db67e28d299742eb0f8603a7ede6dc2ea426abaf8aa195ef"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-06-12",
+      "checkedAt": "2026-09-28T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/49",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/49/oj/eng"
+  },
+  {
+    "familyId": "family:psd",
+    "shortName": "PSD2",
+    "aliases": [
+      "Payment Services Directive 2",
+      "Second Payment Services Directive",
+      "Directive (EU) 2015/2366"
+    ],
+    "celex": "32015L2366",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2015-12-23",
+    "quality": {
+      "articleCount": 117,
+      "recitalCount": 113,
+      "annexCount": 2,
+      "paragraphCount": 355,
+      "pointCount": 346,
+      "structuralNodeCount": 27,
+      "maximumWarnings": 1,
+      "textHashes": {
+        "eu:32015L2366:recital:1": "sha256:f1532e3be461a60ad1b42cb9106fb2a9407541f6e449f099d32ed341dd808fc5",
+        "eu:32015L2366:article:1:paragraph:1": "sha256:157f07328528c53c053bfcd8d9b121f638343847712ca66b7b73d92310ae962e",
+        "eu:32015L2366:article:117:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32015L2366:annex:i": "sha256:a1cc0adbac314c021b2dbe8970c654fc99a526eaebc33423100250ed6f477df3",
+        "eu:32015L2366:annex:ii": "sha256:3b78f8c9f645068fef91e378935510506d9f7464ad8d85cc48f1f147233e85c2"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2015-12-23",
+      "checkedAt": "2026-09-28T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2015/2366",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/2366/oj/eng"
+  },
+  {
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Risk Management",
     "aliases": [

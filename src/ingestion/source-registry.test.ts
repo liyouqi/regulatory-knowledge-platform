@@ -5,8 +5,8 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(27);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(27);
+    expect(sources).toHaveLength(31);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(31);
     expect(sources.slice(0, 10).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
@@ -18,6 +18,12 @@ describe("EU source registry", () => {
       "CRR",
       "CRR III",
       "CRD VI",
+    ]);
+    expect(sources.slice(10, 14).map((source) => source.shortName)).toEqual([
+      "BRRD",
+      "SRMR",
+      "DGSD",
+      "PSD2",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
     expect(

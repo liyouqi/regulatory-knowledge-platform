@@ -13,7 +13,7 @@
     },
     {
       "id": "banking-default",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "displayName": "Banking Default",
       "description": "Cross-sector and banking-relevant baseline corpus; MiCA is excluded by default and can be included in a future activity-specific profile.",
       "selection": {
@@ -25,6 +25,10 @@
           "family:aml",
           "family:crd",
           "family:crr",
+          "family:brrd",
+          "family:srmr",
+          "family:dgsd",
+          "family:psd",
           "family:nis2",
           "family:data-act",
           "family:cssf"

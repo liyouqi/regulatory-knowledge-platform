@@ -327,6 +327,12 @@ describe("SQLite runtime repository", () => {
     const crdSixChain = repository?.findDocumentVersionChain("eu:32024L1619");
     const amldChain = repository?.findDocumentVersionChain("eu:32015L0849");
     const highRiskChain = repository?.findDocumentVersionChain("eu:32016R1675");
+    const addedBankingChains = [
+      "eu:32014L0049",
+      "eu:32014L0059",
+      "eu:32014R0806",
+      "eu:32015L2366",
+    ].map((documentId) => repository?.findDocumentVersionChain(documentId));
 
     expect(chain).toMatchObject({
       documentId: "eu:32024R2956",
@@ -428,6 +434,12 @@ describe("SQLite runtime repository", () => {
       coverage: "source-status-only",
       loadedVersionId: "version:eu:32016R1675:original-oj:2016-09-20",
     });
+    expect(
+      addedBankingChains.every(
+        (bankingChain) =>
+          bankingChain?.nodes.length === 2 && bankingChain.edges.length === 1,
+      ),
+    ).toBe(true);
     expect(repository?.findDocumentVersionChain(dora.id)).toBeNull();
     expect(repository?.findDocumentVersionChain("eu:unknown")).toBeNull();
     expect(repository?.versionNodeCount).toBe(
@@ -437,7 +449,11 @@ describe("SQLite runtime repository", () => {
         (crrThreeChain?.nodes.length ?? 0) +
         (crdSixChain?.nodes.length ?? 0) +
         (amldChain?.nodes.length ?? 0) +
-        (highRiskChain?.nodes.length ?? 0),
+        (highRiskChain?.nodes.length ?? 0) +
+        addedBankingChains.reduce(
+          (sum, bankingChain) => sum + (bankingChain?.nodes.length ?? 0),
+          0,
+        ),
     );
     expect(repository?.versionEdgeCount).toBe(
       (chain?.edges.length ?? 0) +
@@ -446,7 +462,11 @@ describe("SQLite runtime repository", () => {
         (crrThreeChain?.edges.length ?? 0) +
         (crdSixChain?.edges.length ?? 0) +
         (amldChain?.edges.length ?? 0) +
-        (highRiskChain?.edges.length ?? 0),
+        (highRiskChain?.edges.length ?? 0) +
+        addedBankingChains.reduce(
+          (sum, bankingChain) => sum + (bankingChain?.edges.length ?? 0),
+          0,
+        ),
     );
   });
 

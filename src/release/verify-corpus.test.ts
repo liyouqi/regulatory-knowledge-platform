@@ -4,10 +4,10 @@ import { verifyCorpus } from "./verify-corpus";
 describe("release corpus verification", () => {
   it("verifies EUR-Lex, CSSF, and EBA registries through Runtime", async () => {
     await expect(verifyCorpus()).resolves.toMatchObject({
-      sourceRegistryDocuments: 31,
-      verifiedRawSnapshots: 31,
-      canonicalDocuments: 31,
-      runtimeDocuments: 31,
+      sourceRegistryDocuments: 35,
+      verifiedRawSnapshots: 35,
+      canonicalDocuments: 35,
+      runtimeDocuments: 35,
       runtimeProfileId: "full-corpus",
     });
   });
