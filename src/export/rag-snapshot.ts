@@ -150,13 +150,17 @@ function orderedContentBlocks(
   block: BodyBlock,
 ): RagProvision["ordered_content_blocks"] {
   const content: RagProvision["ordered_content_blocks"] = [];
-  block.orderedContent.forEach((item, order) => {
+  for (const item of block.orderedContent) {
     if (item.type === "text") {
-      content.push({ order, type: "text", text: item.text });
+      content.push({ order: content.length, type: "text", text: item.text });
     } else if (item.type === "child") {
-      content.push({ order, type: "child", provision_id: item.childId });
+      content.push({
+        order: content.length,
+        type: "child",
+        provision_id: item.childId,
+      });
     }
-  });
+  }
   return content;
 }
 

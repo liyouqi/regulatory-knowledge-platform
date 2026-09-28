@@ -58,6 +58,7 @@
     "earth:render:benchmark": "playwright test e2e/earth-scale.spec.ts --project=chromium",
     "canonical:build": "node --import tsx src/ingestion/canonical-cli.ts",
     "canonical:inspect": "node --import tsx src/ingestion/canonical-cli.ts --inspect",
+    "corpus:update": "node --import tsx src/corpus/corpus-refresh-cli.ts",
     "corpus:build": "node --import tsx src/corpus/corpus-build-cli.ts",
     "corpus:refresh": "node --import tsx src/corpus/corpus-refresh-cli.ts",
     "runtime:build": "node --import tsx src/search/build-search-index.ts",

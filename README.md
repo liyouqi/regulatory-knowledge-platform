@@ -45,12 +45,11 @@ The project has two deliberately different data layers:
 - Official legal source files and generated Canonical/Runtime artifacts are reproducible, potentially large, and excluded from Git under `data/raw/` and `data/artifacts/`.
 - Small reviewed relationships, topics, applicability rules, authority metadata, registries, and Edition Profiles are maintained in Git under `data/official-mappings/`, `data/official-metadata/`, `data/editorial/`, and the registry JSON files.
 
-On a new computer, clone/pull the code and run one current-source refresh. It downloads every public source declared by the EUR-Lex, CSSF, and EBA registries, builds Canonical documents, validates the Git-managed reviewed data against them, and builds Runtime SQLite:
+On a new computer, clone/pull the code and run the single current-corpus maintenance command. It downloads every selected public source declared by the EUR-Lex, CSSF, and EBA registries, audits consolidated-expression candidates from the verified official CELLAR tree notices, builds Canonical documents, validates the Git-managed reviewed data against them, and builds and verifies Runtime SQLite:
 
 ```bash
 npm ci
-npm run corpus:refresh
-npm run runtime:verify
+npm run corpus:update
 npm run check
 npm test
 npm run build
@@ -59,11 +58,11 @@ npm run dev
 
 Open `http://localhost:5173` after the development server starts.
 
-`corpus:refresh` is the normal experimental workflow. A changed official document is parsed as the current version; count/hash differences from its reviewed baseline are written to `data/artifacts/refresh/build-report.json` instead of blocking the whole refresh. If a Git-managed relationship points to an endpoint that disappeared, that reviewed record is omitted from this experimental Runtime and listed in the same report. It is never silently redirected to another Article or provision.
+`corpus:update` is the normal experimental workflow and the only maintenance entry point users need. It reports a newer effective consolidated expression as `review-required` but does not change the selected expression, registry, exact-snapshot manifest, release-pinned Runtime, or RAG export automatically. A changed selected source is parsed; count/hash differences from its reviewed baseline are written to `data/artifacts/refresh/build-report.json` instead of blocking the whole update. If a Git-managed relationship points to an endpoint that disappeared, that reviewed record is omitted from this experimental Runtime and listed in the same report. It is never silently redirected to another Article or provision. The older `corpus:refresh` command remains a compatibility alias for existing local scripts.
 
-If `data/raw/` already contains snapshots, use `npm run corpus:refresh -- --skip-fetch` to rebuild from the newest local snapshot for every registered source. Copying raw files from another computer is optional and only necessary when reproducing exact historical bytes. Use `npm ci` for a clean/new machine; use `npm install` only when `package.json` intentionally changed.
+If `data/raw/` already contains snapshots, use `npm run corpus:update -- --skip-fetch` to rebuild from the newest local snapshot for every registered source without network acquisition. Its version audit reuses the selected snapshots' verified CELLAR tree notices and reports that it is not a fresh official check. Copying raw files from another computer is optional and only necessary when reproducing exact historical bytes. Use `npm ci` for a clean/new machine; use `npm install` only when `package.json` intentionally changed.
 
-After a refresh reports source drift, review the official change and update any affected Git-managed relationship and quality baseline in a normal commit. For a release or exact reproduction of a reviewed corpus, use the manifest-pinned strict workflow:
+After an update reports source drift, review the official change and update any affected Git-managed relationship and quality baseline in a normal commit. For a release or exact reproduction of a reviewed corpus, use the manifest-pinned strict workflow:
 
 ```bash
 npm run corpus:build -- --profile full-corpus
@@ -124,8 +123,8 @@ npm run build
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
-| `npm run corpus:refresh` | Download all current registered official sources, rebuild Canonical and experimental Runtime artifacts, and report baseline/relationship drift. |
-| `npm run corpus:refresh -- --skip-fetch` | Rebuild the same current-source pipeline from the newest local snapshots without downloading again. |
+| `npm run corpus:update` | Audit consolidated-version candidates, refresh selected official sources, rebuild Canonical and experimental Runtime artifacts, verify Runtime, and write one report. |
+| `npm run corpus:update -- --skip-fetch` | Rebuild and verify the same pipeline from local snapshots; the report marks its tree-notice version audit as not freshly fetched. |
 | `npm run corpus:build -- --profile <profileId>` | Rebuild the exact manifest-pinned raw snapshots through existing Canonical builders into an isolated, verified Runtime artifact and machine-readable report. |
 | `npm run corpus:build -- --profile <profileId> --require-archived` | Apply the production snapshot-retention gate; currently fails until every pinned snapshot has a reviewed remote archive URI. |
 | `npm run runtime:build` | Atomically rebuild the default `full-corpus` read-only runtime SQLite from validated Canonical artifacts. |

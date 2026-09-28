@@ -5,6 +5,7 @@ import {
   corpusBuildManifestSchema,
   loadCorpusBuildManifest,
   resolveCorpusBuildSources,
+  selectManifestSnapshotPath,
   validateCorpusBuildManifestSources,
 } from "./corpus-build";
 
@@ -110,6 +111,16 @@ describe("corpus build manifest", () => {
         `sha256:${"0".repeat(64)}`,
       ),
     ).toThrow("Snapshot checksum differs from corpus manifest");
+  });
+
+  it("selects the earliest retrieval when identical content snapshots recur", () => {
+    const source = loadCorpusBuildManifest().sources[0];
+    expect(
+      selectManifestSnapshotPath(source, [
+        "/raw/2026-09-28-same-content",
+        "/raw/2026-08-31-reviewed",
+      ]),
+    ).toBe("/raw/2026-08-31-reviewed");
   });
 
   it("rejects duplicate source identities and unsafe reviewed-input paths", () => {

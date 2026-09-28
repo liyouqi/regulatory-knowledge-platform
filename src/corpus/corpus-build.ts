@@ -207,6 +207,19 @@ function snapshotDirectories(root: string): string[] {
   });
 }
 
+export function selectManifestSnapshotPath(
+  source: CorpusBuildSource,
+  matches: string[],
+): string {
+  const selected = [...matches].sort()[0];
+  if (!selected) {
+    throw new Error(
+      `Expected a local snapshot for ${source.adapter}:${source.identifier} (${source.snapshotId}), found 0`,
+    );
+  }
+  return selected;
+}
+
 function findSnapshotPath(source: CorpusBuildSource): string {
   const root = resolve(
     process.cwd(),
@@ -223,12 +236,7 @@ function findSnapshotPath(source: CorpusBuildSource): string {
     ) as { snapshotId?: string };
     return value.snapshotId === source.snapshotId;
   });
-  if (matches.length !== 1) {
-    throw new Error(
-      `Expected one local snapshot for ${source.adapter}:${source.identifier} (${source.snapshotId}), found ${matches.length}`,
-    );
-  }
-  return matches[0];
+  return selectManifestSnapshotPath(source, matches);
 }
 
 function assertExactCoverage(

@@ -18,6 +18,8 @@ reviewed source and metadata
 
 The exporter opens the existing Runtime SQLite in read-only/query-only mode. It does not invoke source acquisition, inspect websites, parse raw files, or silently refresh legal data.
 
+`npm run corpus:update` does not change this boundary. It may report newer consolidated-expression candidates, but only the reviewed expression compiled into the selected Runtime can appear in an export. Candidate audit data, raw snapshots, quality drift, and update reports are not part of Snapshot contract 1.1.0.
+
 ## Export
 
 Build and verify the desired Profile first. The exporter does not dynamically change Profile scope:
@@ -83,6 +85,8 @@ Lifecycle, applicability dates, and legal effect remain `null` when the current 
 Root Article records normally have `text_scope=subtree`. Paragraphs containing points also have subtree text; their point records remain independently addressable. A RAG importer should deliberately choose its chunk granularity instead of indexing every `text` field blindly.
 
 The ordered-content contract is required for structures where a paragraph contains introductory text, a nested list, and a trailing subparagraph. The release verifier includes a reviewed semantic case for AMLD IV Article 13(1): its intro, points (a)–(d), and trailing text must remain in that order.
+
+Formula image resources remain outside Snapshot contract 1.1.0. When a Reader block interleaves text/children with a formula resource, the exporter omits the non-text resource and renumbers the remaining `ordered_content_blocks` contiguously without changing their relative order or `direct_text`. This keeps the existing contract valid for consolidated CRR provisions without pretending that an omitted formula is text.
 
 `relationships.jsonl` preserves relationship direction, Platform type, RAG-friendly normalized type, stable endpoints, exact evidence, official source, provenance, builder identity, resolution status, and per-record review status. It includes:
 

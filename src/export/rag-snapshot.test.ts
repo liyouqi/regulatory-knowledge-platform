@@ -105,6 +105,59 @@ describe("RAG snapshot export", () => {
     ).toThrow("will not be overwritten");
   });
 
+  it("keeps exported text order contiguous when Reader content includes a formula resource", () => {
+    const document = structuredClone(loadDoraDocumentView());
+    const block = document.provisions[0]?.blocks[0];
+    if (!block) throw new Error("DORA test block is unavailable");
+    block.text = "Before formula. After formula.";
+    block.orderedContent = [
+      { type: "text", text: "Before formula." },
+      {
+        type: "resource",
+        resource: {
+          id: "eu:32022R2554:resource:test-formula",
+          kind: "formula",
+          mediaType: "image/png",
+          dataUrl: "data:image/png;base64,AQID",
+          sourceFileName: "test-formula.tif",
+          sourceSha256: `sha256:${"a".repeat(64)}`,
+          renditionSha256: `sha256:${"b".repeat(64)}`,
+        },
+      },
+      { type: "text", text: "After formula." },
+    ];
+    const resourceDatabasePath = join(
+      testDirectory,
+      "resource-regulatory.sqlite",
+    );
+    const resourceSnapshotPath = join(testDirectory, "resource-snapshot");
+    buildRuntimeDatabase([document], [], resourceDatabasePath);
+
+    exportRagSnapshot({
+      databasePath: resourceDatabasePath,
+      outputPath: resourceSnapshotPath,
+      snapshotId: "dora-resource-test",
+      asOfDate: "2026-08-31",
+      createdAt: "2026-08-31T12:00:00.000Z",
+    });
+
+    const provision = readFileSync(
+      join(resourceSnapshotPath, "provisions.jsonl"),
+      "utf8",
+    )
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line) as Record<string, unknown>)
+      .find((record) => record.provision_id === block.id);
+    expect(provision).toMatchObject({
+      direct_text: "Before formula.\nAfter formula.",
+      ordered_content_blocks: [
+        { order: 0, type: "text", text: "Before formula." },
+        { order: 1, type: "text", text: "After formula." },
+      ],
+    });
+  });
+
   it("detects handoff file tampering", () => {
     const tamperedPath = join(testDirectory, "tampered");
     exportRagSnapshot({

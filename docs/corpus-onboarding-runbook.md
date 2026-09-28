@@ -18,7 +18,7 @@ Official text is never invented, corrected, or silently replaced. Parser output,
 
 ## What is implemented now
 
-The repository currently provides separate commands for:
+The repository keeps source-specific commands as diagnostic tools, while normal maintenance has one entry point. Internally it provides:
 
 - EUR-Lex/CELLAR source list, fetch, and verification;
 - CSSF source list, fetch, and verification;
@@ -30,26 +30,30 @@ The repository currently provides separate commands for:
 - exact-snapshot corpus manifest, end-to-end local orchestration, isolated Runtime artifact, and machine-readable build report;
 - parser, relationship, search, performance, and release gates.
 
-The implemented command is `npm run corpus:build -- --profile <profileId>`. The explicit acquisition and inspection steps below still apply when adding or refreshing a source; the orchestrator never fetches mutable current content in place of a missing pinned snapshot and never replaces legal review.
+The normal maintenance command is `npm run corpus:update`; `corpus:refresh` remains a compatibility alias. The reproducible release command is `npm run corpus:build -- --profile <profileId>`. The explicit acquisition and inspection steps below remain diagnostic/review tools when a source changes; neither orchestrator replaces legal review.
 
 ## Refresh the current experimental corpus
 
 Daily development and first setup use a separate current-source workflow:
 
 ```bash
-npm run corpus:refresh
+npm run corpus:update
 ```
 
-This command downloads the current official bytes for every registered EUR-Lex, CSSF, and EBA source, selects the newest verified local snapshot, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, and atomically rebuilds the default Runtime SQLite. Use `--skip-fetch` to repeat the pipeline from the newest local snapshots.
+This command downloads the currently selected official bytes for every registered EUR-Lex, CSSF, and EBA source, audits all registered EUR-Lex acts from the verified CELLAR tree notices already stored in those snapshots, selects the newest verified local snapshot, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, atomically rebuilds the default Runtime SQLite, and verifies that artifact through the read-only Reader/Search services. Use `--skip-fetch` for a fully local rebuild; that mode performs the same audit from local tree notices and marks it as not freshly fetched.
+
+The audit is advisory. A newer effective expression is written as `review-required` in the single build report; it never edits `source-registry.json`, `document-expressions.json`, the exact-snapshot manifest, release-pinned Runtime selection, or a RAG export. Future expressions are counted but never selected. This preserves the small human gate without requiring a different discovery command.
+
+Repeated retrieval of unchanged official content may produce several immutable retrieval directories with the same content-based `snapshotId`. The strict manifest build selects the lexicographically earliest matching retrieval, preserving the originally reviewed instance; later retrievals remain available as audit history and do not make the pin ambiguous or move the release forward.
 
 The data ownership boundary is intentional:
 
 - large official snapshots and derived Canonical/Runtime artifacts stay ignored because they can be downloaded and rebuilt;
 - small reviewed mappings, topics, applicability rules, metadata, registries, and Profiles stay in Git because they contain human-reviewed semantics that downloading a PDF cannot reproduce.
 
-Current-source refresh does not pretend that a new official version has already been reviewed. Parser count/hash differences are recorded as `qualityDrift` in `data/artifacts/refresh/build-report.json`. A reviewed record whose Document/provision/evidence endpoint no longer validates is omitted from that experimental Runtime and recorded under `reviewedInputIssues`; it is never retargeted automatically. Review the source change, update the affected Git dataset and quality baseline, run its targeted fixtures/evals, and commit those small changes.
+Current-source update does not pretend that a new official version has already been reviewed. Parser count/hash differences are recorded as `qualityDrift` in `data/artifacts/refresh/build-report.json`. A reviewed record whose Document/provision/evidence endpoint no longer validates is omitted from that experimental Runtime and recorded under `reviewedInputIssues`; it is never retargeted automatically. Review the source change, update the affected Git dataset and quality baseline, run its targeted fixtures/evals, and commit those small changes.
 
-This tolerant behavior applies only to experimental refresh, local development, and ordinary test setup. `npm run corpus:build`, `npm run runtime:build` without `--review-mode report`, and release verification remain strict, pinned review gates.
+This tolerant behavior applies only to experimental update, local development, and ordinary test setup. `npm run corpus:build`, `npm run runtime:build` without `--review-mode report`, and release verification remain strict, pinned review gates.
 
 ## Decide whether an adapter already exists
 
