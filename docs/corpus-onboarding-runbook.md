@@ -69,6 +69,8 @@ A source-specific adapter may preserve source semantics. It must still emit the 
 
 Add the reviewed CELEX, English ELI URL, aliases, `familyId`, `regulatoryLevel`, `measureType`, and bounded source-status metadata to `data/source-registry.json`.
 
+The base `celex` remains the stable Legal Work identifier. By default, acquisition reads that act's original-OJ expression. To publish a reviewed consolidated expression, also pin its dated `expressionCelex` (for example `02013R0575-20260626`), set `sourceStatus.basis` to `consolidated`, and make `textAsOf` match the expression date. Never select a future consolidated expression merely because CELLAR has already published it; the pinned expression must be effective on the review date. A consolidated expression does not replace or delete earlier immutable raw snapshots.
+
 ```bash
 npm run source:list
 npm test
@@ -84,6 +86,8 @@ npm run source:verify -- --snapshot data/raw/eur-lex/<CELEX>/<snapshot-directory
 ```
 
 Keep the printed snapshot identifier and SHA-256 values. `data/raw/` is ignored by Git and must not be edited.
+
+Consolidated expressions use the `CONS.ACT` Formex root and can contain inline `CONS.ANNEX` elements. The shared parser preserves the base-law stable IDs while binding Canonical output to the exact dated expression.
 
 Cellar may expose an older act as one multi-item FMX4 manifestation instead of one downloadable ZIP. The acquisition layer must preserve all byte-exact official ACT/ANNEX/DOC XML items and their individual response metadata/hashes in snapshot schema `1.1.0`; it may assemble only a deterministic transport ZIP at the raw boundary. Do not choose the first XML item by response order, because legacy manifests can list an Annex before the ACT. `source:verify` checks both the assembled package hash and every recorded upstream item before Canonical parsing.
 

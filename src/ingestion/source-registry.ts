@@ -10,6 +10,7 @@ export const sourceDefinitionSchema = z.object({
   shortName: z.string().min(1),
   aliases: z.array(z.string().min(1)).min(1),
   celex: z.string().transform(normalizeCelex),
+  expressionCelex: z.string().transform(normalizeCelex).optional(),
   language: z.literal("ENG"),
   documentType: z.enum(["regulation", "directive"]),
   regulatoryLevel: z.enum(["level-1", "level-2", "level-3"]),
@@ -53,6 +54,14 @@ function parseSourceRegistry(raw: unknown): SourceDefinition[] {
       throw new Error(`Duplicate CELEX in source registry: ${source.celex}`);
     }
     seenCelex.add(source.celex);
+    if (
+      source.expressionCelex &&
+      !source.expressionCelex.startsWith(`0${source.celex.slice(1)}-`)
+    ) {
+      throw new Error(
+        `Consolidated expression ${source.expressionCelex} does not belong to ${source.celex}`,
+      );
+    }
     for (const alias of [source.shortName, ...source.aliases]) {
       const normalizedAlias = alias.normalize("NFKC").trim().toLowerCase();
       const owner = aliasOwners.get(normalizedAlias);

@@ -1301,6 +1301,8 @@ Phase 3 首个 CRD source 暴露了 legacy Cellar multi-item manifestation：同
 
 CRR III 将 Canonical Contract 提升到 `1.2.0`、通用 Formex parser 提升到 `1.5.4`。Formex package boundary 会识别只负责 `FORMEX.DOC` 引用的 ANNEX wrapper，并仅把被引用的 leaf ANNEX 交给法律文本 parser；fixture 防止空 Annex 再进入 Reader。`INCL.ELEMENT CONTENT="FORMULA"` 引用的官方 TIFF 与 XML 分离提取，在 build time 以 lossless PNG 生成浏览器 rendition；Canonical resource 同时记录官方 TIFF SHA-256、PNG SHA-256、媒体类型和 data，Provision `orderedContent` 只记录稳定 resource ID。Reader 在原位置显示公式，搜索、定义提取和 Copilot context 跳过非文本资源，不做 OCR，也不把占位符伪装成法律文本。Annex 内的 Formex `TBL` 作为 Canonical table 子 Provision，保留行/单元格文本间隔以及嵌套 list 的 point/subpoint markers，避免把 bucket 与 items 拼成无结构字符串。
 
+Parser `1.6.0` 增加经过 fixture 和 CRR 实际语料验证的 consolidated Formex 支持。Registry 的基础法 `celex` 继续决定稳定 Document/Provision ID，独立的 dated `expressionCelex` 决定采集哪个 `CONS.ACT`；`CONS.DOC`、inline `CONS.ANNEX`、Formex identifier fallback 和公式资源位置均保留明确 provenance。选择器只发布 review date 当日已经生效且人工固定的 expression，不因 CELLAR 提前发布未来 consolidated work 而自动前移。EUR-Lex consolidated expression 不包含原始 Recitals 时，Runtime 如实发布零 Recitals，不跨 expression 拼接正文。
+
 同一代码库可以把不同 Profile 编译成 `banking.sqlite`、`digital-assets.sqlite` 等独立 artifact。每个生产 deployment 默认固定一个 artifact/Profile；Phase 4 如开放 `profileId`，只能在授权的 artifact/service 范围内选择，不能让客户端绕过 corpus policy。
 
 Phase 1 不要求生产服务器自己下载 bulk dump。

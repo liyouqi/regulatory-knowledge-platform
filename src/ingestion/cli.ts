@@ -124,7 +124,8 @@ async function fetchSource(): Promise<void> {
   const celex = argument("--celex");
   if (!celex) throw new Error("Usage: npm run source:fetch -- --celex <CELEX>");
   const source = await findSource(celex);
-  const treeUrl = cellarTreeNoticeUrl(source.celex);
+  const expressionCelex = source.expressionCelex ?? source.celex;
+  const treeUrl = cellarTreeNoticeUrl(expressionCelex);
   const retrievedAt = new Date().toISOString();
   const treeResponse = await fetchOfficial(
     treeUrl,
@@ -133,7 +134,7 @@ async function fetchSource(): Promise<void> {
   assertMediaType(treeResponse, "xml");
   const treeBytes = await readResponse(treeResponse, MAX_TREE_NOTICE_BYTES);
   const treeXml = new TextDecoder().decode(treeBytes);
-  const discovery = discoverEnglishFmx(treeXml, source.celex);
+  const discovery = discoverEnglishFmx(treeXml, expressionCelex);
   const responses = await Promise.all(
     discovery.contentItems.map(async (item) => {
       const isXml = item.streamName.toLowerCase().endsWith(".xml");
@@ -184,11 +185,16 @@ async function fetchSource(): Promise<void> {
   await mkdir(outputDirectory, { recursive: true });
 
   const snapshot: OfficialSourceSnapshot = officialSourceSnapshotSchema.parse({
-    schemaVersion: isMultiItem ? "1.1.0" : "1.0.0",
+    schemaVersion: source.expressionCelex
+      ? "1.2.0"
+      : isMultiItem
+        ? "1.1.0"
+        : "1.0.0",
     snapshotId,
     provenance: "official",
     sourceSystem: "cellar",
     celex: source.celex,
+    ...(source.expressionCelex ? { expressionCelex } : {}),
     language: "en",
     retrievedAt,
     canonicalUrl: source.eliUrl,

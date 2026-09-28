@@ -49,9 +49,9 @@ describe("reviewed document Expression metadata", () => {
       fallbackReason: "no_reviewed_consolidated_expression_loaded",
     });
     expect(records.get("eu:32013R0575")).toMatchObject({
-      textKind: "original_oj",
-      currencyStatus: "historical",
-      fallbackReason: "no_reviewed_consolidated_expression_loaded",
+      textKind: "consolidated",
+      currencyStatus: "current",
+      fallbackReason: null,
     });
     expect(records.get("eu:32024R1623")).toMatchObject({
       textKind: "original_oj",

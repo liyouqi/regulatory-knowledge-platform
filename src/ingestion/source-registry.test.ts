@@ -65,14 +65,15 @@ describe("EU source registry", () => {
       sources.find((source) => source.celex === "32013R0575"),
     ).toMatchObject({
       familyId: "family:crr",
+      expressionCelex: "02013R0575-20260626",
       quality: {
-        articleCount: 521,
+        articleCount: 786,
         annexCount: 4,
-        maximumWarnings: 2,
+        maximumWarnings: 46,
       },
       sourceStatus: {
-        basis: "original-oj",
-        textAsOf: "2013-06-27",
+        basis: "consolidated",
+        textAsOf: "2026-06-26",
         currentVersionUrl: "https://eur-lex.europa.eu/eli/reg/2013/575",
       },
     });

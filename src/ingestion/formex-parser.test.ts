@@ -239,6 +239,52 @@ describe("Formex ACT parser", () => {
     ).toBe(document.logicalId);
   });
 
+  it("parses a pinned consolidated expression without changing stable IDs", () => {
+    const consolidatedSource = sourceDefinitionSchema.parse({
+      ...source,
+      expressionCelex: "02025R0001-20260101",
+      eliUrl: "https://eur-lex.europa.eu/eli/reg/2025/1/2026-01-01/eng",
+      sourceStatus: {
+        basis: "consolidated",
+        textAsOf: "2026-01-01",
+        checkedAt: "2026-01-02T00:00:00.000Z",
+        currentVersionUrl: "https://eur-lex.europa.eu/eli/reg/2025/1",
+        corrections: [],
+      },
+    });
+    const consolidatedSnapshot = officialSourceSnapshotSchema.parse({
+      ...snapshot,
+      schemaVersion: "1.2.0",
+      expressionCelex: "02025R0001-20260101",
+      canonicalUrl: "https://eur-lex.europa.eu/eli/reg/2025/1/2026-01-01/eng",
+    });
+    const consolidatedXml = xml
+      .replace("<ACT>", "<CONS.ACT><CONS.DOC>")
+      .replace(
+        "</ACT>",
+        "<CONS.ANNEX><TITLE><TI><P>ANNEX I</P></TI></TITLE><CONTENTS><P>Consolidated annex.</P></CONTENTS></CONS.ANNEX></CONS.DOC></CONS.ACT>",
+      );
+
+    const { document, report } = parseFormexAct(
+      consolidatedXml,
+      consolidatedSource,
+      consolidatedSnapshot,
+    );
+
+    expect(document.logicalId).toBe("eu:32025R0001");
+    expect(document.source.sourceStatus).toMatchObject({
+      basis: "consolidated",
+      textAsOf: "2026-01-01",
+    });
+    expect(document.sourceLocator.value).toBe("/CONS.ACT");
+    expect(report).toMatchObject({ articleCount: 2, annexCount: 1 });
+    expect(
+      document.provisions.find(
+        (provision) => provision.logicalId === "eu:32025R0001:annex:i",
+      )?.sourceLocator.value,
+    ).toBe("/CONS.ACT/CONS.DOC/CONS.ANNEX[1]");
+  });
+
   it("parses separately stored annexes with stable internal anchors", () => {
     const { document, report } = parseFormexAct(xml, source, snapshot, [
       { fileName: "TEST.annex-iv.xml", xml: annexXml },

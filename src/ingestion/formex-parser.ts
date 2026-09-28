@@ -403,7 +403,9 @@ class FormexDocumentBuilder {
             .join(" "),
         );
         const expectedText = plainText(item, TEXT_EXCLUSIONS);
-        if (text !== expectedText) {
+        const comparableText = (value: string) =>
+          hasFormula ? value.replace(/\s+/gu, "") : value;
+        if (comparableText(text) !== comparableText(expectedText)) {
           throw new Error(
             `Ordered content drift at ${listXpath}/ITEM[${itemIndex + 1}]`,
           );
@@ -484,8 +486,14 @@ class FormexDocumentBuilder {
         .filter(Boolean)
         .join(" "),
     );
-    if (orderedText !== text) {
-      throw new Error(`Ordered content drift at ${xpath}`);
+    const comparable = (value: string) =>
+      hasFormula
+        ? value.replace(/\s+/gu, "")
+        : value.replace(/\s+([,.;:!?])/gu, "$1");
+    if (comparable(orderedText) !== comparable(text)) {
+      throw new Error(
+        `Ordered content drift at ${xpath}: expected ${JSON.stringify(text.slice(0, 500))}, received ${JSON.stringify(orderedText.slice(0, 500))}`,
+      );
     }
     this.provisions[provisionIndex] = {
       ...this.provisions[provisionIndex],
@@ -544,9 +552,21 @@ class FormexDocumentBuilder {
           attributes(paragraph).IDENTIFIER ?? "",
         );
         const numberNode = childElement(paragraph, "NO.PARAG");
-        const numberRaw = numberNode
+        const displayedNumber = numberNode
           ? plainText(numberNode, new Set())
           : paragraphIdentifier.split(".").at(-1) || String(index + 1);
+        let numberRaw = displayedNumber;
+        try {
+          normalizeLegalNumber(numberRaw);
+        } catch {
+          const identifierNumber = paragraphIdentifier.split(".").at(-1);
+          if (!identifierNumber) throw new Error("Invalid paragraph number");
+          normalizeLegalNumber(identifierNumber);
+          numberRaw = identifierNumber;
+          this.warnings.push(
+            `Invalid displayed paragraph number ${displayedNumber}; used Formex identifier ${identifierNumber} at ${articleXpath}.`,
+          );
+        }
         const paragraphXpath = paragraphIdentifier
           ? `${articleXpath}/PARAG[@IDENTIFIER='${paragraphIdentifier}']`
           : `${articleXpath}/PARAG[${index + 1}]`;
@@ -853,7 +873,12 @@ class FormexDocumentBuilder {
     };
   }
 
-  addAnnex(annex: OrderedNode, fileName: string, annexIndex: number): void {
+  addAnnex(
+    annex: OrderedNode,
+    fileName: string,
+    annexIndex: number,
+    sourceLocator = `${fileName}#/ANNEX`,
+  ): void {
     const titleElement = childElement(annex, "TITLE");
     const titleText = titleElement
       ? plainText(childElement(titleElement, "TI") ?? titleElement)
@@ -877,7 +902,7 @@ class FormexDocumentBuilder {
     const title = titleNode
       ? plainText(titleNode)
       : labelMatch?.[2]?.trim() || undefined;
-    const annexXpath = `${fileName}#/ANNEX`;
+    const annexXpath = sourceLocator;
 
     this.provisions.push({
       logicalId,
@@ -946,9 +971,14 @@ class FormexDocumentBuilder {
   build(
     act: OrderedNode,
     annexes: Array<{ fileName: string; node: OrderedNode }>,
+    rootTag: "ACT" | "CONS.ACT" = "ACT",
   ): FormexParseResult {
-    this.addRecitals(act);
-    const enactingTerms = childElement(act, "ENACTING.TERMS");
+    const legalBody =
+      rootTag === "CONS.ACT" ? (childElement(act, "CONS.DOC") ?? act) : act;
+    const legalBodyPath =
+      rootTag === "CONS.ACT" ? "/CONS.ACT/CONS.DOC" : "/ACT";
+    this.addRecitals(legalBody);
+    const enactingTerms = childElement(legalBody, "ENACTING.TERMS");
     if (!enactingTerms) throw new Error("Formex ACT has no ENACTING.TERMS");
     const divisions = directElements(enactingTerms, "DIVISION");
     divisions.forEach((division, index) =>
@@ -956,18 +986,35 @@ class FormexDocumentBuilder {
         division,
         this.documentId,
         [],
-        `/ACT/ENACTING.TERMS/DIVISION[${index + 1}]`,
+        `${legalBodyPath}/ENACTING.TERMS/DIVISION[${index + 1}]`,
         index + 1,
       ),
     );
     for (const article of directElements(enactingTerms, "ARTICLE")) {
-      this.addArticle(article, this.documentId, [], "/ACT/ENACTING.TERMS");
+      this.addArticle(
+        article,
+        this.documentId,
+        [],
+        `${legalBodyPath}/ENACTING.TERMS`,
+      );
     }
     annexes.forEach(({ fileName, node }, index) =>
       this.addAnnex(node, fileName, index + 1),
     );
+    directElements(legalBody, "CONS.ANNEX").forEach((node, index) =>
+      this.addAnnex(
+        node,
+        "inline",
+        annexes.length + index + 1,
+        `${legalBodyPath}/CONS.ANNEX[${index + 1}]`,
+      ),
+    );
 
-    const title = childElement(act, "TITLE");
+    const title =
+      childElement(act, "TITLE") ??
+      (rootTag === "CONS.ACT"
+        ? firstDescendant(legalBody, "TITLE")
+        : undefined);
     const officialTitle = title
       ? plainText(childElement(title, "TI") ?? title)
       : this.source.shortName;
@@ -978,7 +1025,7 @@ class FormexDocumentBuilder {
       sourceVersionId: this.versionedId(this.documentId),
       sourceSnapshotId: sourceSnapshot.snapshotId,
       displayOrder: 0,
-      sourceLocator: { kind: "xpath", value: "/ACT" },
+      sourceLocator: { kind: "xpath", value: `/${rootTag}` },
       parserWarnings: this.warnings,
       jurisdiction: "EU",
       language: "en",
@@ -1097,7 +1144,10 @@ export function parseFormexAct(
   annexDocuments: FormexAnnexDocument[] = [],
   resources: PreparedFormexResourceDocument[] = [],
 ): FormexParseResult {
-  const parseRoot = (documentXml: string, rootTag: "ACT" | "ANNEX") => {
+  const parseRoot = (
+    documentXml: string,
+    rootTags: Array<"ACT" | "CONS.ACT" | "ANNEX">,
+  ) => {
     const parsed = new XMLParser({
       preserveOrder: true,
       ignoreAttributes: false,
@@ -1108,12 +1158,15 @@ export function parseFormexAct(
     }).parse(documentXml) as unknown;
     if (!Array.isArray(parsed))
       throw new Error("Invalid ordered Formex XML tree");
-    return (parsed as OrderedNode[]).find((node) => tagName(node) === rootTag);
+    return (parsed as OrderedNode[]).find((node) =>
+      rootTags.includes(tagName(node) as "ACT" | "CONS.ACT" | "ANNEX"),
+    );
   };
-  const act = parseRoot(xml, "ACT");
-  if (!act) throw new Error("Formex XML has no ACT root element");
+  const act = parseRoot(xml, ["ACT", "CONS.ACT"]);
+  if (!act) throw new Error("Formex XML has no ACT or CONS.ACT root element");
+  const rootTag = tagName(act) as "ACT" | "CONS.ACT";
   const annexes = annexDocuments.map(({ fileName, xml: annexXml }) => {
-    const node = parseRoot(annexXml, "ANNEX");
+    const node = parseRoot(annexXml, ["ANNEX"]);
     if (!node) {
       throw new Error(`Formex XML has no ANNEX root element: ${fileName}`);
     }
@@ -1122,5 +1175,6 @@ export function parseFormexAct(
   return new FormexDocumentBuilder(source, snapshot, resources).build(
     act,
     annexes,
+    rootTag,
   );
 }

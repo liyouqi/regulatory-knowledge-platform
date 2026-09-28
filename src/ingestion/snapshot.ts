@@ -16,13 +16,14 @@ const responseArtifactSchema = z.object({
 
 export const officialSourceSnapshotSchema = z
   .object({
-    schemaVersion: z.enum(["1.0.0", "1.1.0"]),
+    schemaVersion: z.enum(["1.0.0", "1.1.0", "1.2.0"]),
     snapshotId: z
       .string()
       .regex(/^snapshot:cellar:[0-9A-Z()_-]+:[a-f0-9]{64}$/),
     provenance: z.literal("official"),
     sourceSystem: z.literal("cellar"),
     celex: z.string().min(5),
+    expressionCelex: z.string().min(5).optional(),
     language: z.literal("en"),
     retrievedAt: z.string().datetime(),
     canonicalUrl: z.string().url(),
@@ -44,8 +45,11 @@ export const officialSourceSnapshotSchema = z
     }),
   })
   .superRefine((snapshot, context) => {
-    const isMultiItem = snapshot.schemaVersion === "1.1.0";
-    if (isMultiItem !== Boolean(snapshot.content.upstreamItems)) {
+    const isMultiItem = Boolean(snapshot.content.upstreamItems);
+    if (
+      snapshot.schemaVersion !== "1.2.0" &&
+      (snapshot.schemaVersion === "1.1.0") !== isMultiItem
+    ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message:

@@ -50,7 +50,7 @@ describe("corpus build manifest", () => {
           adapter: "eur-lex",
           identifier: "32013R0575",
           snapshotId:
-            "snapshot:cellar:32013R0575:0ba6d826235f517ad18bad2026d775d994b09af087cc8816119672db5257af16",
+            "snapshot:cellar:32013R0575:6ef4a2094178a015456993cd3a17d625a6ee01154ce15dff056d6dc46e136089",
         }),
       }),
     );

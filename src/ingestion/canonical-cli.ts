@@ -42,6 +42,11 @@ async function buildCanonicalDocument(): Promise<void> {
   }
   const verified = await readVerifiedSourceSnapshot(snapshotPath);
   const source = await findSource(verified.snapshot.celex);
+  if (verified.snapshot.expressionCelex !== source.expressionCelex) {
+    throw new Error(
+      `Snapshot expression ${verified.snapshot.expressionCelex ?? verified.snapshot.celex} does not match reviewed registry expression ${source.expressionCelex ?? source.celex}`,
+    );
+  }
   const inspectOnly = process.argv.includes("--inspect");
   const allowDrift = process.argv.includes("--allow-drift");
   if (!inspectOnly && !source.quality) {

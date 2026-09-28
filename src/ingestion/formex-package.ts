@@ -51,8 +51,10 @@ export function extractFormexPackage(
       );
     }
     const xml = new TextDecoder("utf-8", { fatal: true }).decode(sourceBytes);
-    if (rootElement(xml) !== "ACT") {
-      throw new Error("Single Formex XML source must contain an ACT root");
+    if (!["ACT", "CONS.ACT"].includes(rootElement(xml) ?? "")) {
+      throw new Error(
+        "Single Formex XML source must contain an ACT or CONS.ACT root",
+      );
     }
     return {
       act: { fileName: singleXmlFileName, xml },
@@ -104,7 +106,9 @@ export function extractFormexPackage(
     fileName,
     xml: new TextDecoder("utf-8", { fatal: true }).decode(bytes),
   }));
-  const acts = documents.filter(({ xml }) => rootElement(xml) === "ACT");
+  const acts = documents.filter(({ xml }) =>
+    ["ACT", "CONS.ACT"].includes(rootElement(xml) ?? ""),
+  );
   const annexes = documents.filter(({ xml }) => rootElement(xml) === "ANNEX");
   const annexFileNames = new Set(annexes.map(({ fileName }) => fileName));
 

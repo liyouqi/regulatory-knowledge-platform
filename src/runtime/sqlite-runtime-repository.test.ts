@@ -389,16 +389,13 @@ describe("SQLite runtime repository", () => {
     expect(crrChain).toMatchObject({
       documentId: "eu:32013R0575",
       coverage: "source-status-only",
-      checkedAt: "2026-09-25T00:00:00Z",
-      loadedVersionId: "version:eu:32013R0575:original-oj:2013-06-27",
+      checkedAt: "2026-09-28T00:00:00Z",
+      loadedVersionId: "version:eu:32013R0575:consolidated:2026-06-26",
     });
-    expect(crrChain?.nodes).toHaveLength(6);
+    expect(crrChain?.nodes).toHaveLength(2);
+    expect(crrChain?.nodes[0]).toMatchObject({ kind: "consolidated-snapshot" });
     expect(crrChain?.edges.map((edge) => edge.relationType)).toEqual([
       "CURRENT_VERSION_LINK",
-      "HAS_CORRIGENDUM",
-      "HAS_CORRIGENDUM",
-      "HAS_CORRIGENDUM",
-      "HAS_CORRIGENDUM",
     ]);
     expect(crrThreeChain).toMatchObject({
       documentId: "eu:32024R1623",

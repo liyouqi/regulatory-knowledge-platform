@@ -13,6 +13,16 @@ describe("Formex content boundary", () => {
     });
   });
 
+  it("accepts a consolidated CONS.ACT Formex manifestation", () => {
+    const xml = '<?xml version="1.0"?><CONS.ACT><CONS.DOC /></CONS.ACT>';
+
+    expect(extractFormexPackage(strToU8(xml), "CRR.consolidated.xml")).toEqual({
+      act: { fileName: "CRR.consolidated.xml", xml },
+      annexes: [],
+      resources: [],
+    });
+  });
+
   it("selects the ACT XML and ignores the document metadata XML", () => {
     const zip = zipSync({
       "TEST.doc.xml": strToU8("<DOC />"),
