@@ -76,4 +76,18 @@ describe("LawPicker catalog grouping", () => {
       expect.objectContaining({ familyId: "family:aml" }),
     ]);
   });
+
+  it("keeps legal families separate from business-domain labels", () => {
+    expect(
+      groupLawPickerCatalog([
+        {
+          ...documents[0],
+          id: "eu:crd",
+          slug: "crd-iv",
+          shortName: "CRD IV",
+          familyId: "family:crd",
+        },
+      ])[0],
+    ).toMatchObject({ familyId: "family:crd", label: "CRD" });
+  });
 });

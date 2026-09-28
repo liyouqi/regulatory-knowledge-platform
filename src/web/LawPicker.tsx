@@ -11,12 +11,17 @@ export interface LawPickerGroup {
 const FAMILY_LABELS: Record<string, string> = {
   "family:ai-act": "AI Act",
   "family:aml": "AML / CFT",
-  "family:crd": "Banking governance",
+  "family:brrd": "BRRD",
+  "family:crd": "CRD",
+  "family:crr": "CRR",
   "family:data-act": "Data Act",
+  "family:dgsd": "DGSD",
   "family:dora": "DORA",
   "family:gdpr": "GDPR",
   "family:mica": "MiCA",
   "family:nis2": "NIS2",
+  "family:psd": "PSD",
+  "family:srmr": "SRMR",
   "family:cssf": "CSSF",
 };
 
