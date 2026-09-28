@@ -12,6 +12,7 @@ import {
   Map as MapIcon,
   Network,
   Newspaper,
+  Orbit,
   Route as RouteIcon,
   Search,
   ShieldCheck,
@@ -1341,6 +1342,9 @@ function ReaderPage({
           </button>
           <Link className="view-switch" to="/monitor">
             <Newspaper aria-hidden="true" size={15} /> Monitor
+          </Link>
+          <Link className="view-switch" to="/earth">
+            <Orbit aria-hidden="true" size={15} /> Galaxy
           </Link>
           <Link className="view-switch" to={ebaQaCatalogPath()}>
             <FileQuestion aria-hidden="true" size={15} />

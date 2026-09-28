@@ -302,9 +302,9 @@ export function EarthUniversePage({ graph }: { graph: MetadataGraph }) {
         </a>
         <div className="earth-mark">
           <Globe2 size={18} />
-          <span>Earth</span>
+          <span>Galaxy</span>
         </div>
-        <div className="earth-view-switch" aria-label="Earth view">
+        <div className="earth-view-switch" aria-label="Galaxy view">
           <button
             type="button"
             aria-pressed={!structured}
@@ -425,7 +425,7 @@ export function EarthUniversePage({ graph }: { graph: MetadataGraph }) {
           </div>
         ) : null}
       </section>
-      <section className="earth-workspace" aria-label="Earth explorer">
+      <section className="earth-workspace" aria-label="Galaxy explorer">
         <div className="earth-map">
           {!structured ? (
             <div

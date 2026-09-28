@@ -114,8 +114,8 @@ async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
   if (!response.ok) {
     throw new Error(
       response.status === 503
-        ? "The verified Earth artifact is not installed in this deployment."
-        : `Earth data could not be loaded (${response.status}).`,
+        ? "The verified Galaxy data is not installed in this deployment."
+        : `Galaxy data could not be loaded (${response.status}).`,
     );
   }
   return response.json();
@@ -200,7 +200,8 @@ function EarthLegacyPage() {
       .then((items) => {
         setUniverses(items);
         const first = items[0];
-        if (!first) throw new Error("No reviewed Earth Universe is available.");
+        if (!first)
+          throw new Error("No reviewed Galaxy collection is available.");
         return getJson(
           `/api/earth/universes/${encodeURIComponent(first.id)}/overview?boundaryLimit=100`,
           controller.signal,
@@ -210,7 +211,7 @@ function EarthLegacyPage() {
       .catch((caught: unknown) => {
         if ((caught as DOMException).name !== "AbortError") {
           setError(
-            caught instanceof Error ? caught.message : "Earth is unavailable.",
+            caught instanceof Error ? caught.message : "Galaxy is unavailable.",
           );
         }
       });
@@ -456,9 +457,9 @@ function EarthLegacyPage() {
         </Link>
         <div className="earth-mark">
           <Globe2 aria-hidden="true" size={18} />
-          <span>Earth</span>
+          <span>Galaxy</span>
         </div>
-        <div className="earth-view-switch" aria-label="Earth view">
+        <div className="earth-view-switch" aria-label="Galaxy view">
           <button
             aria-pressed={viewMode === "graph"}
             disabled={webGlUnavailable}
@@ -561,7 +562,7 @@ function EarthLegacyPage() {
         </p>
       ) : null}
 
-      <section className="earth-workspace" aria-label="Earth explorer">
+      <section className="earth-workspace" aria-label="Galaxy explorer">
         <div className="earth-map">
           {viewMode === "graph" && overview ? (
             <div
@@ -719,7 +720,7 @@ function EarthLegacyPage() {
             </details>
           ) : null}
           {!overview && !error ? (
-            <p className="earth-loading">Opening verified Earth artifact…</p>
+            <p className="earth-loading">Opening verified Galaxy data…</p>
           ) : null}
         </div>
 

@@ -1,12 +1,16 @@
-# Official EU Regulatory Earth — v0.4
+# Official EU Regulatory Galaxy — v0.4
 
 > Status: approved product and implementation requirements
-> Scope: an official-source, exploratory regulation graph for a bounded EU regulatory Universe
+> Scope: an official-source, exploratory regulation graph for a bounded EU regulatory universe
 > This document is intentionally independent of the existing Platform Runtime data path.
+
+The user-facing product name is **Galaxy**. Existing `/earth` routes, APIs,
+stable IDs, source directories and implementation names remain unchanged to
+preserve compatibility; they are internal boundaries, not displayed branding.
 
 ## Current direction and installed collection — 2026-09-27
 
-This section supersedes the older Banking-10-first expansion restriction, SQLite-only presentation and two-color-only display policy below. Earth is a simple relationship-first visualization, not a legal reference or applicability engine. The target is 100% of a declared English financial-document scope, not an arbitrary 100-law cap. `/earth` now opens the metadata graph; the separate, existing 10-law Article explorer remains available at `/earth?view=reading` (806 audited Articles and 7,016 reading blocks). Full-text acquisition is not a prerequisite for adding graph nodes.
+This section supersedes the older Banking-10-first expansion restriction, SQLite-only presentation and two-color-only display policy below. Galaxy is a simple relationship-first visualization, not a legal reference or applicability engine. The target is 100% of a declared English financial-document scope, not an arbitrary 100-law cap. `/earth` now opens the metadata graph; the separate, existing 10-law Article explorer remains available at `/earth?view=reading` (806 audited Articles and 7,016 reading blocks). Full-text acquisition is not a prerequisite for adding graph nodes.
 
 ### Simple filters and colors
 
