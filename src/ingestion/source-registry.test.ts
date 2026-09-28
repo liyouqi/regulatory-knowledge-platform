@@ -5,9 +5,9 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(25);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(25);
-    expect(sources.slice(0, 8).map((source) => source.shortName)).toEqual([
+    expect(sources).toHaveLength(27);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(27);
+    expect(sources.slice(0, 10).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
       "AI Act",
@@ -16,6 +16,8 @@ describe("EU source registry", () => {
       "Data Act",
       "CRD IV",
       "CRR",
+      "CRR III",
+      "CRD VI",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
     expect(
@@ -67,6 +69,32 @@ describe("EU source registry", () => {
         textAsOf: "2013-06-27",
         currentVersionUrl: "https://eur-lex.europa.eu/eli/reg/2013/575",
       },
+    });
+    expect(
+      sources.find((source) => source.celex === "32024R1623"),
+    ).toMatchObject({
+      familyId: "family:crr",
+      quality: {
+        articleCount: 2,
+        annexCount: 1,
+        pointCount: 1822,
+        maximumWarnings: 0,
+      },
+      sourceStatus: {
+        basis: "original-oj",
+        corrections: [{ date: "2025-04-16" }],
+      },
+    });
+    expect(
+      sources.find((source) => source.celex === "32024L1619"),
+    ).toMatchObject({
+      familyId: "family:crd",
+      quality: {
+        articleCount: 4,
+        pointCount: 517,
+        maximumWarnings: 0,
+      },
+      sourceStatus: { basis: "original-oj", corrections: [] },
     });
     expect(
       sources.find((source) => source.celex === "32015L0849"),

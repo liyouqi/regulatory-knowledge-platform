@@ -49,6 +49,26 @@ export function validateCanonicalDocument(input: unknown): CanonicalDocument {
     );
   }
 
+  const resourceIds = new Set<string>();
+  for (const resource of document.resources ?? []) {
+    if (resourceIds.has(resource.id)) {
+      throw new Error(`Duplicate resource ID: ${resource.id}`);
+    }
+    resourceIds.add(resource.id);
+    if (resource.sourceSha256 === resource.renditionSha256) {
+      throw new Error(
+        `Resource source and browser rendition hashes must differ: ${resource.id}`,
+      );
+    }
+    const rendition = Buffer.from(resource.dataBase64, "base64");
+    if (
+      rendition.length === 0 ||
+      sha256(rendition) !== resource.renditionSha256
+    ) {
+      throw new Error(`Resource rendition hash mismatch: ${resource.id}`);
+    }
+  }
+
   for (const node of document.structuralNodes) {
     if (node.parentLogicalId && !logicalIds.has(node.parentLogicalId)) {
       throw new Error(`Unknown parent logical ID: ${node.parentLogicalId}`);
@@ -73,6 +93,13 @@ export function validateCanonicalDocument(input: unknown): CanonicalDocument {
     }
     if (provision.contentHash !== sha256(provision.text)) {
       throw new Error(`Content hash mismatch: ${provision.logicalId}`);
+    }
+    for (const entry of provision.orderedContent ?? []) {
+      if (entry.type === "resource" && !resourceIds.has(entry.resourceId)) {
+        throw new Error(
+          `Unknown ordered-content resource: ${entry.resourceId}`,
+        );
+      }
     }
   }
 

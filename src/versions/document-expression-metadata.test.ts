@@ -23,7 +23,7 @@ describe("reviewed document Expression metadata", () => {
     const registered = registeredDocumentIds();
     const selected = selectDocumentExpressionMetadata(registered, dataset);
 
-    expect(selected).toHaveLength(29);
+    expect(selected).toHaveLength(31);
     expect(new Set(selected.map((record) => record.documentId))).toEqual(
       registered,
     );
@@ -51,6 +51,16 @@ describe("reviewed document Expression metadata", () => {
     expect(records.get("eu:32013R0575")).toMatchObject({
       textKind: "original_oj",
       currencyStatus: "historical",
+      fallbackReason: "no_reviewed_consolidated_expression_loaded",
+    });
+    expect(records.get("eu:32024R1623")).toMatchObject({
+      textKind: "original_oj",
+      currencyStatus: "historical",
+      fallbackReason: "no_reviewed_consolidated_expression_loaded",
+    });
+    expect(records.get("eu:32024L1619")).toMatchObject({
+      textKind: "original_oj",
+      currencyStatus: "not_assessed",
       fallbackReason: "no_reviewed_consolidated_expression_loaded",
     });
     expect(records.get("lu:cssf:circular-12-552")).toMatchObject({

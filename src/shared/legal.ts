@@ -37,6 +37,18 @@ export const bodyBlockSchema: z.ZodType<BodyBlock> = z.lazy(() =>
       z.discriminatedUnion("type", [
         z.object({ type: z.literal("text"), text: z.string().min(1) }),
         z.object({ type: z.literal("child"), childId: z.string().min(1) }),
+        z.object({
+          type: z.literal("resource"),
+          resource: z.object({
+            id: z.string().min(1),
+            kind: z.literal("formula"),
+            mediaType: z.literal("image/png"),
+            dataUrl: z.string().startsWith("data:image/png;base64,"),
+            sourceFileName: z.string().min(1),
+            sourceSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+            renditionSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+          }),
+        }),
       ]),
     ),
     children: z.array(bodyBlockSchema),
@@ -59,7 +71,20 @@ export interface BodyBlock {
   anchor: string;
   sourceLocator: z.infer<typeof sourceLocatorSchema>;
   orderedContent: Array<
-    { type: "text"; text: string } | { type: "child"; childId: string }
+    | { type: "text"; text: string }
+    | { type: "child"; childId: string }
+    | {
+        type: "resource";
+        resource: {
+          id: string;
+          kind: "formula";
+          mediaType: "image/png";
+          dataUrl: string;
+          sourceFileName: string;
+          sourceSha256: string;
+          renditionSha256: string;
+        };
+      }
   >;
   children: BodyBlock[];
 }

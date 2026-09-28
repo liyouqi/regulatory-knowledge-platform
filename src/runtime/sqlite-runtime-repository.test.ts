@@ -323,6 +323,8 @@ describe("SQLite runtime repository", () => {
     const chain = repository?.findDocumentVersionChain("eu:32024R2956");
     const crdChain = repository?.findDocumentVersionChain("eu:32013L0036");
     const crrChain = repository?.findDocumentVersionChain("eu:32013R0575");
+    const crrThreeChain = repository?.findDocumentVersionChain("eu:32024R1623");
+    const crdSixChain = repository?.findDocumentVersionChain("eu:32024L1619");
     const amldChain = repository?.findDocumentVersionChain("eu:32015L0849");
     const highRiskChain = repository?.findDocumentVersionChain("eu:32016R1675");
 
@@ -392,6 +394,23 @@ describe("SQLite runtime repository", () => {
       "HAS_CORRIGENDUM",
       "HAS_CORRIGENDUM",
     ]);
+    expect(crrThreeChain).toMatchObject({
+      documentId: "eu:32024R1623",
+      loadedVersionId: "version:eu:32024R1623:original-oj:2024-06-19",
+    });
+    expect(crrThreeChain?.nodes).toHaveLength(3);
+    expect(crrThreeChain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+      "HAS_CORRIGENDUM",
+    ]);
+    expect(crdSixChain).toMatchObject({
+      documentId: "eu:32024L1619",
+      loadedVersionId: "version:eu:32024L1619:original-oj:2024-06-19",
+    });
+    expect(crdSixChain?.nodes).toHaveLength(2);
+    expect(crdSixChain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+    ]);
     expect(amldChain).toMatchObject({
       documentId: "eu:32015L0849",
       coverage: "source-status-only",
@@ -415,6 +434,8 @@ describe("SQLite runtime repository", () => {
       (chain?.nodes.length ?? 0) +
         (crdChain?.nodes.length ?? 0) +
         (crrChain?.nodes.length ?? 0) +
+        (crrThreeChain?.nodes.length ?? 0) +
+        (crdSixChain?.nodes.length ?? 0) +
         (amldChain?.nodes.length ?? 0) +
         (highRiskChain?.nodes.length ?? 0),
     );
@@ -422,6 +443,8 @@ describe("SQLite runtime repository", () => {
       (chain?.edges.length ?? 0) +
         (crdChain?.edges.length ?? 0) +
         (crrChain?.edges.length ?? 0) +
+        (crrThreeChain?.edges.length ?? 0) +
+        (crdSixChain?.edges.length ?? 0) +
         (amldChain?.edges.length ?? 0) +
         (highRiskChain?.edges.length ?? 0),
     );
@@ -521,7 +544,7 @@ describe("SQLite runtime repository", () => {
           relationship.target.documentId === "eu:32022R2554",
       ),
     ).toBe(true);
-    expect(repository?.lifecycleRelationshipCount).toBe(65);
+    expect(repository?.lifecycleRelationshipCount).toBe(67);
     expect(repository?.externalWorkCount).toBe(63);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),

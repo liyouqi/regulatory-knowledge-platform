@@ -123,6 +123,7 @@ function blockText(block: BodyBlock): string {
   const children = new Map(block.children.map((child) => [child.id, child]));
   const content = block.orderedContent.map((item) => {
     if (item.type === "text") return item.text;
+    if (item.type === "resource") return "";
     const child = children.get(item.childId);
     if (!child) {
       throw new Error(
@@ -148,11 +149,15 @@ function directBlockText(block: BodyBlock): string {
 function orderedContentBlocks(
   block: BodyBlock,
 ): RagProvision["ordered_content_blocks"] {
-  return block.orderedContent.map((item, order) =>
-    item.type === "text"
-      ? { order, type: "text" as const, text: item.text }
-      : { order, type: "child" as const, provision_id: item.childId },
-  );
+  const content: RagProvision["ordered_content_blocks"] = [];
+  block.orderedContent.forEach((item, order) => {
+    if (item.type === "text") {
+      content.push({ order, type: "text", text: item.text });
+    } else if (item.type === "child") {
+      content.push({ order, type: "child", provision_id: item.childId });
+    }
+  });
+  return content;
 }
 
 function blockReferences(id: string): {

@@ -4,7 +4,7 @@ import { sourceStatusSchema } from "../shared/source-status";
 
 export { sourceLocatorSchema } from "../shared/source-locator";
 
-export const CANONICAL_SCHEMA_VERSION = "1.1.0" as const;
+export const CANONICAL_SCHEMA_VERSION = "1.2.0" as const;
 
 const logicalIdSchema = z
   .string()
@@ -66,7 +66,19 @@ export const provisionKindSchema = z.enum([
 export const orderedProvisionContentEntrySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("text"), text: z.string().min(1) }),
   z.object({ type: z.literal("child"), childLogicalId: logicalIdSchema }),
+  z.object({ type: z.literal("resource"), resourceId: logicalIdSchema }),
 ]);
+
+export const canonicalResourceSchema = z.object({
+  id: logicalIdSchema,
+  kind: z.literal("formula"),
+  sourceFileName: z.string().min(1),
+  sourceMediaType: z.literal("image/tiff"),
+  sourceSha256: sha256Schema,
+  mediaType: z.literal("image/png"),
+  renditionSha256: sha256Schema,
+  dataBase64: z.string().min(1),
+});
 
 export const provisionSchema = versionedEntitySchema.extend({
   kind: provisionKindSchema,
@@ -121,10 +133,12 @@ export const canonicalDocumentSchema = versionedEntitySchema.extend({
   officialTitle: z.string().min(1),
   publicationDate: z.string().date(),
   source: sourceSnapshotSchema,
+  resources: z.array(canonicalResourceSchema).optional(),
   structuralNodes: z.array(structuralNodeSchema),
   provisions: z.array(provisionSchema),
 });
 
 export type CanonicalDocument = z.infer<typeof canonicalDocumentSchema>;
+export type CanonicalResource = z.infer<typeof canonicalResourceSchema>;
 export type Provision = z.infer<typeof provisionSchema>;
 export type SourceSnapshot = z.infer<typeof sourceSnapshotSchema>;

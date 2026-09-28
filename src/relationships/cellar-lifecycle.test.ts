@@ -11,17 +11,17 @@ describe("CELLAR lifecycle runtime builder", () => {
   it("publishes reviewed lifecycle records without treating external Works as loaded Documents", () => {
     const build = buildCellarLifecycle(documents);
 
-    expect(build.relationships).toHaveLength(65);
-    expect(build.works).toHaveLength(74);
+    expect(build.relationships).toHaveLength(67);
+    expect(build.works).toHaveLength(77);
     expect(
       build.works.filter((work) => work.availability === "loaded"),
-    ).toHaveLength(11);
+    ).toHaveLength(14);
     expect(
       build.works.filter((work) => work.availability === "external"),
     ).toHaveLength(63);
     expect(
       build.relationships.filter((item) => item.relationType === "AMENDS"),
-    ).toHaveLength(24);
+    ).toHaveLength(26);
     expect(
       build.relationships.filter((item) => item.relationType === "CORRECTS"),
     ).toHaveLength(41);
@@ -37,6 +37,16 @@ describe("CELLAR lifecycle runtime builder", () => {
     ).toEqual([
       expect.objectContaining({
         sourceWorkId: "eu:32023R1114",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32013L0036",
+      }),
+      expect.objectContaining({
+        sourceWorkId: "eu:32024R1623",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32013R0575",
+      }),
+      expect.objectContaining({
+        sourceWorkId: "eu:32024L1619",
         relationType: "AMENDS",
         targetWorkId: "eu:32013L0036",
       }),

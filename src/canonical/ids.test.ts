@@ -37,6 +37,7 @@ describe("stable legal identifiers", () => {
     ["iii)", "iii"],
     ["IV", "iv"],
     ["Annex A", "annex-a"],
+    ["2(a)", "2-a"],
   ])("normalizes %s without changing its legal meaning", (raw, expected) => {
     expect(normalizeLegalNumber(raw)).toBe(expected);
   });

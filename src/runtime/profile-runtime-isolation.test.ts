@@ -77,7 +77,7 @@ describe("banking-default runtime isolation", () => {
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 27,
+      documentCount: 29,
     });
   });
 
@@ -98,6 +98,8 @@ describe("banking-default runtime isolation", () => {
       search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
     ).toHaveLength(68);
     expect(repository?.findDocumentBySlug("crr")?.id).toBe("eu:32013R0575");
+    expect(repository?.findDocumentBySlug("crr-iii")?.id).toBe("eu:32024R1623");
+    expect(repository?.findDocumentBySlug("crd-vi")?.id).toBe("eu:32024L1619");
     expect(
       search
         ?.search("own funds requirements")

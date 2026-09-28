@@ -1,1 +1,1 @@
-export const FORMEX_PARSER_VERSION = "1.4.0" as const;
+export const FORMEX_PARSER_VERSION = "1.5.4" as const;

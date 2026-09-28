@@ -133,7 +133,7 @@
       "recitalCount": 144,
       "annexCount": 3,
       "paragraphCount": 200,
-      "pointCount": 271,
+      "pointCount": 338,
       "structuralNodeCount": 9,
       "maximumWarnings": 0,
       "textHashes": {
@@ -277,6 +277,86 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/575/oj/eng"
   },
   {
+    "familyId": "family:crr",
+    "shortName": "CRR III",
+    "aliases": [
+      "Capital Requirements Regulation III",
+      "Regulation (EU) 2024/1623",
+      "CRR3"
+    ],
+    "celex": "32024R1623",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-06-19",
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 68,
+      "annexCount": 1,
+      "paragraphCount": 4,
+      "pointCount": 1822,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1623:recital:1": "sha256:ba0cf4b4fd88bf05ceeff474be25440b0adcb30189ef67e4f6de7c5a52f77573",
+        "eu:32024R1623:article:1:subparagraph:1": "sha256:b44b654723647c13e2b8a185af3e0788945f0d91b1385cb1d786c2deb1d93eea",
+        "eu:32024R1623:article:2:subparagraph:3": "sha256:a8f4a7506aa739fce97ed91b02d2774d024347e5cbfcb46cbde4f8752d249177",
+        "eu:32024R1623:annex:i": "sha256:8ecb31593ff0feae82a91b74f38439dfe1bff154bc415f0c15aa420020a3cbca"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2024-06-19",
+      "checkedAt": "2026-09-25T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2024/1623",
+      "corrections": [
+        {
+          "date": "2025-04-16",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/1623/corrigendum/2025-04-16/oj/eng"
+        }
+      ]
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1623/oj/eng"
+  },
+  {
+    "familyId": "family:crd",
+    "shortName": "CRD VI",
+    "aliases": [
+      "Capital Requirements Directive VI",
+      "Directive (EU) 2024/1619",
+      "CRD6"
+    ],
+    "celex": "32024L1619",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-06-19",
+    "quality": {
+      "articleCount": 4,
+      "recitalCount": 62,
+      "annexCount": 0,
+      "paragraphCount": 6,
+      "pointCount": 517,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024L1619:recital:1": "sha256:fd0d22f3edecfa0d7cbb5a953b6d987679fa2dcf6a045c04c9eb7f1a3622ccfe",
+        "eu:32024L1619:article:1:subparagraph:1": "sha256:a5aa6811604fcde5ad089357d4ee8d77d02a45452d52fa399ce723d856b40027",
+        "eu:32024L1619:article:4:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2024-06-19",
+      "checkedAt": "2026-09-25T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2024/1619",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2024/1619/oj/eng"
+  },
+  {
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Risk Management",
     "aliases": [
@@ -415,7 +495,7 @@
       "recitalCount": 15,
       "annexCount": 4,
       "paragraphCount": 48,
-      "pointCount": 59,
+      "pointCount": 101,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
@@ -489,7 +569,7 @@
       "recitalCount": 12,
       "annexCount": 4,
       "paragraphCount": 19,
-      "pointCount": 8,
+      "pointCount": 377,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
@@ -581,7 +661,7 @@
       "recitalCount": 30,
       "annexCount": 8,
       "paragraphCount": 77,
-      "pointCount": 263,
+      "pointCount": 277,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
@@ -673,7 +753,7 @@
       "recitalCount": 11,
       "annexCount": 1,
       "paragraphCount": 15,
-      "pointCount": 65,
+      "pointCount": 92,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {

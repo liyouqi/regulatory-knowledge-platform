@@ -2536,6 +2536,33 @@ kbd {
   margin: 0;
 }
 
+.block-resource {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: 32px minmax(0, 1fr);
+  margin: 18px 0;
+}
+
+.official-formula {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.official-formula img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.official-formula figcaption {
+  color: #72726b;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  margin-top: 7px;
+  text-transform: uppercase;
+}
+
 .inline-reference {
   background: transparent;
   border: 0;

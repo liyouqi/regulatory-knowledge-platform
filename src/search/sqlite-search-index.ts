@@ -254,6 +254,7 @@ function completeBlockText(block: BodyBlock): string {
   return block.orderedContent
     .map((item) => {
       if (item.type === "text") return item.text;
+      if (item.type === "resource") return "";
       const child = children.get(item.childId);
       if (!child) {
         throw new Error(

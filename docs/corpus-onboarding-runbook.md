@@ -87,6 +87,8 @@ Keep the printed snapshot identifier and SHA-256 values. `data/raw/` is ignored 
 
 Cellar may expose an older act as one multi-item FMX4 manifestation instead of one downloadable ZIP. The acquisition layer must preserve all byte-exact official ACT/ANNEX/DOC XML items and their individual response metadata/hashes in snapshot schema `1.1.0`; it may assemble only a deterministic transport ZIP at the raw boundary. Do not choose the first XML item by response order, because legacy manifests can list an Annex before the ACT. `source:verify` checks both the assembled package hash and every recorded upstream item before Canonical parsing.
 
+Formex packages may also contain packaging-only Annex wrappers and TIFF formula resources. The shared package boundary removes an Annex only when it delegates to another ANNEX document through `TYPE="FORMEX.DOC"`; the referenced leaf Annex remains subject to normal count/hash gates. Formula TIFFs remain official source bytes. Canonical build creates a lossless PNG rendition, records both hashes, and binds the resource to its exact `orderedContent` position. Never OCR a formula into purported legal text or publish a formula-bearing act with the resource silently omitted.
+
 ### 3. Inspect before publication
 
 ```bash

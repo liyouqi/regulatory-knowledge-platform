@@ -98,6 +98,7 @@ function evidenceForBlock(
       });
       continue;
     }
+    if (item.type === "resource") continue;
     const child = children.get(item.childId);
     if (!child) {
       throw new CopilotContextMismatchError(

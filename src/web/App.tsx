@@ -208,6 +208,7 @@ function LegalBlock({
   );
   const orderedRuns: Array<
     | { type: "text"; text: string; textRun: number }
+    | Extract<BodyBlock["orderedContent"][number], { type: "resource" }>
     | {
         type: "children";
         children: BodyBlock[];
@@ -217,6 +218,10 @@ function LegalBlock({
   for (const item of block.orderedContent) {
     if (item.type === "text") {
       orderedRuns.push({ ...item, textRun: textRun++ });
+      continue;
+    }
+    if (item.type === "resource") {
+      orderedRuns.push(item);
       continue;
     }
     const child = childrenById.get(item.childId);
@@ -301,6 +306,48 @@ function LegalBlock({
               />
             </p>
           </div>
+        ) : run.type === "resource" ? (
+          <figure
+            className="block-resource"
+            data-copilot-ignore-selection="true"
+            key={run.resource.id}
+          >
+            {index === 0 ? (
+              <div className="block-marker-actions">
+                <a
+                  aria-label={`Link to ${blockLabel}`}
+                  href={`${provisionPath}#${block.anchor}`}
+                >
+                  {block.marker ?? "¶"}
+                </a>
+                <button
+                  aria-label={
+                    copied
+                      ? `Copied link to ${blockLabel}`
+                      : `Copy link to ${blockLabel}`
+                  }
+                  className="block-copy-button"
+                  onClick={copyBlockPermalink}
+                  type="button"
+                >
+                  {copied ? (
+                    <Check aria-hidden="true" size={12} />
+                  ) : (
+                    <Copy aria-hidden="true" size={12} />
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div aria-hidden="true" />
+            )}
+            <div className="official-formula">
+              <img
+                alt="Formula from the official legal source"
+                src={run.resource.dataUrl}
+              />
+              <figcaption>Official formula</figcaption>
+            </div>
+          </figure>
         ) : (
           <div className="nested-blocks" key={`${block.id}:children:${index}`}>
             {run.children.map((child) => (

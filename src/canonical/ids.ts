@@ -36,8 +36,10 @@ export function normalizeLegalNumber(value: string): string {
     .trim()
     .replace(/^\((.*)\)$/u, "$1")
     .replace(/^\(/u, "")
+    .replace(/\(([^()]+)\)/gu, "-$1")
     .replace(/[.)]+$/u, "")
     .replace(/\s+/gu, "-")
+    .replace(/-+/gu, "-")
     .toLowerCase();
   const arabicWithSuffix = /^(\d+)([a-z]*)$/u.exec(normalized);
 
@@ -122,6 +124,22 @@ export function sourceVersionId(
   }
 
   return `${logicalId}@${normalizedVersion}`;
+}
+
+export function resourceLogicalId(
+  documentId: string,
+  sourceFileName: string,
+): string {
+  const normalized = sourceFileName
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/gu, "-")
+    .replace(/^-+|-+$/gu, "");
+  if (!SAFE_SEGMENT_PATTERN.test(normalized)) {
+    throw new Error(`Invalid resource filename: ${sourceFileName}`);
+  }
+  return `${documentId}:resource:${normalized}`;
 }
 
 export function domAnchor(logicalId: string): string {

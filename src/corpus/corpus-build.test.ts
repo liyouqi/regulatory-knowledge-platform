@@ -14,14 +14,34 @@ describe("corpus build manifest", () => {
     const sources = validateCorpusBuildManifestSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
-    expect(sources).toHaveLength(29);
+    expect(sources).toHaveLength(31);
     expect(sources).toContainEqual(
       expect.objectContaining({
         manifest: expect.objectContaining({
           adapter: "eba",
           identifier: "eba-gl-2021-05",
         }),
-        parserVersion: "eba-pdf-1.1.1",
+        parserVersion: "eba-pdf-1.1.2",
+      }),
+    );
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eur-lex",
+          identifier: "32024R1623",
+          snapshotId:
+            "snapshot:cellar:32024R1623:8c148d9e72b8a07a02873de155441e3ac47a2322feaa18fab17417ce211ebcf6",
+        }),
+      }),
+    );
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eur-lex",
+          identifier: "32024L1619",
+          snapshotId:
+            "snapshot:cellar:32024L1619:92f2689af5cf798320f07d5b869740c2c98528496a62f6b36dbfdd618979d6dd",
+        }),
       }),
     );
     expect(sources).toContainEqual(

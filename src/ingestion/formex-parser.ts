@@ -4,16 +4,19 @@ import {
   documentLogicalId,
   normalizeLegalNumber,
   provisionLogicalId,
+  resourceLogicalId,
   sourceVersionId,
   structuralLogicalId,
 } from "../canonical/ids";
 import {
   CANONICAL_SCHEMA_VERSION,
   type CanonicalDocument,
+  type CanonicalResource,
   type Provision,
 } from "../canonical/schema";
 import { sha256, validateCanonicalDocument } from "../canonical/validate";
 export { FORMEX_PARSER_VERSION } from "../canonical/versions";
+import type { PreparedFormexResourceDocument } from "./formex-resources";
 import type { OfficialSourceSnapshot } from "./snapshot";
 import type { SourceDefinition } from "./source-registry";
 
@@ -32,6 +35,7 @@ const BLOCK_TAGS = new Set([
   "TABLE",
   "TXT",
 ]);
+const TABLE_BLOCK_TAGS = new Set([...BLOCK_TAGS, "CELL", "ROW", "TBL"]);
 const TEXT_EXCLUSIONS = new Set(["NOTE", "NO.P", "NO.PARAG"]);
 
 export interface FormexParseReport {
@@ -92,13 +96,14 @@ function attributes(node: OrderedNode): Record<string, unknown> {
 function plainText(
   node: OrderedNode,
   excludedTags: ReadonlySet<string> = new Set(["NOTE"]),
+  blockTags: ReadonlySet<string> = BLOCK_TAGS,
 ): string {
   function collect(current: OrderedNode): string {
     if ("#text" in current) return String(current["#text"] ?? "");
     const tag = tagName(current);
     if (!tag || excludedTags.has(tag)) return "";
     const content = elementChildren(current).map(collect).join("");
-    return BLOCK_TAGS.has(tag) ? ` ${content} ` : content;
+    return blockTags.has(tag) ? ` ${content} ` : content;
   }
 
   return collect(node).replaceAll("\u00a0", " ").replace(/\s+/gu, " ").trim();
@@ -132,11 +137,32 @@ function normalizeText(value: string): string {
   return value.replaceAll("\u00a0", " ").replace(/\s+/gu, " ").trim();
 }
 
+function formulaFileName(node: OrderedNode): string | undefined {
+  if (tagName(node) !== "INCL.ELEMENT") return undefined;
+  const values = attributes(node);
+  if (String(values.CONTENT ?? "").toUpperCase() !== "FORMULA") {
+    return undefined;
+  }
+  const fileName = String(values.FILEREF ?? "").trim();
+  return fileName || undefined;
+}
+
+function containsFormula(node: OrderedNode): boolean {
+  if (formulaFileName(node)) return true;
+  return elementChildren(node).some(containsFormula);
+}
+
 function orderedContentFromElement(
   element: OrderedNode,
   childLogicalIds: string[],
+  resolveResourceId: (node: OrderedNode) => string | undefined,
+  blockTags: ReadonlySet<string> = BLOCK_TAGS,
 ): OrderedProvisionContent {
-  const raw: Array<string | { childLogicalId: string }> = [];
+  const raw: Array<
+    | string
+    | { type: "child"; childLogicalId: string }
+    | { type: "resource"; resourceId: string }
+  > = [];
   let childIndex = 0;
 
   const appendText = (value: string): void => {
@@ -151,20 +177,25 @@ function orderedContentFromElement(
     }
     const tag = tagName(node);
     if (!tag || TEXT_EXCLUSIONS.has(tag)) return;
+    const resourceId = resolveResourceId(node);
+    if (resourceId) {
+      raw.push({ type: "resource", resourceId });
+      return;
+    }
     if (tag === "LIST") {
       for (const _item of directElements(node, "ITEM")) {
         const childLogicalId = childLogicalIds[childIndex];
         if (!childLogicalId) {
           throw new Error("Ordered Formex list has more items than child IDs");
         }
-        raw.push({ childLogicalId });
+        raw.push({ type: "child", childLogicalId });
         childIndex += 1;
       }
       return;
     }
-    if (BLOCK_TAGS.has(tag)) appendText(" ");
+    if (blockTags.has(tag)) appendText(" ");
     for (const child of elementChildren(node)) visit(child);
-    if (BLOCK_TAGS.has(tag)) appendText(" ");
+    if (blockTags.has(tag)) appendText(" ");
   };
   visit(element);
   if (childIndex !== childLogicalIds.length) {
@@ -176,7 +207,11 @@ function orderedContentFromElement(
   const content: OrderedProvisionContent = [];
   for (const item of raw) {
     if (typeof item !== "string") {
-      content.push({ type: "child", childLogicalId: item.childLogicalId });
+      content.push(
+        item.type === "child"
+          ? { type: "child", childLogicalId: item.childLogicalId }
+          : { type: "resource", resourceId: item.resourceId },
+      );
       continue;
     }
     const text = normalizeText(item);
@@ -209,15 +244,44 @@ class FormexDocumentBuilder {
   readonly structuralNodes: StructuralNode[] = [];
   readonly provisions: Provision[] = [];
   readonly warnings: string[] = [];
+  readonly resources: CanonicalResource[];
+  private readonly resourceIdsByFileName: Map<string, string>;
   private displayOrder = 0;
   private readonly occurrenceCounts = new Map<string, number>();
 
   constructor(
     private readonly source: SourceDefinition,
     private readonly snapshot: OfficialSourceSnapshot,
+    resources: PreparedFormexResourceDocument[],
   ) {
     this.documentId = documentLogicalId(source.celex);
     this.version = sourceVersion(snapshot);
+    this.resources = resources.map((resource) => ({
+      id: resourceLogicalId(this.documentId, resource.fileName),
+      kind: "formula",
+      sourceFileName: resource.fileName,
+      sourceMediaType: resource.sourceMediaType,
+      sourceSha256: sha256(resource.sourceBytes),
+      mediaType: resource.mediaType,
+      renditionSha256: sha256(resource.renditionBytes),
+      dataBase64: Buffer.from(resource.renditionBytes).toString("base64"),
+    }));
+    this.resourceIdsByFileName = new Map(
+      this.resources.map((resource) => [resource.sourceFileName, resource.id]),
+    );
+    if (this.resourceIdsByFileName.size !== this.resources.length) {
+      throw new Error("Formex package contains duplicate resource filenames");
+    }
+  }
+
+  resolveResourceId(node: OrderedNode): string | undefined {
+    const fileName = formulaFileName(node);
+    if (!fileName) return undefined;
+    const resourceId = this.resourceIdsByFileName.get(fileName);
+    if (!resourceId) {
+      throw new Error(`Missing Formex formula resource: ${fileName}`);
+    }
+    return resourceId;
   }
 
   nextOrder(): number {
@@ -257,12 +321,18 @@ class FormexDocumentBuilder {
           : listType === "DASH"
             ? "dash"
             : `item-${itemIndex + 1}`;
+        let identityNumber = numberRaw;
+        try {
+          normalizeLegalNumber(identityNumber);
+        } catch {
+          identityNumber = `item-${itemIndex + 1}`;
+        }
         const kind = depth === 0 ? "point" : "subpoint";
-        const occurrence = this.occurrence(parentId, kind, numberRaw);
+        const occurrence = this.occurrence(parentId, kind, identityNumber);
         const logicalId = provisionLogicalId(
           parentId,
           kind,
-          numberRaw,
+          identityNumber,
           occurrence,
         );
         const directText = plainText(
@@ -274,7 +344,8 @@ class FormexDocumentBuilder {
             ? []
             : ["List item has no explicit number."];
 
-        if (!directText) {
+        const hasFormula = containsFormula(item);
+        if (!directText && !hasFormula) {
           this.warnings.push(`Skipped empty list item at ${xpath}`);
           return;
         }
@@ -293,7 +364,7 @@ class FormexDocumentBuilder {
           parserWarnings: warning,
           kind,
           numberRaw,
-          numberNormalized: normalizeLegalNumber(numberRaw),
+          numberNormalized: normalizeLegalNumber(identityNumber),
           label: numberRaw === "dash" ? "—" : numberRaw,
           text: directText,
           contentHash: sha256(directText),
@@ -311,7 +382,11 @@ class FormexDocumentBuilder {
           .filter((provision) => provision.parentLogicalId === logicalId)
           .sort((left, right) => left.displayOrder - right.displayOrder)
           .map((provision) => provision.logicalId);
-        const orderedContent = orderedContentFromElement(item, directChildIds);
+        const orderedContent = orderedContentFromElement(
+          item,
+          directChildIds,
+          (node) => this.resolveResourceId(node),
+        );
         const childrenById = new Map(
           this.provisions.map((provision) => [provision.logicalId, provision]),
         );
@@ -320,7 +395,9 @@ class FormexDocumentBuilder {
             .map((entry) =>
               entry.type === "text"
                 ? entry.text
-                : childrenById.get(entry.childLogicalId)?.text,
+                : entry.type === "child"
+                  ? childrenById.get(entry.childLogicalId)?.text
+                  : undefined,
             )
             .filter(Boolean)
             .join(" "),
@@ -359,8 +436,10 @@ class FormexDocumentBuilder {
     );
     const text = plainText(element, TEXT_EXCLUSIONS);
     const leadText = plainText(element, new Set([...TEXT_EXCLUSIONS, "LIST"]));
-    const warnings = text ? [] : ["Provision contains no normalized text."];
-    if (!text) this.warnings.push(`Empty provision at ${xpath}`);
+    const hasFormula = containsFormula(element);
+    const warnings =
+      text || hasFormula ? [] : ["Provision contains no normalized text."];
+    if (!text && !hasFormula) this.warnings.push(`Empty provision at ${xpath}`);
 
     const provisionIndex = this.provisions.length;
     this.provisions.push({
@@ -385,7 +464,11 @@ class FormexDocumentBuilder {
       .filter((provision) => provision.parentLogicalId === logicalId)
       .sort((left, right) => left.displayOrder - right.displayOrder)
       .map((provision) => provision.logicalId);
-    const orderedContent = orderedContentFromElement(element, directChildIds);
+    const orderedContent = orderedContentFromElement(
+      element,
+      directChildIds,
+      (node) => this.resolveResourceId(node),
+    );
     const childrenById = new Map(
       this.provisions.map((provision) => [provision.logicalId, provision]),
     );
@@ -394,7 +477,9 @@ class FormexDocumentBuilder {
         .map((entry) =>
           entry.type === "text"
             ? entry.text
-            : childrenById.get(entry.childLogicalId)?.text,
+            : entry.type === "child"
+              ? childrenById.get(entry.childLogicalId)?.text
+              : undefined,
         )
         .filter(Boolean)
         .join(" "),
@@ -694,6 +779,80 @@ class FormexDocumentBuilder {
     }
   }
 
+  addTable(
+    table: OrderedNode,
+    annexId: string,
+    xpath: string,
+    tableIndex: number,
+  ): void {
+    const sourceNumber = String(attributes(table)["NO.SEQ"] ?? tableIndex);
+    const identityNumber = String(tableIndex);
+    const occurrence = this.occurrence(annexId, "table", identityNumber);
+    const logicalId = provisionLogicalId(
+      annexId,
+      "table",
+      identityNumber,
+      occurrence,
+    );
+    const text = plainText(table, TEXT_EXCLUSIONS, TABLE_BLOCK_TAGS);
+    const leadText = plainText(
+      table,
+      new Set([...TEXT_EXCLUSIONS, "LIST"]),
+      TABLE_BLOCK_TAGS,
+    );
+    const provisionIndex = this.provisions.length;
+    this.provisions.push({
+      logicalId,
+      sourceVersionId: this.versionedId(logicalId),
+      sourceSnapshotId: this.snapshot.snapshotId,
+      displayOrder: this.nextOrder(),
+      sourceLocator: { kind: "xpath", value: xpath },
+      parserWarnings: text ? [] : ["Table contains no normalized text."],
+      kind: "table",
+      numberRaw: sourceNumber,
+      numberNormalized: identityNumber,
+      label: `Table ${identityNumber}`,
+      text,
+      leadText: leadText && leadText !== text ? leadText : undefined,
+      contentHash: sha256(text),
+      parentLogicalId: annexId,
+      structuralPath: [],
+    });
+    this.addPointLists(table, logicalId, [], xpath);
+    const directChildIds = this.provisions
+      .filter((provision) => provision.parentLogicalId === logicalId)
+      .sort((left, right) => left.displayOrder - right.displayOrder)
+      .map((provision) => provision.logicalId);
+    const orderedContent = orderedContentFromElement(
+      table,
+      directChildIds,
+      (node) => this.resolveResourceId(node),
+      TABLE_BLOCK_TAGS,
+    );
+    const childrenById = new Map(
+      this.provisions.map((provision) => [provision.logicalId, provision]),
+    );
+    const orderedText = normalizeText(
+      orderedContent
+        .map((entry) =>
+          entry.type === "text"
+            ? entry.text
+            : entry.type === "child"
+              ? childrenById.get(entry.childLogicalId)?.text
+              : undefined,
+        )
+        .filter(Boolean)
+        .join(" "),
+    );
+    if (orderedText !== text) {
+      throw new Error(`Ordered table content drift at ${xpath}`);
+    }
+    this.provisions[provisionIndex] = {
+      ...this.provisions[provisionIndex],
+      orderedContent,
+    };
+  }
+
   addAnnex(annex: OrderedNode, fileName: string, annexIndex: number): void {
     const titleElement = childElement(annex, "TITLE");
     const titleText = titleElement
@@ -745,6 +904,7 @@ class FormexDocumentBuilder {
     let contentIndex = 0;
     let groupIndex = 0;
     let listIndex = 0;
+    let tableIndex = 0;
     for (const child of directElements(contents)) {
       const tag = tagName(child);
       if (tag === "GR.SEQ") {
@@ -770,6 +930,14 @@ class FormexDocumentBuilder {
           logicalId,
           [],
           `${annexXpath}/CONTENTS/LIST[${listIndex}]`,
+        );
+      } else if (tag === "TBL") {
+        tableIndex += 1;
+        this.addTable(
+          child,
+          logicalId,
+          `${annexXpath}/CONTENTS/TBL[${tableIndex}]`,
+          tableIndex,
         );
       }
     }
@@ -836,6 +1004,7 @@ class FormexDocumentBuilder {
         expressionUri: sourceSnapshot.expressionUri,
         manifestationUri: sourceSnapshot.manifestationUri,
       },
+      resources: this.resources,
       structuralNodes: this.structuralNodes,
       provisions: this.provisions,
     });
@@ -926,6 +1095,7 @@ export function parseFormexAct(
   source: SourceDefinition,
   snapshot: OfficialSourceSnapshot,
   annexDocuments: FormexAnnexDocument[] = [],
+  resources: PreparedFormexResourceDocument[] = [],
 ): FormexParseResult {
   const parseRoot = (documentXml: string, rootTag: "ACT" | "ANNEX") => {
     const parsed = new XMLParser({
@@ -949,5 +1119,8 @@ export function parseFormexAct(
     }
     return { fileName, node };
   });
-  return new FormexDocumentBuilder(source, snapshot).build(act, annexes);
+  return new FormexDocumentBuilder(source, snapshot, resources).build(
+    act,
+    annexes,
+  );
 }

@@ -7,7 +7,7 @@ import type {
 } from "../shared/legal";
 import { provisionPath } from "../shared/reader-route";
 import { relativeProvisionAnchor } from "./ids";
-import type { CanonicalDocument, Provision } from "./schema";
+import type { CanonicalDocument, CanonicalResource, Provision } from "./schema";
 
 const collectionForKind = {
   article: "articles",
@@ -56,6 +56,7 @@ function bodyKind(provision: Provision): BodyBlock["kind"] {
 function orderedContent(
   provision: Provision,
   children: Provision[],
+  resources: ReadonlyMap<string, CanonicalResource>,
 ): BodyBlock["orderedContent"] {
   if (provision.orderedContent) {
     const expectedChildren = children.map((child) => child.logicalId);
@@ -72,11 +73,30 @@ function orderedContent(
         `Canonical ordered content child mismatch for ${provision.logicalId}`,
       );
     }
-    return provision.orderedContent.map((entry) =>
-      entry.type === "text"
-        ? entry
-        : { type: "child", childId: entry.childLogicalId },
-    );
+    return provision.orderedContent.map((entry) => {
+      if (entry.type === "text") return entry;
+      if (entry.type === "child") {
+        return { type: "child" as const, childId: entry.childLogicalId };
+      }
+      const resource = resources.get(entry.resourceId);
+      if (!resource) {
+        throw new Error(
+          `Canonical ordered content references missing resource ${entry.resourceId}`,
+        );
+      }
+      return {
+        type: "resource" as const,
+        resource: {
+          id: resource.id,
+          kind: resource.kind,
+          mediaType: resource.mediaType,
+          dataUrl: `data:${resource.mediaType};base64,${resource.dataBase64}`,
+          sourceFileName: resource.sourceFileName,
+          sourceSha256: resource.sourceSha256,
+          renditionSha256: resource.renditionSha256,
+        },
+      };
+    });
   }
   if (children.length === 0) {
     return provision.text.trim()
@@ -126,7 +146,9 @@ function orderedContent(
     .map((item) =>
       item.type === "text"
         ? item.text
-        : children.find((child) => child.logicalId === item.childId)?.text,
+        : item.type === "child"
+          ? children.find((child) => child.logicalId === item.childId)?.text
+          : undefined,
     )
     .filter(Boolean)
     .join(" ")
@@ -145,14 +167,19 @@ function toBodyBlock(
   provision: Provision,
   rootId: string,
   children: Map<string, Provision[]>,
+  resources: ReadonlyMap<string, CanonicalResource>,
 ): BodyBlock {
   const nested = (children.get(provision.logicalId) ?? []).map((child) =>
-    toBodyBlock(child, rootId, children),
+    toBodyBlock(child, rootId, children, resources),
   );
   const directChildren = children.get(provision.logicalId) ?? [];
-  const marker = ["annex-part", "paragraph", "point", "subpoint"].includes(
-    provision.kind,
-  )
+  const marker = [
+    "annex-part",
+    "paragraph",
+    "point",
+    "subpoint",
+    "table",
+  ].includes(provision.kind)
     ? provision.kind === "paragraph"
       ? provision.numberRaw
       : provision.label
@@ -167,7 +194,7 @@ function toBodyBlock(
         : provision.text,
     anchor: relativeProvisionAnchor(rootId, provision.logicalId),
     sourceLocator: provision.sourceLocator,
-    orderedContent: orderedContent(provision, directChildren),
+    orderedContent: orderedContent(provision, directChildren, resources),
     children: nested,
   };
 }
@@ -268,6 +295,9 @@ export function toDocumentView(
 ): DocumentView {
   const slug = documentSlug(document.shortName);
   const children = childMap(document);
+  const resources = new Map(
+    (document.resources ?? []).map((resource) => [resource.id, resource]),
+  );
   const structuralById = new Map(
     document.structuralNodes.map((node) => [node.logicalId, node]),
   );
@@ -339,7 +369,7 @@ export function toDocumentView(
         title: structuralById.get(entry.logicalId)?.title,
       })),
       blocks: blockSources.map((block) =>
-        toBodyBlock(block, provision.logicalId, children),
+        toBodyBlock(block, provision.logicalId, children, resources),
       ),
     };
   });

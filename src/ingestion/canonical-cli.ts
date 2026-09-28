@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { extractFormexPackage } from "./formex-package";
 import { parseFormexAct } from "./formex-parser";
+import { prepareFormexResources } from "./formex-resources";
 import { compareQualityBaseline } from "./quality-drift";
 import { readVerifiedSourceSnapshot } from "./snapshot";
 import { findSource } from "./source-registry";
@@ -52,11 +53,13 @@ async function buildCanonicalDocument(): Promise<void> {
     verified.contentBytes,
     verified.snapshot.content.upstreamStreamName,
   );
+  const resources = await prepareFormexResources(formex.resources);
   const { document, report } = parseFormexAct(
     formex.act.xml,
     inspectOnly || allowDrift ? { ...source, quality: undefined } : source,
     verified.snapshot,
     formex.annexes,
+    resources,
   );
   const qualityDrift = compareQualityBaseline(document, report, source.quality);
   const sourceHash = verified.snapshot.content.sha256.slice(7);
@@ -138,6 +141,7 @@ async function buildCanonicalDocument(): Promise<void> {
     sourceFiles: [
       formex.act.fileName,
       ...formex.annexes.map(({ fileName }) => fileName),
+      ...formex.resources.map(({ fileName }) => fileName),
     ],
     parserVersion: FORMEX_PARSER_VERSION,
     sourceStatusHash,

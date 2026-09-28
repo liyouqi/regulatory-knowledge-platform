@@ -9,6 +9,7 @@ describe("Formex content boundary", () => {
     expect(extractFormexPackage(strToU8(xml), "GDPR.doc.xml")).toEqual({
       act: { fileName: "GDPR.doc.xml", xml },
       annexes: [],
+      resources: [],
     });
   });
 
@@ -24,6 +25,7 @@ describe("Formex content boundary", () => {
         xml: '<?xml version="1.0"?><ACT />',
       },
       annexes: [],
+      resources: [],
     });
   });
 
@@ -37,6 +39,38 @@ describe("Formex content boundary", () => {
     expect(
       extractFormexPackage(zip).annexes.map(({ fileName }) => fileName),
     ).toEqual(["TEST.0002.xml", "TEST.0003.xml"]);
+  });
+
+  it("unwraps a packaging ANNEX and returns only the referenced legal annex", () => {
+    const zip = zipSync({
+      "TEST.0001.xml": strToU8("<ACT />"),
+      "TEST.0002.xml": strToU8(
+        '<ANNEX><TITLE><TI><P>ANNEX</P></TI></TITLE><CONTENTS><P><INCL.ELEMENT FILEREF="TEST.0003.xml" TYPE="FORMEX.DOC"/></P></CONTENTS></ANNEX>',
+      ),
+      "TEST.0003.xml": strToU8(
+        "<ANNEX><TITLE><TI><P>ANNEX I</P></TI></TITLE><CONTENTS><P>Legal annex text.</P></CONTENTS></ANNEX>",
+      ),
+    });
+
+    expect(
+      extractFormexPackage(zip).annexes.map(({ fileName }) => fileName),
+    ).toEqual(["TEST.0003.xml"]);
+  });
+
+  it("extracts official TIFF formula resources separately from legal XML", () => {
+    const resource = new Uint8Array([73, 73, 42, 0]);
+    const zip = zipSync({
+      "TEST.0001.xml": strToU8("<ACT />"),
+      "TEST.0002.tif": resource,
+    });
+
+    expect(extractFormexPackage(zip).resources).toEqual([
+      {
+        fileName: "TEST.0002.tif",
+        mediaType: "image/tiff",
+        bytes: resource,
+      },
+    ]);
   });
 
   it("rejects an ambiguous package with multiple ACT candidates", () => {

@@ -2,8 +2,12 @@ import { spawn } from "node:child_process";
 import type { Dirent } from "node:fs";
 import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { loadDocumentViews } from "../data/document-repository";
+import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
+import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
+import { EBA_GUIDELINES_PDF_PARSER_VERSION } from "../ingestion/eba-guidelines-pdf-parser";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import type { QualityDrift } from "../ingestion/quality-drift";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
@@ -28,8 +32,20 @@ interface SnapshotSelection {
 
 interface CanonicalBuildReport {
   sourceSnapshotId?: string;
+  parserVersion?: string;
   qualityStatus?: "matched" | "drifted";
   qualityDrift?: QualityDrift[];
+}
+
+function currentParserVersions(adapter: Adapter): ReadonlySet<string> {
+  if (adapter === "eur-lex") return new Set([FORMEX_PARSER_VERSION]);
+  if (adapter === "eba") {
+    return new Set([EBA_GUIDELINES_PDF_PARSER_VERSION]);
+  }
+  return new Set([
+    `html-${CSSF_HTML_PARSER_VERSION}`,
+    `pdf-${CSSF_PDF_PARSER_VERSION}`,
+  ]);
 }
 
 function argument(name: string): string | undefined {
@@ -122,6 +138,7 @@ async function latestSnapshot(
 
 async function findCanonicalReport(
   selection: SnapshotSelection,
+  strict: boolean,
 ): Promise<CanonicalBuildReport> {
   const root = resolve(
     process.cwd(),
@@ -145,15 +162,16 @@ async function findCanonicalReport(
         }
       }),
   );
-  const report = reports
-    .filter((candidate) => candidate?.sourceSnapshotId === selection.snapshotId)
-    .sort((left, right) =>
-      left?.qualityStatus === right?.qualityStatus
-        ? 0
-        : left?.qualityStatus
-          ? -1
-          : 1,
-    )[0];
+  const parserVersions = currentParserVersions(selection.adapter);
+  const report = reports.find(
+    (candidate) =>
+      candidate?.sourceSnapshotId === selection.snapshotId &&
+      typeof candidate.parserVersion === "string" &&
+      parserVersions.has(candidate.parserVersion) &&
+      (strict
+        ? candidate.qualityStatus === undefined
+        : candidate.qualityStatus !== undefined),
+  );
   if (report) return report;
   throw new Error(
     `Canonical build report missing for ${selection.adapter}:${selection.identifier}`,
@@ -236,7 +254,7 @@ async function refreshCorpus(): Promise<void> {
   );
   const sourceReports = await Promise.all(
     selections.map(async (selection) => {
-      const canonical = await findCanonicalReport(selection);
+      const canonical = await findCanonicalReport(selection, strict);
       return {
         adapter: selection.adapter,
         identifier: selection.identifier,

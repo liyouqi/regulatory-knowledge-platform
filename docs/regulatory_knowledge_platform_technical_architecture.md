@@ -1299,6 +1299,8 @@ Snapshot retention 与 build orchestration 分开：当前 18 个条目均为 `l
 
 Phase 3 首个 CRD source 暴露了 legacy Cellar multi-item manifestation：同一 English FMX4 manifestation 将 `DOC` metadata、`ACT` 与两个 `ANNEX` 分成独立 item，且 item 顺序不保证主文优先。Acquisition 通过 `.doc.xml` metadata 与同 basename legal XML 识别主文，下载 manifestation 的 byte-exact XML items，并仅在 raw snapshot boundary 组装 deterministic ZIP；snapshot schema `1.1.0` 逐项保留 official URL、media type、ETag/Last-Modified、byte count 与 SHA-256，verification 同时核验 package 和每个上游 item。Canonical parser 仍只接收通用 Formex package，不增加 CRD 专用解析分支；CRD 的 165 Articles、107 Recitals、Annexes I–II 和零 warning 由既有 quality gate 发布。
 
+CRR III 将 Canonical Contract 提升到 `1.2.0`、通用 Formex parser 提升到 `1.5.4`。Formex package boundary 会识别只负责 `FORMEX.DOC` 引用的 ANNEX wrapper，并仅把被引用的 leaf ANNEX 交给法律文本 parser；fixture 防止空 Annex 再进入 Reader。`INCL.ELEMENT CONTENT="FORMULA"` 引用的官方 TIFF 与 XML 分离提取，在 build time 以 lossless PNG 生成浏览器 rendition；Canonical resource 同时记录官方 TIFF SHA-256、PNG SHA-256、媒体类型和 data，Provision `orderedContent` 只记录稳定 resource ID。Reader 在原位置显示公式，搜索、定义提取和 Copilot context 跳过非文本资源，不做 OCR，也不把占位符伪装成法律文本。Annex 内的 Formex `TBL` 作为 Canonical table 子 Provision，保留行/单元格文本间隔以及嵌套 list 的 point/subpoint markers，避免把 bucket 与 items 拼成无结构字符串。
+
 同一代码库可以把不同 Profile 编译成 `banking.sqlite`、`digital-assets.sqlite` 等独立 artifact。每个生产 deployment 默认固定一个 artifact/Profile；Phase 4 如开放 `profileId`，只能在授权的 artifact/service 范围内选择，不能让客户端绕过 corpus policy。
 
 Phase 1 不要求生产服务器自己下载 bulk dump。

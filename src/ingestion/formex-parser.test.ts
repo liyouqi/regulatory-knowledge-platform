@@ -85,6 +85,22 @@ const annexXml = `<?xml version="1.0" encoding="UTF-8"?>
   </GR.SEQ><LIST TYPE="alpha"><ITEM><NP><NO.P>(c)</NO.P><TXT>A direct annex item.</TXT></NP></ITEM></LIST></CONTENTS>
 </ANNEX>`;
 
+const tableAnnexXml = `<?xml version="1.0" encoding="UTF-8"?>
+<ANNEX>
+  <TITLE><TI><P>ANNEX I</P></TI><STI><P>Classification table</P></STI></TITLE>
+  <CONTENTS><TBL NO.SEQ="0001"><CORPUS>
+    <ROW TYPE="HEADER"><CELL>Bucket</CELL><CELL>Items</CELL></ROW>
+    <ROW><CELL>1</CELL><CELL><LIST TYPE="alpha">
+      <ITEM><NP><NO.P>(a)</NO.P><TXT>First item:</TXT><P><LIST TYPE="roman">
+        <ITEM><NP><NO.P>(i)</NO.P><TXT>first detail;</TXT></NP></ITEM>
+        <ITEM><NP><NO.P>(ii)</NO.P><TXT>second detail.</TXT></NP></ITEM>
+      </LIST></P></NP></ITEM>
+      <ITEM><NP><NO.P>(b)</NO.P><TXT>Second item.</TXT></NP></ITEM>
+      <ITEM><NP><NO.P>☐</NO.P><TXT>Checklist item.</TXT></NP></ITEM>
+    </LIST></CELL></ROW>
+  </CORPUS></TBL></CONTENTS>
+</ANNEX>`;
+
 describe("Formex ACT parser", () => {
   it("preserves legal hierarchy, stable IDs, and normalized text", () => {
     const { document, report } = parseFormexAct(xml, source, snapshot);
@@ -158,6 +174,53 @@ describe("Formex ACT parser", () => {
     ).toBe(true);
   });
 
+  it("preserves an official formula at its exact position as a verified resource", () => {
+    const formulaXml = xml.replace(
+      "It applies immediately.",
+      '<P><INCL.ELEMENT CONTENT="FORMULA" FILEREF="TEST.0001.tif" TYPE="TIFF"/></P>',
+    );
+    const sourceBytes = new Uint8Array([1, 2, 3]);
+    const renditionBytes = new Uint8Array([4, 5, 6]);
+    const { document, report } = parseFormexAct(
+      formulaXml,
+      source,
+      snapshot,
+      [],
+      [
+        {
+          fileName: "TEST.0001.tif",
+          sourceMediaType: "image/tiff",
+          sourceBytes,
+          mediaType: "image/png",
+          renditionBytes,
+        },
+      ],
+    );
+
+    expect(report.warningCount).toBe(0);
+    const formulaProvision = document.provisions.find(
+      (provision) =>
+        provision.logicalId === "eu:32025R0001:article:2:subparagraph:1",
+    );
+    expect(formulaProvision?.text).toBe("");
+    expect(formulaProvision?.orderedContent).toEqual([
+      {
+        type: "resource",
+        resourceId: "eu:32025R0001:resource:test.0001.tif",
+      },
+    ]);
+    expect(document.resources).toHaveLength(1);
+    const view = toDocumentView(document, "formula-test");
+    expect(view.provisions[1]?.blocks[0]?.orderedContent[0]).toMatchObject({
+      type: "resource",
+      resource: {
+        id: "eu:32025R0001:resource:test.0001.tif",
+        mediaType: "image/png",
+        dataUrl: "data:image/png;base64,BAUG",
+      },
+    });
+  });
+
   it("parses official acts whose articles are direct ENACTING.TERMS children", () => {
     const ungroupedXml = xml
       .replace("<ENACTING.TERMS><DIVISION>", "<ENACTING.TERMS>")
@@ -219,6 +282,44 @@ describe("Formex ACT parser", () => {
       kind: "annex-part",
       marker: "1. General requirements",
       anchor: "annex-part-1",
+    });
+  });
+
+  it("preserves Annex table rows and nested list markers as ordered content", () => {
+    const { document, report } = parseFormexAct(xml, source, snapshot, [
+      { fileName: "TEST.annex-i.xml", xml: tableAnnexXml },
+    ]);
+
+    expect(report).toMatchObject({ annexCount: 1, pointCount: 6 });
+    const table = document.provisions.find(
+      (provision) => provision.logicalId === "eu:32025R0001:annex:i:table:1",
+    );
+    expect(table).toMatchObject({
+      kind: "table",
+      label: "Table 1",
+      text: "Bucket Items 1 First item: first detail; second detail. Second item. Checklist item.",
+    });
+    expect(table?.orderedContent).toEqual([
+      { type: "text", text: "Bucket Items 1" },
+      {
+        type: "child",
+        childLogicalId: "eu:32025R0001:annex:i:table:1:point:a",
+      },
+      {
+        type: "child",
+        childLogicalId: "eu:32025R0001:annex:i:table:1:point:b",
+      },
+      {
+        type: "child",
+        childLogicalId: "eu:32025R0001:annex:i:table:1:point:item-3",
+      },
+    ]);
+    const annex = toDocumentView(document, "table-test").provisions.find(
+      (provision) => provision.kind === "annex",
+    );
+    expect(annex?.blocks[0]).toMatchObject({
+      kind: "other",
+      marker: "Table 1",
     });
   });
 });
