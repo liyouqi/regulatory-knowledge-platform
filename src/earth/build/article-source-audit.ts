@@ -310,14 +310,18 @@ export function auditArticleReadings(
         if (marker && marker !== provision.numberRaw)
           throw new Error(`Article marker drift: ${provision.logicalId}`);
         const id = `earth-reading:${provision.logicalId}`;
-        const content = provision.orderedContent?.map((entry) =>
-          entry.type === "text"
-            ? entry
-            : {
-                type: "child" as const,
-                childId: `earth-reading:${entry.childLogicalId}`,
-              },
-        );
+        const content = provision.orderedContent?.map((entry) => {
+          if (entry.type === "text") return entry;
+          if (entry.type === "resource") {
+            throw new Error(
+              `Earth reading does not support Article resources: ${provision.logicalId}`,
+            );
+          }
+          return {
+            type: "child" as const,
+            childId: `earth-reading:${entry.childLogicalId}`,
+          };
+        });
         const items = topLists(element).flatMap((list) =>
           list.children.filter((child) => child.tag === "ITEM"),
         );

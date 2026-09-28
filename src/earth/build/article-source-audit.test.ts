@@ -97,6 +97,16 @@ describe("Earth-only Article source audit", () => {
         provisions.filter((p) => p.kind !== "subpoint"),
       ),
     ).toThrow("Incomplete Article list");
+    const withResource = structuredClone(provisions);
+    withResource
+      .find((provision) => provision.kind === "paragraph")
+      ?.orderedContent?.push({
+        type: "resource",
+        resourceId: "eu:39999R9999:resource:formula.tif",
+      });
+    expect(() => auditArticleReadings(xml, withResource)).toThrow(
+      "does not support Article resources",
+    );
     const mixed = xml.replace(
       "<PARAG IDENTIFIER=",
       "<ALINEA>Omitted body.</ALINEA><PARAG IDENTIFIER=",
