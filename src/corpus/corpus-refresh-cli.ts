@@ -31,6 +31,7 @@ import {
   auditConsolidatedExpressions,
   parseConsolidatedExpressionCandidatesFromTreeNotice,
 } from "./consolidated-expression-audit";
+import { writeCorpusStatus } from "./corpus-status";
 
 type Adapter = "eur-lex" | "cssf" | "eba";
 
@@ -377,6 +378,7 @@ async function refreshCorpus(): Promise<void> {
   );
   const cssfSources = loadCssfSourceRegistrySync();
   const ebaSources = loadEbaSourceRegistrySync();
+  await writeCorpusStatus(eurLexCatalog, cssfSources, ebaSources);
   const selectedCssfSources = batch ? [] : cssfSources;
   const selectedEbaSources = batch ? [] : ebaSources;
 

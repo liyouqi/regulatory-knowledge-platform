@@ -1106,5 +1106,89 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1113/oj/eng"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:aml",
+    "shortName": "AMLR",
+    "celex": "32024R1624"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:aml",
+    "shortName": "AMLD VI",
+    "celex": "32024L1640"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:aml",
+    "shortName": "AMLA Regulation",
+    "celex": "32024R1620"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:consumer-credit",
+    "shortName": "Consumer Credit Directive II",
+    "celex": "32023L2225"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:consumer-credit",
+    "shortName": "Mortgage Credit Directive",
+    "celex": "32014L0017"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:payments",
+    "shortName": "Payment Accounts Directive",
+    "celex": "32014L0092"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:payments",
+    "shortName": "SEPA Regulation",
+    "celex": "32012R0260"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-2",
+    "familyId": "family:payments",
+    "shortName": "Instant Payments Regulation",
+    "celex": "32024R0886"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-3",
+    "familyId": "family:payments",
+    "shortName": "Electronic Money Directive II",
+    "celex": "32009L0110"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-3",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation Regulation",
+    "celex": "32017R2402"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-3",
+    "familyId": "family:covered-bonds",
+    "shortName": "Covered Bonds Directive",
+    "celex": "32019L2162"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-core-3",
+    "familyId": "family:covered-bonds",
+    "shortName": "Covered Bonds CRR Amending Regulation",
+    "celex": "32019R2160"
   }
 ]

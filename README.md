@@ -2,12 +2,17 @@
 
 An English European financial regulatory knowledge platform for EU and Luxembourg law. The first usable corpus focuses on digital, ICT, cyber, and data regulation; the same canonical pipeline is intended to support banking, payments, funds, insurance, and digital-assets editions without separate codebases.
 
+## Corpus at a glance
+
+Open [Reader Corpus Status](docs/corpus-status.md) for the generated **Published / Queued / Planned** view. It is refreshed from the source registries by the existing `npm run corpus:update` command and is not maintained by hand.
+
 ## Documents
 
 - `README.md`: setup, commands, quick navigation, and the operational entry point.
 - `docs/regulatory_knowledge_platform_requirements.md`: product scope, releases, and acceptance criteria.
 - `docs/regulatory_knowledge_platform_technical_architecture.md`: architectural decisions and data contracts.
 - `docs/corpus-onboarding-runbook.md`: repeatable workflow for adding or refreshing legal sources.
+- `docs/corpus-status.md`: generated one-page Published / Queued / Planned Reader corpus view.
 - `docs/coverage-backlog.md`: bounded phase completion and deferred 1→100 corpus work.
 - `docs/runtime-operation-runbook.md`: staging, verification, promotion, and rollback of runtime artifacts.
 - `docs/rag-snapshot-export.md`: offline, versioned Platform-to-RAG snapshot contract and handoff workflow.
