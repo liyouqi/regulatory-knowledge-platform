@@ -12,7 +12,11 @@ import {
   officialSourceSnapshotSchema,
   readVerifiedSourceSnapshot,
 } from "./snapshot";
-import { findSource, loadSourceRegistry } from "./source-registry";
+import {
+  findCatalogSource,
+  findSource,
+  loadSourceCatalog,
+} from "./source-registry";
 
 const MAX_TREE_NOTICE_BYTES = 10 * 1024 * 1024;
 const MAX_FMX_CONTENT_BYTES = 50 * 1024 * 1024;
@@ -108,14 +112,15 @@ async function fetchOfficial(url: string, accept: string): Promise<Response> {
 }
 
 async function listSources(): Promise<void> {
-  const sources = await loadSourceRegistry();
+  const sources = await loadSourceCatalog();
   console.table(
-    sources.map(({ shortName, celex, documentType, language, quality }) => ({
-      shortName,
-      celex,
-      documentType,
-      language,
-      canonicalBaseline: quality ? "ready" : "missing",
+    sources.map((source) => ({
+      status: source.status ?? "active",
+      batch: source.batch ?? "-",
+      shortName: source.shortName,
+      celex: source.celex,
+      canonicalBaseline:
+        "quality" in source && source.quality ? "ready" : "missing",
     })),
   );
 }
@@ -123,7 +128,9 @@ async function listSources(): Promise<void> {
 async function fetchSource(): Promise<void> {
   const celex = argument("--celex");
   if (!celex) throw new Error("Usage: npm run source:fetch -- --celex <CELEX>");
-  const source = await findSource(celex);
+  const source = process.argv.includes("--catalog")
+    ? await findCatalogSource(celex)
+    : await findSource(celex);
   const expressionCelex = source.expressionCelex ?? source.celex;
   const treeUrl = cellarTreeNoticeUrl(expressionCelex);
   const retrievedAt = new Date().toISOString();

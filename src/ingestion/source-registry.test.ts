@@ -1,5 +1,12 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadSourceRegistry } from "./source-registry";
+import {
+  loadQueuedSourcesSync,
+  loadSourceCatalog,
+  loadSourceRegistry,
+} from "./source-registry";
 
 describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
@@ -26,6 +33,7 @@ describe("EU source registry", () => {
       "PSD2",
     ]);
     expect(sources.every((source) => source.quality !== undefined)).toBe(true);
+    expect(sources.every((source) => source.status === "active")).toBe(true);
     expect(
       sources.filter((source) => source.familyId === "family:dora"),
     ).toHaveLength(14);
@@ -139,5 +147,53 @@ describe("EU source registry", () => {
     ).toBe(
       sources.reduce((count, source) => count + source.aliases.length + 1, 0),
     );
+  });
+
+  it("keeps planned and queued entries out of the active corpus", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "source-catalog-"));
+    const registryPath = join(directory, "source-registry.json");
+    try {
+      const active = (await loadSourceRegistry())[0];
+      await writeFile(
+        registryPath,
+        JSON.stringify([
+          active,
+          {
+            status: "queued",
+            batch: "banking-core-2",
+            familyId: "family:test-queued",
+            shortName: "Queued Test Act",
+            aliases: ["Queued Test Regulation"],
+            celex: "32030R0002",
+            language: "ENG",
+            documentType: "regulation",
+            regulatoryLevel: "level-1",
+            measureType: "primary-act",
+            publicationDate: "2030-01-02",
+            eliUrl: "https://eur-lex.europa.eu/eli/reg/2030/2/oj/eng",
+          },
+          {
+            status: "planned",
+            batch: "banking-core-3",
+            familyId: "family:test-planned",
+            shortName: "Planned Test Act",
+            celex: "32030L0003",
+          },
+        ]),
+        "utf8",
+      );
+
+      await expect(loadSourceRegistry(registryPath)).resolves.toHaveLength(1);
+      await expect(loadSourceCatalog(registryPath)).resolves.toHaveLength(3);
+      expect(loadQueuedSourcesSync(registryPath)).toMatchObject([
+        {
+          celex: "32030R0002",
+          status: "queued",
+          batch: "banking-core-2",
+        },
+      ]);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 });

@@ -7,7 +7,11 @@ import { parseFormexAct } from "./formex-parser";
 import { prepareFormexResources } from "./formex-resources";
 import { compareQualityBaseline } from "./quality-drift";
 import { readVerifiedSourceSnapshot } from "./snapshot";
-import { findSource } from "./source-registry";
+import {
+  type SourceDefinition,
+  findCatalogSource,
+  findSource,
+} from "./source-registry";
 
 function argument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -41,7 +45,9 @@ async function buildCanonicalDocument(): Promise<void> {
     );
   }
   const verified = await readVerifiedSourceSnapshot(snapshotPath);
-  const source = await findSource(verified.snapshot.celex);
+  const source = process.argv.includes("--catalog")
+    ? await findCatalogSource(verified.snapshot.celex)
+    : await findSource(verified.snapshot.celex);
   if (verified.snapshot.expressionCelex !== source.expressionCelex) {
     throw new Error(
       `Snapshot expression ${verified.snapshot.expressionCelex ?? verified.snapshot.celex} does not match reviewed registry expression ${source.expressionCelex ?? source.celex}`,
@@ -76,7 +82,8 @@ async function buildCanonicalDocument(): Promise<void> {
     .update(JSON.stringify(source.sourceStatus ?? null))
     .digest("hex")
     .slice(0, 12);
-  if (inspectOnly) {
+  let qualityCandidate: SourceDefinition["quality"];
+  if (inspectOnly || !source.quality) {
     const recitals = document.provisions.filter(
       (provision) => provision.kind === "recital",
     );
@@ -109,18 +116,23 @@ async function buildCanonicalDocument(): Promise<void> {
     ]
       .filter((provision) => provision !== undefined)
       .map((provision) => [provision.logicalId, provision.contentHash]);
+    qualityCandidate = {
+      articleCount: report.articleCount,
+      recitalCount: report.recitalCount,
+      annexCount: report.annexCount,
+      paragraphCount: report.paragraphCount,
+      pointCount: report.pointCount,
+      structuralNodeCount: report.structuralNodeCount,
+      maximumWarnings: report.warningCount,
+      textHashes: Object.fromEntries(anchorHashes),
+    };
+  }
+  if (inspectOnly) {
     console.table(report);
     console.log(
       JSON.stringify(
         {
-          articleCount: report.articleCount,
-          recitalCount: report.recitalCount,
-          annexCount: report.annexCount,
-          paragraphCount: report.paragraphCount,
-          pointCount: report.pointCount,
-          structuralNodeCount: report.structuralNodeCount,
-          maximumWarnings: report.warningCount,
-          textHashes: Object.fromEntries(anchorHashes),
+          ...qualityCandidate,
           qualityStatus: qualityDrift.length === 0 ? "matched" : "drifted",
           qualityDrift,
         },
@@ -157,6 +169,7 @@ async function buildCanonicalDocument(): Promise<void> {
           qualityDrift,
         }
       : {}),
+    ...(!source.quality ? { qualityCandidate } : {}),
   };
   const documentJson = `${JSON.stringify(document, null, 2)}\n`;
   const reportJson = `${JSON.stringify(buildReport, null, 2)}\n`;

@@ -1305,6 +1305,8 @@ Parser `1.6.0` 增加经过 fixture 和 CRR 实际语料验证的 consolidated F
 
 `corpus:update` 是日常维护的单一 facade，并继续调用既有 acquisition、Canonical、reviewed-data、Runtime builder 与 Runtime verifier。它复用每个 verified source snapshot 已保存的官方 CELLAR tree notice 审计 consolidated expressions，不增加第二个 SPARQL/网页发现通道；候选必须在官方 notice 中具有 English Formex manifestation，只有其他语言的 consolidated work 不会被误报为英文 Reader 可用版本。它只把截至检查日已生效且不同于当前 pin 的版本写成 `review-required`，不会修改 Git registry、quality baseline、exact-snapshot manifest、release-pinned Runtime 或 RAG export。`corpus:refresh` 保留为兼容 alias，严格、可复现的 release 仍由 manifest-pinned `corpus:build` 完成。因此命令入口收敛不引入第二套 parser/build/export contract。
 
+EUR-Lex source registry 同时提供简单的 corpus catalog lifecycle：`active`、`queued`、`planned`。既有 registry loader 只向生产构建暴露 `active`；`queued` 由同一个 `corpus:update` 采集并解析到隔离的 onboarding artifact，候选 quality baseline 和异常只进入 refresh report；`planned` 仅用于人可读 backlog。这个薄编排层不改变 Canonical contract、parser、Runtime schema、Profile、Reader API、strict manifest 或 RAG snapshot contract。
+
 Snapshot ID 以官方正文 content hash 为核心，同一字节在不同 retrieval time 可以有多个 immutable raw directory。Manifest-pinned build 对同一 snapshot ID 稳定选择最早 retrieval directory，保持最初 reviewed provenance；后续相同内容的检查记录不会阻断 strict build，也不会悄然改变发布输入。
 
 RAG Snapshot 1.1 仍只发布 text/child ordered blocks，不扩展资源 schema。Reader ordered content 含公式 image resource 时，exporter 明确跳过非文本资源，并按保留块的相对顺序重新生成连续 `order`；`direct_text` 仍只由文本块组成。该规则通过带公式资源的 fixture 与完整 35-document export/verify 验证，避免 consolidated CRR 因省略资源留下 order gap，同时不把公式伪装成法律文字。

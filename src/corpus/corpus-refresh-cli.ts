@@ -11,7 +11,12 @@ import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { EBA_GUIDELINES_PDF_PARSER_VERSION } from "../ingestion/eba-guidelines-pdf-parser";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
 import type { QualityDrift } from "../ingestion/quality-drift";
-import { loadSourceRegistrySync } from "../ingestion/source-registry";
+import {
+  type SourceDefinition,
+  loadQueuedSourcesSync,
+  loadSourceCatalogSync,
+  loadSourceRegistrySync,
+} from "../ingestion/source-registry";
 import {
   findEditionProfile,
   loadEditionProfileRegistrySync,
@@ -44,6 +49,19 @@ interface CanonicalBuildReport {
   sourceDefinitionHash?: string;
   qualityStatus?: "matched" | "drifted";
   qualityDrift?: QualityDrift[];
+  qualityCandidate?: SourceDefinition["quality"];
+}
+
+interface OnboardingReport {
+  celex: string;
+  shortName: string;
+  batch: string | null;
+  status: "review-required" | "blocked";
+  stage: "fetch" | "parse" | "review";
+  snapshotId?: string;
+  candidateArtifact?: string;
+  qualityCandidate?: SourceDefinition["quality"];
+  reason?: string;
 }
 
 function currentParserVersions(adapter: Adapter): ReadonlySet<string> {
@@ -266,38 +284,121 @@ async function writeReport(path: string, value: unknown): Promise<void> {
   await rename(pending, path);
 }
 
+async function processQueuedSources(
+  sources: SourceDefinition[],
+  skipFetch: boolean,
+): Promise<OnboardingReport[]> {
+  const reports: OnboardingReport[] = [];
+  for (const source of sources) {
+    let stage: OnboardingReport["stage"] = "fetch";
+    try {
+      if (!skipFetch) {
+        await runTypeScript("src/ingestion/cli.ts", [
+          "fetch",
+          "--celex",
+          source.celex,
+          "--catalog",
+        ]);
+      }
+      const selection = await latestSnapshot("eur-lex", source.celex);
+      stage = "parse";
+      const retrievalToken = selection.retrievedAt.replaceAll(/[-:.]/gu, "");
+      const sourceHash = selection.snapshotId.split(":").at(-1)?.slice(0, 12);
+      if (!sourceHash) {
+        throw new Error(`Invalid snapshot ID: ${selection.snapshotId}`);
+      }
+      const outputDirectory = resolve(
+        process.cwd(),
+        "data/artifacts/onboarding/eur-lex",
+        source.celex,
+        `${retrievalToken}-${sourceHash}-parser-${FORMEX_PARSER_VERSION}`,
+      );
+      await runTypeScript("src/ingestion/canonical-cli.ts", [
+        "--snapshot",
+        selection.directory,
+        "--catalog",
+        "--allow-drift",
+        "--output",
+        outputDirectory,
+      ]);
+      const canonical = JSON.parse(
+        await readFile(resolve(outputDirectory, "build-report.json"), "utf8"),
+      ) as CanonicalBuildReport;
+      if (!canonical.qualityCandidate) {
+        throw new Error("Candidate build did not produce a quality baseline");
+      }
+      reports.push({
+        celex: source.celex,
+        shortName: source.shortName,
+        batch: source.batch ?? null,
+        status: "review-required",
+        stage: "review",
+        snapshotId: selection.snapshotId,
+        candidateArtifact: outputDirectory,
+        qualityCandidate: canonical.qualityCandidate,
+      });
+    } catch (error) {
+      reports.push({
+        celex: source.celex,
+        shortName: source.shortName,
+        batch: source.batch ?? null,
+        status: "blocked",
+        stage,
+        reason: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  return reports;
+}
+
 async function refreshCorpus(): Promise<void> {
   const profileId = argument("--profile");
+  const batch = argument("--batch");
   if (process.argv.includes("--profile") && !profileId) {
     throw new Error(
-      "Usage: npm run corpus:refresh -- [--profile <profile-id>] [--skip-fetch] [--strict]",
+      "Usage: npm run corpus:update -- [--profile <profile-id>] [--batch <batch-id>] [--skip-fetch] [--strict]",
     );
+  }
+  if (process.argv.includes("--batch") && !batch) {
+    throw new Error("Usage: npm run corpus:update -- [--batch <batch-id>]");
   }
   const strict = process.argv.includes("--strict");
   const skipFetch = process.argv.includes("--skip-fetch");
+  const eurLexCatalog = loadSourceCatalogSync();
+  if (batch && !eurLexCatalog.some((source) => source.batch === batch)) {
+    throw new Error(`Unknown corpus batch: ${batch}`);
+  }
   const eurLexSources = loadSourceRegistrySync();
+  const selectedEurLexSources = batch
+    ? eurLexSources.filter((source) => source.batch === batch)
+    : eurLexSources;
+  const queuedSources = loadQueuedSourcesSync().filter(
+    (source) => !batch || source.batch === batch,
+  );
   const cssfSources = loadCssfSourceRegistrySync();
   const ebaSources = loadEbaSourceRegistrySync();
+  const selectedCssfSources = batch ? [] : cssfSources;
+  const selectedEbaSources = batch ? [] : ebaSources;
 
   if (!skipFetch) {
     console.log(
-      `Fetching ${eurLexSources.length + cssfSources.length + ebaSources.length} selected official sources...`,
+      `Fetching ${selectedEurLexSources.length + selectedCssfSources.length + selectedEbaSources.length} active and ${queuedSources.length} queued official sources...`,
     );
-    for (const source of eurLexSources) {
+    for (const source of selectedEurLexSources) {
       await runTypeScript("src/ingestion/cli.ts", [
         "fetch",
         "--celex",
         source.celex,
       ]);
     }
-    for (const source of cssfSources) {
+    for (const source of selectedCssfSources) {
       await runTypeScript("src/ingestion/cssf-cli.ts", [
         "fetch",
         "--id",
         source.localId,
       ]);
     }
-    for (const source of ebaSources) {
+    for (const source of selectedEbaSources) {
       await runTypeScript("src/ingestion/eba-cli.ts", [
         "fetch",
         "--id",
@@ -306,11 +407,21 @@ async function refreshCorpus(): Promise<void> {
     }
   }
 
+  const onboarding = await processQueuedSources(queuedSources, skipFetch);
+
   const selections = await Promise.all([
     ...eurLexSources.map((source) => latestSnapshot("eur-lex", source.celex)),
     ...cssfSources.map((source) => latestSnapshot("cssf", source.localId)),
     ...ebaSources.map((source) => latestSnapshot("eba", source.localId)),
   ]);
+  const selectedIdentities = new Set([
+    ...selectedEurLexSources.map((source) => `eur-lex:${source.celex}`),
+    ...selectedCssfSources.map((source) => `cssf:${source.localId}`),
+    ...selectedEbaSources.map((source) => `eba:${source.localId}`),
+  ]);
+  const buildSelections = selections.filter((selection) =>
+    selectedIdentities.has(`${selection.adapter}:${selection.identifier}`),
+  );
   const versionAudit = await buildConsolidatedExpressionAudit(
     eurLexSources,
     selections,
@@ -319,8 +430,8 @@ async function refreshCorpus(): Promise<void> {
     status: "unavailable" as const,
     reason: error instanceof Error ? error.message : String(error),
   }));
-  console.log(`Building ${selections.length} Canonical documents...`);
-  for (const selection of selections) {
+  console.log(`Building ${buildSelections.length} Canonical documents...`);
+  for (const selection of buildSelections) {
     const script =
       selection.adapter === "eur-lex"
         ? "src/ingestion/canonical-cli.ts"
@@ -389,7 +500,7 @@ async function refreshCorpus(): Promise<void> {
     ),
   ]);
   const sourceReports = await Promise.all(
-    selections.map(async (selection) => {
+    buildSelections.map(async (selection) => {
       const review = reviewBySource.get(
         `${selection.adapter}:${selection.identifier}`,
       );
@@ -423,12 +534,20 @@ async function refreshCorpus(): Promise<void> {
     "data/artifacts/refresh/build-report.json",
   );
   await writeReport(reportPath, {
-    schemaVersion: "1.1.0",
+    schemaVersion: "1.2.0",
     generatedAt: new Date().toISOString(),
     mode: strict ? "strict" : "experimental-current",
     fetchedCurrentSources: !skipFetch,
+    selectedBatch: batch ?? null,
     profileId: runtime.profileId,
     versionAudit,
+    catalog: {
+      active: eurLexSources.length,
+      queued: queuedSources.length,
+      planned: eurLexCatalog.filter((source) => source.status === "planned")
+        .length,
+    },
+    onboarding,
     sources: sourceReports,
     runtime: {
       buildId: runtime.buildId,
@@ -451,6 +570,13 @@ async function refreshCorpus(): Promise<void> {
       versionAudit.status === "completed"
         ? versionAudit.reviewRequired
         : "unknown",
+    queuedSources: queuedSources.length,
+    onboardingReady: onboarding.filter(
+      (source) => source.status === "review-required",
+    ).length,
+    onboardingBlocked: onboarding.filter(
+      (source) => source.status === "blocked",
+    ).length,
     driftedSources: sourceReports.filter(
       (source) => source.qualityStatus === "drifted",
     ).length,

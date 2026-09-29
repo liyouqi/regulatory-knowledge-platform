@@ -32,6 +32,14 @@ The repository keeps source-specific commands as diagnostic tools, while normal 
 
 The normal maintenance command is `npm run corpus:update`; `corpus:refresh` remains a compatibility alias. The reproducible release command is `npm run corpus:build -- --profile <profileId>`. The explicit acquisition and inspection steps below remain diagnostic/review tools when a source changes; neither orchestrator replaces legal review.
 
+For EUR-Lex laws, `data/source-registry.json` is also the small human-readable corpus catalog. Its lifecycle has only three values:
+
+- `active`: reviewed and included in the normal Runtime workflow;
+- `queued`: downloaded and parsed as an isolated onboarding candidate on the next `corpus:update`;
+- `planned`: visible backlog only; it is not fetched or published.
+
+An `active` or `queued` row contains the existing source fields. A `planned` row may contain only `status`, `batch`, `familyId`, `shortName`, and `celex`. Temporary outcomes such as source failure or parser failure are not maintained in this file; they are written to the refresh report. CSSF and EBA retain their existing adapter-specific registries because their source contracts differ from EUR-Lex, but require no additional day-to-day command.
+
 ## Refresh the current experimental corpus
 
 Daily development and first setup use a separate current-source workflow:
@@ -41,6 +49,10 @@ npm run corpus:update
 ```
 
 This command downloads the currently selected official bytes for every registered EUR-Lex, CSSF, and EBA source, audits all registered EUR-Lex acts from the verified CELLAR tree notices already stored in those snapshots, selects the newest verified local snapshot, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, atomically rebuilds the default Runtime SQLite, and verifies that artifact through the read-only Reader/Search services. Use `--skip-fetch` for a fully local rebuild; that mode performs the same audit from local tree notices and marks it as not freshly fetched.
+
+The same command also processes every `queued` EUR-Lex row. It fetches the official source, parses a candidate under ignored `data/artifacts/onboarding/`, and records a suggested quality baseline as `review-required`; a failure is recorded as `blocked` without removing any active Reader document. Queued and planned rows never enter Canonical production selection, the Runtime, strict manifests, or RAG exports. After review, promoting a row means adding the reviewed quality data, changing its status to `active`, and pinning the exact snapshot in the release manifest. Routine users still operate one command and read one report at `data/artifacts/refresh/build-report.json`.
+
+Normally no arguments are needed. For a large catalog, the same command may be limited to one configured batch with `npm run corpus:update -- --batch <batch-id>`; only acquisition and Canonical preparation are limited, while the resulting Runtime is still rebuilt from the complete active corpus so unrelated Reader documents do not disappear.
 
 The audit is advisory. A newer effective expression is written as `review-required` only when the official notice exposes an English Formex manifestation; a consolidated work available only in another language is not a usable English Reader candidate. The audit never edits `source-registry.json`, `document-expressions.json`, the exact-snapshot manifest, release-pinned Runtime selection, or a RAG export. Future expressions are counted but never selected. This preserves the small human gate without requiring a different discovery command.
 

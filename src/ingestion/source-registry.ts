@@ -6,6 +6,11 @@ import { normalizeCelex } from "../canonical/ids";
 import { sourceStatusSchema } from "../shared/source-status";
 
 export const sourceDefinitionSchema = z.object({
+  status: z.enum(["active", "queued", "planned"]).optional(),
+  batch: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]*$/)
+    .optional(),
   familyId: z.string().regex(/^family:[a-z0-9-]+$/),
   shortName: z.string().min(1),
   aliases: z.array(z.string().min(1)).min(1),
@@ -44,8 +49,33 @@ export const sourceDefinitionSchema = z.object({
 
 export type SourceDefinition = z.infer<typeof sourceDefinitionSchema>;
 
-function parseSourceRegistry(raw: unknown): SourceDefinition[] {
-  const sources = z.array(sourceDefinitionSchema).min(1).parse(raw);
+export const plannedSourceDefinitionSchema = z.object({
+  status: z.literal("planned"),
+  batch: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]*$/)
+    .optional(),
+  familyId: z.string().regex(/^family:[a-z0-9-]+$/),
+  shortName: z.string().min(1),
+  celex: z.string().transform(normalizeCelex),
+});
+
+export type PlannedSourceDefinition = z.infer<
+  typeof plannedSourceDefinitionSchema
+>;
+export type SourceCatalogEntry = SourceDefinition | PlannedSourceDefinition;
+
+function isFullSourceDefinition(
+  source: SourceCatalogEntry,
+): source is SourceDefinition {
+  return "eliUrl" in source;
+}
+
+function parseSourceCatalog(raw: unknown): SourceCatalogEntry[] {
+  const sources = z
+    .array(z.union([sourceDefinitionSchema, plannedSourceDefinitionSchema]))
+    .min(1)
+    .parse(raw);
   const seenCelex = new Set<string>();
   const aliasOwners = new Map<string, string>();
 
@@ -55,6 +85,7 @@ function parseSourceRegistry(raw: unknown): SourceDefinition[] {
     }
     seenCelex.add(source.celex);
     if (
+      isFullSourceDefinition(source) &&
       source.expressionCelex &&
       !source.expressionCelex.startsWith(`0${source.celex.slice(1)}-`)
     ) {
@@ -62,7 +93,10 @@ function parseSourceRegistry(raw: unknown): SourceDefinition[] {
         `Consolidated expression ${source.expressionCelex} does not belong to ${source.celex}`,
       );
     }
-    for (const alias of [source.shortName, ...source.aliases]) {
+    const aliases = isFullSourceDefinition(source)
+      ? [source.shortName, ...source.aliases]
+      : [source.shortName];
+    for (const alias of aliases) {
       const normalizedAlias = alias.normalize("NFKC").trim().toLowerCase();
       const owner = aliasOwners.get(normalizedAlias);
       if (owner && owner !== source.celex) {
@@ -75,6 +109,35 @@ function parseSourceRegistry(raw: unknown): SourceDefinition[] {
   }
 
   return sources;
+}
+
+function parseSourceRegistry(raw: unknown): SourceDefinition[] {
+  return parseSourceCatalog(raw).filter(
+    (source): source is SourceDefinition =>
+      isFullSourceDefinition(source) &&
+      (source.status === undefined || source.status === "active"),
+  );
+}
+
+export function loadSourceCatalogSync(
+  registryPath = resolve(process.cwd(), "data/source-registry.json"),
+): SourceCatalogEntry[] {
+  return parseSourceCatalog(JSON.parse(readFileSync(registryPath, "utf8")));
+}
+
+export async function loadSourceCatalog(
+  registryPath = resolve(process.cwd(), "data/source-registry.json"),
+): Promise<SourceCatalogEntry[]> {
+  return parseSourceCatalog(JSON.parse(await readFile(registryPath, "utf8")));
+}
+
+export function loadQueuedSourcesSync(
+  registryPath = resolve(process.cwd(), "data/source-registry.json"),
+): SourceDefinition[] {
+  return loadSourceCatalogSync(registryPath).filter(
+    (source): source is SourceDefinition =>
+      isFullSourceDefinition(source) && source.status === "queued",
+  );
 }
 
 export function loadSourceRegistrySync(
@@ -98,6 +161,24 @@ export async function findSource(celex: string): Promise<SourceDefinition> {
   if (!source) {
     throw new Error(
       `CELEX ${normalized} is not registered in data/source-registry.json`,
+    );
+  }
+
+  return source;
+}
+
+export async function findCatalogSource(
+  celex: string,
+): Promise<SourceDefinition> {
+  const normalized = normalizeCelex(celex);
+  const source = (await loadSourceCatalog()).find(
+    (candidate): candidate is SourceDefinition =>
+      isFullSourceDefinition(candidate) && candidate.celex === normalized,
+  );
+
+  if (!source) {
+    throw new Error(
+      `CELEX ${normalized} has no fetchable definition in data/source-registry.json`,
     );
   }
 

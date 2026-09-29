@@ -1,5 +1,6 @@
 [
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA",
     "aliases": [
@@ -29,6 +30,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:gdpr",
     "shortName": "GDPR",
     "aliases": ["General Data Protection Regulation", "EU GDPR"],
@@ -62,6 +64,7 @@
     }
   },
   {
+    "status": "active",
     "familyId": "family:ai-act",
     "shortName": "AI Act",
     "aliases": ["Artificial Intelligence Act", "EU AI Act", "AIA"],
@@ -97,6 +100,7 @@
     }
   },
   {
+    "status": "active",
     "familyId": "family:mica",
     "shortName": "MiCA",
     "aliases": [
@@ -136,6 +140,7 @@
     }
   },
   {
+    "status": "active",
     "familyId": "family:nis2",
     "shortName": "NIS2",
     "aliases": [
@@ -175,6 +180,7 @@
     }
   },
   {
+    "status": "active",
     "familyId": "family:data-act",
     "shortName": "Data Act",
     "aliases": ["EU Data Act"],
@@ -201,6 +207,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/2854/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:crd",
     "shortName": "CRD IV",
     "aliases": [
@@ -249,6 +256,7 @@
     "expressionCelex": "02013L0036-20250117"
   },
   {
+    "status": "active",
     "familyId": "family:crr",
     "shortName": "CRR",
     "aliases": [
@@ -288,6 +296,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/575/2026-06-26/eng"
   },
   {
+    "status": "active",
     "familyId": "family:crr",
     "shortName": "CRR III",
     "aliases": [
@@ -331,6 +340,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1623/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:crd",
     "shortName": "CRD VI",
     "aliases": [
@@ -368,6 +378,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2024/1619/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:brrd",
     "shortName": "BRRD",
     "aliases": [
@@ -406,6 +417,7 @@
     "expressionCelex": "02014L0059-20260511"
   },
   {
+    "status": "active",
     "familyId": "family:srmr",
     "shortName": "SRMR",
     "aliases": [
@@ -443,6 +455,7 @@
     "expressionCelex": "02014R0806-20260611"
   },
   {
+    "status": "active",
     "familyId": "family:dgsd",
     "shortName": "DGSD",
     "aliases": [
@@ -483,6 +496,7 @@
     "expressionCelex": "02014L0049-20140702"
   },
   {
+    "status": "active",
     "familyId": "family:psd",
     "shortName": "PSD2",
     "aliases": [
@@ -522,6 +536,7 @@
     "expressionCelex": "02015L2366-20250117"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Risk Management",
     "aliases": [
@@ -559,6 +574,7 @@
     }
   },
   {
+    "status": "active",
     "familyId": "family:mica",
     "shortName": "MiCA RTS CASP Authorisation",
     "aliases": [
@@ -589,6 +605,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/305/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Third-Party Policy",
     "aliases": [
@@ -619,6 +636,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1773/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS Incident Classification",
     "aliases": [
@@ -649,6 +667,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1772/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA ITS Register of Information",
     "aliases": [
@@ -693,6 +712,7 @@
     "expressionCelex": "02024R2956-20241202"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS Incident Reporting",
     "aliases": [
@@ -723,6 +743,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA ITS Incident Reporting",
     "aliases": [
@@ -755,6 +776,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/302/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA Amending Directive",
     "aliases": [
@@ -785,6 +807,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2022/2556/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS ICT Subcontracting",
     "aliases": [
@@ -815,6 +838,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/532/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS TLPT",
     "aliases": [
@@ -847,6 +871,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/1190/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA CTPP Designation Criteria",
     "aliases": [
@@ -877,6 +902,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1502/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA CTPP Oversight Fees",
     "aliases": [
@@ -907,6 +933,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1505/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS Oversight Activities",
     "aliases": [
@@ -938,6 +965,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/295/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:dora",
     "shortName": "DORA RTS Joint Examination Teams",
     "aliases": [
@@ -968,6 +996,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/420/oj/eng"
   },
   {
+    "status": "active",
     "familyId": "family:aml",
     "shortName": "AMLD IV",
     "aliases": [
@@ -1007,6 +1036,7 @@
     "expressionCelex": "02015L0849-20241230"
   },
   {
+    "status": "active",
     "familyId": "family:aml",
     "shortName": "AML High-Risk Third Countries Regulation",
     "aliases": [
@@ -1045,6 +1075,7 @@
     "expressionCelex": "02016R1675-20260129"
   },
   {
+    "status": "active",
     "familyId": "family:aml",
     "shortName": "Transfer of Funds Regulation",
     "aliases": [
