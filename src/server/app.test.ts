@@ -160,7 +160,7 @@ describe("Document lookup", () => {
     expect(chain?.nodes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          kind: "original-oj-snapshot",
+          kind: "consolidated-snapshot",
           availability: "loaded",
         }),
         expect.objectContaining({
@@ -519,9 +519,9 @@ describe("Document lookup", () => {
     expect(articleContext?.target.sourceLocator).toEqual({
       kind: "xpath",
       value:
-        "/ACT/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']",
+        "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']",
     });
-    expect(articleContext?.textSegments).toHaveLength(4);
+    expect(articleContext?.textSegments).toHaveLength(3);
     expect(articleContext?.textSegments[2]).toMatchObject({
       entityId: "eu:32013L0036:article:74:paragraph:3",
       text: expect.stringContaining("EBA shall issue guidelines"),
@@ -586,9 +586,10 @@ describe("Document lookup", () => {
     });
     expect(timeline?.events.at(-1)).toMatchObject({
       eventType: "phased-application",
-      date: "2027-08-02",
+      date: "2028-08-02",
       source: {
-        entityId: "eu:32024R1689:article:113:subparagraph:3:point:c",
+        entityId:
+          "eu:32024R1689:article:113:subparagraph:3:point:c:subpoint:ii",
       },
     });
     expect(findImplementationTimeline("dora")).toBeNull();

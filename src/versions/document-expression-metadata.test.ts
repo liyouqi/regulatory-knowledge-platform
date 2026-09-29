@@ -30,7 +30,7 @@ describe("reviewed document Expression metadata", () => {
     expect(selected.every((record) => record.issuers.length > 0)).toBe(true);
   });
 
-  it("does not represent reviewed original-OJ AML text as current", () => {
+  it("distinguishes reviewed consolidated AML text from historical original-OJ text", () => {
     const records = new Map(
       loadDocumentExpressionMetadataDataset().records.map((record) => [
         record.documentId,
@@ -39,14 +39,14 @@ describe("reviewed document Expression metadata", () => {
     );
 
     expect(records.get("eu:32015L0849")).toMatchObject({
-      textKind: "original_oj",
-      currencyStatus: "historical",
-      fallbackReason: "no_reviewed_consolidated_expression_loaded",
+      textKind: "consolidated",
+      currencyStatus: "current",
+      fallbackReason: null,
     });
     expect(records.get("eu:32016R1675")).toMatchObject({
-      textKind: "original_oj",
-      currencyStatus: "historical",
-      fallbackReason: "no_reviewed_consolidated_expression_loaded",
+      textKind: "consolidated",
+      currencyStatus: "current",
+      fallbackReason: null,
     });
     expect(records.get("eu:32013R0575")).toMatchObject({
       textKind: "consolidated",

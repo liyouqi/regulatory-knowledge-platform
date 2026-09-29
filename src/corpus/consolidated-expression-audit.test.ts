@@ -30,9 +30,21 @@ describe("consolidated-expression audit", () => {
   it("extracts only the base act's consolidated expressions from its official tree notice", () => {
     const candidates = parseConsolidatedExpressionCandidatesFromTreeNotice(
       `<NOTICE>
-        <VALUE>02020R0001-20250101</VALUE>
-        <VALUE>http://publications.europa.eu/resource/celex/02020R0001-20260101.ENG.fmx4</VALUE>
-        <VALUE>02020R0999-20250101</VALUE>
+        <RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+          <VALUE>02020R0001-20250101</VALUE>
+          <VALUE>http://publications.europa.eu/resource/celex/02020R0001-20250101.ENG.fmx4</VALUE>
+          <OP-CODE>ENG</OP-CODE>
+        </RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+        <RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+          <VALUE>02020R0001-20260101</VALUE>
+          <VALUE>http://publications.europa.eu/resource/celex/02020R0001-20260101.ENG.fmx4</VALUE>
+          <LANG>en</LANG>
+        </RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+        <RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+          <VALUE>02020R0999-20250101</VALUE>
+          <VALUE>http://publications.europa.eu/resource/celex/02020R0999-20250101.ENG.fmx4</VALUE>
+          <OP-CODE>ENG</OP-CODE>
+        </RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
       </NOTICE>`,
       source.celex,
     );
@@ -43,9 +55,25 @@ describe("consolidated-expression audit", () => {
     ]);
   });
 
+  it("ignores a consolidated work that has no English Formex expression", () => {
+    expect(
+      parseConsolidatedExpressionCandidatesFromTreeNotice(
+        `<RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+          <VALUE>02020R0001-20250101</VALUE>
+          <VALUE>http://publications.europa.eu/resource/consolidation/2020R0001%2F20250101.FRA.fmx4</VALUE>
+          <OP-CODE>FRA</OP-CODE>
+        </RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>`,
+        source.celex,
+      ),
+    ).toEqual([]);
+  });
+
   it("reports the latest effective expression without selecting a future one", () => {
     const candidates = parseConsolidatedExpressionCandidatesFromTreeNotice(
-      "02020R0001-20250101 02020R0001-20260101 02020R0001-20270101",
+      `<RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>
+        02020R0001-20250101 02020R0001-20260101 02020R0001-20270101
+        02020R0001-20270101.ENG.fmx4 <OP-CODE>ENG</OP-CODE>
+      </RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>`,
       source.celex,
     );
 

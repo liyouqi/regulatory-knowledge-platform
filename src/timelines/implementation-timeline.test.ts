@@ -6,20 +6,23 @@ import {
 } from "./implementation-timeline";
 
 describe("reviewed implementation timeline", () => {
-  it("builds the six evidence-checked AI Act milestones", () => {
+  it("builds the nine evidence-checked AI Act milestones", () => {
     const events = buildImplementationTimelineEvents(
       loadDocumentViews(),
       loadImplementationTimelineDataset(),
     );
 
-    expect(events).toHaveLength(6);
+    expect(events).toHaveLength(9);
     expect(events.map((event) => event.date)).toEqual([
       "2024-07-12",
       "2024-08-01",
       "2025-02-02",
       "2025-08-02",
+      "2026-07-27",
       "2026-08-02",
-      "2027-08-02",
+      "2026-12-02",
+      "2027-12-02",
+      "2028-08-02",
     ]);
     expect(events[1]).toMatchObject({
       eventType: "entry-into-force",

@@ -96,7 +96,7 @@ describe("banking-default runtime isolation", () => {
     ).toBe(true);
     expect(
       search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
-    ).toHaveLength(68);
+    ).toHaveLength(74);
     expect(repository?.findDocumentBySlug("crr")?.id).toBe("eu:32013R0575");
     expect(repository?.findDocumentBySlug("crr-iii")?.id).toBe("eu:32024R1623");
     expect(repository?.findDocumentBySlug("crd-vi")?.id).toBe("eu:32024L1619");

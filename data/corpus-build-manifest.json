@@ -1,14 +1,16 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "sources": [
     {
       "adapter": "eur-lex",
       "identifier": "32013L0036",
-      "snapshotId": "snapshot:cellar:32013L0036:5084ee4c2cd50794ed4e3ac789ff1cda44613e701cfdba35e2c89439110710af",
-      "contentSha256": "sha256:5084ee4c2cd50794ed4e3ac789ff1cda44613e701cfdba35e2c89439110710af",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32013L0036:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "contentSha256": "sha256:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -34,44 +36,56 @@
     {
       "adapter": "eur-lex",
       "identifier": "32014L0059",
-      "snapshotId": "snapshot:cellar:32014L0059:94c44c55ea85f2a6ae142e617d0e66c283861f6271f0bfb8f1e92a424edd6671",
-      "contentSha256": "sha256:94c44c55ea85f2a6ae142e617d0e66c283861f6271f0bfb8f1e92a424edd6671",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32014L0059:720f2a7237a7e445c7d820cfa8c9f0aa5c428e36829e71de05c2915d2af3fd1c",
+      "contentSha256": "sha256:720f2a7237a7e445c7d820cfa8c9f0aa5c428e36829e71de05c2915d2af3fd1c",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014R0806",
-      "snapshotId": "snapshot:cellar:32014R0806:7b6ad169977ae9dc96a6fb5ccd99619423e246e657f915ffe51660c19edd6b3b",
-      "contentSha256": "sha256:7b6ad169977ae9dc96a6fb5ccd99619423e246e657f915ffe51660c19edd6b3b",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32014R0806:9b50b64749b98f2151f1358d6cad7b2a9c6b1b33826fd78b50863859928af37d",
+      "contentSha256": "sha256:9b50b64749b98f2151f1358d6cad7b2a9c6b1b33826fd78b50863859928af37d",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014L0049",
-      "snapshotId": "snapshot:cellar:32014L0049:2bbac4b86abf3844c2c94b82193a0d51cfdb10b7ec45ea61818a3c0dd2a91cfe",
-      "contentSha256": "sha256:2bbac4b86abf3844c2c94b82193a0d51cfdb10b7ec45ea61818a3c0dd2a91cfe",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32014L0049:34c79aa0eedaaf45d568b37074b3cee127dcb4fc6420f1f69ea2ffd433a2ee7d",
+      "contentSha256": "sha256:34c79aa0eedaaf45d568b37074b3cee127dcb4fc6420f1f69ea2ffd433a2ee7d",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32015L2366",
-      "snapshotId": "snapshot:cellar:32015L2366:79eb4c1919cbd2bafec83a85d7a85156eb68800a1d611478c861e303a3e505be",
-      "contentSha256": "sha256:79eb4c1919cbd2bafec83a85d7a85156eb68800a1d611478c861e303a3e505be",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32015L2366:4f5527c9e42a608c4b8eab93b8a2abac50cb9a3169f1cb76cdeae2d0d259a6c6",
+      "contentSha256": "sha256:4f5527c9e42a608c4b8eab93b8a2abac50cb9a3169f1cb76cdeae2d0d259a6c6",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32016R0679",
-      "snapshotId": "snapshot:cellar:32016R0679:fce6e6ea8724e66a1c4f98c584cafdc9dfbae26aa83c44b43423b8c7f6aa0295",
-      "contentSha256": "sha256:fce6e6ea8724e66a1c4f98c584cafdc9dfbae26aa83c44b43423b8c7f6aa0295",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32016R0679:3953fc2be872386b46216d17e59c0b8d9b19a475f962e50bdcf8f272c38da4cc",
+      "contentSha256": "sha256:3953fc2be872386b46216d17e59c0b8d9b19a475f962e50bdcf8f272c38da4cc",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32022L2555",
-      "snapshotId": "snapshot:cellar:32022L2555:260e9b24760def5bb3ac7cf8681065572dd8bd537b5ce4ebaaac420259878985",
-      "contentSha256": "sha256:260e9b24760def5bb3ac7cf8681065572dd8bd537b5ce4ebaaac420259878985",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32022L2555:427cc45c882b2517850fdaa9aea4cdadcdf9173e82b7102deb82a242be52a926",
+      "contentSha256": "sha256:427cc45c882b2517850fdaa9aea4cdadcdf9173e82b7102deb82a242be52a926",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -83,23 +97,29 @@
     {
       "adapter": "eur-lex",
       "identifier": "32023R1114",
-      "snapshotId": "snapshot:cellar:32023R1114:dfdc2b4800e98af7f766e0953c2c4c082e85bac20990014205234054574595f0",
-      "contentSha256": "sha256:dfdc2b4800e98af7f766e0953c2c4c082e85bac20990014205234054574595f0",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32023R1114:a2eb606cc09a9422dc9586ce0bf8f6afc87d9508d79088fa704eb874aa65f5b6",
+      "contentSha256": "sha256:a2eb606cc09a9422dc9586ce0bf8f6afc87d9508d79088fa704eb874aa65f5b6",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32023R2854",
-      "snapshotId": "snapshot:cellar:32023R2854:5ffe980d37d9077bc44fe5940afefe6cd4afd71e995e76b0c65c14509d16dd8e",
-      "contentSha256": "sha256:5ffe980d37d9077bc44fe5940afefe6cd4afd71e995e76b0c65c14509d16dd8e",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32023R2854:1630639f099b82b49a3e8e1ce57d685ab53a08af42052c0accfc0a22be0b6ed9",
+      "contentSha256": "sha256:1630639f099b82b49a3e8e1ce57d685ab53a08af42052c0accfc0a22be0b6ed9",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1689",
-      "snapshotId": "snapshot:cellar:32024R1689:e8625a71f3895c72ed7244465f5222b9f25ea12d71f1a094369aef6ef456fc38",
-      "contentSha256": "sha256:e8625a71f3895c72ed7244465f5222b9f25ea12d71f1a094369aef6ef456fc38",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32024R1689:655c4c6c957d1484426e1eb859a4fc65ad58978c1edd4d3a936fee87e4bf153b",
+      "contentSha256": "sha256:655c4c6c957d1484426e1eb859a4fc65ad58978c1edd4d3a936fee87e4bf153b",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -118,16 +138,20 @@
     {
       "adapter": "eur-lex",
       "identifier": "32024R1774",
-      "snapshotId": "snapshot:cellar:32024R1774:f807f53507289a24377503fb861f2b206324cac8ef4d4029bc9c1069aa576c4e",
-      "contentSha256": "sha256:f807f53507289a24377503fb861f2b206324cac8ef4d4029bc9c1069aa576c4e",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32024R1774:6484eb37a06d48ae5c29b582e41c30e6ec28fbc32f7e131cd5830f27cededa48",
+      "contentSha256": "sha256:6484eb37a06d48ae5c29b582e41c30e6ec28fbc32f7e131cd5830f27cededa48",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R2956",
-      "snapshotId": "snapshot:cellar:32024R2956:b185e1ddb02a1b85165e3e9cfd2720063f872c67163f9fa12d16328c2247ff22",
-      "contentSha256": "sha256:b185e1ddb02a1b85165e3e9cfd2720063f872c67163f9fa12d16328c2247ff22",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32024R2956:31fc1b1803a323acaee2e03baf13056f202c611b0bdcb5add0f610a60c5174d6",
+      "contentSha256": "sha256:31fc1b1803a323acaee2e03baf13056f202c611b0bdcb5add0f610a60c5174d6",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -153,16 +177,20 @@
     {
       "adapter": "eur-lex",
       "identifier": "32015L0849",
-      "snapshotId": "snapshot:cellar:32015L0849:79255bbc45eb6e4109dbf756ff3c49aa885f191756d3f0515a934a7a22c2a0f6",
-      "contentSha256": "sha256:79255bbc45eb6e4109dbf756ff3c49aa885f191756d3f0515a934a7a22c2a0f6",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32015L0849:bbb776089dc3ec8a4223467cc4c16f9272de3cbfb3dd1cc6032c35be10b10db8",
+      "contentSha256": "sha256:bbb776089dc3ec8a4223467cc4c16f9272de3cbfb3dd1cc6032c35be10b10db8",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32016R1675",
-      "snapshotId": "snapshot:cellar:32016R1675:aec9991b9c95396ddf645011f44b95a6feb2451d3b3f539e2adaabb1a21bd965",
-      "contentSha256": "sha256:aec9991b9c95396ddf645011f44b95a6feb2451d3b3f539e2adaabb1a21bd965",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cellar:32016R1675:c7ede733cb3b28b57de9df29619bee2eb0823e5009c39538ef2dab52a1691d75",
+      "contentSha256": "sha256:c7ede733cb3b28b57de9df29619bee2eb0823e5009c39538ef2dab52a1691d75",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -230,9 +258,11 @@
     {
       "adapter": "cssf",
       "identifier": "circular-25-893",
-      "snapshotId": "snapshot:cssf:circular-25-893:1b55367a7cbc758eede63fa728b9cf77003acfdad85374cdb1547835c58f8436",
-      "contentSha256": "sha256:1b55367a7cbc758eede63fa728b9cf77003acfdad85374cdb1547835c58f8436",
-      "retention": { "status": "local-only" }
+      "snapshotId": "snapshot:cssf:circular-25-893:5b573fa9f3b6d88f2ab4f0a99a71d49a36c1ce1dddf52759a31b45c91590cb6f",
+      "contentSha256": "sha256:5b573fa9f3b6d88f2ab4f0a99a71d49a36c1ce1dddf52759a31b45c91590cb6f",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "cssf",

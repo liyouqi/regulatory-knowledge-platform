@@ -40,8 +40,8 @@ describe("SQLite FTS5 search artifact", () => {
     expect(first.buildId).toBe(second.buildId);
     expect(first).toMatchObject({
       documentCount: 1,
-      relatedRecitalCount: 0,
-      tfidfBenchmark: null,
+      relatedRecitalCount: 317,
+      tfidfBenchmark: expect.objectContaining({ caseCount: 2, passed: true }),
     });
     expect(first.recordCount).toBeGreaterThan(900);
     expect(first.definitionCount).toBe(65);

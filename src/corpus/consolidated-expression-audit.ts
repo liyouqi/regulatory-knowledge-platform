@@ -25,18 +25,29 @@ export function parseConsolidatedExpressionCandidatesFromTreeNotice(
 ): ConsolidatedExpressionCandidate[] {
   const celex = normalizeCelex(baseCelex);
   const candidates = new Map<string, ConsolidatedExpressionCandidate>();
-  for (const candidate of treeNoticeXml.matchAll(/0\d{4}[A-Z]\d{4}-\d{8}/gu)) {
-    const expressionCelex = normalizeCelex(candidate[0]);
-    const match = /^0(.+)-(\d{4})(\d{2})(\d{2})$/u.exec(expressionCelex);
-    if (!match) continue;
-    if (normalizeCelex(`3${match[1]}`) !== celex) continue;
-    const effectiveDate = `${match[2]}-${match[3]}-${match[4]}`;
-    if (Number.isNaN(Date.parse(`${effectiveDate}T00:00:00Z`))) continue;
-    candidates.set(expressionCelex, {
-      celex,
-      expressionCelex,
-      effectiveDate,
-    });
+  const consolidatedNotices = treeNoticeXml.matchAll(
+    /<RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED\b[^>]*>([\s\S]*?)<\/RESOURCE_LEGAL_CONSOLIDATED_BY_ACT_CONSOLIDATED>/gu,
+  );
+  for (const notice of consolidatedNotices) {
+    const body = notice[1];
+    if (!body) continue;
+    const hasEnglishFormex =
+      /\.ENG\.fmx4\b/u.test(body) &&
+      (/<OP-CODE>ENG<\/OP-CODE>/u.test(body) || /<LANG>en<\/LANG>/u.test(body));
+    if (!hasEnglishFormex) continue;
+    for (const candidate of body.matchAll(/0\d{4}[A-Z]\d{4}-\d{8}/gu)) {
+      const expressionCelex = normalizeCelex(candidate[0]);
+      const match = /^0(.+)-(\d{4})(\d{2})(\d{2})$/u.exec(expressionCelex);
+      if (!match) continue;
+      if (normalizeCelex(`3${match[1]}`) !== celex) continue;
+      const effectiveDate = `${match[2]}-${match[3]}-${match[4]}`;
+      if (Number.isNaN(Date.parse(`${effectiveDate}T00:00:00Z`))) continue;
+      candidates.set(expressionCelex, {
+        celex,
+        expressionCelex,
+        effectiveDate,
+      });
+    }
   }
   return [...candidates.values()].sort((left, right) =>
     left.expressionCelex.localeCompare(right.expressionCelex),

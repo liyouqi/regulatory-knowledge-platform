@@ -41,23 +41,24 @@ describe("EU source registry", () => {
     expect(
       sources.find((source) => source.celex === "32024R2956")?.sourceStatus,
     ).toMatchObject({
-      basis: "original-oj",
+      basis: "consolidated",
       textAsOf: "2024-12-02",
-      checkedAt: "2026-08-23T23:37:57.439Z",
+      checkedAt: "2026-09-29T00:00:00Z",
       corrections: [{ date: "2025-09-19" }],
     });
     expect(
       sources.find((source) => source.celex === "32013L0036"),
     ).toMatchObject({
       familyId: "family:crd",
+      expressionCelex: "02013L0036-20250117",
       quality: {
-        articleCount: 165,
+        articleCount: 178,
         annexCount: 2,
         maximumWarnings: 0,
       },
       sourceStatus: {
-        basis: "original-oj",
-        textAsOf: "2013-06-27",
+        basis: "consolidated",
+        textAsOf: "2025-01-17",
         corrections: [{ date: "2013-08-02" }, { date: "2017-01-25" }],
       },
     });
@@ -107,10 +108,11 @@ describe("EU source registry", () => {
       sources.find((source) => source.celex === "32015L0849"),
     ).toMatchObject({
       familyId: "family:aml",
-      quality: { articleCount: 69, annexCount: 4, maximumWarnings: 0 },
+      expressionCelex: "02015L0849-20241230",
+      quality: { articleCount: 81, annexCount: 4, maximumWarnings: 0 },
       sourceStatus: {
-        basis: "original-oj",
-        textAsOf: "2015-06-05",
+        basis: "consolidated",
+        textAsOf: "2024-12-30",
         currentVersionUrl: "https://eur-lex.europa.eu/eli/dir/2015/849",
       },
     });

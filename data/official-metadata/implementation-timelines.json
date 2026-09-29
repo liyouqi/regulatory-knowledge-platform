@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "id": "implementation-timelines",
-  "version": "1.0.0",
-  "reviewedAt": "2026-08-26T14:00:00Z",
+  "version": "1.1.0",
+  "reviewedAt": "2026-09-29T00:00:00Z",
   "timelines": [
     {
       "id": "timeline:eu:32024R1689:implementation",
@@ -18,7 +18,7 @@
           "sourceEntityId": "eu:32024R1689",
           "evidenceText": "2024-07-12",
           "evidenceLocator": "source-registry:32024R1689:publicationDate",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
         },
         {
           "id": "timeline-event:eu:32024R1689:entry-into-force",
@@ -29,7 +29,7 @@
           "dateBasis": "calculated-from-publication",
           "sourceEntityId": "eu:32024R1689:article:113:subparagraph:1",
           "evidenceText": "This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union.",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng",
           "derivation": {
             "method": "calendar-days-after-publication",
             "baseDate": "2024-07-12",
@@ -41,11 +41,11 @@
           "eventType": "phased-application",
           "date": "2025-02-02",
           "label": "Application under Article 113(3)(a)",
-          "scopeLabel": "Chapters I and II",
+          "scopeLabel": "Chapters I and II, subject to the Article 5 exceptions",
           "dateBasis": "explicit-legal-text",
           "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:a",
-          "evidenceText": "Chapters I and II shall apply from 2 February 2025;",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+          "evidenceText": "Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
         },
         {
           "id": "timeline-event:eu:32024R1689:governance-penalties-application",
@@ -56,7 +56,18 @@
           "dateBasis": "explicit-legal-text",
           "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:b",
           "evidenceText": "Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78 shall apply from 2 August 2025, with the exception of Article 101;",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:articles-102-110-application",
+          "eventType": "phased-application",
+          "date": "2026-07-27",
+          "label": "Application under Article 113(3)(d)",
+          "scopeLabel": "Articles 102 to 110",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:d",
+          "evidenceText": "Articles 102 to 110 shall apply from 27 July 2026.",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
         },
         {
           "id": "timeline-event:eu:32024R1689:general-application",
@@ -67,18 +78,40 @@
           "dateBasis": "explicit-legal-text",
           "sourceEntityId": "eu:32024R1689:article:113:subparagraph:2",
           "evidenceText": "It shall apply from 2 August 2026.",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:article-5-exceptions-application",
+          "eventType": "phased-application",
+          "date": "2026-12-02",
+          "label": "Application under Article 113(3)(a)",
+          "scopeLabel": "Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b)",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:a",
+          "evidenceText": "Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
+        },
+        {
+          "id": "timeline-event:eu:32024R1689:article-6-2-application",
+          "eventType": "phased-application",
+          "date": "2027-12-02",
+          "label": "Application under Article 113(3)(c)(i)",
+          "scopeLabel": "High-risk AI systems under Article 6(2) and Annex III",
+          "dateBasis": "explicit-legal-text",
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:c:subpoint:i",
+          "evidenceText": "2 December 2027 as regards AI systems classified as high-risk pursuant to Article 6(2) and Annex III; and",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
         },
         {
           "id": "timeline-event:eu:32024R1689:article-6-1-application",
           "eventType": "phased-application",
-          "date": "2027-08-02",
-          "label": "Application under Article 113(3)(c)",
-          "scopeLabel": "Article 6(1) and corresponding obligations",
+          "date": "2028-08-02",
+          "label": "Application under Article 113(3)(c)(ii)",
+          "scopeLabel": "High-risk AI systems under Article 6(1) and Annex I",
           "dateBasis": "explicit-legal-text",
-          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:c",
-          "evidenceText": "Article 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027.",
-          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+          "sourceEntityId": "eu:32024R1689:article:113:subparagraph:3:point:c:subpoint:ii",
+          "evidenceText": "2 August 2028 as regards AI systems classified as high-risk pursuant to Article 6(1) and Annex I;",
+          "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
         }
       ]
     }

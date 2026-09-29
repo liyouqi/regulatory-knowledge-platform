@@ -10,17 +10,17 @@ import {
 const documents = loadDocumentViews();
 
 describe("TF-IDF related-recital builder", () => {
-  it("passes the reviewed DORA, GDPR, and AI Act Top-N benchmark", () => {
+  it("passes the reviewed DORA Top-N benchmark for the loaded expression", () => {
     const result = buildTfidfRelatedRecitals(documents);
 
     expect(result.evaluation).toMatchObject({
-      caseCount: 8,
-      passedCaseCount: 8,
+      caseCount: 2,
+      passedCaseCount: 2,
       hitRate: 1,
       passed: true,
     });
     expect(result.evaluation.cases.every((item) => item.passed)).toBe(true);
-    expect(result.relationships.length).toBeGreaterThan(500);
+    expect(result.relationships.length).toBeGreaterThan(300);
   });
 
   it("publishes deterministic scored relationships only for benchmarked laws", () => {
@@ -41,7 +41,7 @@ describe("TF-IDF related-recital builder", () => {
           (relationship) => relationship.sourceEntityId.split(":article:")[0],
         ),
       ),
-    ).toEqual(new Set(["eu:32022R2554", "eu:32016R0679", "eu:32024R1689"]));
+    ).toEqual(new Set(["eu:32022R2554"]));
     expect(
       new Set(first.relationships.map((relationship) => relationship.id)).size,
     ).toBe(first.relationships.length);

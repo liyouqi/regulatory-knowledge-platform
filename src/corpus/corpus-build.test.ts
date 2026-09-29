@@ -61,7 +61,7 @@ describe("corpus build manifest", () => {
           adapter: "eur-lex",
           identifier: "32015L0849",
           snapshotId:
-            "snapshot:cellar:32015L0849:79255bbc45eb6e4109dbf756ff3c49aa885f191756d3f0515a934a7a22c2a0f6",
+            "snapshot:cellar:32015L0849:bbb776089dc3ec8a4223467cc4c16f9272de3cbfb3dd1cc6032c35be10b10db8",
         }),
       }),
     );
@@ -71,7 +71,7 @@ describe("corpus build manifest", () => {
           adapter: "eur-lex",
           identifier: "32013L0036",
           snapshotId:
-            "snapshot:cellar:32013L0036:5084ee4c2cd50794ed4e3ac789ff1cda44613e701cfdba35e2c89439110710af",
+            "snapshot:cellar:32013L0036:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
         }),
       }),
     );

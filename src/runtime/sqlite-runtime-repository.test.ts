@@ -161,11 +161,11 @@ describe("SQLite runtime repository", () => {
     expect(timeline).toMatchObject({
       schemaVersion: "1.0.0",
       id: "timeline:eu:32024R1689:implementation",
-      version: "1.0.0",
+      version: "1.1.0",
       document: { id: "eu:32024R1689", slug: "ai-act" },
       runtime: { buildId: repository?.buildId, profileId: "full-corpus" },
     });
-    expect(timeline?.events).toHaveLength(6);
+    expect(timeline?.events).toHaveLength(9);
     expect(timeline?.events[1]).toMatchObject({
       date: "2024-08-01",
       dateBasis: "calculated-from-publication",
@@ -177,7 +177,7 @@ describe("SQLite runtime repository", () => {
     });
     expect(repository?.findImplementationTimelineBySlug("dora")).toBeNull();
     expect(repository?.findImplementationTimelineBySlug("unknown")).toBeNull();
-    expect(repository).toMatchObject({ timelineEventCount: 6 });
+    expect(repository).toMatchObject({ timelineEventCount: 9 });
     expect(
       repository
         ?.listDocumentSummaries()
@@ -333,18 +333,25 @@ describe("SQLite runtime repository", () => {
       "eu:32014R0806",
       "eu:32015L2366",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
+    const additionalConsolidatedChains = [
+      "eu:32016R0679",
+      "eu:32024R1689",
+      "eu:32023R1114",
+      "eu:32022L2555",
+      "eu:32024R1774",
+    ].map((documentId) => repository?.findDocumentVersionChain(documentId));
 
     expect(chain).toMatchObject({
       documentId: "eu:32024R2956",
       buildId: repository?.buildId,
       coverage: "source-status-only",
-      checkedAt: "2026-08-23T23:37:57.439Z",
-      loadedVersionId: "version:eu:32024R2956:original-oj:2024-12-02",
+      checkedAt: "2026-09-29T00:00:00Z",
+      loadedVersionId: "version:eu:32024R2956:consolidated:2024-12-02",
     });
     expect(chain?.nodes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          kind: "original-oj-snapshot",
+          kind: "consolidated-snapshot",
           date: "2024-12-02",
           availability: "loaded",
         }),
@@ -367,8 +374,8 @@ describe("SQLite runtime repository", () => {
     expect(crdChain).toMatchObject({
       documentId: "eu:32013L0036",
       coverage: "source-status-only",
-      checkedAt: "2026-08-25T18:00:14Z",
-      loadedVersionId: "version:eu:32013L0036:original-oj:2013-06-27",
+      checkedAt: "2026-09-29T00:00:00Z",
+      loadedVersionId: "version:eu:32013L0036:consolidated:2025-01-17",
     });
     expect(crdChain?.nodes).toHaveLength(4);
     expect(crdChain?.nodes).toEqual(
@@ -417,9 +424,9 @@ describe("SQLite runtime repository", () => {
     expect(amldChain).toMatchObject({
       documentId: "eu:32015L0849",
       coverage: "source-status-only",
-      loadedVersionId: "version:eu:32015L0849:original-oj:2015-06-05",
+      loadedVersionId: "version:eu:32015L0849:consolidated:2024-12-30",
       nodes: [
-        expect.objectContaining({ kind: "original-oj-snapshot" }),
+        expect.objectContaining({ kind: "consolidated-snapshot" }),
         expect.objectContaining({
           kind: "current-version-link",
           sourceUrl: "https://eur-lex.europa.eu/eli/dir/2015/849",
@@ -429,7 +436,7 @@ describe("SQLite runtime repository", () => {
     expect(highRiskChain).toMatchObject({
       documentId: "eu:32016R1675",
       coverage: "source-status-only",
-      loadedVersionId: "version:eu:32016R1675:original-oj:2016-09-20",
+      loadedVersionId: "version:eu:32016R1675:consolidated:2026-01-29",
     });
     expect(
       addedBankingChains.every(
@@ -450,6 +457,11 @@ describe("SQLite runtime repository", () => {
         addedBankingChains.reduce(
           (sum, bankingChain) => sum + (bankingChain?.nodes.length ?? 0),
           0,
+        ) +
+        additionalConsolidatedChains.reduce(
+          (sum, consolidatedChain) =>
+            sum + (consolidatedChain?.nodes.length ?? 0),
+          0,
         ),
     );
     expect(repository?.versionEdgeCount).toBe(
@@ -462,6 +474,11 @@ describe("SQLite runtime repository", () => {
         (highRiskChain?.edges.length ?? 0) +
         addedBankingChains.reduce(
           (sum, bankingChain) => sum + (bankingChain?.edges.length ?? 0),
+          0,
+        ) +
+        additionalConsolidatedChains.reduce(
+          (sum, consolidatedChain) =>
+            sum + (consolidatedChain?.edges.length ?? 0),
           0,
         ),
     );
@@ -623,7 +640,7 @@ describe("SQLite runtime repository", () => {
         score: expect.any(Number),
       }),
     );
-    expect(repository?.relatedRecitalCount).toBeGreaterThan(1_000);
+    expect(repository?.relatedRecitalCount).toBeGreaterThan(300);
   });
 
   it("returns reviewed Level 2 mappings in both legal directions", () => {
@@ -759,9 +776,9 @@ describe("SQLite runtime repository", () => {
     expect(repository?.findDocument("eu:32024R2956")).toMatchObject({
       buildId: expect.stringContaining("status-"),
       sourceStatus: {
-        basis: "original-oj",
+        basis: "consolidated",
         textAsOf: "2024-12-02",
-        checkedAt: "2026-08-23T23:37:57.439Z",
+        checkedAt: "2026-09-29T00:00:00Z",
         currentVersionUrl: "https://eur-lex.europa.eu/eli/reg_impl/2024/2956",
         corrections: [expect.objectContaining({ date: "2025-09-19" })],
       },
@@ -810,7 +827,7 @@ describe("SQLite runtime repository", () => {
           id: "eu:32024R2956",
           measureType: "its",
           sourceStatus: expect.objectContaining({
-            basis: "original-oj",
+            basis: "consolidated",
             corrections: [expect.objectContaining({ date: "2025-09-19" })],
           }),
           mandates: [

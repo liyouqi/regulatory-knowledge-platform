@@ -40,19 +40,26 @@
     "publicationDate": "2016-05-04",
     "quality": {
       "articleCount": 99,
-      "recitalCount": 173,
+      "recitalCount": 0,
       "annexCount": 0,
       "paragraphCount": 390,
       "pointCount": 389,
       "structuralNodeCount": 26,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32016R0679:recital:1": "sha256:3baeaf5c9cf4e66538baeb15c106328fa12b35b58caadf5f022b8dae1600c34f",
         "eu:32016R0679:article:1:paragraph:1": "sha256:9e654552ce9e0e0f0f1bf6f2521b18c3a2985d858414affec7fd60d7c3e4bd30",
         "eu:32016R0679:article:99:paragraph:2": "sha256:41a55c9b41a1becca4abc825d5d4aed31905d64216e8e9b46234cfc60a3995b2"
       }
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng",
+    "expressionCelex": "02016R0679-20160504",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2016-05-04",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2016/679",
+      "corrections": []
+    }
   },
   {
     "familyId": "family:ai-act",
@@ -65,22 +72,29 @@
     "measureType": "primary-act",
     "publicationDate": "2024-07-12",
     "quality": {
-      "articleCount": 113,
-      "recitalCount": 180,
-      "annexCount": 13,
-      "paragraphCount": 581,
-      "pointCount": 632,
+      "articleCount": 119,
+      "recitalCount": 0,
+      "annexCount": 14,
+      "paragraphCount": 645,
+      "pointCount": 692,
       "structuralNodeCount": 29,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R1689:recital:1": "sha256:37a9025a1127e7e256c678005ba459b0c624c3bfb171e3781853cb362493c36a",
         "eu:32024R1689:article:1:paragraph:1": "sha256:61052d02dfbc5b15efe3f8132180249abd7b1733eb1cb8307b5f33e687e1a188",
-        "eu:32024R1689:article:113:subparagraph:3": "sha256:659bd7e8a2a48684979a6d540518f9dc9850a96275b92bb67552a39d06970fd0",
-        "eu:32024R1689:annex:i": "sha256:e1daf4a8bcb91506d0a05994b9e0cb5b89a190a3fd667fd0bbf6bf9c6b14e435",
-        "eu:32024R1689:annex:xiii": "sha256:8b44634a79c895e17aff37e5221fb0c055823f5eb91e6436f7dbf9ba1da3a439"
+        "eu:32024R1689:article:113:subparagraph:3": "sha256:79f1ba07b20713a1c54341ad74d2ec4fea2db9c1d9601e8b740fe12f57dca649",
+        "eu:32024R1689:annex:i": "sha256:12084f4818258d211ae32bed3ac39b306eeee2754c7da4566b8cacd6c7f0c822",
+        "eu:32024R1689:annex:xiv": "sha256:04582c6fcb68104eba1325289cb76ae383598a4b0f8952a27ae3774da53d35b1"
       }
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng",
+    "expressionCelex": "02024R1689-20260727",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-07-27",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689",
+      "corrections": []
+    }
   },
   {
     "familyId": "family:mica",
@@ -97,22 +111,29 @@
     "measureType": "primary-act",
     "publicationDate": "2023-06-09",
     "quality": {
-      "articleCount": 149,
-      "recitalCount": 119,
+      "articleCount": 150,
+      "recitalCount": 0,
       "annexCount": 6,
-      "paragraphCount": 889,
-      "pointCount": 1119,
+      "paragraphCount": 895,
+      "pointCount": 1135,
       "structuralNodeCount": 27,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32023R1114:recital:1": "sha256:0e409c4acf62b2ca491a7ae9a87fa5f5907cdb9f91c464eba1c8bc94e2e92ab1",
         "eu:32023R1114:article:1:paragraph:1": "sha256:2c7472ac05bcdf246b14a3392ec6e221813f81009fde991a9d36dcef12e21a06",
         "eu:32023R1114:article:149:paragraph:4": "sha256:8e51177beed32bf91eddae27c962432ed5803595556e7cddf65d17c80c7ab7a4",
         "eu:32023R1114:annex:i": "sha256:0259522c00fdc009cec893c2d83a8872562d13f2b4b304f80f740d811e0c067d",
         "eu:32023R1114:annex:vi": "sha256:0ae71694a9e25073151a353eb9a68798ec7ba3d9465c9e36a5a48293428b2535"
       }
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1114/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1114/2024-01-09/eng",
+    "expressionCelex": "02023R1114-20240109",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-09",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2023/1114",
+      "corrections": []
+    }
   },
   {
     "familyId": "family:nis2",
@@ -130,21 +151,28 @@
     "publicationDate": "2022-12-27",
     "quality": {
       "articleCount": 46,
-      "recitalCount": 144,
+      "recitalCount": 0,
       "annexCount": 3,
       "paragraphCount": 200,
       "pointCount": 338,
       "structuralNodeCount": 9,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32022L2555:recital:1": "sha256:2512f9e73bc58b3af37663dce8a8f5f83c445a21bcf931c4348a608b27dc965e",
         "eu:32022L2555:article:1:paragraph:1": "sha256:ab9299002d799da83137bce14684ed36ee40ceae7cf73b780fafa7b77b035293",
         "eu:32022L2555:article:46:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
         "eu:32022L2555:annex:i": "sha256:1f66d16ce7d5dfc504c9f6319e08879c51e33619b1eafe169ebcb5e8a7ac6ecc",
         "eu:32022L2555:annex:iii": "sha256:bed81065a711a121110d254f8bc5074ed00a18f0ef9b4170ca988d858993d692"
       }
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2022/2555/2022-12-27/eng",
+    "expressionCelex": "02022L2555-20221227",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-12-27",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2022/2555",
+      "corrections": []
+    }
   },
   {
     "familyId": "family:data-act",
@@ -158,14 +186,14 @@
     "publicationDate": "2023-12-22",
     "quality": {
       "articleCount": 50,
-      "recitalCount": 120,
+      "recitalCount": 119,
       "annexCount": 0,
       "paragraphCount": 240,
       "pointCount": 260,
       "structuralNodeCount": 11,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32023R2854:recital:1": "sha256:2e2af877f24a32de4eb7f7d3ac6077b337eca46e83fec8fd195b2d1e868d6d46",
+        "eu:32023R2854:recital:1": "sha256:7ed0ad4eb5b267ffd3048c0454b45c26e829ab11911b42bbb69ae28254f52021",
         "eu:32023R2854:article:1:paragraph:1": "sha256:e6c0094c60073e740f99f80dae15b22d5dd853dfae3159be2df2de592e0ad77a",
         "eu:32023R2854:article:50:subparagraph:6": "sha256:098752db90a970701a50b8d9d8b78b0c0e09fb1648c3cfa02fef0383f9633685"
       }
@@ -187,25 +215,24 @@
     "measureType": "primary-act",
     "publicationDate": "2013-06-27",
     "quality": {
-      "articleCount": 165,
-      "recitalCount": 107,
+      "articleCount": 178,
+      "recitalCount": 0,
       "annexCount": 2,
-      "paragraphCount": 550,
-      "pointCount": 595,
-      "structuralNodeCount": 41,
+      "paragraphCount": 645,
+      "pointCount": 767,
+      "structuralNodeCount": 42,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32013L0036:recital:1": "sha256:e703d0536f7d7bf2ee9c4a7e343d91cdcbae633da23b5ca97b163901981953c1",
-        "eu:32013L0036:article:1:subparagraph:1": "sha256:189e1046928fd096de5004e0cec3b5492f926d0aa3e1a4f18004136c06c1cd21",
+        "eu:32013L0036:article:1:subparagraph:1": "sha256:09c7024672fc5a7c6acebb6c963d3b13956350eb191cfb0017d50e69e242498c",
         "eu:32013L0036:article:165:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
-        "eu:32013L0036:annex:i": "sha256:bbc0d04b31cc5af2ca5fa0acab3d1422af37dbb6b540804fbaaf47ba2bf76d86",
+        "eu:32013L0036:annex:i": "sha256:680575d5d9f70bdb8bf190afcd5f66b0edba34d30256966910b2da32c4d4d389",
         "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152"
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2013-06-27",
-      "checkedAt": "2026-08-25T18:00:14Z",
+      "basis": "consolidated",
+      "textAsOf": "2025-01-17",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2013/36",
       "corrections": [
         {
@@ -218,7 +245,8 @@
         }
       ]
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2025-01-17/eng",
+    "expressionCelex": "02013L0036-20250117"
   },
   {
     "familyId": "family:crr",
@@ -354,28 +382,28 @@
     "measureType": "primary-act",
     "publicationDate": "2014-06-12",
     "quality": {
-      "articleCount": 132,
-      "recitalCount": 133,
+      "articleCount": 152,
+      "recitalCount": 0,
       "annexCount": 1,
-      "paragraphCount": 652,
-      "pointCount": 955,
+      "paragraphCount": 761,
+      "pointCount": 1207,
       "structuralNodeCount": 35,
-      "maximumWarnings": 0,
+      "maximumWarnings": 5,
       "textHashes": {
-        "eu:32014L0059:recital:1": "sha256:a10cb26464ad57f4607819b287a6c257b2d627aa8a1d4e75a83d62e318ee9e09",
         "eu:32014L0059:article:1:paragraph:1": "sha256:c8dc461bc65570bf841750076490c5060caa205e54801164d2532b1942cea9b3",
         "eu:32014L0059:article:132:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
-        "eu:32014L0059:annex:1": "sha256:c02429873b6f41a2496834103bbf122ce7a3a9a513cbfe9113b539b02b364b58"
+        "eu:32014L0059:annex:1": "sha256:a52d5f53475eb9a905e81fea68bac87ab82c3db723bf3d71b0fc1051a8d944cd"
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2014-06-12",
-      "checkedAt": "2026-09-28T00:00:00Z",
+      "basis": "consolidated",
+      "textAsOf": "2026-05-11",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/59",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/59/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/59/2026-05-11/eng",
+    "expressionCelex": "02014L0059-20260511"
   },
   {
     "familyId": "family:srmr",
@@ -392,27 +420,27 @@
     "measureType": "primary-act",
     "publicationDate": "2014-07-30",
     "quality": {
-      "articleCount": 99,
-      "recitalCount": 124,
+      "articleCount": 114,
+      "recitalCount": 0,
       "annexCount": 0,
-      "paragraphCount": 455,
-      "pointCount": 431,
+      "paragraphCount": 533,
+      "pointCount": 627,
       "structuralNodeCount": 22,
-      "maximumWarnings": 0,
+      "maximumWarnings": 4,
       "textHashes": {
-        "eu:32014R0806:recital:1": "sha256:b7f907df05e538302c7901188f7af62a7ea978e7245d51612ba2baaf363da3a0",
         "eu:32014R0806:article:1:subparagraph:1": "sha256:5bf87cd75cebd93c5ed9e79817eab300adb4b81f948fc638ef71935be36ec908",
         "eu:32014R0806:article:99:paragraph:6": "sha256:eb4e1554ec8cb76369a0baa45742fe7976b74c0b90309becc5ad7de19b104eea"
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2014-07-30",
-      "checkedAt": "2026-09-28T00:00:00Z",
+      "basis": "consolidated",
+      "textAsOf": "2026-06-11",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/806",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/806/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/806/2026-06-11/eng",
+    "expressionCelex": "02014R0806-20260611"
   },
   {
     "familyId": "family:dgsd",
@@ -445,13 +473,14 @@
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2014-06-12",
-      "checkedAt": "2026-09-28T00:00:00Z",
+      "basis": "consolidated",
+      "textAsOf": "2014-07-02",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/49",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/49/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/49/2014-07-02/eng",
+    "expressionCelex": "02014L0049-20140702"
   },
   {
     "familyId": "family:psd",
@@ -468,15 +497,14 @@
     "measureType": "primary-act",
     "publicationDate": "2015-12-23",
     "quality": {
-      "articleCount": 117,
-      "recitalCount": 113,
+      "articleCount": 118,
+      "recitalCount": 0,
       "annexCount": 2,
-      "paragraphCount": 355,
-      "pointCount": 346,
+      "paragraphCount": 359,
+      "pointCount": 375,
       "structuralNodeCount": 27,
       "maximumWarnings": 1,
       "textHashes": {
-        "eu:32015L2366:recital:1": "sha256:f1532e3be461a60ad1b42cb9106fb2a9407541f6e449f099d32ed341dd808fc5",
         "eu:32015L2366:article:1:paragraph:1": "sha256:157f07328528c53c053bfcd8d9b121f638343847712ca66b7b73d92310ae962e",
         "eu:32015L2366:article:117:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
         "eu:32015L2366:annex:i": "sha256:a1cc0adbac314c021b2dbe8970c654fc99a526eaebc33423100250ed6f477df3",
@@ -484,13 +512,14 @@
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2015-12-23",
-      "checkedAt": "2026-09-28T00:00:00Z",
+      "basis": "consolidated",
+      "textAsOf": "2025-01-17",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2015/2366",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/2366/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/2366/2025-01-17/eng",
+    "expressionCelex": "02015L2366-20250117"
   },
   {
     "familyId": "family:dora",
@@ -508,19 +537,26 @@
     "publicationDate": "2024-06-25",
     "quality": {
       "articleCount": 42,
-      "recitalCount": 30,
+      "recitalCount": 0,
       "annexCount": 0,
       "paragraphCount": 120,
       "pointCount": 404,
       "structuralNodeCount": 21,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R1774:recital:1": "sha256:60bdf836fae2b01089bd3480647414a17e76ac59a678d5a75de7da83c94d64e6",
         "eu:32024R1774:article:1:subparagraph:1": "sha256:8f24b41b37a7574134be69e62211c8b63ef6b62aee08d61ac13da1ec32f6a44f",
         "eu:32024R1774:article:42:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
       }
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774/2024-06-25/eng",
+    "expressionCelex": "02024R1774-20240625",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-06-25",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1774",
+      "corrections": []
+    }
   },
   {
     "familyId": "family:mica",
@@ -628,24 +664,23 @@
     "publicationDate": "2024-12-02",
     "quality": {
       "articleCount": 7,
-      "recitalCount": 15,
+      "recitalCount": 0,
       "annexCount": 4,
       "paragraphCount": 48,
-      "pointCount": 101,
+      "pointCount": 100,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R2956:recital:1": "sha256:348dc95d7b6874a9c329309c166876001f309188d9056c005e9d21dbd01b41c7",
         "eu:32024R2956:article:1:subparagraph:1": "sha256:f61de16c4d042bd36ae212623114bd98b5a1ae865fa92d14fb1101ed21c444ff",
         "eu:32024R2956:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
-        "eu:32024R2956:annex:i": "sha256:331ba9e52441c83082bd211e2d06b3fb16e46b33fb160cac65d21f3ec0b3400e",
-        "eu:32024R2956:annex:iv": "sha256:ab712323bae64ba0783ac8e0514296ee60f96ab3839a88ce8c1bfe23d9a08767"
+        "eu:32024R2956:annex:i": "sha256:502a200f4f63aaa6d42ac207a8cb87e8a6af69b61e5c2f7c12c7bdc196813297",
+        "eu:32024R2956:annex:iv": "sha256:2515bba997a285bc6c964c39941644f2720054e7b8949e0ad22c414619e5a74e"
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
+      "basis": "consolidated",
       "textAsOf": "2024-12-02",
-      "checkedAt": "2026-08-23T23:37:57.439Z",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956",
       "corrections": [
         {
@@ -654,7 +689,8 @@
         }
       ]
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/2024-12-02/eng",
+    "expressionCelex": "02024R2956-20241202"
   },
   {
     "familyId": "family:dora",
@@ -946,15 +982,14 @@
     "measureType": "primary-act",
     "publicationDate": "2015-06-05",
     "quality": {
-      "articleCount": 69,
-      "recitalCount": 68,
+      "articleCount": 81,
+      "recitalCount": 0,
       "annexCount": 4,
-      "paragraphCount": 211,
-      "pointCount": 230,
-      "structuralNodeCount": 23,
+      "paragraphCount": 263,
+      "pointCount": 310,
+      "structuralNodeCount": 25,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32015L0849:recital:1": "sha256:1950b9c5d75e793e2b263fa0f8cd85cbea94e8947b3ffc502de6cd9d60938686",
         "eu:32015L0849:article:1:paragraph:1": "sha256:c9f98ae09f1601cb04240c3c79bc2c641cf61d129018d3588f6009ad84f71026",
         "eu:32015L0849:article:69:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
         "eu:32015L0849:annex:i": "sha256:d2865c12ea94d1e6228ce05a5f6bcafe36f8f36b323bf984119a1ee0696aa38a",
@@ -962,13 +997,14 @@
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2015-06-05",
-      "checkedAt": "2026-08-31T00:00:00.000Z",
+      "basis": "consolidated",
+      "textAsOf": "2024-12-30",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2015/849",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/849/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2015/849/2024-12-30/eng",
+    "expressionCelex": "02015L0849-20241230"
   },
   {
     "familyId": "family:aml",
@@ -986,27 +1022,27 @@
     "publicationDate": "2016-09-20",
     "quality": {
       "articleCount": 2,
-      "recitalCount": 13,
+      "recitalCount": 0,
       "annexCount": 1,
-      "paragraphCount": 2,
+      "paragraphCount": 3,
       "pointCount": 0,
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32016R1675:recital:1": "sha256:0ab706e285117fb6b40b7fae128e691ded2a4a27f2a53524c6a55ea5d31a7f69",
         "eu:32016R1675:article:1:subparagraph:1": "sha256:e1f4f9b8864e0f276172300af0f53fb10c2f74db69e86c2394637fed2bc6f27b",
         "eu:32016R1675:article:2:subparagraph:1": "sha256:1683e019da62d143a5ba9b6e8362e502b484a28631725e9f00de172384d3a7ed",
-        "eu:32016R1675:annex:1": "sha256:9831ab48148292989a587d8411f8a2713fa62e7212e8fc9368a8d89e5a4115e6"
+        "eu:32016R1675:annex:1": "sha256:79fb455030a55121be0f2501cad47c360e65875d873959cfb0766c0129575661"
       }
     },
     "sourceStatus": {
-      "basis": "original-oj",
-      "textAsOf": "2016-09-20",
-      "checkedAt": "2026-08-31T00:00:00.000Z",
+      "basis": "consolidated",
+      "textAsOf": "2026-01-29",
+      "checkedAt": "2026-09-29T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/1675",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/1675/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/1675/2026-01-29/eng",
+    "expressionCelex": "02016R1675-20260129"
   },
   {
     "familyId": "family:aml",

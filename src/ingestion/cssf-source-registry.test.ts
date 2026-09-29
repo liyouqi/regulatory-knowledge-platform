@@ -42,10 +42,10 @@ describe("CSSF source registry", () => {
       sources.slice(1).every((source) => source.quality === undefined),
     ).toBe(true);
     expect(sources[1]?.pdfQuality).toMatchObject({
-      pageCount: 8,
+      pageCount: 9,
       structuralNodeCount: 4,
       provisionCount: 16,
-      pointCount: 46,
+      pointCount: 50,
       maximumWarnings: 1,
     });
     expect(sources[1]?.pdfProfile).toBe("incident-reporting");

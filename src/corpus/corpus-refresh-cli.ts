@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import type { Dirent } from "node:fs";
 import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
@@ -39,6 +40,8 @@ interface SnapshotSelection {
 interface CanonicalBuildReport {
   sourceSnapshotId?: string;
   parserVersion?: string;
+  sourceStatusHash?: string;
+  sourceDefinitionHash?: string;
   qualityStatus?: "matched" | "drifted";
   qualityDrift?: QualityDrift[];
 }
@@ -110,10 +113,18 @@ async function buildConsolidatedExpressionAudit(
           resolve(selection.directory, "tree-notice.xml"),
           "utf8",
         );
-        return parseConsolidatedExpressionCandidatesFromTreeNotice(
+        const candidates = parseConsolidatedExpressionCandidatesFromTreeNotice(
           treeNotice,
           source.celex,
         );
+        if (source.expressionCelex && source.sourceStatus) {
+          candidates.push({
+            celex: source.celex,
+            expressionCelex: source.expressionCelex,
+            effectiveDate: source.sourceStatus.textAsOf,
+          });
+        }
+        return candidates;
       }),
     )
   ).flat();
@@ -198,6 +209,8 @@ async function latestSnapshot(
 async function findCanonicalReport(
   selection: SnapshotSelection,
   strict: boolean,
+  qualityHash: string,
+  sourceMetadataHash?: string,
 ): Promise<CanonicalBuildReport> {
   const root = resolve(
     process.cwd(),
@@ -210,28 +223,37 @@ async function findCanonicalReport(
       .filter((entry) => entry.isDirectory())
       .map(async (entry) => {
         try {
-          return JSON.parse(
-            await readFile(
-              resolve(root, entry.name, "build-report.json"),
-              "utf8",
-            ),
-          ) as CanonicalBuildReport;
+          return {
+            directoryName: entry.name,
+            report: JSON.parse(
+              await readFile(
+                resolve(root, entry.name, "build-report.json"),
+                "utf8",
+              ),
+            ) as CanonicalBuildReport,
+          };
         } catch {
           return null;
         }
       }),
   );
   const parserVersions = currentParserVersions(selection.adapter);
-  const report = reports.find(
+  const candidate = reports.find(
     (candidate) =>
-      candidate?.sourceSnapshotId === selection.snapshotId &&
-      typeof candidate.parserVersion === "string" &&
-      parserVersions.has(candidate.parserVersion) &&
+      candidate?.report.sourceSnapshotId === selection.snapshotId &&
+      typeof candidate.report.parserVersion === "string" &&
+      parserVersions.has(candidate.report.parserVersion) &&
+      (selection.adapter === "eur-lex"
+        ? candidate.report.sourceStatusHash === sourceMetadataHash
+        : selection.adapter === "cssf"
+          ? candidate.report.sourceDefinitionHash === sourceMetadataHash
+          : true) &&
       (strict
-        ? candidate.qualityStatus === undefined
-        : candidate.qualityStatus !== undefined),
+        ? candidate.report.qualityStatus === undefined
+        : candidate.report.qualityStatus !== undefined &&
+          candidate.directoryName.includes(`-refresh-quality-${qualityHash}-`)),
   );
-  if (report) return report;
+  if (candidate) return candidate.report;
   throw new Error(
     `Canonical build report missing for ${selection.adapter}:${selection.identifier}`,
   );
@@ -325,9 +347,67 @@ async function refreshCorpus(): Promise<void> {
     { reviewValidationMode: strict ? "strict" : "report" },
   );
   const runtimeVerification = verifyRuntimeArtifact(runtime.outputPath);
+  const reviewBySource = new Map<
+    string,
+    { quality: unknown; sourceMetadataHash?: string }
+  >([
+    ...eurLexSources.map(
+      (source) =>
+        [
+          `eur-lex:${source.celex}`,
+          {
+            quality: source.quality,
+            sourceMetadataHash: createHash("sha256")
+              .update(JSON.stringify(source.sourceStatus ?? null))
+              .digest("hex")
+              .slice(0, 12),
+          },
+        ] as const,
+    ),
+    ...cssfSources.map(
+      (source) =>
+        [
+          `cssf:${source.localId}`,
+          {
+            quality: source.quality ?? source.pdfQuality,
+            sourceMetadataHash: createHash("sha256")
+              .update(
+                JSON.stringify({
+                  ...source,
+                  quality: undefined,
+                  pdfQuality: undefined,
+                }),
+              )
+              .digest("hex")
+              .slice(0, 12),
+          },
+        ] as const,
+    ),
+    ...ebaSources.map(
+      (source) =>
+        [`eba:${source.localId}`, { quality: source.quality }] as const,
+    ),
+  ]);
   const sourceReports = await Promise.all(
     selections.map(async (selection) => {
-      const canonical = await findCanonicalReport(selection, strict);
+      const review = reviewBySource.get(
+        `${selection.adapter}:${selection.identifier}`,
+      );
+      if (!review?.quality) {
+        throw new Error(
+          `Reviewed quality baseline missing for ${selection.adapter}:${selection.identifier}`,
+        );
+      }
+      const qualityHash = createHash("sha256")
+        .update(JSON.stringify(review.quality))
+        .digest("hex")
+        .slice(0, 12);
+      const canonical = await findCanonicalReport(
+        selection,
+        strict,
+        qualityHash,
+        review.sourceMetadataHash,
+      );
       return {
         adapter: selection.adapter,
         identifier: selection.identifier,

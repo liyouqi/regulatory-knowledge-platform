@@ -1303,7 +1303,7 @@ CRR III 将 Canonical Contract 提升到 `1.2.0`、通用 Formex parser 提升�
 
 Parser `1.6.0` 增加经过 fixture 和 CRR 实际语料验证的 consolidated Formex 支持。Registry 的基础法 `celex` 继续决定稳定 Document/Provision ID，独立的 dated `expressionCelex` 决定采集哪个 `CONS.ACT`；`CONS.DOC`、inline `CONS.ANNEX`、Formex identifier fallback 和公式资源位置均保留明确 provenance。选择器只发布 review date 当日已经生效且人工固定的 expression，不因 CELLAR 提前发布未来 consolidated work 而自动前移。EUR-Lex consolidated expression 不包含原始 Recitals 时，Runtime 如实发布零 Recitals，不跨 expression 拼接正文。
 
-`corpus:update` 是日常维护的单一 facade，并继续调用既有 acquisition、Canonical、reviewed-data、Runtime builder 与 Runtime verifier。它复用每个 verified source snapshot 已保存的官方 CELLAR tree notice 审计 consolidated expressions，不增加第二个 SPARQL/网页发现通道；只把截至检查日已生效且不同于当前 pin 的版本写成 `review-required`，不会修改 Git registry、quality baseline、exact-snapshot manifest、release-pinned Runtime 或 RAG export。`corpus:refresh` 保留为兼容 alias，严格、可复现的 release 仍由 manifest-pinned `corpus:build` 完成。因此命令入口收敛不引入第二套 parser/build/export contract。
+`corpus:update` 是日常维护的单一 facade，并继续调用既有 acquisition、Canonical、reviewed-data、Runtime builder 与 Runtime verifier。它复用每个 verified source snapshot 已保存的官方 CELLAR tree notice 审计 consolidated expressions，不增加第二个 SPARQL/网页发现通道；候选必须在官方 notice 中具有 English Formex manifestation，只有其他语言的 consolidated work 不会被误报为英文 Reader 可用版本。它只把截至检查日已生效且不同于当前 pin 的版本写成 `review-required`，不会修改 Git registry、quality baseline、exact-snapshot manifest、release-pinned Runtime 或 RAG export。`corpus:refresh` 保留为兼容 alias，严格、可复现的 release 仍由 manifest-pinned `corpus:build` 完成。因此命令入口收敛不引入第二套 parser/build/export contract。
 
 Snapshot ID 以官方正文 content hash 为核心，同一字节在不同 retrieval time 可以有多个 immutable raw directory。Manifest-pinned build 对同一 snapshot ID 稳定选择最早 retrieval directory，保持最初 reviewed provenance；后续相同内容的检查记录不会阻断 strict build，也不会悄然改变发布输入。
 

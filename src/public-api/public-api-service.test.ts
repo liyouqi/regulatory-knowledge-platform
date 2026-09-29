@@ -168,7 +168,7 @@ describe("Public API v1 service contract", () => {
             entityId: "eu:32024R2956",
             documentShortName: "DORA ITS Register of Information",
             officialUrl:
-              "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/oj/eng",
+              "https://eur-lex.europa.eu/eli/reg_impl/2024/2956/2024-12-02/eng",
           }),
           evidence: expect.objectContaining({
             text: expect.any(String),
