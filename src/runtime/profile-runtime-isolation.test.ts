@@ -72,12 +72,12 @@ describe("banking-default runtime isolation", () => {
   it("reports one Profile identity across Reader and Search services", () => {
     expect(repository).toMatchObject({
       profileId: "banking-default",
-      profileVersion: "1.3.0",
+      profileVersion: "1.4.0",
     });
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 37,
+      documentCount: 41,
     });
   });
 

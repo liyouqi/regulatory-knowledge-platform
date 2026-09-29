@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "records": [
     {
       "documentId": "eu:32013L0036",
@@ -384,6 +384,50 @@
       "currencyStatus": "current",
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32023L2225",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014L0017",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014L0092",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32024R0886",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
       "reviewStatus": "reviewed",
       "reviewedAt": "2026-09-29T00:00:00.000Z"
     },

@@ -741,11 +741,20 @@ class FormexDocumentBuilder {
     const numberRaw = explicitNumber
       ? plainText(explicitNumber, new Set())
       : (labelledNumber ?? String(groupIndex));
-    const occurrence = this.occurrence(annexId, "annex-part", numberRaw);
+    let identityNumber = numberRaw;
+    try {
+      normalizeLegalNumber(identityNumber);
+    } catch {
+      const trailingNumber = /([a-z0-9]+)[.)]?\s*$/iu.exec(numberRaw)?.[1];
+      if (!trailingNumber)
+        throw new Error(`Invalid legal number: ${numberRaw}`);
+      identityNumber = trailingNumber;
+    }
+    const occurrence = this.occurrence(annexId, "annex-part", identityNumber);
     const logicalId = provisionLogicalId(
       annexId,
       "annex-part",
-      numberRaw,
+      identityNumber,
       occurrence,
     );
     const text = plainText(group, TEXT_EXCLUSIONS);
@@ -762,7 +771,7 @@ class FormexDocumentBuilder {
       parserWarnings: titleElement ? [] : ["Annex part has no TITLE element."],
       kind: "annex-part",
       numberRaw,
-      numberNormalized: normalizeLegalNumber(numberRaw),
+      numberNormalized: normalizeLegalNumber(identityNumber),
       label: label || `Part ${groupIndex}`,
       text,
       leadText: hasChildContent ? "" : undefined,

@@ -1213,25 +1213,99 @@
     }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:consumer-credit",
     "shortName": "Consumer Credit Directive II",
-    "celex": "32023L2225"
+    "aliases": ["Directive (EU) 2023/2225", "CCD II"],
+    "celex": "32023L2225",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2023-10-30",
+    "quality": {
+      "articleCount": 50,
+      "recitalCount": 98,
+      "annexCount": 4,
+      "paragraphCount": 194,
+      "pointCount": 296,
+      "structuralNodeCount": 15,
+      "maximumWarnings": 2,
+      "textHashes": {
+        "eu:32023L2225:recital:1": "sha256:8e103643999ef82f662224dcd33ac18a6b2cc2ca8a449905424ac435ef28da2f",
+        "eu:32023L2225:article:1:subparagraph:1": "sha256:0ec29c036e5d1e1e6fbb63ceb8d350de8073ae036a7369934394b95bf382a7d2",
+        "eu:32023L2225:article:50:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32023L2225:annex:i": "sha256:f51b8bd0a6378156ec210775899099de4a21b513d1b35da7bde9d7e94da840ec",
+        "eu:32023L2225:annex:iv": "sha256:4f40e6bbf2f71d3682efec8d9db5ab5f564eb2c1c39a50177469129ae91a5073"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2023/2225/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:consumer-credit",
     "shortName": "Mortgage Credit Directive",
-    "celex": "32014L0017"
+    "aliases": ["Directive 2014/17/EU", "MCD"],
+    "celex": "32014L0017",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-02-28",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2023-12-30",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/17",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/17/2023-12-30/eng",
+    "expressionCelex": "02014L0017-20231230",
+    "quality": {
+      "articleCount": 52,
+      "recitalCount": 0,
+      "annexCount": 3,
+      "paragraphCount": 351,
+      "pointCount": 220,
+      "structuralNodeCount": 14,
+      "maximumWarnings": 2,
+      "textHashes": {
+        "eu:32014L0017:article:1:subparagraph:1": "sha256:4ebf46d28c80e79d39a8de4d380d27a2965bd9b0aa147d59d8c60590fd8d8a95",
+        "eu:32014L0017:article:50:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32014L0017:annex:i": "sha256:33ff641b078e9136a533f72b15c6f417a81b75b01db9223a058fa55840530bbe",
+        "eu:32014L0017:annex:iii": "sha256:2ab27f0e22ec228d21ab334806605fbbba743dea4a1ac46a86c6af45770862ee"
+      }
+    }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:payments",
     "shortName": "Payment Accounts Directive",
-    "celex": "32014L0092"
+    "aliases": ["Directive 2014/92/EU", "PAD"],
+    "celex": "32014L0092",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-08-28",
+    "quality": {
+      "articleCount": 31,
+      "recitalCount": 58,
+      "annexCount": 0,
+      "paragraphCount": 108,
+      "pointCount": 122,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014L0092:recital:1": "sha256:07c9fb797705c34f8706175579b0ca74d4f33cda9949d33adac5066fabcf5986",
+        "eu:32014L0092:article:1:paragraph:1": "sha256:71f246de17c9b29ae88f670afe33a62680181e5dc0eebba4b3f2ffee4fab51d2",
+        "eu:32014L0092:article:31:subparagraph:1": "sha256:6afb0696f032fd2f893556943bfde48506a5c1395f6da0495be8d2420235b740"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/92/oj/eng"
   },
   {
     "status": "active",
@@ -1273,11 +1347,32 @@
     }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:payments",
     "shortName": "Instant Payments Regulation",
-    "celex": "32024R0886"
+    "aliases": ["Regulation (EU) 2024/886", "IPR"],
+    "celex": "32024R0886",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-03-19",
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 34,
+      "annexCount": 0,
+      "paragraphCount": 7,
+      "pointCount": 76,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R0886:recital:1": "sha256:7d3f8612a830ec44d8d2c2bd2cf215b27b9b67b1129eda424a8376838534fdb4",
+        "eu:32024R0886:article:1:subparagraph:1": "sha256:45eb8854dd519bc308a20efad7c5249f4c1bdcd9d54c9fb28ccb1dcfdc8e4ab9",
+        "eu:32024R0886:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/886/oj/eng"
   },
   {
     "status": "planned",

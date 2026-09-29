@@ -82,6 +82,9 @@ const annexXml = `<?xml version="1.0" encoding="UTF-8"?>
       <ITEM><NP><NO.P>(a)</NO.P><TXT>a general description;</TXT></NP></ITEM>
       <ITEM><NP><NO.P>(b)</NO.P><TXT>the system elements.</TXT></NP></ITEM>
     </LIST></P></NP>
+  </GR.SEQ><GR.SEQ LEVEL="1">
+    <TITLE><TI><NP><NO.P>(Where applicable) 14.</NO.P><TXT>Additional information</TXT></NP></TI></TITLE>
+    <NP><NO.P>1.</NO.P><TXT>The official descriptive marker is preserved.</TXT></NP>
   </GR.SEQ><LIST TYPE="alpha"><ITEM><NP><NO.P>(c)</NO.P><TXT>A direct annex item.</TXT></NP></ITEM></LIST></CONTENTS>
 </ANNEX>`;
 
@@ -292,7 +295,7 @@ describe("Formex ACT parser", () => {
 
     expect(report).toMatchObject({
       annexCount: 1,
-      paragraphCount: 4,
+      paragraphCount: 5,
       pointCount: 4,
       warningCount: 0,
     });
@@ -315,6 +318,16 @@ describe("Formex ACT parser", () => {
           "eu:32025R0001:annex:iv:annex-part:1:paragraph:1:point:b",
       )?.text,
     ).toBe("the system elements.");
+    expect(
+      document.provisions.find(
+        (provision) =>
+          provision.logicalId === "eu:32025R0001:annex:iv:annex-part:14",
+      ),
+    ).toMatchObject({
+      numberRaw: "(Where applicable) 14.",
+      numberNormalized: "14",
+      label: "(Where applicable) 14. Additional information",
+    });
     expect(
       document.provisions.find(
         (provision) => provision.logicalId === "eu:32025R0001:annex:iv:point:c",

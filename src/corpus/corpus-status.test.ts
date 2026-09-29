@@ -12,10 +12,9 @@ describe("Reader corpus status", () => {
       loadEbaSourceRegistrySync(),
     );
 
-    expect(output).toContain("## Published — 39");
+    expect(output).toContain("## Published — 43");
     expect(output).toContain("## Queued — 0");
-    expect(output).toContain("## Planned — 8");
-    expect(output).toContain("**banking-core-2 — 4:**");
+    expect(output).toContain("## Planned — 4");
     expect(output).toContain("**banking-core-3 — 4:**");
     expect(output).toContain("DORA");
     expect(output).toContain("AMLR");
