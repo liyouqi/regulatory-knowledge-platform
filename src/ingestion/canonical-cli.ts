@@ -55,7 +55,7 @@ async function buildCanonicalDocument(): Promise<void> {
   }
   const inspectOnly = process.argv.includes("--inspect");
   const allowDrift = process.argv.includes("--allow-drift");
-  if (!inspectOnly && !source.quality) {
+  if (!inspectOnly && !allowDrift && !source.quality) {
     throw new Error(
       `CELEX ${source.celex} has no canonical quality baseline; run canonical:inspect first`,
     );

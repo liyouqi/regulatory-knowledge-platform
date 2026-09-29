@@ -23,7 +23,7 @@ describe("reviewed document Expression metadata", () => {
     const registered = registeredDocumentIds();
     const selected = selectDocumentExpressionMetadata(registered, dataset);
 
-    expect(selected).toHaveLength(35);
+    expect(selected).toHaveLength(39);
     expect(new Set(selected.map((record) => record.documentId))).toEqual(
       registered,
     );

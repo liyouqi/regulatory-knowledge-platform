@@ -1108,25 +1108,109 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2023/1113/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:aml",
     "shortName": "AMLR",
-    "celex": "32024R1624"
+    "aliases": [
+      "Regulation (EU) 2024/1624",
+      "EU Anti-Money Laundering Regulation"
+    ],
+    "celex": "32024R1624",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-06-19",
+    "quality": {
+      "articleCount": 90,
+      "recitalCount": 175,
+      "annexCount": 6,
+      "paragraphCount": 333,
+      "pointCount": 618,
+      "structuralNodeCount": 24,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1624:recital:1": "sha256:3175841fabdaf152b5793fcbe8b6cf4805df77309956b827a875df96223ab552",
+        "eu:32024R1624:article:1:subparagraph:1": "sha256:a5c34807e5f9953ca7e10af3854e4b9a5cabf45026e771b02e453059997aedef",
+        "eu:32024R1624:article:90:subparagraph:2": "sha256:8683da32b79295bace18c6a2b3799222a9e76aef9802a26af89c7d8c16b36657",
+        "eu:32024R1624:annex:i": "sha256:bc1e2832b85ee3c266ffcc49837dd59a126609b1d60c83a704dd2275fc288ef3",
+        "eu:32024R1624:annex:vi": "sha256:d8b55dfeeaa697023b5789cdad4fddf95a9dad5edcb609023604e09b48900651"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1624/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:aml",
     "shortName": "AMLD VI",
-    "celex": "32024L1640"
+    "aliases": [
+      "Directive (EU) 2024/1640",
+      "Sixth Anti-Money Laundering Directive"
+    ],
+    "celex": "32024L1640",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-06-19",
+    "quality": {
+      "articleCount": 80,
+      "recitalCount": 139,
+      "annexCount": 1,
+      "paragraphCount": 343,
+      "pointCount": 398,
+      "structuralNodeCount": 21,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024L1640:recital:1": "sha256:340882b6174d78338d6fbc088c3abb86ce30659387d17452e3b8626ce1b6c365",
+        "eu:32024L1640:article:1:subparagraph:1": "sha256:f909e96f6062c730003a0b9bfd0b8a02b0e1e80f7bf2cf6fac4f76e60131e7bc",
+        "eu:32024L1640:article:80:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32024L1640:annex:1": "sha256:b79f046269bc589a89d18f1ff8600bbafc71e3da0e22388c5c54e9c7cabacfbf"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2024/1640/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:aml",
     "shortName": "AMLA Regulation",
-    "celex": "32024R1620"
+    "aliases": [
+      "Regulation (EU) 2024/1620",
+      "Anti-Money Laundering Authority Regulation"
+    ],
+    "celex": "32024R1620",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-06-19",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-11-10",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2024/1620",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/1620/2025-11-10/eng",
+    "expressionCelex": "02024R1620-20251110",
+    "quality": {
+      "articleCount": 109,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 472,
+      "pointCount": 364,
+      "structuralNodeCount": 20,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1620:article:1:paragraph:1": "sha256:554ed42308949c44b52af9c2aa18bb5172da036bb92edaf4f119e592f7830a89",
+        "eu:32024R1620:article:108:subparagraph:3": "sha256:df5afce2f8eadd615428e76d1468b5a7353b6390966e95b9d93d64c13fa3c987",
+        "eu:32024R1620:annex:i": "sha256:a5e5f7d08cf832a86de9bbe7a4fec99257108d45582ac05a460f405e93a62b4d",
+        "eu:32024R1620:annex:ii": "sha256:1656352324df9cb1459c94dfba1d734786fb07aab4c922ce99842a63576a7a2d"
+      }
+    }
   },
   {
     "status": "planned",
@@ -1150,11 +1234,43 @@
     "celex": "32014L0092"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-2",
     "familyId": "family:payments",
     "shortName": "SEPA Regulation",
-    "celex": "32012R0260"
+    "aliases": [
+      "Regulation (EU) No 260/2012",
+      "Single Euro Payments Area Regulation"
+    ],
+    "celex": "32012R0260",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2012-03-30",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-04-08",
+      "checkedAt": "2026-09-29T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2012/260",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2012/260/2024-04-08/eng",
+    "expressionCelex": "02012R0260-20240408",
+    "quality": {
+      "articleCount": 22,
+      "recitalCount": 0,
+      "annexCount": 1,
+      "paragraphCount": 93,
+      "pointCount": 171,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32012R0260:article:1:paragraph:1": "sha256:5cbf8815ae3b744cf76a496bcedc3b053d9ce7ce71758b701afcfcff5ff835f3",
+        "eu:32012R0260:article:18:subparagraph:1": "sha256:4d08d73dc3bc1c24d2d1cf1aca752abad3eb1480fd98385736355411d90b1e77",
+        "eu:32012R0260:annex:1": "sha256:e5589150712a49c7a0fadad3647810f26ebde909dc466212bfd951cbb619d128"
+      }
+    }
   },
   {
     "status": "planned",
