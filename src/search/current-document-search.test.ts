@@ -22,6 +22,16 @@ describe("current-document search", () => {
     expect(index.postings.management.length).toBeGreaterThan(0);
   });
 
+  it("indexes legal terms that match object prototype property names", () => {
+    const conflictingDocument = structuredClone(document);
+    conflictingDocument.provisions[0].title = "Constructor requirements";
+
+    const conflictingIndex =
+      buildCurrentDocumentSearchIndex(conflictingDocument);
+
+    expect(conflictingIndex.postings.constructor).toContain(0);
+  });
+
   it("parses quoted phrases separately from strict AND terms", () => {
     expect(parseCurrentDocumentQuery('risk "management body" polic')).toEqual({
       phrases: ["management body"],

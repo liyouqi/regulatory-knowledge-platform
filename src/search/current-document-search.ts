@@ -106,7 +106,7 @@ export function buildCurrentDocumentSearchIndex(
       ...blockRecords(provision, provision.blocks),
     ];
   });
-  const postings: Record<string, number[]> = {};
+  const postings: Record<string, number[]> = Object.create(null);
   records.forEach((candidate, recordIndex) => {
     for (const token of new Set(candidate.tokens)) {
       const tokenPostings = postings[token] ?? [];
