@@ -314,34 +314,7 @@ The company-report source set is covered: CSSF, ESAs, EBA, ESMA, AMLA, and Europ
 
 ### Recommended transfer from the old computer
 
-Clone the code; do not copy the repository itself:
-
-```bash
-git clone git@github.com:liyouqi/regulatory-knowledge-platform.git
-cd regulatory-knowledge-platform
-npm install
-git log -1 --oneline
-```
-
-Node.js 24 or newer and npm 11 or newer are expected.
-
-Copy these local-only files/directories securely from the old computer:
-
-```text
-.env
-data/artifacts/canonical/
-data/artifacts/earth/earth.sqlite
-data/monitor/                         # optional but recommended; about 940 KB
-```
-
-Why:
-
-- `.env` contains `PRIVATE_AI_*` and is intentionally not in Git;
-- `data/artifacts/canonical/` lets the normal `npm run dev` pre-step rebuild Runtime SQLite without downloading the legal corpus again;
-- `data/artifacts/earth/earth.sqlite` preserves the locally built Earth view;
-- copying `data/monitor/` preserves the current 303 enriched records and avoids immediately repeating external LLM calls. It may instead be omitted and rebuilt with `npm run monitor:refresh`.
-
-Do not copy `node_modules/`, `dist/`, `data/artifacts/corpus-builds/`, `data/artifacts/runtime/`, or `data/artifacts/search/`. Runtime and search artifacts are rebuilt from Canonical. `data/raw/` is also unnecessary for normal UI development; copy it only when continuing source acquisition or parser work.
+Use [Moving Development to Another Computer](../development-migration.md) as the authoritative project-wide checklist. It covers `.env`, Reader Canonical/raw data, the complete Galaxy artifact, Monitor data, disposable artifacts, clean rebuild options, and verification. Do not maintain a second transfer list in this Monitor document.
 
 ### Restart commands
 

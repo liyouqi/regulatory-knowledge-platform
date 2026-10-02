@@ -12,6 +12,7 @@ Open [Reader Corpus Status](docs/corpus-status.md) for the generated **Published
 - `docs/regulatory_knowledge_platform_requirements.md`: product scope, releases, and acceptance criteria.
 - `docs/regulatory_knowledge_platform_technical_architecture.md`: architectural decisions and data contracts.
 - `docs/corpus-onboarding-runbook.md`: repeatable workflow for adding or refreshing legal sources.
+- `docs/development-migration.md`: definitive checklist for moving development to another computer.
 - `docs/corpus-status.md`: generated one-page Published / Queued / Planned Reader corpus view.
 - `docs/coverage-backlog.md`: bounded phase completion and deferred 1→100 corpus work.
 - `docs/runtime-operation-runbook.md`: staging, verification, promotion, and rollback of runtime artifacts.
@@ -44,6 +45,8 @@ npm ci
 If `nvm` is not installed, install a current Node.js 24 LTS release, confirm `node --version` starts with `v24`, then run `npm ci`.
 
 ## First Setup
+
+For moving an existing full development environment, follow [Moving Development to Another Computer](docs/development-migration.md). It is the authoritative list of Git-managed and local-only files.
 
 The project has two deliberately different data layers:
 
