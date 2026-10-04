@@ -6,6 +6,8 @@
 > 需求文档语言：中文  
 > 文档用途：作为独立 Git 工程的产品需求、阶段规划与架构约束基线
 
+阅读入口：[文档索引](README.md)。本文是完整产品设计基线，包含未来范围和历史实现说明；阶段完成情况与覆盖队列见 [Coverage Backlog](coverage-backlog.md)，Reader 入库数量见自动生成的 [Corpus Status](corpus-status.md)。安装、刷新与部署使用对应操作指南。
+
 ---
 
 ## 0. 文档目标

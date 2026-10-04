@@ -4,6 +4,8 @@
 > Last reviewed: 2026-09-11
 > Review level: Sol High
 
+Document role: feature design baseline. The dated [implementation status](#13-implementation-plan-and-current-status) and remaining readiness checks are recorded in section 13; intended Milestone B retrieval is distinct from the current-context implementation. See the [documentation index](../README.md) for operating guides.
+
 ## 1. Decision summary
 
 Contextual Regulatory Copilot is a lightweight assistant embedded in the existing Regulatory Knowledge Platform Reader. It preserves the user's current legal reading position and conversation so that a selected word, sentence, paragraph, or current Article can be discussed without copying legal text or leaving the Reader.

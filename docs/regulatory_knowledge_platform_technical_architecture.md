@@ -7,6 +7,8 @@
 > 技术文档语言：中文  
 > 目标：把最终版产品需求落实为一套**简单、可落地、可逐步扩展、适合 Codex 协作开发**的工程架构。
 
+阅读入口：[文档索引](README.md)。本文是技术设计基线，包含后续阶段设计和历史实现说明；当前环境与命令以 `package.json`、`.nvmrc` 和对应操作指南为准。技术栈表中的环境及 UI 依赖已于 2026-10-03 对照当前依赖清单校正。
+
 ---
 
 # 0. 文档定位
@@ -41,12 +43,12 @@ Phase 1 默认技术栈：
 | 层 | 选择 |
 |---|---|
 | 主语言 | **TypeScript** |
-| Runtime | **Node.js LTS（最低 22）**，初始化时固定版本 |
+| Runtime | **Node.js 24+**，`.nvmrc` 固定为 24 |
 | Frontend | **React 19** |
 | Router | **React Router 7** |
 | Build | **Vite** |
-| Styling | **Tailwind CSS 4** |
-| Motion | **Motion / Framer Motion**，仅用于 Side Peek、Command Palette、轻量过渡 |
+| Styling | **应用自有 CSS**，当前依赖清单未引入 Tailwind |
+| Motion | **CSS / 视图内部动画**，当前依赖清单未引入 Motion / Framer Motion |
 | Icons | **Lucide React** |
 | Backend | **Express** |
 | Runtime DB | **SQLite** |
@@ -62,7 +64,7 @@ Phase 1 默认技术栈：
 | Unit / integration test | **Vitest** |
 | E2E | **Playwright** |
 | Lint / format | **Biome + TypeScript compiler** |
-| Package manager | **npm**，避免额外工具链 |
+| Package manager | **npm 11+**，避免额外工具链 |
 | Production deploy | **单 Node 服务 + 静态 React + 单 SQLite artifact** |
 | Container | **Docker 可选但推荐用于部署** |
 | Phase 4 MCP | **实施时稳定的官方 MCP TypeScript SDK，作为 Service adapter** |
