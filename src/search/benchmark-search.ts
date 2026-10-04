@@ -11,6 +11,8 @@ const EVALUATION_CASES = [
   { query: "artificial intelligence system", expectedLaw: "AI Act" },
   { query: "crypto asset", expectedLaw: "MiCA" },
   { query: "data holder", expectedLaw: "Data Act" },
+  { query: "money laundering", expectedLaw: "AMLD IV" },
+  { query: '"management body"', expectedLaw: "DORA" },
 ] as const;
 
 const DEFINITION_EVALUATION_CASES = [

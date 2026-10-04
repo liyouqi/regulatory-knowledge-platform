@@ -8,8 +8,9 @@ import {
 } from "./regulatory-dossier";
 
 describe("Regulatory Dossier build", () => {
+  const documents = loadDocumentViews();
+
   it("publishes three reviewed Dossiers with source-backed sections", () => {
-    const documents = loadDocumentViews();
     const relationships = buildExplicitReferences(documents);
     const dossiers = buildRegulatoryDossiers(
       documents,
@@ -50,7 +51,6 @@ describe("Regulatory Dossier build", () => {
   });
 
   it("omits profile-incompatible Dossiers instead of weakening source gates", () => {
-    const documents = loadDocumentViews();
     const relationships = buildExplicitReferences(documents);
     const ebaQa = buildEbaQa(documents, relationships.entities);
     const doraOnly = documents.filter(
@@ -69,7 +69,6 @@ describe("Regulatory Dossier build", () => {
   });
 
   it("does not silently drop an unresolved optional source used by a section", () => {
-    const documents = loadDocumentViews();
     const relationships = buildExplicitReferences(documents);
     const dataset = structuredClone(loadRegulatoryDossierDataset());
     const source = dataset.dossiers[0]?.sources[0];

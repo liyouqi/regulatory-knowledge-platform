@@ -12,10 +12,12 @@ describe("Reader corpus status", () => {
       loadEbaSourceRegistrySync(),
     );
 
-    expect(output).toContain("## Published — 43");
+    expect(output).toContain("## Published — 59");
     expect(output).toContain("## Queued — 0");
-    expect(output).toContain("## Planned — 4");
-    expect(output).toContain("**banking-core-3 — 4:**");
+    expect(output).toContain("## Planned — 0");
+    expect(output).toContain("Electronic Money Directive II");
+    expect(output).toContain("Securitisation Regulation");
+    expect(output).toContain("Covered Bonds CRR Amending Regulation");
     expect(output).toContain("DORA");
     expect(output).toContain("AMLR");
   });

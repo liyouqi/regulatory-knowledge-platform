@@ -165,7 +165,7 @@
       "textHashes": {
         "eu:32022L2555:article:1:paragraph:1": "sha256:ab9299002d799da83137bce14684ed36ee40ceae7cf73b780fafa7b77b035293",
         "eu:32022L2555:article:46:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
-        "eu:32022L2555:annex:i": "sha256:1f66d16ce7d5dfc504c9f6319e08879c51e33619b1eafe169ebcb5e8a7ac6ecc",
+        "eu:32022L2555:annex:i": "sha256:d15188e48cd016e8b740b0f6943fb34e4f338af2d7624d3488a9bbbae91aa142",
         "eu:32022L2555:annex:iii": "sha256:bed81065a711a121110d254f8bc5074ed00a18f0ef9b4170ca988d858993d692"
       }
     },
@@ -319,10 +319,10 @@
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R1623:recital:1": "sha256:ba0cf4b4fd88bf05ceeff474be25440b0adcb30189ef67e4f6de7c5a52f77573",
-        "eu:32024R1623:article:1:subparagraph:1": "sha256:b44b654723647c13e2b8a185af3e0788945f0d91b1385cb1d786c2deb1d93eea",
+        "eu:32024R1623:recital:1": "sha256:6984169d80766eb9122e7407b198a287ed911da247198123ca4ede3894d19416",
+        "eu:32024R1623:article:1:subparagraph:1": "sha256:ff21ddb4533ab05843d32c980fb01ef264479e78757a99f233f3126c45cf376a",
         "eu:32024R1623:article:2:subparagraph:3": "sha256:a8f4a7506aa739fce97ed91b02d2774d024347e5cbfcb46cbde4f8752d249177",
-        "eu:32024R1623:annex:i": "sha256:8ecb31593ff0feae82a91b74f38439dfe1bff154bc415f0c15aa420020a3cbca"
+        "eu:32024R1623:annex:i": "sha256:bf35a1867b36aeecedd7c3e62ca56cf11c31a9b5896cb0e1031cbe60b8492aba"
       }
     },
     "sourceStatus": {
@@ -363,8 +363,8 @@
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024L1619:recital:1": "sha256:fd0d22f3edecfa0d7cbb5a953b6d987679fa2dcf6a045c04c9eb7f1a3622ccfe",
-        "eu:32024L1619:article:1:subparagraph:1": "sha256:a5aa6811604fcde5ad089357d4ee8d77d02a45452d52fa399ce723d856b40027",
+        "eu:32024L1619:recital:1": "sha256:b8a1d788440dbe76582db9f3ee4f075cbd74e480100cd4e41a91c060705262cd",
+        "eu:32024L1619:article:1:subparagraph:1": "sha256:b658b7eb5ff2ca76e4bf932c92c38f405a08f1fc312bb7af1b43406984e5fc2a",
         "eu:32024L1619:article:4:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
       }
     },
@@ -481,7 +481,7 @@
         "eu:32014L0049:recital:1": "sha256:40abc7ca7a28b7601b59ac6e20f67a3ec1f6ba6dd23a0b6677828d031ccade12",
         "eu:32014L0049:article:1:paragraph:1": "sha256:126e4338abf1974474757ed3b5b0ecc53a8967767e160c16860be6290b188dc1",
         "eu:32014L0049:article:23:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
-        "eu:32014L0049:annex:i": "sha256:cf4c721ccd1a7754d7909e5d51edf61c25322b863e10887b2991668dffe31f56",
+        "eu:32014L0049:annex:i": "sha256:802dced77a159070a4d95720537845309c76868f122c7176f3f92716b63faf0d",
         "eu:32014L0049:annex:iii": "sha256:fc2a6cb7a392ccc8db67e28d299742eb0f8603a7ede6dc2ea426abaf8aa195ef"
       }
     },
@@ -597,8 +597,8 @@
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32025R0305:recital:1": "sha256:f590118278b7139d4cff65b83448447cb0626d61122821be31e28f8838105e69",
-        "eu:32025R0305:article:1:subparagraph:1": "sha256:fcd2055cfac2f1231bee32ba3d283c9e012303ab5ac3a0b6b4775ce7df2c5ed1",
+        "eu:32025R0305:recital:1": "sha256:6e79da0ccec8c0a025ed92b103511865887e5cce41062312627d74600b956b78",
+        "eu:32025R0305:article:1:subparagraph:1": "sha256:306b7abf3975c82f2d402967b1c5818f917f912b8b06e0bb4ba3d3db36e3cec4",
         "eu:32025R0305:article:18:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
       }
     },
@@ -629,7 +629,7 @@
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32024R1773:recital:1": "sha256:373ed5ec7c69cdc97bead2ac9a3b29dd839b1dedda49c830d715cc8485426c5b",
-        "eu:32024R1773:article:1:subparagraph:1": "sha256:4d969624cd50c451785234e5918e366d94fecb711242a980de901784c910e745",
+        "eu:32024R1773:article:1:subparagraph:1": "sha256:a31de461912f0bbd713212a45eef46fe784895e604c10511dba6596c4fa33360",
         "eu:32024R1773:article:11:subparagraph:1": "sha256:43014c7c23ae89f22ac2fe4828a8aa9584cfb7214b251d8c71de00b0505f61f2"
       }
     },
@@ -659,7 +659,7 @@
       "structuralNodeCount": 5,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R1772:recital:1": "sha256:e38eedb1789db2cec86297671fb2cb7bd00fc16d81bfe86934a3445220680766",
+        "eu:32024R1772:recital:1": "sha256:f5eac5b5d135aee5016968b3339c36630b0c78318e825d0812b984cb41e34de8",
         "eu:32024R1772:article:1:paragraph:1": "sha256:a4a6ee6a4420b6dc997b65bde4281c0e765ff452f6074e393ba87d1fde4c4f67",
         "eu:32024R1772:article:13:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
       }
@@ -690,9 +690,9 @@
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R2956:article:1:subparagraph:1": "sha256:f61de16c4d042bd36ae212623114bd98b5a1ae865fa92d14fb1101ed21c444ff",
+        "eu:32024R2956:article:1:subparagraph:1": "sha256:5e8408bca729a4bc07acec3b1504341c28f99b8f89d5b192313ed3fdffb056cf",
         "eu:32024R2956:article:7:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
-        "eu:32024R2956:annex:i": "sha256:502a200f4f63aaa6d42ac207a8cb87e8a6af69b61e5c2f7c12c7bdc196813297",
+        "eu:32024R2956:annex:i": "sha256:cd8539eed96f6327c7251235ac73e3625f752f3fb3a3effb3eef1bf60092a25f",
         "eu:32024R2956:annex:iv": "sha256:2515bba997a285bc6c964c39941644f2720054e7b8949e0ad22c414619e5a74e"
       }
     },
@@ -769,8 +769,8 @@
         "eu:32025R0302:recital:1": "sha256:c180aee345c92af8e11241cddfefe87c508881b07c8f37d7987d286b63fa8d2c",
         "eu:32025R0302:article:1:paragraph:1": "sha256:0382976e4929aa54d96dd180c6ebdeb539ed9b3280ca302d6f1dc46e04da81f1",
         "eu:32025R0302:article:9:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
-        "eu:32025R0302:annex:i": "sha256:e68b39d80afb992c08101ace997bf4607aa6d5545fd8f33ab140a49f18b2e788",
-        "eu:32025R0302:annex:iv": "sha256:98aeb5bffe119b051dd846b0ff45e85c0fd2b04f60328e6b7dd5f4ce3d4c7d1d"
+        "eu:32025R0302:annex:i": "sha256:1f74a123db615e03b32bf04fb1551a3400904dd1a294595e6cf9dcdbe0438fbe",
+        "eu:32025R0302:annex:iv": "sha256:24673d63f609b483a9e41c8b2e0a33fdc02180990efc1dab184c62a99ef89b6f"
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/302/oj/eng"
@@ -800,7 +800,7 @@
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32022L2556:recital:1": "sha256:484bef301a9164e82d14366a3969611bfe91278fded3bb7c4c9c0706354d8e64",
-        "eu:32022L2556:article:1:subparagraph:1": "sha256:282a40459b7a202594d21fd53c7c2b80ef68f87baee0f48f3517eafd14bc684b",
+        "eu:32022L2556:article:1:subparagraph:1": "sha256:33f6223a79887b809a58c78c7c7e32e67b31cf513e2da42fff9f9ed24b679558",
         "eu:32022L2556:article:11:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
       }
     },
@@ -862,7 +862,7 @@
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32025R1190:recital:1": "sha256:0e89eba0ebec6f672656b1edf56412728f662004b921064270ca4310167a7669",
-        "eu:32025R1190:article:1:subparagraph:1": "sha256:5a07488df015854f11b5ddbf2e4bcd9d9b0e80e107d69b907e4b3927144c3a61",
+        "eu:32025R1190:article:1:subparagraph:1": "sha256:df13011640d3e61f93972607310e649e9dbec7a032fc621a8ac1d03a6ecc8208",
         "eu:32025R1190:article:17:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
         "eu:32025R1190:annex:i": "sha256:e7e809476c315f3965b60f03628775d4225723a7500afa90967d0c589a7c2d3d",
         "eu:32025R1190:annex:viii": "sha256:1bccc1e89ebad00bb42d36958c581ad94f1cfb6daa8c3114f08a53ca779d770f"
@@ -895,7 +895,7 @@
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32024R1502:recital:1": "sha256:b70b38293ebea240d715a73110446f52fb19ef0a544441d2f90b8062c1133e3c",
-        "eu:32024R1502:article:1:paragraph:1": "sha256:8c5f31fcc47c548e09a91633f44ac2b58dedde385502ae577c334ec44902a446",
+        "eu:32024R1502:article:1:paragraph:1": "sha256:5922ce827f98887cb096301f0339a5859c4b46a72ef1914a7ed02101b814fd5b",
         "eu:32024R1502:article:7:subparagraph:2": "sha256:c0de1e7f0f18c0acafb16f1fd4a9edb59d6928ac3e3d3c8fe545fa73b023d622"
       }
     },
@@ -1059,7 +1059,7 @@
       "structuralNodeCount": 0,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32016R1675:article:1:subparagraph:1": "sha256:e1f4f9b8864e0f276172300af0f53fb10c2f74db69e86c2394637fed2bc6f27b",
+        "eu:32016R1675:article:1:subparagraph:1": "sha256:fdc52545de83d4b511eb67088297505be34faa112730daa2630255af0ab361a9",
         "eu:32016R1675:article:2:subparagraph:1": "sha256:1683e019da62d143a5ba9b6e8362e502b484a28631725e9f00de172384d3a7ed",
         "eu:32016R1675:annex:1": "sha256:79fb455030a55121be0f2501cad47c360e65875d873959cfb0766c0129575661"
       }
@@ -1205,7 +1205,7 @@
       "structuralNodeCount": 20,
       "maximumWarnings": 0,
       "textHashes": {
-        "eu:32024R1620:article:1:paragraph:1": "sha256:554ed42308949c44b52af9c2aa18bb5172da036bb92edaf4f119e592f7830a89",
+        "eu:32024R1620:article:1:paragraph:1": "sha256:c27bd9e13b49652028824bce546ce1f6e4f3c9ef3077fb5741e0988b1f657cf7",
         "eu:32024R1620:article:108:subparagraph:3": "sha256:df5afce2f8eadd615428e76d1468b5a7353b6390966e95b9d93d64c13fa3c987",
         "eu:32024R1620:annex:i": "sha256:a5e5f7d08cf832a86de9bbe7a4fec99257108d45582ac05a460f405e93a62b4d",
         "eu:32024R1620:annex:ii": "sha256:1656352324df9cb1459c94dfba1d734786fb07aab4c922ce99842a63576a7a2d"
@@ -1368,38 +1368,610 @@
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32024R0886:recital:1": "sha256:7d3f8612a830ec44d8d2c2bd2cf215b27b9b67b1129eda424a8376838534fdb4",
-        "eu:32024R0886:article:1:subparagraph:1": "sha256:45eb8854dd519bc308a20efad7c5249f4c1bdcd9d54c9fb28ccb1dcfdc8e4ab9",
+        "eu:32024R0886:article:1:subparagraph:1": "sha256:b1dd4e5dd8f4c4145d7e465fe619002061b6277fda7c3a4317b5d6de8194d313",
         "eu:32024R0886:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/886/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:payments",
     "shortName": "Electronic Money Directive II",
-    "celex": "32009L0110"
+    "celex": "32009L0110",
+    "aliases": ["EMD2", "Electronic Money Directive", "Directive 2009/110/EC"],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2009-10-10",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2009/110/2018-01-13/eng",
+    "expressionCelex": "02009L0110-20180113",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2018-01-13",
+      "checkedAt": "2026-10-04T09:17:49Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2009/110",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 24,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 68,
+      "pointCount": 36,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32009L0110:article:1:paragraph:1": "sha256:aa75157c22896ef01e1452293981af73bca23586a35c58ef6ba698d660a096ec",
+        "eu:32009L0110:article:24:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:securitisation",
     "shortName": "Securitisation Regulation",
-    "celex": "32017R2402"
+    "celex": "32017R2402",
+    "aliases": ["STS Regulation", "Regulation (EU) 2017/2402"],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2017-12-28",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2017/2402/2021-04-09/eng",
+    "expressionCelex": "02017R2402-20210409",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2021-04-09",
+      "checkedAt": "2026-10-04T09:17:49Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2017/2402",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 55,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 261,
+      "pointCount": 385,
+      "structuralNodeCount": 10,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R2402:article:1:paragraph:1": "sha256:9192bd7aeab6cd3abacb211b220431361ab7ddd5ff6cb44fc635a92a81ac9df7",
+        "eu:32017R2402:article:48:subparagraph:2": "sha256:a4a506a8e4ab18b4cc81f148d47459fbfec3ca3fff93e7cb63cbb84f12afede6"
+      }
+    }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:covered-bonds",
     "shortName": "Covered Bonds Directive",
-    "celex": "32019L2162"
+    "celex": "32019L2162",
+    "aliases": ["Directive (EU) 2019/2162"],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-18",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2019/2162/2024-01-09/eng",
+    "expressionCelex": "02019L2162-20240109",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-09",
+      "checkedAt": "2026-10-04T09:17:49Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2019/2162",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 35,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 113,
+      "pointCount": 184,
+      "structuralNodeCount": 10,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019L2162:article:1:subparagraph:1": "sha256:19f21ee21d5754c354f08c27456706ad99afd639fe44b314db53bd6f669068bc",
+        "eu:32019L2162:article:34:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:covered-bonds",
     "shortName": "Covered Bonds CRR Amending Regulation",
-    "celex": "32019R2160"
+    "celex": "32019R2160",
+    "aliases": ["Covered Bonds CRR Amendment", "Regulation (EU) 2019/2160"],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-18",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2019-12-18",
+      "checkedAt": "2026-10-04T09:17:49Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 15,
+      "annexCount": 0,
+      "paragraphCount": 3,
+      "pointCount": 34,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019R2160:recital:1": "sha256:1133813b36410bd15907de76adf76252d68c5bdf030cbf49ba1ea61f78f3e241",
+        "eu:32019R2160:article:1:subparagraph:1": "sha256:de85dd1e13cab69160d57929ba83b40366422592645c363bd6cdfeb4be3f13a7",
+        "eu:32019R2160:article:2:subparagraph:2": "sha256:e9a366cb71b8421323192150287eb33600846c409e25790777c79fe0cd306421"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-4",
+    "familyId": "family:financial-collateral",
+    "shortName": "Financial Collateral Directive",
+    "celex": "32002L0047",
+    "aliases": ["FCD", "Directive 2002/47/EC"],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2002-06-27",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2002/47/2022-08-12/eng",
+    "expressionCelex": "02002L0047-20220812",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-08-12",
+      "checkedAt": "2026-10-04T10:05:16.595Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2002/47",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 14,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 40,
+      "pointCount": 61,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32002L0047:article:1:paragraph:1": "sha256:16532f3ea6d13e86618484af68d0cf32cedbca7127afe5c25b63d3456de78cf0",
+        "eu:32002L0047:article:13:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-4",
+    "familyId": "family:settlement-finality",
+    "shortName": "Settlement Finality Directive",
+    "celex": "31998L0026",
+    "aliases": ["SFD", "Directive 98/26/EC"],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "1998-06-11",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/1998/26/2024-04-08/eng",
+    "expressionCelex": "01998L0026-20240408",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-04-08",
+      "checkedAt": "2026-10-04T10:05:16.595Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/1998/26",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 16,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 27,
+      "pointCount": 36,
+      "structuralNodeCount": 5,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:31998L0026:article:1:subparagraph:1": "sha256:9f92ecfc7ae5692e87498530fce090fa75e1cdf99ccd1f58d74980eed7a2f878",
+        "eu:31998L0026:article:14:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-5",
+    "familyId": "family:ssm",
+    "shortName": "SSM Regulation",
+    "celex": "32013R1024",
+    "aliases": [
+      "Single Supervisory Mechanism Regulation",
+      "Regulation (EU) No 1024/2013"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2013-10-29",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2013-10-29",
+      "checkedAt": "2026-10-04T10:37:57.021Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 34,
+      "recitalCount": 87,
+      "annexCount": 0,
+      "paragraphCount": 147,
+      "pointCount": 88,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32013R1024:recital:1": "sha256:baec0fb3bda6b3027943bef0fec4b19b594e19c928f7f1f5bc782c2e59f99b34",
+        "eu:32013R1024:article:1:subparagraph:1": "sha256:2a19251b2c2a96ee5f825755a83d6a7b4ae66c62fe4bcc5a7fbd2641495607f8",
+        "eu:32013R1024:article:34:subparagraph:1": "sha256:108c32bbb1e793bb274dc8c6d01029ff95eff2c23126208217b56a33a4da2a42"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-5",
+    "familyId": "family:payments",
+    "shortName": "Interchange Fee Regulation",
+    "celex": "32015R0751",
+    "aliases": ["IFR", "Regulation (EU) 2015/751"],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2015-05-19",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2015/751/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2015-05-19",
+      "checkedAt": "2026-10-04T10:37:57.021Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2015/751",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 18,
+      "recitalCount": 44,
+      "annexCount": 0,
+      "paragraphCount": 55,
+      "pointCount": 63,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32015R0751:recital:1": "sha256:0c49bb9b2ea20b348af199063aec367d11ac3686fe88c33368cb3ce95e88a707",
+        "eu:32015R0751:article:1:paragraph:1": "sha256:86d6fc9e03d1dcb9de1d2e80cf23b36aaa877d37dbe6dbb45a438b653bf7f055",
+        "eu:32015R0751:article:18:paragraph:2": "sha256:777cb1020b0a932d79fa639b5a558cc27323d482f5e48247b80a0af77256685c"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-6",
+    "familyId": "family:eba-regulation",
+    "shortName": "EBA Regulation",
+    "celex": "32010R1093",
+    "aliases": [
+      "European Banking Authority Regulation",
+      "Regulation (EU) No 1093/2010"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2010-12-15",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2010/1093/2025-12-31/eng",
+    "expressionCelex": "02010R1093-20251231",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-12-31",
+      "checkedAt": "2026-10-04T11:18:33.417Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2010/1093",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 100,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 402,
+      "pointCount": 197,
+      "structuralNodeCount": 14,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32010R1093:article:1:paragraph:1": "sha256:d73ea8badc7f899ca40011d6bd93e4d77f4265f631795fc0baff5f388440e104",
+        "eu:32010R1093:article:82:subparagraph:1": "sha256:69135d3f2d080f9b826c67a7c3fe9a8e7a74bcd037e99eab4ffb7ba510be6b66"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-6",
+    "familyId": "family:bank-reorganisation",
+    "shortName": "Bank Reorganisation and Winding-up Directive",
+    "celex": "32001L0024",
+    "aliases": [
+      "Credit Institutions Reorganisation and Winding-up Directive",
+      "Directive 2001/24/EC"
+    ],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2001-05-05",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2001/24/2014-07-02/eng",
+    "expressionCelex": "02001L0024-20140702",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2014-07-02",
+      "checkedAt": "2026-10-04T11:18:33.417Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2001/24",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 36,
+      "recitalCount": 32,
+      "annexCount": 0,
+      "paragraphCount": 70,
+      "pointCount": 35,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32001L0024:recital:1": "sha256:ec869013b0d5e42654063e5f51bfe2df05f72e8bae907e867c8b0d87bc95a0eb",
+        "eu:32001L0024:article:1:paragraph:1": "sha256:7d69f0fc4715a3a459cc77f7229b51909d5aac1c1f4b3a48634c35aab0b3da29",
+        "eu:32001L0024:article:36:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-7",
+    "familyId": "family:mifid",
+    "shortName": "MiFID II",
+    "celex": "32014L0065",
+    "aliases": [
+      "Markets in Financial Instruments Directive II",
+      "Directive 2014/65/EU"
+    ],
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/65/2026-06-06/eng",
+    "expressionCelex": "02014L0065-20260606",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-06-06",
+      "checkedAt": "2026-10-04T13:36:19.993Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/65",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 103,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 498,
+      "pointCount": 750,
+      "structuralNodeCount": 25,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014L0065:article:1:paragraph:1": "sha256:24f7393702202ded3d90d7b0ef5560780d469576291c46ce65a99c2e6b902c96",
+        "eu:32014L0065:article:97:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32014L0065:annex:i": "sha256:ca70bbd2d7ea37d4d6c90c84da2ad8b148cc7011cb9962416a81f8263cd76273",
+        "eu:32014L0065:annex:iv": "sha256:febe3de064c7863bf0eb36b355821809be95fba2bb494a98d7b45f3cc7094fab",
+        "eu:32014L0065:article:25:paragraph:2": "sha256:911be813530e9a1cf45bd07f98cca55e911bac472d86aab5d03c0db9bd8e5629"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-7",
+    "familyId": "family:mifid",
+    "shortName": "MiFIR",
+    "celex": "32014R0600",
+    "aliases": [
+      "Markets in Financial Instruments Regulation",
+      "Regulation (EU) No 600/2014"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/600/2025-11-23/eng",
+    "expressionCelex": "02014R0600-20251123",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-11-23",
+      "checkedAt": "2026-10-04T13:36:19.993Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/600",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 95,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 447,
+      "pointCount": 555,
+      "structuralNodeCount": 23,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0600:article:1:paragraph:1": "sha256:fd11d37cf352d99aa31defff2a12bfa864aac744e85bca69f095d543d1c06823",
+        "eu:32014R0600:article:55:subparagraph:4": "sha256:be64ef4b94b9a975fa5684d31a691855c71dac8ae30f549db12f700d50b1393e",
+        "eu:32014R0600:article:26:paragraph:1": "sha256:516599de0a368ff703850c58d73dca4f3222999376b6e4d4ec081be4b872f099"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-8",
+    "familyId": "family:emir",
+    "shortName": "EMIR",
+    "celex": "32012R0648",
+    "aliases": [
+      "European Market Infrastructure Regulation",
+      "Regulation (EU) No 648/2012"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2012-07-27",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2012/648/2025-01-17/eng",
+    "expressionCelex": "02012R0648-20250117",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-01-17",
+      "checkedAt": "2026-10-04T14:57:18.977Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2012/648",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 137,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 686,
+      "pointCount": 871,
+      "structuralNodeCount": 20,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32012R0648:article:1:paragraph:1": "sha256:dd84eaabfbe273c4b1e188c72c1333d4e21e4a13cf069d0fddd4ff053b407990",
+        "eu:32012R0648:article:91:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32012R0648:annex:i": "sha256:035e62946d7d67a4cfde500a5416b25f33dff5e86e2a3d78ce5aefb28a68f743",
+        "eu:32012R0648:annex:iv": "sha256:f969ddc0836b898426907e9059f028adc5b469004f1d433f49d3eecc97a49a69",
+        "eu:32012R0648:article:9:paragraph:1": "sha256:63509c0ae09d35c3a23e7c57ebe0648824a898b13e2aaa37a2690d9e5bf432ba"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-8",
+    "familyId": "family:csdr",
+    "shortName": "CSDR",
+    "celex": "32014R0909",
+    "aliases": [
+      "Central Securities Depositories Regulation",
+      "Regulation (EU) No 909/2014"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-08-28",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/909/2026-01-17/eng",
+    "expressionCelex": "02014R0909-20260117",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-01-17",
+      "checkedAt": "2026-10-04T14:57:18.977Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/909",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 83,
+      "recitalCount": 0,
+      "annexCount": 1,
+      "paragraphCount": 414,
+      "pointCount": 357,
+      "structuralNodeCount": 26,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0909:article:1:paragraph:1": "sha256:f17fb5a0aa1b745c28adb66d2917fd5ad9f759e6847686c4873476a1436b111b",
+        "eu:32014R0909:article:76:paragraph:7": "sha256:f9f2c2b5fcebb29274ee0de018e34ed3d80c361c3e03950f561d6389adb5133f",
+        "eu:32014R0909:annex:1": "sha256:315b0bdb108751a2a16557e1109ca8961623c58a76a30f49e13c0f839b5941bf",
+        "eu:32014R0909:article:5:paragraph:1": "sha256:95fc5767c8bd877d2bf0274017606bf725e8d13abd24d3beabaaeb969122230b"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-8",
+    "familyId": "family:ai-act",
+    "shortName": "AI Act Scientific Panel",
+    "celex": "32025R0454",
+    "aliases": [
+      "AI Act Scientific Panel Implementing Regulation",
+      "Commission Implementing Regulation (EU) 2025/454"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2025-03-10",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/454/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2025-03-10",
+      "checkedAt": "2026-10-04T14:57:18.977Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/454",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 20,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 64,
+      "pointCount": 27,
+      "structuralNodeCount": 6,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0454:recital:1": "sha256:1f320d7fe6e4495c1383d1d0b3087f82dbfee9f1b60d57bdd985f565811e9b21",
+        "eu:32025R0454:article:1:subparagraph:1": "sha256:61352a87b858d6759296cbfb60bd32ec6d466a63934f0a07bfb775dc14db907c",
+        "eu:32025R0454:article:20:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32025R0454:article:5:paragraph:1": "sha256:937486910f91097e3011e8a2ee4ef62517fba33cd9f28f67567c47499e1ff92f"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-core-8",
+    "familyId": "family:ai-act",
+    "shortName": "AI Act Commission Proceedings",
+    "celex": "32026R1755",
+    "aliases": [
+      "AI Act Commission Proceedings Implementing Regulation",
+      "Commission Implementing Regulation (EU) 2026/1755"
+    ],
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2026-07-21",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2026/1755/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2026-07-21",
+      "checkedAt": "2026-10-04T14:57:18.977Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2026/1755",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 15,
+      "recitalCount": 6,
+      "annexCount": 1,
+      "paragraphCount": 69,
+      "pointCount": 28,
+      "structuralNodeCount": 5,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32026R1755:recital:1": "sha256:d0b20f86d50d1a03fb86ece44e6e255b907ca46e8e04b5858040916a97dcd1e9",
+        "eu:32026R1755:article:1:subparagraph:1": "sha256:1dfbe6395d2581b4c9eeacd9575489514210118e109d53d0e8dd648393823d04",
+        "eu:32026R1755:article:15:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32026R1755:annex:1": "sha256:c7b30df7a78e6ac6db124421167926a6fd9eb05e21beb09749faeedfa566cab7",
+        "eu:32026R1755:article:5:paragraph:1": "sha256:ab117d97d9fa2b8effbfce74c5f9b80fc27c50db530f22f8118da1f4bd159ea6"
+      }
+    }
   }
 ]

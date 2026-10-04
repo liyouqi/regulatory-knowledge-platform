@@ -35,7 +35,7 @@ For normal setup, start with the [project README](../README.md). Use the [corpus
 | `npm run cellar:case-law:metadata:fetch -- --snapshot <path>` | Save an immutable official English-title/ECLI/date snapshot for a verified CJEU discovery snapshot. |
 | `npm run cellar:case-law:metadata:verify -- --snapshot <path>` | Verify a CJEU metadata snapshot's source candidate, query, response, hashes, and normalized candidate. |
 | `npm run cellar:case-law:metadata:probe -- --snapshot <path>` | Check the official English title, ECLI, and date completeness of a verified CJEU candidate snapshot without publishing metadata. |
-| `npm run search:benchmark` | Run the fixed six-query relevance check and record a warm-search latency baseline with machine/runtime metadata. |
+| `npm run search:benchmark` | Run the fixed eight-query full-text and six-query definition relevance checks and record a warm-search latency baseline with machine/runtime metadata. |
 | `npm run cssf:source:list` | List the reviewed CSSF representative-source registry. |
 | `npm run cssf:source:fetch -- --id <ID>` | Save an immutable official CSSF HTML/PDF snapshot under ignored raw data. |
 | `npm run cssf:source:verify -- --snapshot <path>` | Recompute CSSF snapshot byte counts and SHA-256 hashes. |
@@ -65,7 +65,7 @@ source registry
 → immutable offline RAG snapshot export
 ```
 
-These stages are real and independently runnable. `data/corpus-build-manifest.json` pins all 43 current registry entries to exact verified snapshot IDs and content hashes. `npm run corpus:build -- --profile <profileId>` verifies those snapshots and reviewed inputs, invokes the existing EUR-Lex/CSSF/EBA Canonical builders, compiles the selected Edition/Profile, verifies an isolated Runtime SQLite, and writes an ignored machine-readable build report. Rebuilding both `full-corpus` and `banking-default` reproduces their existing Runtime build IDs. Durable remote snapshot storage is not configured yet: all current entries are honestly marked `local-only`, and `--require-archived` fails closed until reviewed archive URIs are recorded. The workflow is documented in `docs/corpus-onboarding-runbook.md`.
+These stages are real and independently runnable. `data/corpus-build-manifest.json` pins all 59 current registry entries to exact verified snapshot IDs and content hashes. `npm run corpus:build -- --profile <profileId>` verifies those snapshots and reviewed inputs, invokes the existing EUR-Lex/CSSF/EBA Canonical builders, compiles the selected Edition/Profile, verifies an isolated Runtime SQLite, and writes an ignored machine-readable build report. Repeated builds with the same pinned snapshots and reviewed inputs reproduce each strict Profile's Runtime build ID. Experimental current-source refresh is a separate build and may use newer local retrieval metadata. Durable remote snapshot storage is not configured yet: all current entries are honestly marked `local-only`, and `--require-archived` fails closed until reviewed archive URIs are recorded. The workflow is documented in `docs/corpus-onboarding-runbook.md`.
 
 The RAG export is deliberately downstream of Runtime verification. Contract 1.1 reads only the selected read-only SQLite artifact and writes `manifest.json`, `documents.jsonl`, `provisions.jsonl`, and `relationships.jsonl`; it never calls a source adapter or the network. It preserves reviewed issuer/Expression currency metadata and exact mixed text/list order. Export the complete compiled Profile and let the receiving RAG release select complete Legal Works by stable document ID; cross-boundary relationships remain metadata stubs and never auto-import another law. Do not maintain a Platform-side list of what another project currently lacks. Snapshot directories are ignored under `exports/`, are never overwritten, and are independently verifiable. See `docs/rag-snapshot-export.md`.
 
@@ -79,7 +79,7 @@ For local development, `REGULATORY_EDITION_PROFILE` is consumed only by the buil
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains 39 active EUR-Lex acts, plus the visible queued and planned backlog summarized in `docs/corpus-status.md`. Together with three CSSF sources and one EBA guideline, the manifest pins 43 documents. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, other delegated measures, and future Level 3 material.
+The version-controlled registry is `data/source-registry.json`. It currently contains 55 active EUR-Lex acts, plus the visible queued and planned backlog summarized in `docs/corpus-status.md`. Together with three CSSF sources and one EBA guideline, the manifest pins 59 documents. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, other delegated measures, and future Level 3 material.
 
 ### CSSF representative sources
 
@@ -391,6 +391,8 @@ artificial intelligence system
 crypto asset
 data holder
 ```
+
+Global results show each matching law's best BM25 hit before its second hit, then its third, with BM25 and stable ties within each round. This keeps a large law from filling the first page. Document-scoped search retains ordinary BM25 ordering; definitions and law-identity search retain their own ranking. Matching, official text, highlighted snippets, and Reader anchors are unchanged.
 
 The endpoint is `/api/search/full-text?q=<query>&limit=<1-50>`. Add `documentId=eu:<CELEX>` for exact document scope. User input is normalized into bounded parameterized FTS expressions; unsupported operator punctuation is not executed as raw FTS syntax.
 

@@ -39,7 +39,7 @@ describe("SQLite runtime repository", () => {
       expect(repository?.findDocument(document.id)).toEqual(document);
       expect(repository?.findDocumentBySlug(document.slug)).toEqual(document);
     }
-  });
+  }, 30_000);
 
   it("returns an Explorer payload identical to the canonical projection", () => {
     for (const document of documents) {
@@ -332,6 +332,22 @@ describe("SQLite runtime repository", () => {
       "eu:32014L0059",
       "eu:32014R0806",
       "eu:32015L2366",
+      "eu:32009L0110",
+      "eu:32017R2402",
+      "eu:32019L2162",
+      "eu:32019R2160",
+      "eu:32002L0047",
+      "eu:31998L0026",
+      "eu:32013R1024",
+      "eu:32015R0751",
+      "eu:32010R1093",
+      "eu:32001L0024",
+      "eu:32014L0065",
+      "eu:32014R0600",
+      "eu:32012R0648",
+      "eu:32014R0909",
+      "eu:32025R0454",
+      "eu:32026R1755",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
     const additionalConsolidatedChains = [
       "eu:32016R0679",
@@ -581,8 +597,8 @@ describe("SQLite runtime repository", () => {
           relationship.target.documentId === "eu:32022R2554",
       ),
     ).toBe(true);
-    expect(repository?.lifecycleRelationshipCount).toBe(67);
-    expect(repository?.externalWorkCount).toBe(63);
+    expect(repository?.lifecycleRelationshipCount).toBe(70);
+    expect(repository?.externalWorkCount).toBe(59);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

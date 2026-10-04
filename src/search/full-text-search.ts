@@ -257,8 +257,36 @@ export class SearchService {
     const scopeClause = options.documentId
       ? "AND p.document_id = @documentId"
       : "";
+    const ranking = options.documentId
+      ? ""
+      : `WITH matches AS MATERIALIZED (
+          SELECT p.rowid AS rowId, p.document_id AS documentId,
+            bm25(search_records_fts, 5.0, 1.0) AS rank
+          FROM search_records_fts
+          JOIN search_records p ON p.rowid = search_records_fts.rowid
+          WHERE search_records_fts MATCH @matchExpression
+        ), ranked AS (
+          SELECT *, row_number() OVER (
+            PARTITION BY documentId ORDER BY rank ASC, rowId ASC
+          ) AS documentPosition
+          FROM matches
+        ), selected AS MATERIALIZED (
+          SELECT * FROM ranked
+          ORDER BY documentPosition ASC, rank ASC, documentId ASC, rowId ASC
+          LIMIT @limit
+        )`;
+    const selectedJoin = options.documentId
+      ? ""
+      : "JOIN selected ON selected.rowId = search_records_fts.rowid";
+    const rank = options.documentId
+      ? "bm25(search_records_fts, 5.0, 1.0)"
+      : "selected.rank";
+    const order = options.documentId
+      ? "rank ASC, p.document_id ASC, p.rowid ASC"
+      : "selected.documentPosition ASC, selected.rank ASC, p.document_id ASC, p.rowid ASC";
     const rows = this.database
       .prepare(`
+        ${ranking}
         SELECT
           p.record_id AS id,
           p.document_id AS documentId,
@@ -273,13 +301,14 @@ export class SearchService {
           p.marker AS marker,
           p.path AS path,
           snippet(search_records_fts, -1, char(1), char(2), '…', 28) AS markedSnippet,
-          bm25(search_records_fts, 5.0, 1.0) AS rank
+          ${rank} AS rank
         FROM search_records_fts
+        ${selectedJoin}
         JOIN search_records p ON p.rowid = search_records_fts.rowid
         JOIN documents d ON d.id = p.document_id
         WHERE search_records_fts MATCH @matchExpression
         ${scopeClause}
-        ORDER BY rank ASC, p.document_id ASC, p.rowid ASC
+        ORDER BY ${order}
         LIMIT @limit
       `)
       .all({

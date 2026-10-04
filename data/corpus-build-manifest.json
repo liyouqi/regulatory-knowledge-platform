@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.13.0",
+  "version": "1.19.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -333,6 +333,150 @@
       "snapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
       "contentSha256": "sha256:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
       "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32009L0110",
+      "snapshotId": "snapshot:cellar:32009L0110:8892b0a4082005facafe3b40f80493895171c40e4887e320c9d0167f267b4e2c",
+      "contentSha256": "sha256:8892b0a4082005facafe3b40f80493895171c40e4887e320c9d0167f267b4e2c",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32017R2402",
+      "snapshotId": "snapshot:cellar:32017R2402:f22e1b40b70dccb7f538d515ca02fe92d946fcf212e76fcd92f296ce506ec99f",
+      "contentSha256": "sha256:f22e1b40b70dccb7f538d515ca02fe92d946fcf212e76fcd92f296ce506ec99f",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32019L2162",
+      "snapshotId": "snapshot:cellar:32019L2162:4860e6f5bd8f80bbe7381a2a69db5e882fde4cda0e63578dae21de15b8a128e8",
+      "contentSha256": "sha256:4860e6f5bd8f80bbe7381a2a69db5e882fde4cda0e63578dae21de15b8a128e8",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32019R2160",
+      "snapshotId": "snapshot:cellar:32019R2160:f0118aa7c91af6407123fa72349fda7470d5ae281db3b3b4ee05bfc6af8e9781",
+      "contentSha256": "sha256:f0118aa7c91af6407123fa72349fda7470d5ae281db3b3b4ee05bfc6af8e9781",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32002L0047",
+      "snapshotId": "snapshot:cellar:32002L0047:9f421bb0239fd4cd96060ff3b745545943c0bd7a0940f03c4bfe0103b58af923",
+      "contentSha256": "sha256:9f421bb0239fd4cd96060ff3b745545943c0bd7a0940f03c4bfe0103b58af923",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "31998L0026",
+      "snapshotId": "snapshot:cellar:31998L0026:727d73482e6ef73d419e6fc9d4e3277d747967342824693931b5ee8f1a3a9e1a",
+      "contentSha256": "sha256:727d73482e6ef73d419e6fc9d4e3277d747967342824693931b5ee8f1a3a9e1a",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32013R1024",
+      "snapshotId": "snapshot:cellar:32013R1024:265a5174830cfc038bad902b0da326dfbd07c77f2737698b2144fcfc476dc573",
+      "contentSha256": "sha256:265a5174830cfc038bad902b0da326dfbd07c77f2737698b2144fcfc476dc573",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32015R0751",
+      "snapshotId": "snapshot:cellar:32015R0751:acd4fbff5f6bc3766496b3e1384ca89466c978b6bba4890783673c624398adfb",
+      "contentSha256": "sha256:acd4fbff5f6bc3766496b3e1384ca89466c978b6bba4890783673c624398adfb",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32010R1093",
+      "snapshotId": "snapshot:cellar:32010R1093:558784b426762a2fe38c034afb854f3f9fa9c122d97fbc438ddc27047fba092b",
+      "contentSha256": "sha256:558784b426762a2fe38c034afb854f3f9fa9c122d97fbc438ddc27047fba092b",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32001L0024",
+      "snapshotId": "snapshot:cellar:32001L0024:40e1ceb21480418626af862e24109d705e4386c0f865de84878ce55e4b4ee4d6",
+      "contentSha256": "sha256:40e1ceb21480418626af862e24109d705e4386c0f865de84878ce55e4b4ee4d6",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014L0065",
+      "snapshotId": "snapshot:cellar:32014L0065:7088da74b7adac9d789a446469e2f120e0a7a4ac1aa54e51c8cf3a45eef726b9",
+      "contentSha256": "sha256:7088da74b7adac9d789a446469e2f120e0a7a4ac1aa54e51c8cf3a45eef726b9",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R0600",
+      "snapshotId": "snapshot:cellar:32014R0600:28c1d7d07ceaa67adebed2565a33dc0b2ff2b6181bd4faf6d1c75cfb6443f2f3",
+      "contentSha256": "sha256:28c1d7d07ceaa67adebed2565a33dc0b2ff2b6181bd4faf6d1c75cfb6443f2f3",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32012R0648",
+      "snapshotId": "snapshot:cellar:32012R0648:292c87688f129674daebb6813cf85d230522d0bf558fc236fdaff5ccbbcc6c36",
+      "contentSha256": "sha256:292c87688f129674daebb6813cf85d230522d0bf558fc236fdaff5ccbbcc6c36",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R0909",
+      "snapshotId": "snapshot:cellar:32014R0909:b14f760c5a72254e4a41f42f25facfc4b18eadb077bf00cac7112610258b7ff7",
+      "contentSha256": "sha256:b14f760c5a72254e4a41f42f25facfc4b18eadb077bf00cac7112610258b7ff7",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32025R0454",
+      "snapshotId": "snapshot:cellar:32025R0454:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
+      "contentSha256": "sha256:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32026R1755",
+      "snapshotId": "snapshot:cellar:32026R1755:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
+      "contentSha256": "sha256:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
+      "retention": {
+        "status": "local-only"
+      }
     }
   ],
   "requiredReviewedInputs": [

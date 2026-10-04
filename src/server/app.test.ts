@@ -409,7 +409,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      43,
+      59,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({
@@ -687,7 +687,7 @@ describe("Document lookup", () => {
         term: "digital operational resilience",
         normalizedTerm: "digital operational resilience",
         definitionText: expect.stringContaining(
-          "digital operational resilience means",
+          "‘digital operational resilience’ means",
         ),
         sourceUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
         provisionId: "eu:32022R2554:article:3",

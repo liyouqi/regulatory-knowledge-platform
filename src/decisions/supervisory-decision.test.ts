@@ -7,8 +7,10 @@ import {
   loadSupervisoryDecisionDataset,
 } from "./supervisory-decision";
 
+const allDocuments = loadDocumentViews();
+
 function build() {
-  const documents = loadDocumentViews();
+  const documents = allDocuments;
   const entities = buildExplicitReferences(documents).entities;
   return buildSupervisoryDecisions(
     documents,
@@ -51,7 +53,7 @@ describe("reviewed supervisory decisions", () => {
   });
 
   it("fails closed when a finding no longer matches the official disposition", () => {
-    const documents = loadDocumentViews();
+    const documents = allDocuments;
     const dataset = structuredClone(loadSupervisoryDecisionDataset());
     const finding = dataset.decisions[0]?.findings[0];
     if (!finding) throw new Error("Decision fixture is incomplete");
@@ -69,7 +71,7 @@ describe("reviewed supervisory decisions", () => {
   });
 
   it("omits the decision when GDPR is excluded by the Edition Profile", () => {
-    const documents = loadDocumentViews().filter(
+    const documents = allDocuments.filter(
       (document) => document.id !== "eu:32016R0679",
     );
     const result = buildSupervisoryDecisions(
@@ -77,7 +79,7 @@ describe("reviewed supervisory decisions", () => {
       buildExplicitReferences(documents).entities,
       loadAuthorityDataset().authorities,
       loadSupervisoryDecisionDataset(),
-      new Set(loadDocumentViews().map((document) => document.id)),
+      new Set(allDocuments.map((document) => document.id)),
     );
 
     expect(result.decisions).toEqual([]);

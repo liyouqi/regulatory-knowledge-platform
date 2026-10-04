@@ -46,7 +46,7 @@ describe("SQLite FTS5 search artifact", () => {
     expect(first.recordCount).toBeGreaterThan(900);
     expect(first.definitionCount).toBe(65);
     expect(first.byteCount).toBeGreaterThan(0);
-  });
+  }, 60_000);
 
   it("turns user input into constrained AND, phrase, and prefix syntax", () => {
     expect(parseFullTextQuery('risk "management body" polic')).toEqual({
@@ -129,7 +129,7 @@ describe("SQLite FTS5 search artifact", () => {
       path: "/read/dora/articles/3#subparagraph-1-point-1",
     });
     expect(exact?.results[0]?.definitionText).toContain(
-      "digital operational resilience means",
+      "‘digital operational resilience’ means",
     );
     expect(service?.searchDefinitions("legacy ict").results[0]?.term).toBe(
       "legacy ICT system",

@@ -2,9 +2,13 @@
   "schemaVersion": "1.0.0",
   "queryVersion": "1.0.0",
   "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
-  "checkedAt": "2026-09-25T17:03:02.954Z",
+  "checkedAt": "2026-10-04T09:23:19.049Z",
   "seedCelexes": [
+    "32009L0110",
     "32016R0679",
+    "32017R2402",
+    "32019L2162",
+    "32019R2160",
     "32022L2555",
     "32022R2554",
     "32023R1114",
@@ -489,6 +493,27 @@
       "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_amends_resource_legal",
       "targetCelex": "32024R1689",
       "targetWorkUri": "https://publications.europa.eu/resource/cellar/dc8116a1-3fe6-11ef-865a-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32015L2366",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/dd85ef2e-a953-11e5-b528-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_amends_resource_legal",
+      "targetCelex": "32009L0110",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/bb562081-8f79-4ee2-9f0d-13a01ceb66b6"
+    },
+    {
+      "sourceCelex": "32019L2162",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/63e9c933-2174-11ea-95ab-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_amends_resource_legal",
+      "targetCelex": "32014L0059",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/d108610e-f1f7-11e3-8cd4-01aa75ed71a1"
+    },
+    {
+      "sourceCelex": "32019R2160",
+      "sourceWorkUri": "https://publications.europa.eu/resource/cellar/4f0a6bf6-2173-11ea-95ab-01aa75ed71a1",
+      "predicate": "http://publications.europa.eu/ontology/cdm#resource_legal_amends_resource_legal",
+      "targetCelex": "32013R0575",
+      "targetWorkUri": "https://publications.europa.eu/resource/cellar/ccd31733-df06-11e2-9165-01aa75ed71a1"
     }
   ]
 }
