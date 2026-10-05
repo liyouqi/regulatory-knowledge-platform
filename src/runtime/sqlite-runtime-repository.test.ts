@@ -332,6 +332,10 @@ describe("SQLite runtime repository", () => {
       "eu:32014L0059",
       "eu:32014R0806",
       "eu:32015L2366",
+      "eu:32009L0110",
+      "eu:32017R2402",
+      "eu:32019L2162",
+      "eu:32019R2160",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
     const additionalConsolidatedChains = [
       "eu:32016R0679",

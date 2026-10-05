@@ -1375,31 +1375,143 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2024/886/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:payments",
     "shortName": "Electronic Money Directive II",
-    "celex": "32009L0110"
+    "aliases": ["Directive 2009/110/EC", "EMD2"],
+    "celex": "32009L0110",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2009-10-10",
+    "quality": {
+      "articleCount": 24,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 68,
+      "pointCount": 36,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32009L0110:article:1:paragraph:1": "sha256:aa75157c22896ef01e1452293981af73bca23586a35c58ef6ba698d660a096ec",
+        "eu:32009L0110:article:24:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    },
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2018-01-13",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2009/110",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2009/110/2018-01-13/eng",
+    "expressionCelex": "02009L0110-20180113"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:securitisation",
     "shortName": "Securitisation Regulation",
-    "celex": "32017R2402"
+    "aliases": ["Regulation (EU) 2017/2402", "STS Regulation"],
+    "celex": "32017R2402",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2017-12-28",
+    "quality": {
+      "articleCount": 55,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 261,
+      "pointCount": 385,
+      "structuralNodeCount": 10,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R2402:article:1:paragraph:1": "sha256:f712002d99be174077aa24820c1ae87c2c96aadc9159b15b9cb6aca3d5d26f52",
+        "eu:32017R2402:article:48:subparagraph:2": "sha256:a4a506a8e4ab18b4cc81f148d47459fbfec3ca3fff93e7cb63cbb84f12afede6"
+      }
+    },
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2021-04-09",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2017/2402",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2017/2402/2021-04-09/eng",
+    "expressionCelex": "02017R2402-20210409"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:covered-bonds",
     "shortName": "Covered Bonds Directive",
-    "celex": "32019L2162"
+    "aliases": ["Directive (EU) 2019/2162", "CBD"],
+    "celex": "32019L2162",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-18",
+    "quality": {
+      "articleCount": 35,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 113,
+      "pointCount": 184,
+      "structuralNodeCount": 10,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019L2162:article:1:subparagraph:1": "sha256:19f21ee21d5754c354f08c27456706ad99afd639fe44b314db53bd6f669068bc",
+        "eu:32019L2162:article:34:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    },
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-09",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2019/2162",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2019/2162/2024-01-09/eng",
+    "expressionCelex": "02019L2162-20240109"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "banking-core-3",
     "familyId": "family:covered-bonds",
     "shortName": "Covered Bonds CRR Amending Regulation",
-    "celex": "32019R2160"
+    "aliases": ["Regulation (EU) 2019/2160", "Covered Bonds CRR Amendment"],
+    "celex": "32019R2160",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-18",
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 15,
+      "annexCount": 0,
+      "paragraphCount": 3,
+      "pointCount": 34,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019R2160:recital:1": "sha256:1133813b36410bd15907de76adf76252d68c5bdf030cbf49ba1ea61f78f3e241",
+        "eu:32019R2160:article:1:subparagraph:1": "sha256:7e6071163ff7f65f6d867ea4659af9cc312b918bcdb2bf444c67a1efe4dd9979",
+        "eu:32019R2160:article:2:subparagraph:2": "sha256:e9a366cb71b8421323192150287eb33600846c409e25790777c79fe0cd306421"
+      }
+    },
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2019-12-18",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160/oj/eng"
   }
 ]

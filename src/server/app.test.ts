@@ -409,7 +409,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      43,
+      47,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({

@@ -12,8 +12,8 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(39);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(39);
+    expect(sources).toHaveLength(43);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(43);
     expect(sources.slice(0, 10).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
@@ -52,6 +52,11 @@ describe("EU source registry", () => {
       "32024L1640",
       "32024R1620",
     ]);
+    expect(
+      sources
+        .filter((source) => source.batch === "banking-core-3")
+        .map((source) => source.celex),
+    ).toEqual(["32009L0110", "32017R2402", "32019L2162", "32019R2160"]);
     expect(sources.every((source) => source.aliases.length > 0)).toBe(true);
     expect(
       sources.find((source) => source.celex === "32024R2956")?.sourceStatus,

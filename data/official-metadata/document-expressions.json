@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "records": [
     {
       "documentId": "eu:32013L0036",
@@ -430,6 +430,50 @@
       "fallbackReason": "no_reviewed_consolidated_expression_loaded",
       "reviewStatus": "reviewed",
       "reviewedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32009L0110",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R2402",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32019L2162",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32019R2160",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
       "documentId": "eu:eba:gl:2021:05",
