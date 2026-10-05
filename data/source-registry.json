@@ -1515,74 +1515,243 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "Settlement Finality Directive",
-    "celex": "31998L0026"
+    "aliases": ["Directive 98/26/EC", "SFD"],
+    "celex": "31998L0026",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "1998-06-11",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-04-08",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/1998/26",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/1998/26/2024-04-08/eng",
+    "expressionCelex": "01998L0026-20240408"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:crisis-management",
     "shortName": "Credit Institutions Reorganisation and Winding-up Directive",
-    "celex": "32001L0024"
+    "aliases": [
+      "Directive 2001/24/EC",
+      "Credit Institutions Winding-up Directive"
+    ],
+    "celex": "32001L0024",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2001-05-05",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2014-07-02",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2001/24",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2001/24/2014-07-02/eng",
+    "expressionCelex": "02001L0024-20140702"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "Financial Collateral Directive",
-    "celex": "32002L0047"
+    "aliases": ["Directive 2002/47/EC", "FCD"],
+    "celex": "32002L0047",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2002-06-27",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-08-12",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2002/47",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2002/47/2022-08-12/eng",
+    "expressionCelex": "02002L0047-20220812"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:eba",
     "shortName": "EBA Regulation",
-    "celex": "32010R1093"
+    "aliases": [
+      "Regulation (EU) No 1093/2010",
+      "European Banking Authority Regulation"
+    ],
+    "celex": "32010R1093",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2010-12-15",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-12-31",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2010/1093",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2010/1093/2025-12-31/eng",
+    "expressionCelex": "02010R1093-20251231"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "EMIR",
-    "celex": "32012R0648"
+    "aliases": [
+      "Regulation (EU) No 648/2012",
+      "European Market Infrastructure Regulation"
+    ],
+    "celex": "32012R0648",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2012-07-27",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-01-17",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2012/648",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2012/648/2025-01-17/eng",
+    "expressionCelex": "02012R0648-20250117"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:ssm",
     "shortName": "SSM Regulation",
-    "celex": "32013R1024"
+    "aliases": [
+      "Council Regulation (EU) No 1024/2013",
+      "Single Supervisory Mechanism Regulation"
+    ],
+    "celex": "32013R1024",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2013-10-29",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2013-10-29",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:mifid",
     "shortName": "MiFID II",
-    "celex": "32014L0065"
+    "aliases": [
+      "Directive 2014/65/EU",
+      "Markets in Financial Instruments Directive II"
+    ],
+    "celex": "32014L0065",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-06-06",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2014/65",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/65/2026-06-06/eng",
+    "expressionCelex": "02014L0065-20260606"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:mifid",
     "shortName": "MiFIR",
-    "celex": "32014R0600"
+    "aliases": [
+      "Regulation (EU) No 600/2014",
+      "Markets in Financial Instruments Regulation"
+    ],
+    "celex": "32014R0600",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-11-23",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/600",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/600/2025-11-23/eng",
+    "expressionCelex": "02014R0600-20251123"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "CSDR",
-    "celex": "32014R0909"
+    "aliases": [
+      "Regulation (EU) No 909/2014",
+      "Central Securities Depositories Regulation"
+    ],
+    "celex": "32014R0909",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-08-28",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-01-17",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/909",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/909/2026-01-17/eng",
+    "expressionCelex": "02014R0909-20260117"
   },
   {
-    "status": "planned",
+    "status": "queued",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:payments",
     "shortName": "Interchange Fee Regulation",
-    "celex": "32015R0751"
+    "aliases": ["Regulation (EU) 2015/751", "Interchange Fees Regulation"],
+    "celex": "32015R0751",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2015-05-19",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2015-05-19",
+      "checkedAt": "2026-10-04T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2015/751",
+      "corrections": []
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2015/751/oj/eng"
   },
   {
     "status": "planned",

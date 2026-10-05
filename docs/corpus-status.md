@@ -6,13 +6,12 @@
 
 DORA, GDPR, AI Act, MiCA, NIS2, Data Act, CRD IV, CRR, CRR III, CRD VI, BRRD, SRMR, DGSD, PSD2, DORA RTS ICT Risk Management, MiCA RTS CASP Authorisation, DORA RTS ICT Third-Party Policy, DORA RTS Incident Classification, DORA ITS Register of Information, DORA RTS Incident Reporting, DORA ITS Incident Reporting, DORA Amending Directive, DORA RTS ICT Subcontracting, DORA RTS TLPT, DORA CTPP Designation Criteria, DORA CTPP Oversight Fees, DORA RTS Oversight Activities, DORA RTS Joint Examination Teams, AMLD IV, AML High-Risk Third Countries Regulation, Transfer of Funds Regulation, AMLR, AMLD VI, AMLA Regulation, Consumer Credit Directive II, Mortgage Credit Directive, Payment Accounts Directive, SEPA Regulation, Instant Payments Regulation, Electronic Money Directive II, Securitisation Regulation, Covered Bonds Directive, Covered Bonds CRR Amending Regulation, CSSF ICT Risk Updates 2025, Circular CSSF 25/893, Circular CSSF 12/552, EBA/GL/2021/05
 
-## Queued — 0
-
-_None._
-
-## Planned — 12
+## Queued — 10
 
 - **banking-market-infrastructure-1 — 10:** Settlement Finality Directive, Credit Institutions Reorganisation and Winding-up Directive, Financial Collateral Directive, EBA Regulation, EMIR, SSM Regulation, MiFID II, MiFIR, CSDR, Interchange Fee Regulation
+
+## Planned — 2
+
 - **ai-act-level-2 — 2:** AI Act Scientific Panel Implementing Regulation, AI Act Commission Proceedings Implementing Regulation
 
 Published documents are available to the Runtime/Reader. Queued laws are isolated onboarding candidates. Planned laws are visible backlog only.
