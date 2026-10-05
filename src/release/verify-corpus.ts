@@ -38,6 +38,18 @@ function assertSameIds(
   );
 }
 
+export function assertContainsIds(
+  label: string,
+  actual: Set<string>,
+  expected: Set<string>,
+) {
+  const missing = [...expected].filter((id) => !actual.has(id));
+  if (missing.length === 0) return;
+  throw new Error(
+    `${label} is missing source-registry documents: [${missing.join(", ")}]`,
+  );
+}
+
 export interface CorpusVerification {
   sourceRegistryDocuments: number;
   verifiedRawSnapshots: number;
@@ -89,7 +101,10 @@ export async function verifyCorpus(): Promise<CorpusVerification> {
     ...cssfSnapshots.map((snapshot) => snapshot.snapshot.documentId),
     ...ebaSnapshots.map((snapshot) => snapshot.snapshot.documentId),
   ]);
-  assertSameIds("Verified raw snapshots", rawIds, expectedIds);
+  // Raw storage is an immutable acquisition history and may also contain
+  // verified candidates that have not passed the publication gates yet.
+  // Canonical and Runtime remain exact closed sets below.
+  assertContainsIds("Verified raw snapshots", rawIds, expectedIds);
 
   const canonicalDocuments = loadDocumentViews();
   if (

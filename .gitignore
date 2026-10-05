@@ -9,6 +9,7 @@ test-results/
 .env.*
 !.env.example
 data/raw/
+/*-pinned-sources.tar.gz
 data/artifacts/
 data/monitor/*
 !data/monitor/default.json

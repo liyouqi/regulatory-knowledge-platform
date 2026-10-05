@@ -1,5 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { verifyCorpus } from "./verify-corpus";
+import { assertContainsIds, verifyCorpus } from "./verify-corpus";
+
+describe("raw snapshot release boundary", () => {
+  it("allows verified candidate snapshots while still requiring every published source", () => {
+    expect(() =>
+      assertContainsIds(
+        "Verified raw snapshots",
+        new Set(["eu:published", "eu:candidate"]),
+        new Set(["eu:published"]),
+      ),
+    ).not.toThrow();
+
+    expect(() =>
+      assertContainsIds(
+        "Verified raw snapshots",
+        new Set(["eu:candidate"]),
+        new Set(["eu:published"]),
+      ),
+    ).toThrow(
+      "Verified raw snapshots is missing source-registry documents: [eu:published]",
+    );
+  });
+});
 
 describe("release corpus verification", () => {
   it("verifies EUR-Lex, CSSF, and EBA registries through Runtime", async () => {
