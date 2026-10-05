@@ -14,7 +14,9 @@ describe("Reader corpus status", () => {
 
     expect(output).toContain("## Published — 47");
     expect(output).toContain("## Queued — 0");
-    expect(output).toContain("## Planned — 0");
+    expect(output).toContain("## Planned — 12");
+    expect(output).toContain("**banking-market-infrastructure-1 — 10:**");
+    expect(output).toContain("**ai-act-level-2 — 2:**");
     expect(output).toContain("DORA");
     expect(output).toContain("AMLR");
   });

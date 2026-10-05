@@ -10,8 +10,9 @@ DORA, GDPR, AI Act, MiCA, NIS2, Data Act, CRD IV, CRR, CRR III, CRD VI, BRRD, SR
 
 _None._
 
-## Planned — 0
+## Planned — 12
 
-_None._
+- **banking-market-infrastructure-1 — 10:** Settlement Finality Directive, Credit Institutions Reorganisation and Winding-up Directive, Financial Collateral Directive, EBA Regulation, EMIR, SSM Regulation, MiFID II, MiFIR, CSDR, Interchange Fee Regulation
+- **ai-act-level-2 — 2:** AI Act Scientific Panel Implementing Regulation, AI Act Commission Proceedings Implementing Regulation
 
 Published documents are available to the Runtime/Reader. Queued laws are isolated onboarding candidates. Planned laws are visible backlog only.

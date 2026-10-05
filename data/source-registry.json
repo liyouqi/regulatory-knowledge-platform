@@ -1513,5 +1513,89 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160/oj/eng"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:market-infrastructure",
+    "shortName": "Settlement Finality Directive",
+    "celex": "31998L0026"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:crisis-management",
+    "shortName": "Credit Institutions Reorganisation and Winding-up Directive",
+    "celex": "32001L0024"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:market-infrastructure",
+    "shortName": "Financial Collateral Directive",
+    "celex": "32002L0047"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:eba",
+    "shortName": "EBA Regulation",
+    "celex": "32010R1093"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:market-infrastructure",
+    "shortName": "EMIR",
+    "celex": "32012R0648"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:ssm",
+    "shortName": "SSM Regulation",
+    "celex": "32013R1024"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:mifid",
+    "shortName": "MiFID II",
+    "celex": "32014L0065"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:mifid",
+    "shortName": "MiFIR",
+    "celex": "32014R0600"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:market-infrastructure",
+    "shortName": "CSDR",
+    "celex": "32014R0909"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-market-infrastructure-1",
+    "familyId": "family:payments",
+    "shortName": "Interchange Fee Regulation",
+    "celex": "32015R0751"
+  },
+  {
+    "status": "planned",
+    "batch": "ai-act-level-2",
+    "familyId": "family:ai-act",
+    "shortName": "AI Act Scientific Panel Implementing Regulation",
+    "celex": "32025R0454"
+  },
+  {
+    "status": "planned",
+    "batch": "ai-act-level-2",
+    "familyId": "family:ai-act",
+    "shortName": "AI Act Commission Proceedings Implementing Regulation",
+    "celex": "32026R1755"
   }
 ]
