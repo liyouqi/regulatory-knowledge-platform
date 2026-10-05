@@ -336,6 +336,16 @@ describe("SQLite runtime repository", () => {
       "eu:32017R2402",
       "eu:32019L2162",
       "eu:32019R2160",
+      "eu:31998L0026",
+      "eu:32001L0024",
+      "eu:32002L0047",
+      "eu:32010R1093",
+      "eu:32012R0648",
+      "eu:32013R1024",
+      "eu:32014L0065",
+      "eu:32014R0600",
+      "eu:32014R0909",
+      "eu:32015R0751",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
     const additionalConsolidatedChains = [
       "eu:32016R0679",
@@ -586,7 +596,7 @@ describe("SQLite runtime repository", () => {
       ),
     ).toBe(true);
     expect(repository?.lifecycleRelationshipCount).toBe(67);
-    expect(repository?.externalWorkCount).toBe(63);
+    expect(repository?.externalWorkCount).toBe(59);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

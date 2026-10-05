@@ -15,10 +15,10 @@ describe("CELLAR lifecycle runtime builder", () => {
     expect(build.works).toHaveLength(77);
     expect(
       build.works.filter((work) => work.availability === "loaded"),
-    ).toHaveLength(14);
+    ).toHaveLength(18);
     expect(
       build.works.filter((work) => work.availability === "external"),
-    ).toHaveLength(63);
+    ).toHaveLength(59);
     expect(
       build.relationships.filter((item) => item.relationType === "AMENDS"),
     ).toHaveLength(26);
@@ -29,7 +29,7 @@ describe("CELLAR lifecycle runtime builder", () => {
       build.relationships.filter(
         (item) => item.resolutionStatus === "external",
       ),
-    ).toHaveLength(64);
+    ).toHaveLength(60);
     expect(
       build.relationships.filter(
         (item) => item.resolutionStatus === "resolved",
@@ -41,6 +41,11 @@ describe("CELLAR lifecycle runtime builder", () => {
         targetWorkId: "eu:32013L0036",
       }),
       expect.objectContaining({
+        sourceWorkId: "eu:32022R2554",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32012R0648",
+      }),
+      expect.objectContaining({
         sourceWorkId: "eu:32024R1623",
         relationType: "AMENDS",
         targetWorkId: "eu:32013R0575",
@@ -49,6 +54,21 @@ describe("CELLAR lifecycle runtime builder", () => {
         sourceWorkId: "eu:32024L1619",
         relationType: "AMENDS",
         targetWorkId: "eu:32013L0036",
+      }),
+      expect.objectContaining({
+        sourceWorkId: "eu:32023R1114",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32010R1093",
+      }),
+      expect.objectContaining({
+        sourceWorkId: "eu:32022R2554",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32014R0909",
+      }),
+      expect.objectContaining({
+        sourceWorkId: "eu:32022R2554",
+        relationType: "AMENDS",
+        targetWorkId: "eu:32014R0600",
       }),
     ]);
     expect(build.works).toContainEqual(

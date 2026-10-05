@@ -72,12 +72,12 @@ describe("banking-default runtime isolation", () => {
   it("reports one Profile identity across Reader and Search services", () => {
     expect(repository).toMatchObject({
       profileId: "banking-default",
-      profileVersion: "1.5.0",
+      profileVersion: "1.6.0",
     });
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 45,
+      documentCount: 55,
     });
   });
 
@@ -85,7 +85,7 @@ describe("banking-default runtime isolation", () => {
     expect(repository?.findDocumentBySlug("amld-iv")?.id).toBe("eu:32015L0849");
     expect(
       search
-        ?.search("money laundering")
+        ?.search("obliged entities customer due diligence")
         .results.some((result) => result.documentId === "eu:32015L0849"),
     ).toBe(true);
     expect(repository?.findDocumentBySlug("crd-iv")?.id).toBe("eu:32013L0036");

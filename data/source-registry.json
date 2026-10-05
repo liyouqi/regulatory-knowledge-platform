@@ -1515,7 +1515,7 @@
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2160/oj/eng"
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "Settlement Finality Directive",
@@ -1534,10 +1534,23 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/1998/26/2024-04-08/eng",
-    "expressionCelex": "01998L0026-20240408"
+    "expressionCelex": "01998L0026-20240408",
+    "quality": {
+      "articleCount": 16,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 27,
+      "pointCount": 36,
+      "structuralNodeCount": 5,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:31998L0026:article:1:subparagraph:1": "sha256:9f92ecfc7ae5692e87498530fce090fa75e1cdf99ccd1f58d74980eed7a2f878",
+        "eu:31998L0026:article:14:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:crisis-management",
     "shortName": "Credit Institutions Reorganisation and Winding-up Directive",
@@ -1559,10 +1572,24 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2001/24/2014-07-02/eng",
-    "expressionCelex": "02001L0024-20140702"
+    "expressionCelex": "02001L0024-20140702",
+    "quality": {
+      "articleCount": 36,
+      "recitalCount": 32,
+      "annexCount": 0,
+      "paragraphCount": 70,
+      "pointCount": 35,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32001L0024:recital:1": "sha256:ec869013b0d5e42654063e5f51bfe2df05f72e8bae907e867c8b0d87bc95a0eb",
+        "eu:32001L0024:article:1:paragraph:1": "sha256:7d69f0fc4715a3a459cc77f7229b51909d5aac1c1f4b3a48634c35aab0b3da29",
+        "eu:32001L0024:article:36:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "Financial Collateral Directive",
@@ -1581,10 +1608,23 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2002/47/2022-08-12/eng",
-    "expressionCelex": "02002L0047-20220812"
+    "expressionCelex": "02002L0047-20220812",
+    "quality": {
+      "articleCount": 14,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 40,
+      "pointCount": 61,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32002L0047:article:1:paragraph:1": "sha256:16532f3ea6d13e86618484af68d0cf32cedbca7127afe5c25b63d3456de78cf0",
+        "eu:32002L0047:article:13:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:eba",
     "shortName": "EBA Regulation",
@@ -1606,10 +1646,23 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2010/1093/2025-12-31/eng",
-    "expressionCelex": "02010R1093-20251231"
+    "expressionCelex": "02010R1093-20251231",
+    "quality": {
+      "articleCount": 100,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 402,
+      "pointCount": 197,
+      "structuralNodeCount": 14,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32010R1093:article:1:paragraph:1": "sha256:9f0da9da06dffc4f1a2d4f73b0073e1fdf8b8514b9a9decd8732c6aa0352e9cc",
+        "eu:32010R1093:article:82:subparagraph:1": "sha256:69135d3f2d080f9b826c67a7c3fe9a8e7a74bcd037e99eab4ffb7ba510be6b66"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "EMIR",
@@ -1631,10 +1684,25 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2012/648/2025-01-17/eng",
-    "expressionCelex": "02012R0648-20250117"
+    "expressionCelex": "02012R0648-20250117",
+    "quality": {
+      "articleCount": 137,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 686,
+      "pointCount": 871,
+      "structuralNodeCount": 20,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32012R0648:article:1:paragraph:1": "sha256:60b40075ffa69a1e8ec141097632e9b9b178e97ae0438ea89836ec0fe2a3ac80",
+        "eu:32012R0648:article:91:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32012R0648:annex:i": "sha256:035e62946d7d67a4cfde500a5416b25f33dff5e86e2a3d78ce5aefb28a68f743",
+        "eu:32012R0648:annex:iv": "sha256:f969ddc0836b898426907e9059f028adc5b469004f1d433f49d3eecc97a49a69"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:ssm",
     "shortName": "SSM Regulation",
@@ -1655,10 +1723,24 @@
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2013/1024/oj/eng",
+    "quality": {
+      "articleCount": 34,
+      "recitalCount": 87,
+      "annexCount": 0,
+      "paragraphCount": 147,
+      "pointCount": 88,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32013R1024:recital:1": "sha256:baec0fb3bda6b3027943bef0fec4b19b594e19c928f7f1f5bc782c2e59f99b34",
+        "eu:32013R1024:article:1:subparagraph:1": "sha256:2a19251b2c2a96ee5f825755a83d6a7b4ae66c62fe4bcc5a7fbd2641495607f8",
+        "eu:32013R1024:article:34:subparagraph:1": "sha256:108c32bbb1e793bb274dc8c6d01029ff95eff2c23126208217b56a33a4da2a42"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:mifid",
     "shortName": "MiFID II",
@@ -1680,10 +1762,25 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/dir/2014/65/2026-06-06/eng",
-    "expressionCelex": "02014L0065-20260606"
+    "expressionCelex": "02014L0065-20260606",
+    "quality": {
+      "articleCount": 103,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 498,
+      "pointCount": 750,
+      "structuralNodeCount": 25,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014L0065:article:1:paragraph:1": "sha256:24f7393702202ded3d90d7b0ef5560780d469576291c46ce65a99c2e6b902c96",
+        "eu:32014L0065:article:97:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32014L0065:annex:i": "sha256:1ee4d749bb8bcec0ebbf3fd7ad56a75ef6dbc1ea298938c3cdfed7a6f29d144c",
+        "eu:32014L0065:annex:iv": "sha256:febe3de064c7863bf0eb36b355821809be95fba2bb494a98d7b45f3cc7094fab"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:mifid",
     "shortName": "MiFIR",
@@ -1705,10 +1802,23 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/600/2025-11-23/eng",
-    "expressionCelex": "02014R0600-20251123"
+    "expressionCelex": "02014R0600-20251123",
+    "quality": {
+      "articleCount": 95,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 447,
+      "pointCount": 555,
+      "structuralNodeCount": 23,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0600:article:1:paragraph:1": "sha256:fd11d37cf352d99aa31defff2a12bfa864aac744e85bca69f095d543d1c06823",
+        "eu:32014R0600:article:55:subparagraph:4": "sha256:be64ef4b94b9a975fa5684d31a691855c71dac8ae30f549db12f700d50b1393e"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:market-infrastructure",
     "shortName": "CSDR",
@@ -1730,10 +1840,24 @@
       "corrections": []
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/909/2026-01-17/eng",
-    "expressionCelex": "02014R0909-20260117"
+    "expressionCelex": "02014R0909-20260117",
+    "quality": {
+      "articleCount": 83,
+      "recitalCount": 0,
+      "annexCount": 1,
+      "paragraphCount": 414,
+      "pointCount": 357,
+      "structuralNodeCount": 26,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0909:article:1:paragraph:1": "sha256:f17fb5a0aa1b745c28adb66d2917fd5ad9f759e6847686c4873476a1436b111b",
+        "eu:32014R0909:article:76:paragraph:7": "sha256:f9f2c2b5fcebb29274ee0de018e34ed3d80c361c3e03950f561d6389adb5133f",
+        "eu:32014R0909:annex:1": "sha256:11d01228fd94ae265b41db8d02f8d598cc62e2f42d2b45b2a6058874e8a19c77"
+      }
+    }
   },
   {
-    "status": "queued",
+    "status": "active",
     "batch": "banking-market-infrastructure-1",
     "familyId": "family:payments",
     "shortName": "Interchange Fee Regulation",
@@ -1751,7 +1875,21 @@
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2015/751",
       "corrections": []
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2015/751/oj/eng"
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2015/751/oj/eng",
+    "quality": {
+      "articleCount": 18,
+      "recitalCount": 44,
+      "annexCount": 0,
+      "paragraphCount": 55,
+      "pointCount": 63,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32015R0751:recital:1": "sha256:0c49bb9b2ea20b348af199063aec367d11ac3686fe88c33368cb3ce95e88a707",
+        "eu:32015R0751:article:1:paragraph:1": "sha256:86d6fc9e03d1dcb9de1d2e80cf23b36aaa877d37dbe6dbb45a438b653bf7f055",
+        "eu:32015R0751:article:18:paragraph:2": "sha256:777cb1020b0a932d79fa639b5a558cc27323d482f5e48247b80a0af77256685c"
+      }
+    }
   },
   {
     "status": "planned",

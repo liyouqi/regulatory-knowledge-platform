@@ -13,7 +13,7 @@
     },
     {
       "id": "banking-default",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "displayName": "Banking Default",
       "description": "Cross-sector and banking-relevant baseline corpus; MiCA is excluded by default and can be included in a future activity-specific profile.",
       "selection": {
@@ -35,7 +35,12 @@
           "family:covered-bonds",
           "family:nis2",
           "family:data-act",
-          "family:cssf"
+          "family:cssf",
+          "family:market-infrastructure",
+          "family:crisis-management",
+          "family:eba",
+          "family:ssm",
+          "family:mifid"
         ],
         "documentIds": []
       }

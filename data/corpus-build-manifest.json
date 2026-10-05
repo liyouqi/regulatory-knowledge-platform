@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -17,21 +17,27 @@
       "identifier": "32013R0575",
       "snapshotId": "snapshot:cellar:32013R0575:6ef4a2094178a015456993cd3a17d625a6ee01154ce15dff056d6dc46e136089",
       "contentSha256": "sha256:6ef4a2094178a015456993cd3a17d625a6ee01154ce15dff056d6dc46e136089",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1623",
       "snapshotId": "snapshot:cellar:32024R1623:8c148d9e72b8a07a02873de155441e3ac47a2322feaa18fab17417ce211ebcf6",
       "contentSha256": "sha256:8c148d9e72b8a07a02873de155441e3ac47a2322feaa18fab17417ce211ebcf6",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024L1619",
       "snapshotId": "snapshot:cellar:32024L1619:92f2689af5cf798320f07d5b869740c2c98528496a62f6b36dbfdd618979d6dd",
       "contentSha256": "sha256:92f2689af5cf798320f07d5b869740c2c98528496a62f6b36dbfdd618979d6dd",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -92,7 +98,9 @@
       "identifier": "32022R2554",
       "snapshotId": "snapshot:cellar:32022R2554:39d20d15551b006f2bf20476152c30089730efe761672072419a9d88df15d121",
       "contentSha256": "sha256:39d20d15551b006f2bf20476152c30089730efe761672072419a9d88df15d121",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -126,14 +134,18 @@
       "identifier": "32024R1772",
       "snapshotId": "snapshot:cellar:32024R1772:6f565041442340a4aa5362033297adb6d32fbc0881985c6fdff0605b5056e86b",
       "contentSha256": "sha256:6f565041442340a4aa5362033297adb6d32fbc0881985c6fdff0605b5056e86b",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1773",
       "snapshotId": "snapshot:cellar:32024R1773:3e14b3854dcd72b2016c22726c9ab8a36acd75beadb9ee77c7346046d232bb59",
       "contentSha256": "sha256:3e14b3854dcd72b2016c22726c9ab8a36acd75beadb9ee77c7346046d232bb59",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -158,21 +170,27 @@
       "identifier": "32025R0301",
       "snapshotId": "snapshot:cellar:32025R0301:cfb5dafed10f493ad77fb0d52e7d6fb3232444d674296c0aa573a6dee81fb35e",
       "contentSha256": "sha256:cfb5dafed10f493ad77fb0d52e7d6fb3232444d674296c0aa573a6dee81fb35e",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0302",
       "snapshotId": "snapshot:cellar:32025R0302:ecad76089d9d56cda120c344d08d52267db6c60ab368c731ca94093772323d0e",
       "contentSha256": "sha256:ecad76089d9d56cda120c344d08d52267db6c60ab368c731ca94093772323d0e",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0305",
       "snapshotId": "snapshot:cellar:32025R0305:1521cbdb1a75bf43ec037e5fae771c6505f0a2b85187b57152f6d53a5f0588ca",
       "contentSha256": "sha256:1521cbdb1a75bf43ec037e5fae771c6505f0a2b85187b57152f6d53a5f0588ca",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
@@ -197,147 +215,279 @@
       "identifier": "32022L2556",
       "snapshotId": "snapshot:cellar:32022L2556:db8a63e108187e2c9ddbe3f633ba18b2db1fe4aefb8fd37203f1ea9b31ce9b0f",
       "contentSha256": "sha256:db8a63e108187e2c9ddbe3f633ba18b2db1fe4aefb8fd37203f1ea9b31ce9b0f",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32023R1113",
       "snapshotId": "snapshot:cellar:32023R1113:ef78a941550dd16743bc564aee9f22326fc51fc13bb7a047614f14f748c26306",
       "contentSha256": "sha256:ef78a941550dd16743bc564aee9f22326fc51fc13bb7a047614f14f748c26306",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1502",
       "snapshotId": "snapshot:cellar:32024R1502:3935bd38ad651cc68e528de4f9ea0b3cb5deca1812df3d710a3288a89d833e36",
       "contentSha256": "sha256:3935bd38ad651cc68e528de4f9ea0b3cb5deca1812df3d710a3288a89d833e36",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1505",
       "snapshotId": "snapshot:cellar:32024R1505:b03a8424cd44ac293e5f6b3db00ef39205ee1bc9ba6c47232088d067eb4dc14f",
       "contentSha256": "sha256:b03a8424cd44ac293e5f6b3db00ef39205ee1bc9ba6c47232088d067eb4dc14f",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0295",
       "snapshotId": "snapshot:cellar:32025R0295:45019884d01c5809fe7d726b1c192928c03749715926f2ba74547daf5179f0f2",
       "contentSha256": "sha256:45019884d01c5809fe7d726b1c192928c03749715926f2ba74547daf5179f0f2",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0420",
       "snapshotId": "snapshot:cellar:32025R0420:15da6b1193d022b8f39e13d26660622e174263fb6024ba130e80affeee789dfa",
       "contentSha256": "sha256:15da6b1193d022b8f39e13d26660622e174263fb6024ba130e80affeee789dfa",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0532",
       "snapshotId": "snapshot:cellar:32025R0532:dda61fd77a330df4552140714c1b68be1c2d3109799aa5037241209ecc46572a",
       "contentSha256": "sha256:dda61fd77a330df4552140714c1b68be1c2d3109799aa5037241209ecc46572a",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R1190",
       "snapshotId": "snapshot:cellar:32025R1190:3051c4cfc12ba8467423b6e6ee6d38dcf14e9e980c78d8cf952c298cf1ad80d4",
       "contentSha256": "sha256:3051c4cfc12ba8467423b6e6ee6d38dcf14e9e980c78d8cf952c298cf1ad80d4",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1624",
       "snapshotId": "snapshot:cellar:32024R1624:95871243a4a615be06e57ea08ef68831e52057511729bf8d83617836fd8f4ca3",
       "contentSha256": "sha256:95871243a4a615be06e57ea08ef68831e52057511729bf8d83617836fd8f4ca3",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024L1640",
       "snapshotId": "snapshot:cellar:32024L1640:dbba2e38a682cd28ccb539a80a8be0f3ecfc506c554427d9995c38fd7ed1c695",
       "contentSha256": "sha256:dbba2e38a682cd28ccb539a80a8be0f3ecfc506c554427d9995c38fd7ed1c695",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1620",
       "snapshotId": "snapshot:cellar:32024R1620:61d0459ea85e29321333e5b9edfd025979630e0951cde88ca4e3ddd222cd1921",
       "contentSha256": "sha256:61d0459ea85e29321333e5b9edfd025979630e0951cde88ca4e3ddd222cd1921",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32012R0260",
       "snapshotId": "snapshot:cellar:32012R0260:bc568238262b961393854d1b38dbd20f131ad01c1fca230fd69e6801f3c92d39",
       "contentSha256": "sha256:bc568238262b961393854d1b38dbd20f131ad01c1fca230fd69e6801f3c92d39",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32023L2225",
       "snapshotId": "snapshot:cellar:32023L2225:fb363e9e03c1444fd328deaee125833b01681be97b540a41f0407a87deabbc24",
       "contentSha256": "sha256:fb363e9e03c1444fd328deaee125833b01681be97b540a41f0407a87deabbc24",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014L0017",
       "snapshotId": "snapshot:cellar:32014L0017:075cb7ede7973553e52240ec5cc146baa77da7d4e96b36289b929d65b439bf09",
       "contentSha256": "sha256:075cb7ede7973553e52240ec5cc146baa77da7d4e96b36289b929d65b439bf09",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014L0092",
       "snapshotId": "snapshot:cellar:32014L0092:c2b57494654ca94857f8bb163fbf63bc259fc34083abbd3b3d1717b57543900d",
       "contentSha256": "sha256:c2b57494654ca94857f8bb163fbf63bc259fc34083abbd3b3d1717b57543900d",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R0886",
       "snapshotId": "snapshot:cellar:32024R0886:b547836ad5d55243bb6584f20618eca32fc9e418992fe945230d182cac0ff537",
       "contentSha256": "sha256:b547836ad5d55243bb6584f20618eca32fc9e418992fe945230d182cac0ff537",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32009L0110",
       "snapshotId": "snapshot:cellar:32009L0110:8892b0a4082005facafe3b40f80493895171c40e4887e320c9d0167f267b4e2c",
       "contentSha256": "sha256:8892b0a4082005facafe3b40f80493895171c40e4887e320c9d0167f267b4e2c",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32017R2402",
       "snapshotId": "snapshot:cellar:32017R2402:f22e1b40b70dccb7f538d515ca02fe92d946fcf212e76fcd92f296ce506ec99f",
       "contentSha256": "sha256:f22e1b40b70dccb7f538d515ca02fe92d946fcf212e76fcd92f296ce506ec99f",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32019L2162",
       "snapshotId": "snapshot:cellar:32019L2162:4860e6f5bd8f80bbe7381a2a69db5e882fde4cda0e63578dae21de15b8a128e8",
       "contentSha256": "sha256:4860e6f5bd8f80bbe7381a2a69db5e882fde4cda0e63578dae21de15b8a128e8",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32019R2160",
       "snapshotId": "snapshot:cellar:32019R2160:f0118aa7c91af6407123fa72349fda7470d5ae281db3b3b4ee05bfc6af8e9781",
       "contentSha256": "sha256:f0118aa7c91af6407123fa72349fda7470d5ae281db3b3b4ee05bfc6af8e9781",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "31998L0026",
+      "snapshotId": "snapshot:cellar:31998L0026:727d73482e6ef73d419e6fc9d4e3277d747967342824693931b5ee8f1a3a9e1a",
+      "contentSha256": "sha256:727d73482e6ef73d419e6fc9d4e3277d747967342824693931b5ee8f1a3a9e1a",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32001L0024",
+      "snapshotId": "snapshot:cellar:32001L0024:40e1ceb21480418626af862e24109d705e4386c0f865de84878ce55e4b4ee4d6",
+      "contentSha256": "sha256:40e1ceb21480418626af862e24109d705e4386c0f865de84878ce55e4b4ee4d6",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32002L0047",
+      "snapshotId": "snapshot:cellar:32002L0047:9f421bb0239fd4cd96060ff3b745545943c0bd7a0940f03c4bfe0103b58af923",
+      "contentSha256": "sha256:9f421bb0239fd4cd96060ff3b745545943c0bd7a0940f03c4bfe0103b58af923",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32010R1093",
+      "snapshotId": "snapshot:cellar:32010R1093:558784b426762a2fe38c034afb854f3f9fa9c122d97fbc438ddc27047fba092b",
+      "contentSha256": "sha256:558784b426762a2fe38c034afb854f3f9fa9c122d97fbc438ddc27047fba092b",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32012R0648",
+      "snapshotId": "snapshot:cellar:32012R0648:292c87688f129674daebb6813cf85d230522d0bf558fc236fdaff5ccbbcc6c36",
+      "contentSha256": "sha256:292c87688f129674daebb6813cf85d230522d0bf558fc236fdaff5ccbbcc6c36",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32013R1024",
+      "snapshotId": "snapshot:cellar:32013R1024:265a5174830cfc038bad902b0da326dfbd07c77f2737698b2144fcfc476dc573",
+      "contentSha256": "sha256:265a5174830cfc038bad902b0da326dfbd07c77f2737698b2144fcfc476dc573",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014L0065",
+      "snapshotId": "snapshot:cellar:32014L0065:7088da74b7adac9d789a446469e2f120e0a7a4ac1aa54e51c8cf3a45eef726b9",
+      "contentSha256": "sha256:7088da74b7adac9d789a446469e2f120e0a7a4ac1aa54e51c8cf3a45eef726b9",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R0600",
+      "snapshotId": "snapshot:cellar:32014R0600:28c1d7d07ceaa67adebed2565a33dc0b2ff2b6181bd4faf6d1c75cfb6443f2f3",
+      "contentSha256": "sha256:28c1d7d07ceaa67adebed2565a33dc0b2ff2b6181bd4faf6d1c75cfb6443f2f3",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R0909",
+      "snapshotId": "snapshot:cellar:32014R0909:b14f760c5a72254e4a41f42f25facfc4b18eadb077bf00cac7112610258b7ff7",
+      "contentSha256": "sha256:b14f760c5a72254e4a41f42f25facfc4b18eadb077bf00cac7112610258b7ff7",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32015R0751",
+      "snapshotId": "snapshot:cellar:32015R0751:acd4fbff5f6bc3766496b3e1384ca89466c978b6bba4890783673c624398adfb",
+      "contentSha256": "sha256:acd4fbff5f6bc3766496b3e1384ca89466c978b6bba4890783673c624398adfb",
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "cssf",
       "identifier": "circular-12-552",
       "snapshotId": "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
       "contentSha256": "sha256:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "cssf",
@@ -353,14 +503,18 @@
       "identifier": "communication-2025-04-09-ict-risk-updates",
       "snapshotId": "snapshot:cssf:communication-2025-04-09-ict-risk-updates:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
       "contentSha256": "sha256:9a5fb41e8a31ad703bfecbf9cef72ac0a4ca050da1dd08b9c7dda2bed5725a82",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eba",
       "identifier": "eba-gl-2021-05",
       "snapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
       "contentSha256": "sha256:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     }
   ],
   "requiredReviewedInputs": [
