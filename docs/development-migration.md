@@ -34,20 +34,6 @@ Purpose:
 
 `exports/` is optional. Copy it only when an existing RAG handoff snapshot must be retained.
 
-### Restore a transferred raw-source archive
-
-If `data/raw/` was transferred as an archive such as `full-pinned-sources.tar.gz`, place it at the repository root and run:
-
-```bash
-tar -tzf full-pinned-sources.tar.gz | head
-tar -xzf full-pinned-sources.tar.gz
-npm run corpus:update -- --skip-fetch
-```
-
-Before extraction, confirm that every listed path starts with `data/raw/`. The archive is a local transport file: do not commit it, and remove it from the repository root after keeping any required backup elsewhere.
-
-Raw snapshots alone do not register or publish a new law. Changes to the source registry, reviewed quality baseline, and exact-snapshot corpus manifest are small version-controlled inputs and must be committed and pushed from the old computer, then pulled before the local rebuild. Without those Git changes, an extra verified raw snapshot remains outside Canonical and Reader publication.
-
 To inspect transfer size before copying:
 
 ```bash
