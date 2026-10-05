@@ -356,6 +356,16 @@ describe("SQLite runtime repository", () => {
       "eu:32024R1620",
       "eu:32012R0260",
       "eu:32014L0017",
+      "eu:32015R0061",
+      "eu:32016R0101",
+      "eu:32015R0063",
+      "eu:32016R1075",
+      "eu:32018R0389",
+      "eu:32017R0565",
+      "eu:32017R0587",
+      "eu:32013R0149",
+      "eu:32013R0153",
+      "eu:32016R2251",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
 
     expect(chain).toMatchObject({
