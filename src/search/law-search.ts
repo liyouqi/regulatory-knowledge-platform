@@ -78,6 +78,29 @@ function hasEditDistanceAtMostOne(left: string, right: string): boolean {
   return true;
 }
 
+function editDistance(left: string, right: string): number {
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex];
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        previous[rightIndex] + 1,
+        previous[rightIndex - 1] +
+          (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1),
+      );
+    }
+    previous = current;
+  }
+  return previous[right.length];
+}
+
+function typoDistanceLimit(term: string, candidate: string): number {
+  const longest = Math.max(term.length, candidate.length);
+  if (Math.min(term.length, candidate.length) < 4) return 0;
+  return Math.min(3, Math.floor(longest * 0.34));
+}
+
 function normalizedAliases(record: LawSearchRecord): string[] {
   return [record.shortName, ...record.aliases].map(normalizeLawQuery);
 }
@@ -130,14 +153,42 @@ function rankRecord(
   );
   const haystackTerms = haystack.split(" ").filter(Boolean);
   const terms = query.split(" ").filter(Boolean);
-  const hasTerm = (term: string) =>
+  const hasExactTermMatch = (term: string, termIndex: number) =>
     haystackTerms.some(
       (candidate) =>
         candidate === term ||
-        (/^[a-z]{3,}$/u.test(term) && candidate.startsWith(term)),
+        (/^[a-z]+$/u.test(term) &&
+          candidate.startsWith(term) &&
+          (term.length >= 3 ||
+            (terms.length > 1 && termIndex === terms.length - 1))),
     );
-  if (terms.length > 0 && terms.every(hasTerm)) {
+  if (terms.length > 0 && terms.every(hasExactTermMatch)) {
     return { matchReason: "title-terms", score: 500 + terms.length };
+  }
+  let totalTypoDistance = 0;
+  const hasTypoTerms =
+    terms.length > 0 &&
+    terms.every((term, termIndex) => {
+      if (hasExactTermMatch(term, termIndex)) return true;
+      if (!/^[a-z]+$/u.test(term)) return false;
+      const bestDistance = haystackTerms.reduce((best, candidate) => {
+        if (!/^[a-z]+$/u.test(candidate)) return best;
+        const limit = typoDistanceLimit(term, candidate);
+        if (limit === 0 || Math.abs(term.length - candidate.length) > limit) {
+          return best;
+        }
+        const distance = editDistance(term, candidate);
+        return distance <= limit ? Math.min(best, distance) : best;
+      }, Number.POSITIVE_INFINITY);
+      const accepted = Number.isFinite(bestDistance);
+      if (accepted) totalTypoDistance += bestDistance;
+      return accepted;
+    });
+  if (hasTypoTerms) {
+    return {
+      matchReason: "typo-alias",
+      score: Math.max(400, 480 + terms.length - totalTypoDistance * 10),
+    };
   }
   return typoAliasRank(record, query);
 }

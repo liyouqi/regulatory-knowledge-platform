@@ -59,6 +59,9 @@ describe("EU source registry", () => {
     ).toEqual(["32009L0110", "32017R2402", "32019L2162", "32019R2160"]);
     expect(sources.every((source) => source.aliases.length > 0)).toBe(true);
     expect(
+      sources.find((source) => source.celex === "32015R0061")?.aliases,
+    ).toEqual(expect.arrayContaining(["Liquidity Coverage Ratio", "LCR"]));
+    expect(
       sources.find((source) => source.celex === "32024R2956")?.sourceStatus,
     ).toMatchObject({
       basis: "consolidated",

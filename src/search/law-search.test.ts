@@ -108,6 +108,20 @@ const cssfRecord: LawSearchRecord = {
   ],
 };
 
+const emirMarginRecord: LawSearchRecord = {
+  ...base,
+  id: "eu:32016R2251",
+  familyId: "family:market-infrastructure",
+  regulatoryLevel: "level-2",
+  measureType: "rts",
+  slug: "emir-rts-margin-for-uncleared-derivatives",
+  shortName: "EMIR RTS Margin for Uncleared Derivatives",
+  officialTitle:
+    "Regulatory technical standards for OTC derivative contracts not cleared by a central counterparty",
+  celex: "32016R2251",
+  aliases: ["EMIR Uncleared Derivatives Margin RTS"],
+};
+
 describe("Find Laws deterministic ranking", () => {
   it("normalizes punctuation and case without changing legal tokens", () => {
     expect(normalizeLawQuery(" Regulation (EU) 2022/2554 ")).toBe(
@@ -146,6 +160,30 @@ describe("Find Laws deterministic ranking", () => {
       });
     },
   );
+
+  it.each(["unclearedd derivatives", "uuclear derivatives", "uncleared d"])(
+    "tolerates an in-progress or mistyped multi-word law name: %s",
+    (query) => {
+      expect(
+        searchLaws([...records, emirMarginRecord], query).bestMatch,
+      ).toMatchObject({
+        slug: "emir-rts-margin-for-uncleared-derivatives",
+      });
+    },
+  );
+
+  it("recovers immediately after a typo is corrected", () => {
+    expect(
+      searchLaws([...records, emirMarginRecord], "not-a-law").results,
+    ).toHaveLength(0);
+    expect(
+      searchLaws([...records, emirMarginRecord], "uncleared derivatives")
+        .bestMatch,
+    ).toMatchObject({
+      slug: "emir-rts-margin-for-uncleared-derivatives",
+      matchReason: "title-terms",
+    });
+  });
 
   it("matches a CSSF local ID without manufacturing a CELEX identifier", () => {
     const result = searchLaws(

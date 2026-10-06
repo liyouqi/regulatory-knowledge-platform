@@ -5,7 +5,7 @@ import Database from "better-sqlite3";
 import { FullTextSearchService } from "./full-text-search";
 
 const EVALUATION_CASES = [
-  { query: "operational risk", expectedLaw: "DORA" },
+  { query: "operational risk", expectedLaw: "CRD IV" },
   { query: '"management body"', expectedLaw: "MiCA" },
   { query: "personal data controller", expectedLaw: "GDPR" },
   { query: "artificial intelligence system", expectedLaw: "AI Act" },

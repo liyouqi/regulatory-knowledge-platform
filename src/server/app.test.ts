@@ -209,6 +209,10 @@ describe("Document lookup", () => {
       readerPath: "/read/crr/articles/1",
     });
     expect(findLaws("32013R0575").bestMatch?.id).toBe("eu:32013R0575");
+    expect(findLaws("liquidity coverage ratio").bestMatch).toMatchObject({
+      id: "eu:32015R0061",
+      matchReason: "exact-alias",
+    });
   });
 
   it("resolves a compound law and provision query without returning body data", () => {
