@@ -2940,6 +2940,312 @@
     }
   },
   {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Variable Remuneration Instruments",
+    "aliases": [
+      "Commission Delegated Regulation (EU) No 527/2014",
+      "CRD Variable Remuneration Instruments RTS"
+    ],
+    "celex": "32014R0527",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2014-05-20",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/527/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-05-20",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/527",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 14,
+      "annexCount": 0,
+      "paragraphCount": 23,
+      "pointCount": 62,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0527:recital:1": "sha256:26ef32957910c7c807542705d3faecc713635c8bcf7b38c785f12cb9c7546ba9",
+        "eu:32014R0527:article:1:paragraph:1": "sha256:46d6cef754f94115e8059a048727b8658134ac9c86fa400918dc66f3a9a8eb28",
+        "eu:32014R0527:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Material Trading-Book Exposures",
+    "aliases": [
+      "Commission Delegated Regulation (EU) No 530/2014",
+      "CRD Material Exposures RTS"
+    ],
+    "celex": "32014R0530",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2014-05-20",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/530/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-05-20",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/530",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 3,
+      "recitalCount": 5,
+      "annexCount": 0,
+      "paragraphCount": 3,
+      "pointCount": 0,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0530:recital:1": "sha256:3bea2d19f376230237975de555a37be37092857b183011c64de849c17bfc762e",
+        "eu:32014R0530:article:1:subparagraph:1": "sha256:80ca73c182a88550ccec9705b21e96a5f187e327499fa27f87026a95d1fa9dcd",
+        "eu:32014R0530:article:3:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Supervisory Benchmarking Assessment",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2017/180",
+      "CRD Benchmarking Portfolio Assessment RTS"
+    ],
+    "celex": "32017R0180",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2017-02-03",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2017/180/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2017-02-03",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2017/180",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 12,
+      "recitalCount": 15,
+      "annexCount": 0,
+      "paragraphCount": 29,
+      "pointCount": 69,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R0180:recital:1": "sha256:db6c993345e8734d494e98a2d1e6ddc31b0acc4f108ca3649d864a1bd2445318",
+        "eu:32017R0180:article:1:paragraph:1": "sha256:02733dcdeb661e5d6b456b7086dd3f5d4ddb39cf8cef1cf401257a7acdbd3bba",
+        "eu:32017R0180:article:12:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Credit Institution Authorisation",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2022/2580",
+      "CRD Credit Institution Authorisation RTS"
+    ],
+    "celex": "32022R2580",
+    "expressionCelex": "02022R2580-20221229",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2022-12-29",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2022/2580/2022-12-29/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-12-29",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2022/2580",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 13,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 37,
+      "pointCount": 282,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32022R2580:article:1:subparagraph:1": "sha256:020a1f53fe140198cd7b92d976654f8152a1e75c524befea4a23ce404b09bd6c",
+        "eu:32022R2580:article:13:subparagraph:2": "sha256:114497293557805cb1e3091a936e09dc4820554dbf427c2b26fcd40b1f8ac350",
+        "eu:32022R2580:annex:i": "sha256:32f01f113e95739dfeb0ae48cfe3fba39b8386f910eba595a13f38e79e7c07f3",
+        "eu:32022R2580:annex:ii": "sha256:022ae8b82fe22e6168ab7c9aae226afaadee9827fb3e82d67bcfdc025446c818"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:srmr",
+    "shortName": "SRMR Ex-Ante Contributions Implementing Regulation",
+    "aliases": [
+      "Council Implementing Regulation (EU) 2015/81",
+      "Single Resolution Fund Ex-Ante Contributions"
+    ],
+    "celex": "32015R0081",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2015-01-22",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2015/81/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2015-01-22",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2015/81",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 9,
+      "recitalCount": 20,
+      "annexCount": 0,
+      "paragraphCount": 17,
+      "pointCount": 15,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32015R0081:recital:1": "sha256:205afd6781f7b74ef56cbfe2d071eece25e6a17deecea8e9a3af22dafe4bc7df",
+        "eu:32015R0081:article:1:subparagraph:1": "sha256:80691123efb4de67ba0d078b689c5421e8c47d6fc520466ac0b49dc32ff1f1de",
+        "eu:32015R0081:article:9:subparagraph:2": "sha256:fb480afc85f0d17f0365e93bfc3f46eef79bf73dd5066f2b735580a813a6faea"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:srmr",
+    "shortName": "SRMR Fund Investment Strategy",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2016/451",
+      "Single Resolution Fund Investment Strategy"
+    ],
+    "celex": "32016R0451",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2016-03-30",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/451/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2016-03-30",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/451",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 19,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 55,
+      "pointCount": 16,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R0451:recital:1": "sha256:d9a969754c924f1325779b2f0262a250e04b61400900446f2629198d69e3621c",
+        "eu:32016R0451:article:1:paragraph:1": "sha256:500329e477927817480f4d48163902d9aef47fa1b469545151671ba43be19af3",
+        "eu:32016R0451:article:19:subparagraph:2": "sha256:eec71ac0f580ce32638cfeade22971e40f7673410a1b6cb8c27f7b3034aa9d9d"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:ssm",
+    "shortName": "ECB Supervisory Fees Regulation",
+    "aliases": [
+      "Regulation (EU) No 1163/2014 of the European Central Bank",
+      "ECB/2014/41"
+    ],
+    "celex": "32014R1163",
+    "expressionCelex": "02014R1163-20200101",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2014-10-31",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/1163/2020-01-01/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2020-01-01",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/1163",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 19,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 48,
+      "pointCount": 54,
+      "structuralNodeCount": 6,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R1163:article:1:paragraph:1": "sha256:dea0ce2d4f5582143faae2dc3169ca1b4adf886f92cf40207ec05e0fa568ac7e",
+        "eu:32014R1163:article:18:subparagraph:1": "sha256:4d08d73dc3bc1c24d2d1cf1aca752abad3eb1480fd98385736355411d90b1e77"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-2",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Cross-Border Passport Notifications",
+    "aliases": [
+      "Commission Delegated Regulation (EU) No 1151/2014",
+      "CRD Passport Notifications RTS"
+    ],
+    "celex": "32014R1151",
+    "expressionCelex": "02014R1151-20221229",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2014-10-30",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/1151/2022-12-29/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-12-29",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2014/1151",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 8,
+      "pointCount": 36,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R1151:article:1:subparagraph:1": "sha256:e52cac68b4aedf0e0e063a4ce3bf5dd61a1dfadd9a84d9640a98acaea6f272d9",
+        "eu:32014R1151:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    }
+  },
+  {
     "status": "planned",
     "batch": "ai-act-level-2",
     "familyId": "family:ai-act",
