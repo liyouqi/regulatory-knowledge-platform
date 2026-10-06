@@ -92,6 +92,7 @@ This queue is coverage work, not permission to add RAG-specific ingestion code t
 
 ## Cross-cutting 1→100 queues
 
+- **TODO — periodic law-search alias review:** during corpus batch onboarding and occasional review of observed zero-result queries, add only stable abbreviations or widely used act names to the version-controlled source registries and add a regression query for each accepted alias. Do not store arbitrary keywords, one-off user wording, or misspellings as aliases; generic prefix/typo matching and full-text search remain responsible for those cases.
 - additional jurisdictions after the first EU → Luxembourg chain;
 - provision-level taxonomy coverage beyond representative samples;
 - institution/activity-specific applicability profiles;
