@@ -77,7 +77,7 @@ describe("banking-default runtime isolation", () => {
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 74,
+      documentCount: 82,
     });
   });
 

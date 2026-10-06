@@ -2630,6 +2630,316 @@
     }
   },
   {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Material Risk Takers",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2021/923",
+      "CRD Material Risk Takers RTS"
+    ],
+    "celex": "32021R0923",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2021-06-09",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2021/923/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2021-06-09",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2021/923",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 9,
+      "recitalCount": 14,
+      "annexCount": 0,
+      "paragraphCount": 18,
+      "pointCount": 44,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32021R0923:recital:1": "sha256:262b877a3aecfc44e9433d8c379af92825b62447098e7a4a58dbb7baedbca855",
+        "eu:32021R0923:article:1:subparagraph:1": "sha256:275ba9b7c38b383a9f06efdc4c7627593dc639d2fd6776278860f72dda34be58",
+        "eu:32021R0923:article:9:subparagraph:1": "sha256:108c32bbb1e793bb274dc8c6d01029ff95eff2c23126208217b56a33a4da2a42"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Supervisory Shock Scenarios",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/856",
+      "CRD Supervisory Shock Scenarios RTS"
+    ],
+    "celex": "32024R0856",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2024-04-24",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/856/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2024-04-24",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/856",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 7,
+      "annexCount": 1,
+      "paragraphCount": 27,
+      "pointCount": 24,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R0856:recital:1": "sha256:725827cdce8e45b29c7e3d3b1270d5353cd63967ab788625fde420f3935c2b29",
+        "eu:32024R0856:article:1:paragraph:1": "sha256:4cb1ca060afb4822bbcfa95576d03becc9b563cec96f4ad7f81b84cd21c655af",
+        "eu:32024R0856:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32024R0856:annex:1": "sha256:9ded406e14414f70f59d2ee3eff1ffae7c7284562b74b5a9f05b9bbea0aa4ed9"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS IRRBB Standardised Methodologies",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/857",
+      "CRD IRRBB Methodologies RTS"
+    ],
+    "celex": "32024R0857",
+    "expressionCelex": "02024R0857-20250717",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2024-04-24",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/857/2025-07-17/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-07-17",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/857",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 27,
+      "recitalCount": 0,
+      "annexCount": 1,
+      "paragraphCount": 112,
+      "pointCount": 242,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R0857:article:1:subparagraph:1": "sha256:c17f5df17f0899ab1bd7450232b212fd0ab246f3c751545f85fb3f3f084cfd5e",
+        "eu:32024R0857:article:27:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32024R0857:annex:1": "sha256:37beaa5c27ce5d0d430340b8994e9aa55365eff5dcc5455d0474982b4d360b84"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Authorisation Information",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2022/2579",
+      "CRD Authorisation Information RTS"
+    ],
+    "celex": "32022R2579",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2022-12-29",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2022/2579/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2022-12-29",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2022/2579",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 9,
+      "annexCount": 0,
+      "paragraphCount": 7,
+      "pointCount": 0,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32022R2579:recital:1": "sha256:1f8ce1327c5676768b08c18b831088b1bb17dac516f9d46f861dd299408651a7",
+        "eu:32022R2579:article:1:paragraph:1": "sha256:c85612c618155caf543322de452dee5e3d30c4f2df315db8129c1cc7b0128a1c",
+        "eu:32022R2579:article:2:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:crd",
+    "shortName": "CRD RTS Supervisory Colleges",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2025/791",
+      "CRD Supervisory Colleges RTS"
+    ],
+    "celex": "32025R0791",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2025-08-08",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/791/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2025-08-08",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2025/791",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 43,
+      "recitalCount": 21,
+      "annexCount": 1,
+      "paragraphCount": 123,
+      "pointCount": 173,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0791:recital:1": "sha256:b1d3651d1045b92a816565e696f943a873e788a8cbde707535fef450e8837b5a",
+        "eu:32025R0791:article:1:subparagraph:1": "sha256:b2ca053ddf2a116c13ef7797f1dbe7593e1cd5d97a924e6020ec927cc1e4d665",
+        "eu:32025R0791:article:43:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32025R0791:annex:1": "sha256:f55d10c95b0e480145d534521a6185eb97ce48450cf4a5fe1a0bf4f2ff92737d"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:srmr",
+    "shortName": "SRMR Contribution Criteria",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2017/747",
+      "Single Resolution Fund Contribution Criteria"
+    ],
+    "celex": "32017R0747",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2017-04-29",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2017/747/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2017-04-29",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2017/747",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 9,
+      "recitalCount": 12,
+      "annexCount": 1,
+      "paragraphCount": 30,
+      "pointCount": 14,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R0747:recital:1": "sha256:d713c0203b5ec700c37e314cffc6c8e07b0c74563a3197fb649ea2cf84db7edb",
+        "eu:32017R0747:article:1:subparagraph:1": "sha256:ddd3590778d4170c4cc111edaf17dd3971c3b6dcee599222e552fa2ea478329f",
+        "eu:32017R0747:article:9:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32017R0747:annex:1": "sha256:18707193f3dbdff4b5ad0fadc8a4ff6ae197eb489fbd7b725c8c006e80b84091"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:ssm",
+    "shortName": "SSM Framework Regulation",
+    "aliases": [
+      "Regulation (EU) No 468/2014 of the European Central Bank",
+      "ECB/2014/17"
+    ],
+    "celex": "32014R0468",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2014-05-14",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/468/oj/eng",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2014-05-14",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/468",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 153,
+      "recitalCount": 11,
+      "annexCount": 0,
+      "paragraphCount": 417,
+      "pointCount": 128,
+      "structuralNodeCount": 67,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0468:recital:1": "sha256:9d14c3bba1efacba5a85210dd7c40c022044c8f34e4a6aa35cf8177726bdf0f2",
+        "eu:32014R0468:article:1:paragraph:1": "sha256:96fa8231974f1ac78c44e42349e5c6c13cfb4d937612e2c242c9a8fc1a311c5c",
+        "eu:32014R0468:article:153:subparagraph:1": "sha256:4d08d73dc3bc1c24d2d1cf1aca752abad3eb1480fd98385736355411d90b1e77"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "banking-supervision-level-2-1",
+    "familyId": "family:ssm",
+    "shortName": "ECB Options and Discretions Regulation",
+    "aliases": [
+      "Regulation (EU) 2016/445 of the European Central Bank",
+      "ECB/2016/4"
+    ],
+    "celex": "32016R0445",
+    "expressionCelex": "02016R0445-20250817",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2016-03-24",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2016/445/2025-08-17/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2025-08-17",
+      "checkedAt": "2026-10-06T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2016/445",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 31,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 69,
+      "pointCount": 86,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R0445:article:3:subparagraph:1": "sha256:99929f4214c85aaf57bb673092dc26355f5849bebd2c16eba9eeb62d0190a16c",
+        "eu:32016R0445:article:2:subparagraph:1": "sha256:ecd48a1c8b886bc77406d8109685f689a07745c950b7d546c50b8c42bb8da682",
+        "eu:32016R0445:annex:i": "sha256:f7198552bfce16a71417ad26f44a2270f061193ae95e1f4473f8eade5cc878d9",
+        "eu:32016R0445:annex:ii": "sha256:b6c29faba93fac7de94a7a66f1eba1c9dd6f5ea4d78d70ab6059f76b1c55bfb6"
+      }
+    }
+  },
+  {
     "status": "planned",
     "batch": "ai-act-level-2",
     "familyId": "family:ai-act",

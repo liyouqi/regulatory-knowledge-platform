@@ -12,7 +12,7 @@ describe("Reader corpus status", () => {
       loadEbaSourceRegistrySync(),
     );
 
-    expect(output).toContain("## Published — 76");
+    expect(output).toContain("## Published — 84");
     expect(output).toContain("## Queued — 0");
     expect(output).toContain("## Planned — 2");
     expect(output).toContain("**ai-act-level-2 — 2:**");
