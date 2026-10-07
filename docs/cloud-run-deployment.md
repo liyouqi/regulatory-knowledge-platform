@@ -253,7 +253,7 @@ gcloud logging read \
 
 Do not declare the release complete until the health identity, Copilot status, Galaxy graph, Monitor counts, browser smoke test, and query log all match the intended release.
 
-The current deployment serves the Monitor snapshot baked into the image. It does not configure a daily scheduler and therefore does not refresh Monitor automatically. Runtime refresh is an optional, separately operated feature; Cloud Run instance-local files are not durable across a new revision or replacement instance, so a reliable daily production refresh also needs an explicit persistence or image-rebuild decision.
+The current deployment starts from the Monitor snapshot baked into the image. It does not configure a daily scheduler and therefore does not refresh Monitor automatically. The Monitor page can refresh the current month once per UTC day through its `Refresh today` button. That result is instance-local and is not durable across a new revision or replacement instance, so a reliable automatic daily production refresh still needs an explicit persistence or image-rebuild decision.
 
 ## Troubleshooting and rollback
 

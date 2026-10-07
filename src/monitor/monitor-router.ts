@@ -13,9 +13,16 @@ import { refreshMonitor } from "./monitor-refresh";
 export function createMonitorRouter(
   options: {
     aiService?: MonitorAiService | null;
+    now?: () => Date;
+    refresh?: typeof refreshMonitor;
+    readFeeds?: typeof availableMonitorFeeds;
   } = {},
 ) {
   const router = express.Router();
+  const now = options.now ?? (() => new Date());
+  const runRefresh = options.refresh ?? refreshMonitor;
+  const readFeeds = options.readFeeds ?? availableMonitorFeeds;
+  let refreshInProgress = false;
 
   router.get("/months", (_request, response) => {
     try {
@@ -158,8 +165,17 @@ export function createMonitorRouter(
       typeof request.query.month === "string" ? request.query.month : undefined;
     const month = requestedMonth ?? new Date().toISOString().slice(0, 7);
 
+    if (refreshInProgress) {
+      response.status(409).json({
+        code: "refresh_in_progress",
+        error: "A Monitor refresh is already in progress.",
+      });
+      return;
+    }
+
     try {
-      const feed = await refreshMonitor({ month });
+      refreshInProgress = true;
+      const feed = await runRefresh({ month });
       response.json({
         month: feed.month,
         generatedAt: feed.generatedAt,
@@ -171,6 +187,51 @@ export function createMonitorRouter(
         error:
           error instanceof Error ? error.message : "Monitor refresh failed.",
       });
+    } finally {
+      refreshInProgress = false;
+    }
+  });
+
+  router.post("/refresh-today", async (_request, response) => {
+    const currentTime = now();
+    const month = currentTime.toISOString().slice(0, 7);
+    const today = currentTime.toISOString().slice(0, 10);
+    const existing = readFeeds().find((feed) => feed.month === month);
+
+    if (existing?.generatedAt.slice(0, 10) === today) {
+      response.status(409).json({
+        code: "already_refreshed_today",
+        error: "Monitor has already been refreshed today.",
+        month,
+        generatedAt: existing.generatedAt,
+        eventCount: existing.events.length,
+      });
+      return;
+    }
+    if (refreshInProgress) {
+      response.status(409).json({
+        code: "refresh_in_progress",
+        error: "A Monitor refresh is already in progress.",
+      });
+      return;
+    }
+
+    try {
+      refreshInProgress = true;
+      const feed = await runRefresh({ month });
+      response.json({
+        month: feed.month,
+        generatedAt: feed.generatedAt,
+        eventCount: feed.events.length,
+        sources: feed.sources,
+      });
+    } catch (error) {
+      response.status(500).json({
+        error:
+          error instanceof Error ? error.message : "Monitor refresh failed.",
+      });
+    } finally {
+      refreshInProgress = false;
     }
   });
 

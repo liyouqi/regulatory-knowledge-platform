@@ -67,7 +67,8 @@
 }
 
 .monitor-report-button,
-.monitor-mcp-button {
+.monitor-mcp-button,
+.monitor-refresh-button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -82,23 +83,27 @@
   cursor: pointer;
 }
 
-.monitor-mcp-button {
+.monitor-mcp-button,
+.monitor-refresh-button {
   color: var(--monitor-ink);
   background: transparent;
   border: 1px solid var(--monitor-ink);
 }
 
 .monitor-report-button:hover,
-.monitor-mcp-button:hover {
+.monitor-mcp-button:hover,
+.monitor-refresh-button:hover {
   background: #092832;
 }
 
-.monitor-report-button:disabled {
+.monitor-report-button:disabled,
+.monitor-refresh-button:disabled {
   cursor: default;
   opacity: 0.45;
 }
 
-.monitor-mcp-button:hover {
+.monitor-mcp-button:hover,
+.monitor-refresh-button:hover {
   color: #fff;
 }
 
@@ -1376,6 +1381,13 @@
   }
 
   .monitor-mcp-button {
+    width: 32px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .monitor-refresh-button {
     width: 32px;
     padding: 0;
     overflow: hidden;
