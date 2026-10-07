@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -812,6 +812,34 @@
       "identifier": "32020R1227",
       "snapshotId": "snapshot:cellar:32020R1227:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
       "contentSha256": "sha256:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32019R1851",
+      "snapshotId": "snapshot:cellar:32019R1851:a594eabfbb0f17d798fef2e9c002deb2cff8bd58648a75b7b5a14788cbcdbb8d",
+      "contentSha256": "sha256:a594eabfbb0f17d798fef2e9c002deb2cff8bd58648a75b7b5a14788cbcdbb8d",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024R1700",
+      "snapshotId": "snapshot:cellar:32024R1700:6528c421b72600157bf225ed1e35aeb73b07bea30df53ac763a00d63320852cb",
+      "contentSha256": "sha256:6528c421b72600157bf225ed1e35aeb73b07bea30df53ac763a00d63320852cb",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32020R0447",
+      "snapshotId": "snapshot:cellar:32020R0447:39f43b09be7d0cf81d5f0e6ebc1cdee6cf4588e135480bcdec19655dac2e1b92",
+      "contentSha256": "sha256:39f43b09be7d0cf81d5f0e6ebc1cdee6cf4588e135480bcdec19655dac2e1b92",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32018R1229",
+      "snapshotId": "snapshot:cellar:32018R1229:1484572e792e78940e1f377be37f86f5afc2f34cb0b739459606b5e2b1e66132",
+      "contentSha256": "sha256:1484572e792e78940e1f377be37f86f5afc2f34cb0b739459606b5e2b1e66132",
       "retention": { "status": "local-only" }
     },
     {

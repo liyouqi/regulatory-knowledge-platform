@@ -3458,5 +3458,160 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2020/1227/2022-11-02/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-level-2-operations",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation RTS Homogeneity",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2019/1851",
+      "STS Homogeneity RTS"
+    ],
+    "celex": "32019R1851",
+    "expressionCelex": "02019R1851-20240306",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2019-11-06",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-03-06",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2019/1851",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 3,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 10,
+      "pointCount": 57,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019R1851:article:1:subparagraph:1": "sha256:4fd6ecd2183f866546b918b1024dba75fe5863ee8d4f9239fb0ab5f753b1ae5f",
+        "eu:32019R1851:article:3:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2019/1851/2024-03-06/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-level-2-operations",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation RTS Principal Adverse Impacts",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2024/1700",
+      "STS Securitisation Sustainability RTS"
+    ],
+    "celex": "32024R1700",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2024-06-18",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2024-06-18",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1700",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 3,
+      "recitalCount": 8,
+      "annexCount": 1,
+      "paragraphCount": 14,
+      "pointCount": 33,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024R1700:recital:1": "sha256:62ef5f712e9c57f7bfdef74ffbcd64a05e01df5190bf98d5f4fc9e4fbdcccb02",
+        "eu:32024R1700:article:1:paragraph:1": "sha256:25d5ace01732a62610e7d97d80c394fb66c5b05e9cffedd239bf3efd54058499",
+        "eu:32024R1700:article:3:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32024R1700:annex:1": "sha256:8f50a91af8aaafa6a99ef0c248ea9af6d7645ca3f73ca63b5ad86f3919c25654"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2024/1700/oj/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-level-2-operations",
+    "familyId": "family:covered-bonds",
+    "shortName": "Covered Bonds and Securitisation Counterparty Risk RTS",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2020/447",
+      "Covered Bond Counterparty Risk RTS"
+    ],
+    "celex": "32020R0447",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2020-03-27",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2020-03-27",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2020/447",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 5,
+      "recitalCount": 7,
+      "annexCount": 0,
+      "paragraphCount": 5,
+      "pointCount": 6,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32020R0447:recital:1": "sha256:294a3784255807adcab8d609db3ad71236441e5e77fa8655b22ebc357248c49a",
+        "eu:32020R0447:article:1:subparagraph:1": "sha256:8008986cb7eeaa9965fa03709b01136b044da232876fa1621b3f44364097260e",
+        "eu:32020R0447:article:5:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2020/447/oj/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-level-2-operations",
+    "familyId": "family:market-infrastructure",
+    "shortName": "CSDR RTS Settlement Discipline",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2018/1229",
+      "Settlement Discipline RTS"
+    ],
+    "celex": "32018R1229",
+    "expressionCelex": "02018R1229-20240902",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2018-09-13",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-09-02",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2018/1229",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 43,
+      "recitalCount": 0,
+      "annexCount": 3,
+      "paragraphCount": 130,
+      "pointCount": 122,
+      "structuralNodeCount": 15,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32018R1229:article:1:subparagraph:1": "sha256:99a8bd8e6f904f1f087682b0f3fadd1b47b0147ef3c0210cdce78e73e32d4ff3",
+        "eu:32018R1229:article:42:subparagraph:2": "sha256:b011950bd749fd0c8fd9761c59206b830ef67b293d36ad39c0c9f67572088c98",
+        "eu:32018R1229:annex:i": "sha256:b220607542d6e243f87bf66c71160c781488f4076afa79c91d2bb49f15b7597f",
+        "eu:32018R1229:annex:iii": "sha256:d381e77ccf245b0dcc86348651943f029bd16c6d599b8250c1dc89b51703ad77"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2018/1229/2024-09-02/eng"
   }
 ]
