@@ -1,6 +1,11 @@
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { DocumentSummary } from "../shared/legal";
+import {
+  BANKING_BUSINESS_AREAS,
+  type BankingBusinessAreaId,
+  familyBelongsToBusinessArea,
+} from "./banking-business-areas";
 
 export interface LawPickerGroup {
   familyId: string;
@@ -12,17 +17,26 @@ const FAMILY_LABELS: Record<string, string> = {
   "family:ai-act": "AI Act",
   "family:aml": "AML / CFT",
   "family:brrd": "BRRD",
+  "family:consumer-credit": "Consumer Credit",
+  "family:covered-bonds": "Covered Bonds",
   "family:crd": "CRD",
   "family:crr": "CRR",
+  "family:crisis-management": "Crisis Management",
+  "family:cssf": "CSSF",
   "family:data-act": "Data Act",
   "family:dgsd": "DGSD",
   "family:dora": "DORA",
+  "family:eba": "EBA",
   "family:gdpr": "GDPR",
+  "family:market-infrastructure": "Market Infrastructure",
   "family:mica": "MiCA",
+  "family:mifid": "MiFID / MiFIR",
   "family:nis2": "NIS2",
+  "family:payments": "Payments",
   "family:psd": "PSD",
+  "family:securitisation": "Securitisation",
   "family:srmr": "SRMR",
-  "family:cssf": "CSSF",
+  "family:ssm": "SSM",
 };
 
 const LEVEL_ORDER: Record<DocumentSummary["regulatoryLevel"], number> = {
@@ -65,9 +79,15 @@ function matchesDocument(document: DocumentSummary, query: string): boolean {
 export function groupLawPickerCatalog(
   catalog: DocumentSummary[],
   query = "",
+  businessArea: BankingBusinessAreaId | "" = "",
 ): LawPickerGroup[] {
   const groups = new Map<string, DocumentSummary[]>();
   for (const document of catalog) {
+    if (
+      businessArea &&
+      !familyBelongsToBusinessArea(document.familyId, businessArea)
+    )
+      continue;
     if (!matchesDocument(document, query)) continue;
     const current = groups.get(document.familyId) ?? [];
     current.push(document);
@@ -155,13 +175,16 @@ export function LawPicker({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [businessArea, setBusinessArea] = useState<BankingBusinessAreaId | "">(
+    "",
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const panelId = useId();
   const current = catalog.find((document) => document.slug === currentSlug);
   const currentFamily = current ? familyLabel(current.familyId) : undefined;
   const groups = useMemo(
-    () => groupLawPickerCatalog(catalog, query),
-    [catalog, query],
+    () => groupLawPickerCatalog(catalog, query, businessArea),
+    [catalog, query, businessArea],
   );
 
   useEffect(() => {
@@ -192,6 +215,27 @@ export function LawPicker({
         </span>
         <ChevronDown aria-hidden="true" size={16} />
       </button>
+      {variant === "reader" ? (
+        <label className="law-picker-business-area">
+          <span>Business area</span>
+          <select
+            onChange={(event) => {
+              setBusinessArea(
+                event.currentTarget.value as BankingBusinessAreaId | "",
+              );
+              setOpen(true);
+            }}
+            value={businessArea}
+          >
+            <option value="">All business areas</option>
+            {BANKING_BUSINESS_AREAS.map((area) => (
+              <option key={area.id} value={area.id}>
+                {area.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       {open ? (
         <section
           className="law-picker-panel"

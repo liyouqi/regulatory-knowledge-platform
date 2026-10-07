@@ -473,6 +473,8 @@ Reader URLs are stable and readable:
 
 Refreshing or using browser Back/Forward restores the selected collection and provision. Paragraph and point markers are permalinks; the adjacent copy control puts the stable URL on the clipboard and briefly confirms success. The Reader's current-law field gives exact locators priority and accepts inputs such as `23`, `art 23`, `rec 40`, and `annex 2`.
 
+The Reader law picker can filter the same catalog by six editorial banking business areas before opening a legal family. The small mapping in `src/web/banking-business-areas.ts` is navigation only: it does not change legal family IDs, applicability, Runtime data, Search, or RAG exports. Unknown future families remain available under **All business areas** until deliberately classified.
+
 The same field searches the loaded law's Article, Recital, and Annex titles and body text without another server request. Multiple unquoted terms use strict AND semantics, each term supports word-prefix matching, and quoted text is an exact normalized phrase. Results include highlighted snippets and open stable provision or paragraph anchors. For example:
 
 ```text

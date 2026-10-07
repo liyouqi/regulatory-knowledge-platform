@@ -2038,6 +2038,31 @@ kbd {
   padding: 2px;
 }
 
+.law-picker-business-area {
+  align-items: center;
+  color: #aeb2a4;
+  display: grid;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  gap: 5px;
+  letter-spacing: 0.07em;
+  margin-top: 7px;
+  text-transform: uppercase;
+}
+
+.law-picker-business-area select {
+  background: #171b15;
+  border: 1px solid #3e4836;
+  border-radius: 6px;
+  color: #eef0e8;
+  font-size: 12px;
+  letter-spacing: normal;
+  padding: 8px;
+  text-transform: none;
+  width: 100%;
+}
+
 .law-picker-groups {
   display: grid;
   gap: 5px;
@@ -4829,7 +4854,8 @@ kbd {
 
 :root[data-theme="light"] .law-picker-trigger,
 :root[data-theme="light"] .law-picker-panel,
-:root[data-theme="light"] .law-picker-search {
+:root[data-theme="light"] .law-picker-search,
+:root[data-theme="light"] .law-picker-business-area select {
   background: #fffef9;
   border-color: #cbc9be;
   color: #252820;
@@ -4846,6 +4872,7 @@ kbd {
 :root[data-theme="light"] .law-picker-trigger small,
 :root[data-theme="light"] .law-picker-search,
 :root[data-theme="light"] .law-picker-search button,
+:root[data-theme="light"] .law-picker-business-area,
 :root[data-theme="light"] .law-picker-group summary small,
 :root[data-theme="light"] .law-picker-option small,
 :root[data-theme="light"] .law-picker-empty {

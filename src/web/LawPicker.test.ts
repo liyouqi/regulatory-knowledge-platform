@@ -90,4 +90,17 @@ describe("LawPicker catalog grouping", () => {
       ])[0],
     ).toMatchObject({ familyId: "family:crd", label: "CRD" });
   });
+
+  it("filters existing legal families through the editorial business map", () => {
+    expect(
+      groupLawPickerCatalog(documents, "", "digital-operational").map(
+        (group) => group.familyId,
+      ),
+    ).toEqual(["family:dora"]);
+    expect(
+      groupLawPickerCatalog(documents, "", "aml-financial-crime").map(
+        (group) => group.familyId,
+      ),
+    ).toEqual(["family:aml"]);
+  });
 });
