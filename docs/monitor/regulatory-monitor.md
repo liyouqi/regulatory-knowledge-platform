@@ -191,9 +191,11 @@ During enrichment the CLI prints the month, AI item number, authority, abbreviat
 
 This is not the Platform corpus pipeline and does not call `corpus:refresh`.
 
-The pipeline may run locally, during image preparation, in Cloud Run, or from a scheduler. Cloud Run local storage is intentionally acceptable for this feature: Monitor data is disposable and can be reconstructed by running the refresh command again. No persistence service is required for V1.
+The current Cloud Run deployment does not schedule this pipeline. It serves the `data/monitor` snapshot copied into the image, so Monitor remains unchanged until another snapshot is built and deployed.
 
 Runtime syncing uses the same implementation through `POST /api/monitor/refresh`. The route is available when `MONITOR_REFRESH_TOKEN` is configured and accepts the token as `Authorization: Bearer <token>`. An optional Cloud Scheduler request can call this route; it does not introduce a second ingestion path.
+
+That optional route writes to one Cloud Run instance's local filesystem. The write is disposable and may be lost when the revision or instance is replaced, so it is not yet a durable daily production refresh. If automatic daily updates become a release requirement, add Cloud Scheduler together with an explicit persistence or image-rebuild strategy; do not assume that deploying the current service enables it.
 
 ## 7. Data and Git policy
 
