@@ -12,8 +12,8 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(88);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(88);
+    expect(sources).toHaveLength(93);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(93);
     expect(sources.slice(0, 10).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
@@ -40,6 +40,12 @@ describe("EU source registry", () => {
     expect(
       sources.filter((source) => source.familyId === "family:mica"),
     ).toHaveLength(2);
+    expect(
+      sources.filter((source) => source.familyId === "family:ai-act"),
+    ).toHaveLength(3);
+    expect(
+      sources.filter((source) => source.familyId === "family:securitisation"),
+    ).toHaveLength(4);
     expect(
       sources
         .filter((source) => source.familyId === "family:aml")

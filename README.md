@@ -256,7 +256,7 @@ For local development, `REGULATORY_EDITION_PROFILE` is consumed only by the buil
 npm run source:list
 ```
 
-The version-controlled registry is `data/source-registry.json`. It currently contains 88 active EUR-Lex acts, plus the visible queued and planned backlog summarized in `docs/corpus-status.md`. Together with three CSSF sources and one EBA guideline, the manifest pins 92 documents. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, other delegated measures, and future Level 3 material.
+The version-controlled registry is `data/source-registry.json`. It currently contains 93 active EUR-Lex acts, plus the visible queued and planned backlog summarized in `docs/corpus-status.md`. Together with three CSSF sources and one EBA guideline, the manifest pins 97 documents. Documents in the same regulatory family intentionally share a `familyId`; `regulatoryLevel` and `measureType` distinguish primary acts, RTS, ITS, other delegated measures, and future Level 3 material.
 
 ### CSSF representative sources
 

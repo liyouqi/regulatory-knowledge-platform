@@ -3246,17 +3246,217 @@
     }
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "ai-act-level-2",
     "familyId": "family:ai-act",
     "shortName": "AI Act Scientific Panel Implementing Regulation",
-    "celex": "32025R0454"
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2025/454",
+      "AI Act Scientific Panel Regulation"
+    ],
+    "celex": "32025R0454",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2025-03-10",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2025-03-10",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/454",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 20,
+      "recitalCount": 13,
+      "annexCount": 0,
+      "paragraphCount": 64,
+      "pointCount": 27,
+      "structuralNodeCount": 6,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32025R0454:recital:1": "sha256:be70a80a679e45a1c0a6983d962b204c84e723c21444ef74b2194302ca603a4f",
+        "eu:32025R0454:article:1:subparagraph:1": "sha256:61352a87b858d6759296cbfb60bd32ec6d466a63934f0a07bfb775dc14db907c",
+        "eu:32025R0454:article:20:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2025/454/oj/eng"
   },
   {
-    "status": "planned",
+    "status": "active",
     "batch": "ai-act-level-2",
     "familyId": "family:ai-act",
     "shortName": "AI Act Commission Proceedings Implementing Regulation",
-    "celex": "32026R1755"
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2026/1755",
+      "AI Act Commission Proceedings Regulation"
+    ],
+    "celex": "32026R1755",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2026-07-21",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2026-07-21",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2026/1755",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 15,
+      "recitalCount": 6,
+      "annexCount": 1,
+      "paragraphCount": 69,
+      "pointCount": 28,
+      "structuralNodeCount": 5,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32026R1755:recital:1": "sha256:776c5c92cf391cb43039bcea7b25baaedd330d5cdd3cff2c0e2ac8ac9f39c0d0",
+        "eu:32026R1755:article:1:subparagraph:1": "sha256:1dfbe6395d2581b4c9eeacd9575489514210118e109d53d0e8dd648393823d04",
+        "eu:32026R1755:article:15:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32026R1755:annex:1": "sha256:c7b30df7a78e6ac6db124421167926a6fd9eb05e21beb09749faeedfa566cab7"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2026/1755/oj/eng"
+  },
+  {
+    "status": "planned",
+    "batch": "banking-securitisation-level-2",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation RTS Disclosure Details",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2020/1224",
+      "Securitisation Disclosure RTS"
+    ],
+    "celex": "32020R1224",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2020-09-03",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2020/1224/oj/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-securitisation-level-2",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation ITS Disclosure Templates",
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2020/1225",
+      "Securitisation Disclosure Templates ITS"
+    ],
+    "celex": "32020R1225",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "its",
+    "publicationDate": "2020-09-03",
+    "sourceStatus": {
+      "basis": "original-oj",
+      "textAsOf": "2020-09-03",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2020/1225",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 6,
+      "recitalCount": 6,
+      "annexCount": 15,
+      "paragraphCount": 12,
+      "pointCount": 10,
+      "structuralNodeCount": 3,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32020R1225:recital:1": "sha256:201b7ad5556d9484194e3046f8a8b1bc113b36b6269e7ee3484fbfb370bf1479",
+        "eu:32020R1225:article:1:paragraph:1": "sha256:319e82ac051951d54741dbb60fae1d0e389beb29486604342024e3211f654dbe",
+        "eu:32020R1225:article:6:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32020R1225:annex:i": "sha256:d30ffb8deee4c08df0d9cb1ac1edf824998f96faead03e6ee9d1272982ca9f4e",
+        "eu:32020R1225:annex:xv": "sha256:034f8e3f78db16147d1b1a6463dd1fea8e616415a52c322b4b66379920cbaef8"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2020/1225/oj/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-securitisation-level-2",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation RTS STS Notification Information",
+    "aliases": [
+      "Commission Delegated Regulation (EU) 2020/1226",
+      "STS Notification Information RTS"
+    ],
+    "celex": "32020R1226",
+    "expressionCelex": "02020R1226-20220815",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "rts",
+    "publicationDate": "2020-09-03",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-08-15",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2020/1226",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 3,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 8,
+      "pointCount": 11,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32020R1226:article:1:paragraph:1": "sha256:075b0050d51372e392e32972088593aa5110f6283111adc6b73e411cef269cc6",
+        "eu:32020R1226:article:3:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32020R1226:annex:i": "sha256:4575237fdaf0a819cb5a81a5f8be9f93d976f3acc6adc1a1f8d8a9929824333e",
+        "eu:32020R1226:annex:iv": "sha256:809c19281a0b5fc11657a971a497c90a5cb685a2be74da45caf560fd2d666711"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2020/1226/2022-08-15/eng"
+  },
+  {
+    "status": "active",
+    "batch": "banking-securitisation-level-2",
+    "familyId": "family:securitisation",
+    "shortName": "Securitisation ITS STS Notification Templates",
+    "aliases": [
+      "Commission Implementing Regulation (EU) 2020/1227",
+      "STS Notification Templates ITS"
+    ],
+    "celex": "32020R1227",
+    "expressionCelex": "02020R1227-20221102",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "its",
+    "publicationDate": "2020-09-03",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-11-02",
+      "checkedAt": "2026-10-07T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_impl/2020/1227",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 2,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 8,
+      "pointCount": 0,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32020R1227:article:1:paragraph:1": "sha256:e5a568a963f9fd09163fbde9e52bd6d3ee58a687dcbbe7f5c48eadd6542b163e",
+        "eu:32020R1227:article:2:subparagraph:1": "sha256:7521c32a90f5ee981042548d552a96206956fd9a1b9c292a5454ee68610371f8",
+        "eu:32020R1227:annex:i": "sha256:e32dfe422e8369ce7b4916f8f18d93aeb99ce86be8bb7a5f9db29b2cbcc95411",
+        "eu:32020R1227:annex:iv": "sha256:b892a819fa52a83189dcd253fd8fa77561fdf33fed024f03ec82c1c939663f71"
+      }
+    },
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_impl/2020/1227/2022-11-02/eng"
   }
 ]

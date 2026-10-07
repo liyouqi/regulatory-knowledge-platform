@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.19.0",
+  "version": "1.20.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -777,6 +777,41 @@
       "identifier": "32014R1151",
       "snapshotId": "snapshot:cellar:32014R1151:decf7f43526a3978030c287f6ded10de637c2f08dc8929423f9931cc6ab941ef",
       "contentSha256": "sha256:decf7f43526a3978030c287f6ded10de637c2f08dc8929423f9931cc6ab941ef",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32025R0454",
+      "snapshotId": "snapshot:cellar:32025R0454:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
+      "contentSha256": "sha256:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32026R1755",
+      "snapshotId": "snapshot:cellar:32026R1755:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
+      "contentSha256": "sha256:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32020R1225",
+      "snapshotId": "snapshot:cellar:32020R1225:b7fe221b4e21afe5d6110ff5eadb71850eb7b744f1ba20be6f738061d204939d",
+      "contentSha256": "sha256:b7fe221b4e21afe5d6110ff5eadb71850eb7b744f1ba20be6f738061d204939d",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32020R1226",
+      "snapshotId": "snapshot:cellar:32020R1226:ebecc1e920afec2a843f20af2c35aab9625c81048ab2625b0afef83542eb14f0",
+      "contentSha256": "sha256:ebecc1e920afec2a843f20af2c35aab9625c81048ab2625b0afef83542eb14f0",
+      "retention": { "status": "local-only" }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32020R1227",
+      "snapshotId": "snapshot:cellar:32020R1227:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
+      "contentSha256": "sha256:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
       "retention": { "status": "local-only" }
     },
     {

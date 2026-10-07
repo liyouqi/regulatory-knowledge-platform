@@ -12,11 +12,12 @@ describe("Reader corpus status", () => {
       loadEbaSourceRegistrySync(),
     );
 
-    expect(output).toContain("## Published — 92");
+    expect(output).toContain("## Published — 97");
     expect(output).toContain("## Queued — 0");
-    expect(output).toContain("## Planned — 2");
-    expect(output).toContain("**ai-act-level-2 — 2:**");
+    expect(output).toContain("## Planned — 1");
+    expect(output).toContain("**banking-securitisation-level-2 — 1:**");
     expect(output).toContain("DORA");
     expect(output).toContain("AMLR");
+    expect(output).toContain("AI Act Scientific Panel Implementing Regulation");
   });
 });
