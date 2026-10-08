@@ -9,6 +9,10 @@ RUN apt-get update \
 COPY package.json package-lock.json ./
 RUN npm ci
 
+FROM dependencies AS production-dependencies
+
+RUN npm prune --omit=dev
+
 FROM dependencies AS web-build
 
 COPY index.html tsconfig.json vite.config.ts ./
@@ -23,7 +27,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package.json package-lock.json tsconfig.json ./
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=production-dependencies /app/node_modules ./node_modules
 COPY --from=web-build /app/dist ./dist
 COPY src ./src
 COPY data/artifacts/runtime/regulatory.sqlite ./data/artifacts/runtime/regulatory.sqlite
