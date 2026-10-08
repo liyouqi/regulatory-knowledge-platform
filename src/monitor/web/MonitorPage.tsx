@@ -25,6 +25,7 @@ import {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { HelpMenu } from "../../contact/web/HelpMenu";
 import type {
   MonitorAiMessage,
   MonitorExplainResponse,
@@ -667,6 +668,7 @@ export function MonitorPage() {
               <FileDown aria-hidden="true" size={15} />
               Generate Monthly Report
             </button>
+            <HelpMenu surface="monitor" tone="light" />
           </div>
         </div>
         <a className="monitor-masthead" href="/monitor">

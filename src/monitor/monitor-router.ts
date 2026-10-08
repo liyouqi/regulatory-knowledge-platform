@@ -1,4 +1,5 @@
 import express from "express";
+import { logProductEvent } from "../shared/product-event-log";
 import { logUserQuery } from "../shared/user-query-log";
 import { MonitorAiTimeoutError, MonitorAiUnavailableError } from "./monitor-ai";
 import type { MonitorAiService } from "./monitor-ai";
@@ -176,6 +177,16 @@ export function createMonitorRouter(
     try {
       refreshInProgress = true;
       const feed = await runRefresh({ month });
+      logProductEvent({
+        event: "monitor_refresh",
+        message: "Monitor refresh completed",
+        surface: "monitor",
+        metadata: {
+          trigger: "protected_api",
+          month: feed.month,
+          eventCount: feed.events.length,
+        },
+      });
       response.json({
         month: feed.month,
         generatedAt: feed.generatedAt,
@@ -219,6 +230,16 @@ export function createMonitorRouter(
     try {
       refreshInProgress = true;
       const feed = await runRefresh({ month });
+      logProductEvent({
+        event: "monitor_refresh",
+        message: "Monitor refresh completed",
+        surface: "monitor",
+        metadata: {
+          trigger: "daily_button",
+          month: feed.month,
+          eventCount: feed.events.length,
+        },
+      });
       response.json({
         month: feed.month,
         generatedAt: feed.generatedAt,

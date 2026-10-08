@@ -31,6 +31,7 @@ import {
   useState,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { HelpMenu } from "../contact/web/HelpMenu";
 import { ReaderCopilot } from "../copilot/web/ReaderCopilot";
 import { EarthPage } from "../earth/web/EarthPage";
 import { MonitorPage } from "../monitor/web/MonitorPage";
@@ -88,6 +89,10 @@ import {
   type DocumentSupervisoryDecisionsResponse,
   documentSupervisoryDecisionsResponseSchema,
 } from "../shared/supervisory-decision";
+import {
+  surfaceForPath,
+  trackProductEvent,
+} from "../telemetry/web/product-analytics";
 import { ApplicabilityPage } from "./ApplicabilityPage";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
@@ -1395,6 +1400,10 @@ function ReaderPage({
             Find laws
             <kbd>⌘ K</kbd>
           </button>
+          <HelpMenu
+            context={`${legalDocument.shortName} · ${activeProvision.label}`}
+            surface="reader"
+          />
         </div>
       </header>
 
@@ -1734,6 +1743,14 @@ export function App() {
       // Theme selection remains available for the current browser session.
     }
   }, [theme]);
+
+  useEffect(() => {
+    trackProductEvent({
+      event: "page_view",
+      surface: surfaceForPath(location.pathname),
+      path: `${location.pathname}${location.search}`,
+    });
+  }, [location.pathname, location.search]);
 
   const toggleTheme = () =>
     setTheme((current) => (current === "dark" ? "light" : "dark"));

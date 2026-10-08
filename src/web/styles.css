@@ -1790,7 +1790,7 @@ select:focus-visible,
   justify-content: space-between;
   padding: 0 26px;
   position: relative;
-  z-index: 3;
+  z-index: 30;
 }
 
 .topbar-actions {

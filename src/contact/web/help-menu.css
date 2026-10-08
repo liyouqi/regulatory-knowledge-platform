@@ -1,0 +1,185 @@
+.product-help {
+  position: relative;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.product-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  color: #b7b9ad;
+  background: transparent;
+  border: 1px solid #555b50;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.product-help-trigger:hover,
+.product-help-trigger[aria-expanded="true"] {
+  color: #f2f1eb;
+  background: #2a3026;
+}
+
+.product-help-light .product-help-trigger {
+  color: #173c46;
+  border-color: #173c46;
+}
+
+.product-help-light .product-help-trigger:hover,
+.product-help-light .product-help-trigger[aria-expanded="true"] {
+  color: #fff;
+  background: #173c46;
+}
+
+.product-help-space .product-help-trigger {
+  color: #a4b0bd;
+  border-color: rgb(170 196 221 / 22%);
+  border-radius: 8px;
+}
+
+.product-help-space .product-help-trigger:hover,
+.product-help-space .product-help-trigger[aria-expanded="true"] {
+  color: #f3e4cd;
+  background: rgb(170 196 221 / 10%);
+}
+
+.product-help-panel {
+  position: fixed;
+  z-index: 300;
+  inset: 64px 20px auto auto;
+  width: min(390px, calc(100vw - 40px));
+  margin: 0;
+  padding: 20px;
+  color: #1f292b;
+  background: #fff;
+  border: 0;
+  border-top: 4px solid #d4a95c;
+  border-radius: 4px;
+  box-shadow: 0 18px 52px rgb(0 0 0 / 28%);
+}
+
+.product-help-panel header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.product-help-panel header span {
+  color: #687377;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.product-help-panel h2 {
+  margin: 4px 0 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  font-size: 1.35rem;
+}
+
+.product-help-panel header button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  place-items: center;
+  color: #4f5c5e;
+  background: transparent;
+  border: 1px solid #d7dedc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.product-help-panel form,
+.product-help-panel label {
+  display: grid;
+  gap: 7px;
+}
+
+.product-help-panel form {
+  gap: 14px;
+}
+
+.product-help-panel label {
+  color: #354548;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.product-help-panel label small {
+  color: #7c8789;
+  font-weight: 400;
+}
+
+.product-help-panel input,
+.product-help-panel select,
+.product-help-panel textarea {
+  width: 100%;
+  padding: 9px 10px;
+  color: #1f292b;
+  background: #fbfbf9;
+  border: 1px solid #cbd3d2;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.product-help-panel textarea {
+  resize: vertical;
+}
+
+.product-help-note,
+.product-help-state {
+  margin: 0;
+  color: #687377;
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+.product-help-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  color: #fff;
+  background: #173c46;
+  border: 0;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.product-help-send:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.product-help-honeypot {
+  position: absolute;
+  left: -10000px;
+}
+
+@media (max-width: 680px) {
+  .product-help-trigger {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .product-help-panel {
+    top: 58px;
+    right: 14px;
+    width: calc(100vw - 28px);
+  }
+}

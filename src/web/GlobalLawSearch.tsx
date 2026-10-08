@@ -26,6 +26,7 @@ import {
   fullTextSearchResponseSchema,
   lawSearchResponseSchema,
 } from "../shared/legal";
+import { trackProductEvent } from "../telemetry/web/product-analytics";
 import {
   OPENED_LAWS_CHANGED_EVENT,
   type ResolvedOpenedLaw,
@@ -442,21 +443,53 @@ export function GlobalLawSearch({
   if (!open) return null;
 
   function openLawResult(result: LawSearchResult) {
+    trackProductEvent({
+      event: "search_result_opened",
+      surface: "search",
+      path: result.target?.path ?? result.explorerPath,
+      action: "laws",
+      query,
+      resultCount,
+    });
     onClose();
     navigate(result.target?.path ?? result.explorerPath);
   }
 
   function openFullTextResult(result: FullTextSearchResult) {
+    trackProductEvent({
+      event: "search_result_opened",
+      surface: "search",
+      path: result.path,
+      action: "fulltext",
+      query,
+      resultCount,
+    });
     onClose();
     navigate(result.path);
   }
 
   function openDefinitionResult(result: DefinitionSearchResult) {
+    trackProductEvent({
+      event: "search_result_opened",
+      surface: "search",
+      path: result.path,
+      action: "definitions",
+      query,
+      resultCount,
+    });
     onClose();
     navigate(result.path);
   }
 
   function openOpenedLaw(result: ResolvedOpenedLaw) {
+    trackProductEvent({
+      event: "search_result_opened",
+      surface: "search",
+      path: result.opened.path,
+      action: "opened",
+      query,
+      resultCount,
+    });
     onClose();
     navigate(result.opened.path);
   }

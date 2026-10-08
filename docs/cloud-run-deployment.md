@@ -54,6 +54,15 @@ The current application also accepts:
 - `PRIVATE_AI_TIMEOUT_SECONDS`, defaulting to `60`;
 - `PRIVATE_AI_THINKING_MODE`, either `enabled`, `disabled`, or unset.
 
+The optional private contact form uses server-only values:
+
+- `CONTACT_TO_EMAIL`;
+- `CONTACT_SMTP_USER`;
+- `CONTACT_SMTP_PASSWORD`;
+- optional `CONTACT_SMTP_HOST`, `CONTACT_SMTP_PORT`, and `CONTACT_SMTP_FROM`.
+
+If these values are incomplete, the website remains available and the Help menu reports that contact delivery is not configured. The recipient address is never sent to the browser. See [Contact and lightweight product analytics](contact-and-analytics.md).
+
 Do not deploy placeholder values. The model value must be the provider's exact identifier, without literal quote characters. If the provider exposes an OpenAI-compatible model listing, it may be inspected with:
 
 ```bash
@@ -197,7 +206,7 @@ gcloud run deploy "$SERVICE" \
   --remove-secrets REGULATORY_PUBLIC_API_KEYS
 ```
 
-`--env-vars-file .env` is an explicit deployment action: it sends the file's values to the Cloud Run revision even though the file is absent from Git and the image. The current `.env` is expected to contain only the `PRIVATE_AI_*` server configuration described in step 1.
+`--env-vars-file .env` is an explicit deployment action: it sends the file's values to the Cloud Run revision even though the file is absent from Git and the image. The current `.env` may contain the `PRIVATE_AI_*` configuration and optional server-only `CONTACT_*` configuration described in step 1. Variables without a `VITE_` prefix are not compiled into browser assets.
 
 `--remove-secrets REGULATORY_PUBLIC_API_KEYS` removes the stale Secret Manager reference that otherwise gets inherited and blocks creation of the new revision. Consequently, authenticated operations under `/api/v1` remain fail-closed in this demo. Reader, Explorer, Earth, Monitor, Reader Copilot, and Monitor Copilot do not require that Public API key.
 
@@ -224,13 +233,14 @@ Verify the server, Copilot configuration, Galaxy graph, and Monitor snapshot:
 ```bash
 curl -fsS "$SERVICE_URL/api/health" | jq
 curl -fsS "$SERVICE_URL/api/copilot/status" | jq
+curl -fsS "$SERVICE_URL/api/contact/status" | jq
 curl -fsS "$SERVICE_URL/api/earth/graph" \
   | jq '{snapshot: .source.snapshotHash, included: .report.scopeWorks, related: .report.boundaryWorks, institutions: .report.institutions, relations: (.edges | length)}'
 curl -fsS "$SERVICE_URL/api/monitor/timeline?year=$(date -u +%Y)" \
   | jq '{year, events: (.events | length), sources: (.sources | length), generatedAt}'
 ```
 
-Copilot must report `status: "ready"`. The Galaxy graph and Monitor counts must match step 2. Open these browser routes as a final smoke test:
+Copilot must report `status: "ready"`. Contact must report `available: true` when delivery is intended. The Galaxy graph and Monitor counts must match step 2. Open these browser routes as a final smoke test:
 
 ```text
 <SERVICE_URL>/
@@ -250,6 +260,8 @@ gcloud logging read \
   --limit 20 \
   --format json
 ```
+
+Page views, selected searches, Monitor refreshes, and contact delivery are available with the same command by replacing the final event value with `page_view`, `search_result_opened`, `monitor_refresh`, or `contact_submission`.
 
 Do not declare the release complete until the health identity, Copilot status, Galaxy graph, Monitor counts, browser smoke test, and query log all match the intended release.
 

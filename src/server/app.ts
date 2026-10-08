@@ -3,6 +3,9 @@ import { resolve } from "node:path";
 import express from "express";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
+import { loadContactMailConfig } from "../contact/contact-config";
+import { createContactRouter } from "../contact/contact-router";
+import { ContactService } from "../contact/contact-service";
 import { createCopilotRouter } from "../copilot/api/copilot-router";
 import { CopilotContextResolver } from "../copilot/context/copilot-context-resolver";
 import { ConfiguredPrivateAiProvider } from "../copilot/providers/configured-private-ai-provider";
@@ -33,6 +36,7 @@ import { SqliteRuntimeRepository } from "../runtime/sqlite-runtime-repository";
 import { SearchService } from "../search/full-text-search";
 import { createLawSearchRecords, searchLaws } from "../search/law-search";
 import { level2MandateQueryResponseSchema } from "../shared/legal";
+import { createTelemetryRouter } from "../telemetry/telemetry-router";
 import { RegulatoryTopicService } from "../topics/regulatory-topic-service";
 
 export const app = express();
@@ -76,6 +80,10 @@ const copilotService = privateAiConfig.available
   : null;
 const monitorAiService = privateAiConfig.available
   ? new MonitorAiService(privateAiConfig.config)
+  : null;
+const contactConfig = loadContactMailConfig();
+const contactService = contactConfig.available
+  ? new ContactService(contactConfig.config)
   : null;
 
 export function findDocument(documentId: string) {
@@ -319,6 +327,8 @@ app.get("/api/health", (_request, response) => {
 
 app.use("/api/copilot", createCopilotRouter({ service: copilotService }));
 app.use("/api/monitor", createMonitorRouter({ aiService: monitorAiService }));
+app.use("/api/contact", createContactRouter({ service: contactService }));
+app.use("/api/telemetry", createTelemetryRouter());
 
 const earthArtifactPath =
   process.env.EARTH_ARTIFACT_PATH ?? DEFAULT_EARTH_ARTIFACT_PATH;
