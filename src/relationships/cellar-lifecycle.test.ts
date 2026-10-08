@@ -11,66 +11,68 @@ describe("CELLAR lifecycle runtime builder", () => {
   it("publishes reviewed lifecycle records without treating external Works as loaded Documents", () => {
     const build = buildCellarLifecycle(documents);
 
-    expect(build.relationships).toHaveLength(67);
-    expect(build.works).toHaveLength(77);
+    expect(build.relationships).toHaveLength(535);
+    expect(build.works).toHaveLength(530);
     expect(
       build.works.filter((work) => work.availability === "loaded"),
-    ).toHaveLength(18);
+    ).toHaveLength(74);
     expect(
       build.works.filter((work) => work.availability === "external"),
-    ).toHaveLength(59);
+    ).toHaveLength(456);
     expect(
       build.relationships.filter((item) => item.relationType === "AMENDS"),
-    ).toHaveLength(26);
+    ).toHaveLength(250);
     expect(
       build.relationships.filter((item) => item.relationType === "CORRECTS"),
-    ).toHaveLength(41);
+    ).toHaveLength(285);
     expect(
       build.relationships.filter(
         (item) => item.resolutionStatus === "external",
       ),
-    ).toHaveLength(60);
+    ).toHaveLength(498);
     expect(
       build.relationships.filter(
         (item) => item.resolutionStatus === "resolved",
       ),
-    ).toEqual([
-      expect.objectContaining({
-        sourceWorkId: "eu:32023R1114",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32013L0036",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32022R2554",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32012R0648",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32024R1623",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32013R0575",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32024L1619",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32013L0036",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32023R1114",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32010R1093",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32022R2554",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32014R0909",
-      }),
-      expect.objectContaining({
-        sourceWorkId: "eu:32022R2554",
-        relationType: "AMENDS",
-        targetWorkId: "eu:32014R0600",
-      }),
-    ]);
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          sourceWorkId: "eu:32023R1114",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32013L0036",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32022R2554",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32012R0648",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32024R1623",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32013R0575",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32024L1619",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32013L0036",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32023R1114",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32010R1093",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32022R2554",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32014R0909",
+        }),
+        expect.objectContaining({
+          sourceWorkId: "eu:32022R2554",
+          relationType: "AMENDS",
+          targetWorkId: "eu:32014R0600",
+        }),
+      ]),
+    );
     expect(build.works).toContainEqual(
       expect.objectContaining({
         id: "eu:32013L0036",

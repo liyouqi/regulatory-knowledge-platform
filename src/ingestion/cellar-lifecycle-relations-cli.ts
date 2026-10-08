@@ -39,15 +39,15 @@ function sha256(value: string | Uint8Array): string {
 }
 
 async function officialSparqlResponse(query: string): Promise<Uint8Array> {
-  const url = new URL(CELLAR_SPARQL_ENDPOINT);
-  url.searchParams.set("format", "application/sparql-results+json");
-  url.searchParams.set("query", query);
-  const response = await fetch(url, {
+  const response = await fetch(CELLAR_SPARQL_ENDPOINT, {
+    method: "POST",
     headers: {
       Accept: "application/sparql-results+json, application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
       "User-Agent":
         "regulatory-knowledge-platform/0.1 (personal research project)",
     },
+    body: new URLSearchParams({ query }),
     signal: AbortSignal.timeout(90_000),
   });
   if (!response.ok) {

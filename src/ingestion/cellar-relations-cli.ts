@@ -42,15 +42,15 @@ async function fetchRelations(): Promise<void> {
   const sources = await loadSourceRegistry();
   const celexes = sources.map((source) => source.celex).sort();
   const query = buildCellarFocusedRelationsQuery(celexes);
-  const url = new URL(CELLAR_SPARQL_ENDPOINT);
-  url.searchParams.set("format", "application/sparql-results+json");
-  url.searchParams.set("query", query);
-  const response = await fetch(url, {
+  const response = await fetch(CELLAR_SPARQL_ENDPOINT, {
+    method: "POST",
     headers: {
       Accept: "application/sparql-results+json, application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
       "User-Agent":
         "regulatory-knowledge-platform/0.1 (personal research project)",
     },
+    body: new URLSearchParams({ query }),
     signal: AbortSignal.timeout(60_000),
   });
   if (!response.ok) {

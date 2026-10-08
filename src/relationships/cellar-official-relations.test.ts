@@ -13,13 +13,13 @@ describe("CELLAR official relationship builder", () => {
   it("publishes only reviewed closed-corpus structural relationships", () => {
     const relationships = buildCellarOfficialRelations(documents, entities);
 
-    expect(relationships).toHaveLength(12);
+    expect(relationships).toHaveLength(94);
     expect(
       relationships.filter((item) => item.relationType === "ADOPTED_UNDER"),
-    ).toHaveLength(7);
+    ).toHaveLength(60);
     expect(
       relationships.filter((item) => item.relationType === "SUPPLEMENTS"),
-    ).toHaveLength(5);
+    ).toHaveLength(34);
     expect(relationships).toContainEqual(
       expect.objectContaining({
         sourceEntityId: "eu:32025R0301",
@@ -50,11 +50,13 @@ describe("CELLAR official relationship builder", () => {
       first,
     );
     expect(new Set(first.map((item) => item.id)).size).toBe(first.length);
+    const reviewed = records[0];
+    expect(reviewed).toBeDefined();
     expect(() =>
       buildCellarOfficialRelations(
-        documents.filter((document) => document.celex !== "32022R2554"),
+        documents.filter((document) => document.celex !== reviewed.sourceCelex),
         entities,
-        records.slice(0, 1),
+        [reviewed],
       ),
     ).toThrow("requires loaded documents");
   });

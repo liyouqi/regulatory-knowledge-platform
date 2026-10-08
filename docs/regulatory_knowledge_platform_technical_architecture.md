@@ -608,7 +608,7 @@ Phase 2 首个 `cellar-focused-relations@1.0.0` 使用固定 CELEX `VALUES` 和 
 
 `work_cites_work` 暂不发布，以避免把粗粒度 Work citation 与已有 Article/body-block `REFERENCES` 混合。Article Graph projection 只接受真正以当前 root provision 为 endpoint 的边，不把 Reader 提供的 document context 重写成 Article relationship。Document Graph 单独查询所有跨文档 relationship，并只在 UI-owned projection 中把 Article/body-block endpoints 折叠到其 stable document entity；原始 relationship endpoints、evidence 与 provenance 不变，同文档 self-edge 不进入 Document Graph。
 
-独立 `cellar-lifecycle@1.0.0` adapter 使用开放一跳查询，只允许 `resource_legal_amends_resource_legal` 与 `resource_legal_corrects_resource_legal`，并校验每条结果至少一端属于 seed CELEX。它支持 URL-encoded corrigendum CELEX（例如 `32024R2956R(01)`），固定官方 host、response size、query/response SHA-256 与 immutable ignored snapshot。2026-08-24 的 65 条 verified candidate 全部涉及 external Work；人工复核后的 normalized dataset 才由同版本 runtime builder 消费。builder 输出 24 条 `AMENDS`、41 条 `CORRECTS` 和 64 个 metadata-only external Works，写入独立表并只投影到 Document Graph。external endpoint 没有 Reader path；若同一 CELEX 日后作为正式 Document 载入，其 stable Work ID 与 Document ID 收敛，而不是迁移到第二套身份。
+独立 `cellar-lifecycle@1.0.0` adapter 使用开放一跳查询，只允许 `resource_legal_amends_resource_legal` 与 `resource_legal_corrects_resource_legal`，并校验每条结果至少一端属于 seed CELEX。它支持 URL-encoded corrigendum CELEX（例如 `32024R2956R(01)`），固定官方 host、response size、query/response SHA-256 与 immutable ignored snapshot。2026-10-07 对 98 个 EU seed 的 verified dataset 包含 535 条关系：250 条 `AMENDS`、285 条 `CORRECTS`；37 条两端均已加载，498 条保留一个 external endpoint，形成 456 个 metadata-only external Works。人工复核后的 normalized dataset 才由同版本 runtime builder 消费并投影到 Document Graph。external endpoint 没有 Reader path；若同一 CELEX 日后作为正式 Document 载入，其 stable Work ID 与 Document ID 收敛，而不是迁移到第二套身份。
 
 ## 9.4 为什么 Phase 1 不需要专用“Citation Engine”服务
 

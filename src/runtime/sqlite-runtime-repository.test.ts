@@ -580,7 +580,7 @@ describe("SQLite runtime repository", () => {
       }),
     );
     expect(repository?.relationshipCount).toBeGreaterThan(1_000);
-    expect(repository?.cellarRelationshipCount).toBe(12);
+    expect(repository?.cellarRelationshipCount).toBe(94);
     expect(repository?.unresolvedReferenceCount).toBeGreaterThan(0);
   });
 
@@ -638,8 +638,8 @@ describe("SQLite runtime repository", () => {
           relationship.target.documentId === "eu:32022R2554",
       ),
     ).toBe(true);
-    expect(repository?.lifecycleRelationshipCount).toBe(67);
-    expect(repository?.externalWorkCount).toBe(59);
+    expect(repository?.lifecycleRelationshipCount).toBe(535);
+    expect(repository?.externalWorkCount).toBe(456);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

@@ -15,7 +15,7 @@ The visible Web product and the Agent/RAG data product consume the same reviewed
 | Capability | 0→1 completion | Later 1→100 work | Status |
 |---|---|---|---|
 | Relationship graph | Article, Document, and Global projections over one runtime dataset | richer layouts and larger relation coverage | validated |
-| CELLAR relations | reviewed closed-corpus and external-Work examples | more predicates and broader neighborhoods | validated |
+| CELLAR relations | 94 closed-corpus structural edges plus 535 amendment/corrigendum edges over 98 EU seeds | more predicates and Article-level amendment provenance | validated |
 | Version lifecycle | bounded version-chain plus amendment/corrigendum metadata | consolidated lineage, comparison, Article provenance | validated |
 | CJEU | metadata-only Act-level interpretation graph | judgment text and Article/paragraph citations | validated |
 | Level 2 | representative DORA/MiCA RTS/ITS and reporting pair | additional RTS/ITS/Guidelines/Q&A | validated |
