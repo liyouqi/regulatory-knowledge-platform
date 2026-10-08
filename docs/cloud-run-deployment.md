@@ -267,6 +267,17 @@ Do not declare the release complete until the health identity, Copilot status, G
 
 The current deployment starts from the Monitor snapshot baked into the image. It does not configure a daily scheduler and therefore does not refresh Monitor automatically. The Monitor page can refresh the current month once per UTC day through its `Refresh today` button. That result is instance-local and is not durable across a new revision or replacement instance, so a reliable automatic daily production refresh still needs an explicit persistence or image-rebuild decision.
 
+### Validated release — 8 October 2026
+
+- Service URL: `https://regulatory-knowledge-platform-hl2vvy6dra-ew.a.run.app`
+- Revision: `regulatory-knowledge-platform-00013-z8r` with 100% traffic
+- Image: `europe-west1-docker.pkg.dev/regulatory-507508/regulatory/regulatory-knowledge-platform:20261008124845-0015b3d`
+- Image digest: `sha256:34e9f0d7ca6d34b0c0ad0c59e6fb7fecb5725817761b9e77eb330c634c6ad639`
+- Runtime: `runtime-5.8.0-c030abcffab23e31`, profile `full-corpus@1.0.0`, profile hash `sha256:f96b420077a2fe92df36f06f049112f98277cd0534a542e7ca913cc5725edfae`
+- Release gates: check, tests (364), Runtime verification, Earth verification, and Web build passed
+- Online acceptance: Reader/search, Copilot answer with citation, contact SMTP delivery, Galaxy, Monitor refresh and once-per-UTC-day guard, and structured Cloud Logging events passed
+- Rollback target: revision `regulatory-knowledge-platform-00012-l29`
+
 ## Troubleshooting and rollback
 
 If Artifact Registry returns `403`, repeat the Docker authentication command from step 3 and confirm that the active account can write to the repository.
