@@ -6,7 +6,7 @@ The release remains one Node application and one Cloud Run service:
 
 - Express serves the API and the built React application;
 - the verified Platform Runtime SQLite artifact is copied into the image and opened read-only;
-- the verified Earth SQLite remains a separate artifact but is copied into the same image;
+- the verified Galaxy graph and Earth SQLite remain separate artifacts but are copied into the same image;
 - Monitor code and the current local `data/monitor` snapshot are copied into the same image;
 - Private AI is called only by the server. The browser never receives its API key.
 
@@ -54,6 +54,15 @@ The current application also accepts:
 - `PRIVATE_AI_TIMEOUT_SECONDS`, defaulting to `60`;
 - `PRIVATE_AI_THINKING_MODE`, either `enabled`, `disabled`, or unset.
 
+The optional private contact form uses server-only values:
+
+- `CONTACT_TO_EMAIL`;
+- `CONTACT_SMTP_USER`;
+- `CONTACT_SMTP_PASSWORD`;
+- optional `CONTACT_SMTP_HOST`, `CONTACT_SMTP_PORT`, and `CONTACT_SMTP_FROM`.
+
+If these values are incomplete, the website remains available and the Help menu reports that contact delivery is not configured. The recipient address is never sent to the browser. See [Contact and lightweight product analytics](contact-and-analytics.md).
+
 Do not deploy placeholder values. The model value must be the provider's exact identifier, without literal quote characters. If the provider exposes an OpenAI-compatible model listing, it may be inspected with:
 
 ```bash
@@ -84,6 +93,25 @@ npm run build
 ```
 
 `npm test` runs the Runtime build through its `pretest` hook, so it is not repeated as a separate command. Do not continue if any command fails. Keep the Runtime `buildId`, `profileId`, `profileVersion`, and `profileHash` printed by these commands with the release record.
+
+Confirm the generated Galaxy graph that will be copied into the image:
+
+```bash
+node --import tsx -e '
+import { readFileSync } from "node:fs";
+import { metadataGraphSchema } from "./src/earth/contract/metadata-graph.ts";
+const graph = metadataGraphSchema.parse(JSON.parse(readFileSync("data/artifacts/earth/graph.json", "utf8")));
+console.log({
+  snapshot: graph.source.snapshotHash,
+  included: graph.report.scopeWorks,
+  related: graph.report.boundaryWorks,
+  institutions: graph.report.institutions,
+  relations: graph.edges.length,
+});
+'
+```
+
+`graph.json` is a generated, Git-ignored release input. It must exist on the machine that builds the image.
 
 Confirm the Monitor snapshot that will be copied into the image:
 
@@ -159,7 +187,7 @@ docker buildx build \
 echo "$IMAGE"
 ```
 
-The Docker build compiles the Web application and copies the already verified Platform Runtime SQLite, the separately verified Earth SQLite, and the local `data/monitor` snapshot. It does not fetch official legal sources or run Monitor refresh inside Cloud Run.
+The Docker build compiles the Web application and copies the already verified Platform Runtime SQLite, Galaxy graph, the separately verified Earth SQLite, and the local `data/monitor` snapshot. It does not fetch official legal sources or run Monitor refresh inside Cloud Run.
 
 ## 5. Deploy the image and Private AI configuration
 
@@ -178,7 +206,7 @@ gcloud run deploy "$SERVICE" \
   --remove-secrets REGULATORY_PUBLIC_API_KEYS
 ```
 
-`--env-vars-file .env` is an explicit deployment action: it sends the file's values to the Cloud Run revision even though the file is absent from Git and the image. The current `.env` is expected to contain only the `PRIVATE_AI_*` server configuration described in step 1.
+`--env-vars-file .env` is an explicit deployment action: it sends the file's values to the Cloud Run revision even though the file is absent from Git and the image. The current `.env` may contain the `PRIVATE_AI_*` configuration and optional server-only `CONTACT_*` configuration described in step 1. Variables without a `VITE_` prefix are not compiled into browser assets.
 
 `--remove-secrets REGULATORY_PUBLIC_API_KEYS` removes the stale Secret Manager reference that otherwise gets inherited and blocks creation of the new revision. Consequently, authenticated operations under `/api/v1` remain fail-closed in this demo. Reader, Explorer, Earth, Monitor, Reader Copilot, and Monitor Copilot do not require that Public API key.
 
@@ -200,16 +228,19 @@ gcloud run services describe "$SERVICE" \
   --format='table(status.latestReadyRevisionName,spec.template.spec.containers[0].image,status.url)'
 ```
 
-Verify the server, Copilot configuration, and Monitor snapshot:
+Verify the server, Copilot configuration, Galaxy graph, and Monitor snapshot:
 
 ```bash
 curl -fsS "$SERVICE_URL/api/health" | jq
 curl -fsS "$SERVICE_URL/api/copilot/status" | jq
+curl -fsS "$SERVICE_URL/api/contact/status" | jq
+curl -fsS "$SERVICE_URL/api/earth/graph" \
+  | jq '{snapshot: .source.snapshotHash, included: .report.scopeWorks, related: .report.boundaryWorks, institutions: .report.institutions, relations: (.edges | length)}'
 curl -fsS "$SERVICE_URL/api/monitor/timeline?year=$(date -u +%Y)" \
   | jq '{year, events: (.events | length), sources: (.sources | length), generatedAt}'
 ```
 
-Copilot must report `status: "ready"`. The Monitor counts must match step 2. Open these browser routes as a final smoke test:
+Copilot must report `status: "ready"`. Contact must report `available: true` when delivery is intended. The Galaxy graph and Monitor counts must match step 2. Open these browser routes as a final smoke test:
 
 ```text
 <SERVICE_URL>/
@@ -230,7 +261,22 @@ gcloud logging read \
   --format json
 ```
 
-Do not declare the release complete until the health identity, Copilot status, Monitor counts, browser smoke test, and query log all match the intended release.
+Page views, selected searches, Monitor refreshes, and contact delivery are available with the same command by replacing the final event value with `page_view`, `search_result_opened`, `monitor_refresh`, or `contact_submission`.
+
+Do not declare the release complete until the health identity, Copilot status, Galaxy graph, Monitor counts, browser smoke test, and query log all match the intended release.
+
+The current deployment starts from the Monitor snapshot baked into the image. It does not configure a daily scheduler and therefore does not refresh Monitor automatically. The Monitor page can refresh the current month once per UTC day through its `Refresh today` button. That result is instance-local and is not durable across a new revision or replacement instance, so a reliable automatic daily production refresh still needs an explicit persistence or image-rebuild decision.
+
+### Validated release — 8 October 2026
+
+- Service URL: `https://regulatory-knowledge-platform-hl2vvy6dra-ew.a.run.app`
+- Revision: `regulatory-knowledge-platform-00013-z8r` with 100% traffic
+- Image: `europe-west1-docker.pkg.dev/regulatory-507508/regulatory/regulatory-knowledge-platform:20261008124845-0015b3d`
+- Image digest: `sha256:34e9f0d7ca6d34b0c0ad0c59e6fb7fecb5725817761b9e77eb330c634c6ad639`
+- Runtime: `runtime-5.8.0-c030abcffab23e31`, profile `full-corpus@1.0.0`, profile hash `sha256:f96b420077a2fe92df36f06f049112f98277cd0534a542e7ca913cc5725edfae`
+- Release gates: check, tests (364), Runtime verification, Earth verification, and Web build passed
+- Online acceptance: Reader/search, Copilot answer with citation, contact SMTP delivery, Galaxy, Monitor refresh and once-per-UTC-day guard, and structured Cloud Logging events passed
+- Rollback target: revision `regulatory-knowledge-platform-00012-l29`
 
 ## Troubleshooting and rollback
 

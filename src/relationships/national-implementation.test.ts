@@ -7,10 +7,10 @@ import {
 } from "./national-implementation";
 
 describe("reviewed national implementation mappings", () => {
-  it("publishes the evidence-checked CSSF to EBA implementation edge", () => {
-    const documents = loadDocumentViews();
-    const entities = buildExplicitReferences(documents).entities;
+  const documents = loadDocumentViews();
+  const entities = buildExplicitReferences(documents).entities;
 
+  it("publishes the evidence-checked CSSF to EBA implementation edge", () => {
     expect(buildNationalImplementationMappings(documents, entities)).toEqual([
       expect.objectContaining({
         sourceEntityId:
@@ -23,8 +23,6 @@ describe("reviewed national implementation mappings", () => {
   });
 
   it("fails closed when reviewed implementation evidence drifts", () => {
-    const documents = loadDocumentViews();
-    const entities = buildExplicitReferences(documents).entities;
     const mappings = structuredClone(loadNationalImplementationMappings());
     const first = mappings[0];
     if (!first) throw new Error("Missing national implementation fixture");

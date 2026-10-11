@@ -17,6 +17,12 @@
     "psd": { "label": "PSD", "color": "#cdb69c" },
     "emir": { "label": "EMIR", "color": "#a4bfa0" },
     "brrd": { "label": "BRRD", "color": "#c2a596" },
+    "srmr": { "label": "SRMR", "color": "#b99f96" },
+    "ssm": { "label": "SSM", "color": "#9eacc5" },
+    "dgsd": { "label": "DGSD", "color": "#c5b794" },
+    "securitisation": { "label": "Securitisation", "color": "#91b5ad" },
+    "covered-bonds": { "label": "Covered Bonds", "color": "#9eb4c4" },
+    "csdr": { "label": "CSDR", "color": "#90aaa8" },
     "aml": { "label": "AML", "color": "#d2a3a1" },
     "mica": { "label": "MiCA", "color": "#a5c796" },
     "gdpr": { "label": "GDPR", "color": "#83afc8" },
@@ -62,6 +68,28 @@
       "sectors": ["banking", "funds", "securities"]
     },
     "32014L0059": { "label": "BRRD", "family": "brrd", "sectors": ["banking"] },
+    "32014R0806": { "label": "SRMR", "family": "srmr", "sectors": ["banking"] },
+    "32013R1024": {
+      "label": "SSM Regulation",
+      "family": "ssm",
+      "sectors": ["banking"]
+    },
+    "32014L0049": { "label": "DGSD", "family": "dgsd", "sectors": ["banking"] },
+    "32017R2402": {
+      "label": "Securitisation Regulation",
+      "family": "securitisation",
+      "sectors": ["banking", "funds", "securities"]
+    },
+    "32019L2162": {
+      "label": "Covered Bonds Directive",
+      "family": "covered-bonds",
+      "sectors": ["banking", "securities"]
+    },
+    "32014R0909": {
+      "label": "CSDR",
+      "family": "csdr",
+      "sectors": ["securities"]
+    },
     "32022R2554": {
       "family": "dora",
       "sectors": ["banking", "insurance", "funds", "payments", "crypto"]

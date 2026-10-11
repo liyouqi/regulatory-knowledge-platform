@@ -209,6 +209,10 @@ describe("Document lookup", () => {
       readerPath: "/read/crr/articles/1",
     });
     expect(findLaws("32013R0575").bestMatch?.id).toBe("eu:32013R0575");
+    expect(findLaws("liquidity coverage ratio").bestMatch).toMatchObject({
+      id: "eu:32015R0061",
+      matchReason: "exact-alias",
+    });
   });
 
   it("resolves a compound law and provision query without returning body data", () => {
@@ -409,7 +413,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      59,
+      101,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({
@@ -687,7 +691,7 @@ describe("Document lookup", () => {
         term: "digital operational resilience",
         normalizedTerm: "digital operational resilience",
         definitionText: expect.stringContaining(
-          "‘digital operational resilience’ means",
+          "digital operational resilience means",
         ),
         sourceUrl: "https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng",
         provisionId: "eu:32022R2554:article:3",

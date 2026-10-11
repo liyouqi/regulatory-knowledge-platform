@@ -15,7 +15,17 @@ describe("corpus build manifest", () => {
     const sources = validateCorpusBuildManifestSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
-    expect(sources).toHaveLength(59);
+    expect(sources).toHaveLength(101);
+    expect(sources).toContainEqual(
+      expect.objectContaining({
+        manifest: expect.objectContaining({
+          adapter: "eur-lex",
+          identifier: "32017R2402",
+          snapshotId:
+            "snapshot:cellar:32017R2402:f22e1b40b70dccb7f538d515ca02fe92d946fcf212e76fcd92f296ce506ec99f",
+        }),
+      }),
+    );
     expect(sources).toContainEqual(
       expect.objectContaining({
         manifest: expect.objectContaining({

@@ -1,6 +1,6 @@
 # Earth family coverage
 
-Generated from installed graph snapshot f73458596f92cdad1312014e54f34fb8630428526975de7ac32419f3475d2640.
+Generated from installed graph snapshot bf5b13f9b400dfd17d6b25e62ea1e2c20e69b07661462a238963d2bdaedb47a4.
 
 Families follow configured roots and exact official legal-basis/completion chains, never title similarity or citations. Counts include historical files and may overlap across families. RTS/ITS counts require those terms in official titles. These are observed counts, not a certification of completeness.
 
@@ -15,6 +15,12 @@ Families follow configured roots and exact official legal-basis/completion chain
 | PSD | 10 | 10 | 0 | 8 | 1 |
 | EMIR | 121 | 120 | 1 | 30 | 8 |
 | BRRD | 34 | 7 | 27 | 11 | 12 |
+| SRMR | 32 | 5 | 27 | 0 | 0 |
+| SSM | 122 | 71 | 51 | 0 | 0 |
+| DGSD | 1 | 1 | 0 | 0 | 0 |
+| Securitisation | 19 | 19 | 0 | 12 | 4 |
+| Covered Bonds | 1 | 1 | 0 | 0 | 0 |
+| CSDR | 16 | 8 | 8 | 9 | 2 |
 | AML | 24 | 2 | 22 | 2 | 0 |
 | MiCA | 39 | 1 | 38 | 25 | 8 |
 | GDPR | 15 | 2 | 13 | 0 | 0 |
@@ -28,17 +34,36 @@ Included in family focus and filters; full-text ingestion is not implied.
 
 | CELEX / English source | Display label | Editorial family | Editorial sectors |
 | --- | --- | --- | --- |
+| [32013D0797](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013D0797) | 32013D0797 | SSM | banking |
+| [32013Q1130(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013Q1130(01)) | 32013Q1130(01) | SSM | banking |
 | [32013R1003](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R1003) | 32013R1003 | EMIR | banking, funds, securities |
+| [32014D0001(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0001(01)) | 32014D0001(01) | SSM | banking |
+| [32014D0004(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0004(01)) | 32014D0004(01) | SSM | banking |
+| [32014D0016(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0016(01)) | 32014D0016(01) | SSM | banking |
+| [32014D0039(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0039(01)) | 32014D0039(01) | SSM | banking |
+| [32014D0077](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0077) | 32014D0077 | SSM | banking |
+| [32014D0943](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014D0943) | 32014D0943 | SRMR | banking |
+| [32014Q0621(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014Q0621(01)) | 32014Q0621(01) | SSM | banking |
 | [32014R0241](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014R0241) | 32014R0241 | CRR / CRD | banking |
+| [32014R1310](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014R1310) | 32014R1310 | SRMR | banking |
 | [32014Y0403(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014Y0403(01)) | 32014Y0403(01) | CRR / CRD | banking |
 | [32014Y0902(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014Y0902(01)) | 32014Y0902(01) | CRR / CRD | banking |
+| [32015D0016(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015D0016(01)) | 32015D0016(01) | SSM | banking |
+| [32015O0012](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015O0012) | 32015O0012 | SSM | banking |
+| [32015Q0313(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015Q0313(01)) | 32015Q0313(01) | SSM | banking |
+| [32015Q1224(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015Q1224(01)) | 32015Q1224(01) | SRMR | banking |
 | [32015R0063](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0063) | 32015R0063 | BRRD | banking |
+| [32015R0081](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0081) | 32015R0081 | SRMR | banking |
 | [32015R0233](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0233) | 32015R0233 | CRR / CRD | banking |
 | [32015R0462](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0462) | 32015R0462 | Solvency II | insurance |
 | [32015R0488](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0488) | 32015R0488 | CRR / CRD | banking |
 | [32015R0850](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0850) | 32015R0850 | CRR / CRD | banking |
 | [32015R0923](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R0923) | 32015R0923 | CRR / CRD | banking |
+| [32016D0041(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016D0041(01)) | 32016D0041(01) | SSM | banking |
+| [32016D0042(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016D0042(01)) | 32016D0042(01) | SSM | banking |
 | [32016D1021](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016D1021) | 32016D1021 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
+| [32016O0001](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016O0001) | 32016O0001 | SSM | banking |
+| [32016R0451](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0451) | 32016R0451 | SRMR | banking |
 | [32016R0778](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0778) | 32016R0778 | BRRD | banking |
 | [32016R0911](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0911) | 32016R0911 | BRRD | banking |
 | [32016R0962](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0962) | 32016R0962 | BRRD | banking |
@@ -51,10 +76,25 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32016R1675](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R1675) | 32016R1675 | AML | banking, crypto, funds, insurance, payments |
 | [32016R1712](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R1712) | 32016R1712 | BRRD | banking |
 | [32016Y0312(04)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016Y0312(04)) | 32016Y0312(04) | CRR / CRD | banking |
+| [32017D0016](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D0016) | 32017D0016 | SSM | banking |
+| [32017D0017](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D0017) | 32017D0017 | SSM | banking |
 | [32017D0846](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D0846) | 32017D0846 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
 | [32017D1400](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D1400) | 32017D1400 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
+| [32017D2437](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D2437) | 32017D2437 | SRMR | banking |
+| [32017R0390](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0390) | 32017R0390 | CSDR | securities |
+| [32017R0391](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0391) | 32017R0391 | CSDR | securities |
+| [32017R0392](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0392) | 32017R0392 | CSDR | securities |
+| [32017R0393](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0393) | 32017R0393 | CSDR | securities |
+| [32017R0394](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0394) | 32017R0394 | CSDR | securities |
 | [32017R1443](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R1443) | 32017R1443 | CRR / CRD | banking |
-| [32018D0011(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0011(01)) | 32018D0011(01) | CRR / CRD | banking |
+| [32017R2361](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R2361) | 32017R2361 | SRMR | banking |
+| [32018B0664](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018B0664) | 32018B0664 | SRMR | banking |
+| [32018B0665](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018B0665) | 32018B0665 | SRMR | banking |
+| [32018D0006(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0006(01)) | 32018D0006(01) | SSM | banking |
+| [32018D0011(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0011(01)) | 32018D0011(01) | CRR / CRD, SSM | banking |
+| [32018D0463](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0463) | 32018D0463 | SRMR | banking |
+| [32018D1958](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D1958) | 32018D1958 | SSM | banking |
+| [32018D2030](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D2030) | 32018D2030 | CSDR | securities |
 | [32018R0105](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R0105) | 32018R0105 | AML | banking, crypto, funds, insurance, payments |
 | [32018R0212](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R0212) | 32018R0212 | AML | banking, crypto, funds, insurance, payments |
 | [32018R0308](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R0308) | 32018R0308 | BRRD | banking |
@@ -63,40 +103,77 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32018R1108](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1108) | 32018R1108 | AML | banking, crypto, funds, insurance, payments |
 | [32018R1467](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1467) | 32018R1467 | AML | banking, crypto, funds, insurance, payments |
 | [32018R1624](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1624) | 32018R1624 | BRRD | banking |
+| [32019B0571](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019B0571) | 32019B0571 | SRMR | banking |
+| [32019D0004](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0004) | 32019D0004 | SSM | banking |
+| [32019D0005](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0005) | 32019D0005 | SSM | banking |
+| [32019D0023](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0023) | 32019D0023 | SSM | banking |
+| [32019D0026](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0026) | 32019D0026 | SSM | banking |
+| [32019D0027](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0027) | 32019D0027 | SSM | banking |
 | [32019D0419](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0419) | 32019D0419 | GDPR | banking, crypto, funds, insurance, payments |
+| [32019D0545](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0545) | 32019D0545 | CSDR | securities |
+| [32019D0568](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D0568) | 32019D0568 | SRMR | banking |
+| [32019D1671](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019D1671) | 32019D1671 | SSM | banking |
+| [32019Q1122(02)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019Q1122(02)) | 32019Q1122(02) | SRMR | banking |
+| [32019Q1122(03)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019Q1122(03)) | 32019Q1122(03) | SRMR | banking |
+| [32019Q1122(04)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019Q1122(04)) | 32019Q1122(04) | SRMR | banking |
 | [32019R0348](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0348) | 32019R0348 | BRRD | banking |
 | [32019R0758](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0758) | 32019R0758 | AML | banking, crypto, funds, insurance, payments |
-| [32020D1333](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1333) | 32020D1333 | CRR / CRD | banking |
+| [32020B0586](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020B0586) | 32020B0586 | SRMR | banking |
+| [32020D0216](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D0216) | 32020D0216 | SRMR | banking |
+| [32020D1331](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1331) | 32020D1331 | SSM | banking |
+| [32020D1332](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1332) | 32020D1332 | SSM | banking |
+| [32020D1333](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1333) | 32020D1333 | CRR / CRD, SSM | banking |
+| [32020D1334](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1334) | 32020D1334 | SSM | banking |
+| [32020D1335](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1335) | 32020D1335 | SSM | banking |
+| [32020D1766](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1766) | 32020D1766 | CSDR | securities |
+| [32020O0497](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020O0497) | 32020O0497 | SSM | banking |
+| [32020Q0727(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020Q0727(01)) | 32020Q0727(01) | SSM | banking |
 | [32020R0855](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R0855) | 32020R0855 | AML | banking, crypto, funds, insurance, payments |
 | [32020R2176](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R2176) | 32020R2176 | CRR / CRD | banking |
+| [32021B0789](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021B0789) | 32021B0789 | SRMR | banking |
+| [32021D0325](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0325) | 32021D0325 | SSM | banking |
 | [32021D0914](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0914) | 32021D0914 | GDPR | banking, crypto, funds, insurance, payments |
 | [32021D0915](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D0915) | 32021D0915 | GDPR | banking, crypto, funds, insurance, payments |
-| [32021D1439](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1439) | 32021D1439 | CRR / CRD | banking |
-| [32021D1442](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1442) | 32021D1442 | CRR / CRD | banking |
-| [32021D1443](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1443) | 32021D1443 | CRR / CRD | banking |
+| [32021D1437](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1437) | 32021D1437 | SSM | banking |
+| [32021D1438](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1438) | 32021D1438 | SSM | banking |
+| [32021D1439](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1439) | 32021D1439 | CRR / CRD, SSM | banking |
+| [32021D1440](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1440) | 32021D1440 | SSM | banking |
+| [32021D1441](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1441) | 32021D1441 | SSM | banking |
+| [32021D1442](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1442) | 32021D1442 | CRR / CRD, SSM | banking |
+| [32021D1443](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1443) | 32021D1443 | CRR / CRD, SSM | banking |
 | [32021D1772](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1772) | 32021D1772 | GDPR | banking, crypto, funds, insurance, payments |
+| [32021O2256](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021O2256) | 32021O2256 | SSM | banking |
 | [32021R0037](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0037) | 32021R0037 | AML | banking, crypto, funds, insurance, payments |
 | [32021R0369](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0369) | 32021R0369 | AML | banking, crypto, funds, insurance, payments |
+| [32021R0517](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0517) | 32021R0517 | SRMR | banking |
 | [32021R0622](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0622) | 32021R0622 | BRRD | banking |
 | [32021R1118](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1118) | 32021R1118 | BRRD | banking |
 | [32021R1340](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1340) | 32021R1340 | BRRD | banking |
 | [32021R1527](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1527) | 32021R1527 | BRRD | banking |
 | [32021R1751](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1751) | 32021R1751 | BRRD | banking |
+| [32022B0811](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022B0811) | 32022B0811 | SRMR | banking |
 | [32022D0254](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022D0254) | 32022D0254 | GDPR | banking, crypto, funds, insurance, payments |
 | [32022D0480](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022D0480) | 32022D0480 | GDPR | banking, crypto, funds, insurance, payments |
+| [32022D2331](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022D2331) | 32022D2331 | SRMR | banking |
 | [32022R0229](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0229) | 32022R0229 | AML | banking, crypto, funds, insurance, payments |
 | [32022R0365](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0365) | 32022R0365 | BRRD | banking |
+| [32023B0976](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023B0976) | 32023B0976 | SRMR | banking |
 | [32023D00611](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D00611) | 32023D00611 | AML | banking, crypto, funds, insurance, payments |
 | [32023D0367](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0367) | 32023D0367 | GDPR | banking, crypto, funds, insurance, payments |
-| [32023D0672](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0672) | 32023D0672 | CRR / CRD | banking |
-| [32023D0673](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0673) | 32023D0673 | CRR / CRD | banking |
+| [32023D0672](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0672) | 32023D0672 | CRR / CRD, SSM | banking |
+| [32023D0673](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0673) | 32023D0673 | CRR / CRD, SSM | banking |
+| [32023D0864](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0864) | 32023D0864 | SSM | banking |
 | [32023D0975](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0975) | 32023D0975 | GDPR | banking, crypto, funds, insurance, payments |
 | [32023D1795](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D1795) | 32023D1795 | GDPR | banking, crypto, funds, insurance, payments |
+| [32023D2410](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D2410) | 32023D2410 | SSM | banking |
 | [32023R0410](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R0410) | 32023R0410 | AML | banking, crypto, funds, insurance, payments |
 | [32023R0662](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R0662) | 32023R0662 | BRRD | banking |
 | [32023R0827](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R0827) | 32023R0827 | CRR / CRD | banking |
 | [32023R1219](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1219) | 32023R1219 | AML | banking, crypto, funds, insurance, payments |
 | [32023R2070](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2070) | 32023R2070 | AML | banking, crypto, funds, insurance, payments |
+| [32024B1337](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024B1337) | 32024B1337 | SRMR | banking |
+| [32024D03391](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024D03391) | 32024D03391 | SRMR | banking |
+| [32024D0461](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024D0461) | 32024D0461 | SSM | banking |
 | [32024H1101](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024H1101) | 32024H1101 | NIS2 | banking, crypto, funds, insurance, payments |
 | [32024R0163](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0163) | 32024R0163 | AML | banking, crypto, funds, insurance, payments |
 | [32024R0895](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0895) | 32024R0895 | BRRD | banking |
@@ -116,6 +193,9 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32024R2902](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2902) | 32024R2902 | MiCA | banking, crypto |
 | [32024R2956](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2956) | 32024R2956 | DORA | banking, crypto, funds, insurance, payments |
 | [32024R2984](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2984) | 32024R2984 | MiCA | banking, crypto |
+| [32025B0829](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025B0829) | 32025B0829 | SRMR | banking |
+| [32025D0451](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025D0451) | 32025D0451 | SSM | banking |
+| [32025D0607](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025D0607) | 32025D0607 | SRMR | banking |
 | [32025D1226](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025D1226) | 32025D1226 | GDPR | banking, crypto, funds, insurance, payments |
 | [32025D1382](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025D1382) | 32025D1382 | GDPR | banking, crypto, funds, insurance, payments |
 | [32025D2574](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025D2574) | 32025D2574 | GDPR | banking, crypto, funds, insurance, payments |
@@ -158,10 +238,12 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32025R1393](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R1393) | 32025R1393 | AML | banking, crypto, funds, insurance, payments |
 | [32025R2303](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2303) | 32025R2303 | BRRD | banking |
 | [32025Y06342](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025Y06342) | 32025Y06342 | MiCA | banking, crypto |
+| [32026B1048](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026B1048) | 32026B1048 | SRMR | banking |
 | [32026D0179](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D0179) | 32026D0179 | GDPR | banking, crypto, funds, insurance, payments |
-| [32026D2036](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2036) | 32026D2036 | CRR / CRD | banking |
-| [32026D2037](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2037) | 32026D2037 | CRR / CRD | banking |
-| [32026D2040](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2040) | 32026D2040 | CRR / CRD | banking |
+| [32026D0416](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D0416) | 32026D0416 | SSM | banking |
+| [32026D2036](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2036) | 32026D2036 | CRR / CRD, SSM | banking |
+| [32026D2037](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2037) | 32026D2037 | CRR / CRD, SSM | banking |
+| [32026D2040](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2040) | 32026D2040 | CRR / CRD, SSM | banking |
 | [32026R0046](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R0046) | 32026R0046 | AML | banking, crypto, funds, insurance, payments |
 | [32026R0083](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R0083) | 32026R0083 | AML | banking, crypto, funds, insurance, payments |
 | [32026R0440](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026R0440) | 32026R0440 | BRRD | banking |
@@ -170,7 +252,7 @@ Included in family focus and filters; full-text ingestion is not implied.
 
 ## Unclassified technical standards
 
-2149 Work files have no configured family, including 200 title-labelled technical standards. Unclassified is not necessarily an error: historical or unrelated files may lie outside the configured families. Add an evidenced root/override to the single display-tags configuration when needed; never manufacture links.
+2044 Work files have no configured family, including 175 title-labelled technical standards. Unclassified is not necessarily an error: historical or unrelated files may lie outside the configured families. Add an evidenced root/override to the single display-tags configuration when needed; never manufacture links.
 
 | CELEX / English source | Display label | Editorial family | Editorial sectors |
 | --- | --- | --- | --- |
@@ -213,11 +295,8 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32016R1437](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R1437) | 32016R1437 | Unclassified | securities |
 | [32016R2251R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R2251R(01)) | 32016R2251R(01) | Unclassified | Unclassified |
 | [32017R0105R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0105R(01)) | 32017R0105R(01) | Unclassified | Unclassified |
-| [32017R0390](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0390) | 32017R0390 | Unclassified | Unclassified |
-| [32017R0391](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0391) | 32017R0391 | Unclassified | Unclassified |
-| [32017R0392](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0392) | 32017R0392 | Unclassified | Unclassified |
-| [32017R0393](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0393) | 32017R0393 | Unclassified | Unclassified |
-| [32017R0394](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0394) | 32017R0394 | Unclassified | Unclassified |
+| [32017R0390R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0390R(01)) | 32017R0390R(01) | Unclassified | Unclassified |
+| [32017R0391R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0391R(01)) | 32017R0391R(01) | Unclassified | Unclassified |
 | [32017R0653](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0653) | 32017R0653 | Unclassified | Unclassified |
 | [32017R1018R(02)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R1018R(02)) | 32017R1018R(02) | Unclassified | Unclassified |
 | [32017R1158](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R1158) | 32017R1158 | Unclassified | securities |
@@ -233,7 +312,6 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32018R0708](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R0708) | 32018R0708 | Unclassified | banking, securities |
 | [32018R1105](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1105) | 32018R1105 | Unclassified | Unclassified |
 | [32018R1106](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1106) | 32018R1106 | Unclassified | Unclassified |
-| [32018R1229](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1229) | 32018R1229 | Unclassified | securities |
 | [32018R1637](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1637) | 32018R1637 | Unclassified | Unclassified |
 | [32018R1638](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1638) | 32018R1638 | Unclassified | Unclassified |
 | [32018R1639](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1639) | 32018R1639 | Unclassified | Unclassified |
@@ -252,23 +330,11 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32019R0365](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0365) | 32019R0365 | Unclassified | banking, securities |
 | [32019R0815](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0815) | 32019R0815 | Unclassified | securities |
 | [32019R0815R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0815R(01)) | 32019R0815R(01) | Unclassified | Unclassified |
-| [32019R0885](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0885) | 32019R0885 | Unclassified | banking |
 | [32019R0979](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R0979) | 32019R0979 | Unclassified | securities |
-| [32019R1689](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R1689) | 32019R1689 | Unclassified | securities |
-| [32019R1851](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R1851) | 32019R1851 | Unclassified | banking |
 | [32019R1935](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R1935) | 32019R1935 | Unclassified | insurance |
-| [32020R1212](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1212) | 32020R1212 | Unclassified | securities |
-| [32020R1224](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1224) | 32020R1224 | Unclassified | banking |
-| [32020R1225](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1225) | 32020R1225 | Unclassified | banking |
-| [32020R1226](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1226) | 32020R1226 | Unclassified | banking |
-| [32020R1227](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1227) | 32020R1227 | Unclassified | banking |
-| [32020R1228](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1228) | 32020R1228 | Unclassified | banking |
-| [32020R1229](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1229) | 32020R1229 | Unclassified | banking |
-| [32020R1230](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1230) | 32020R1230 | Unclassified | banking |
 | [32020R1272](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1272) | 32020R1272 | Unclassified | securities |
 | [32020R1406](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1406) | 32020R1406 | Unclassified | securities |
 | [32020R1989](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020R1989) | 32020R1989 | Unclassified | securities |
-| [32021R0070](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0070) | 32021R0070 | Unclassified | securities |
 | [32021R0451R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0451R(01)) | 32021R0451R(01) | Unclassified | Unclassified |
 | [32021R0453R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0453R(01)) | 32021R0453R(01) | Unclassified | Unclassified |
 | [32021R0473](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0473) | 32021R0473 | Unclassified | Unclassified |
@@ -280,7 +346,6 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32021R1350](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1350) | 32021R1350 | Unclassified | Unclassified |
 | [32021R1351](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1351) | 32021R1351 | Unclassified | Unclassified |
 | [32021R1352](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1352) | 32021R1352 | Unclassified | Unclassified |
-| [32021R1415](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1415) | 32021R1415 | Unclassified | banking |
 | [32021R1783](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R1783) | 32021R1783 | Unclassified | securities |
 | [32021R2153](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R2153) | 32021R2153 | Unclassified | banking |
 | [32021R2154](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R2154) | 32021R2154 | Unclassified | banking |
@@ -299,13 +364,10 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32022R1210](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1210) | 32022R1210 | Unclassified | securities |
 | [32022R1288](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1288) | 32022R1288 | Unclassified | Unclassified |
 | [32022R1299R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1299R(01)) | 32022R1299R(01) | Unclassified | Unclassified |
-| [32022R1301](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1301) | 32022R1301 | Unclassified | banking |
 | [32022R1455](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1455) | 32022R1455 | Unclassified | banking |
 | [32022R1622R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1622R(01)) | 32022R1622R(01) | Unclassified | Unclassified |
 | [32022R1860R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1860R(01)) | 32022R1860R(01) | Unclassified | Unclassified |
 | [32022R1860R(03)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1860R(03)) | 32022R1860R(03) | Unclassified | Unclassified |
-| [32022R1929](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1929) | 32022R1929 | Unclassified | banking |
-| [32022R1930](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1930) | 32022R1930 | Unclassified | securities |
 | [32022R1959](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R1959) | 32022R1959 | Unclassified | securities |
 | [32022R2111](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2111) | 32022R2111 | Unclassified | Unclassified |
 | [32022R2112](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2112) | 32022R2112 | Unclassified | Unclassified |
@@ -336,21 +398,16 @@ Included in family focus and filters; full-text ingestion is not implied.
 | [32023R1193](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1193) | 32023R1193 | Unclassified | banking, securities |
 | [32023R1615](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1615) | 32023R1615 | Unclassified | banking, securities |
 | [32023R1616](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1616) | 32023R1616 | Unclassified | banking, securities |
-| [32023R1626](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1626) | 32023R1626 | Unclassified | securities |
 | [32023R1651](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1651) | 32023R1651 | Unclassified | banking |
 | [32023R1668](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R1668) | 32023R1668 | Unclassified | banking |
 | [32023R2083](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2083) | 32023R2083 | Unclassified | banking |
-| [32023R2175](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2175) | 32023R2175 | Unclassified | banking |
 | [32023R2526](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023R2526) | 32023R2526 | Unclassified | banking |
 | [32024R0358](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0358) | 32024R0358 | Unclassified | Unclassified |
 | [32024R0450](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0450) | 32024R0450 | Unclassified | banking, securities |
-| [32024R0584](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0584) | 32024R0584 | Unclassified | banking |
 | [32024R0595](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0595) | 32024R0595 | Unclassified | banking |
 | [32024R0857R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0857R(01)) | 32024R0857R(01) | Unclassified | Unclassified |
 | [32024R0896](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0896) | 32024R0896 | Unclassified | insurance |
-| [32024R0920](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R0920) | 32024R0920 | Unclassified | banking |
 | [32024R1618R(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1618R(01)) | 32024R1618R(01) | Unclassified | Unclassified |
-| [32024R1700](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1700) | 32024R1700 | Unclassified | banking |
 | [32024R1771](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1771) | 32024R1771 | Unclassified | banking |
 | [32024R1774R(02)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1774R(02)) | 32024R1774R(02) | Unclassified | Unclassified |
 | [32024R2759](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2759) | 32024R2759 | Unclassified | Unclassified |
@@ -377,18 +434,40 @@ Included in family focus and filters; full-text ingestion is not implied.
 
 ## Source limits
 
-342 raw triples use unpublished predicates; 754 supported triples have an unavailable English titled endpoint (absent English expression or title, combined). Raw evidence and predicate-specific counts remain in the snapshot and local coverage JSON. National sources and standalone agency publications are outside this pipeline's current source scope.
+345 raw triples use unpublished predicates; 779 supported triples have an unavailable English titled endpoint (absent English expression or title, combined). Raw evidence and predicate-specific counts remain in the snapshot and local coverage JSON. National sources and standalone agency publications are outside this pipeline's current source scope.
 
 ## Refresh status and ambiguities
 
-Closure status: complete; final frontier empty: true; 1268 Works scanned. Acquisition interval: 2026-09-27T15:00:39.045Z to 2026-09-27T15:08:52.212Z. 754 unique Works could not be published with an English title (absent English expression or title, combined); 0 are family intermediaries/members. They remain in raw traversal evidence. This is a live acquisition interval, not a transactional legal snapshot.
+Closure status: complete; final frontier empty: true; 1348 Works scanned. Acquisition interval: 2026-10-07T13:15:52.195Z to 2026-10-07T13:30:01.689Z. 779 unique Works could not be published with an English title (absent English expression or title, combined); 0 are family intermediaries/members. They remain in raw traversal evidence. This is a live acquisition interval, not a transactional legal snapshot.
 
-531 unclassified included files are distinguished from 1618 unclassified context files. 5 files inherit multiple families; these assignments are retained. Explicit/inherited counts and exception IDs are recorded in local family-coverage JSON.
+442 unclassified included files are distinguished from 1602 unclassified context files. 27 files inherit multiple families; these assignments are retained. Explicit/inherited counts and exception IDs are recorded in local family-coverage JSON.
 
 | CELEX / English source | Display label | Editorial family | Editorial sectors |
 | --- | --- | --- | --- |
+| [32015D0004](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015D0004) | 32015D0004 | CRR / CRD, SSM | banking |
 | [32016D1021](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016D1021) | 32016D1021 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
+| [32016O0037](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016O0037) | 32016O0037 | CRR / CRD, SSM | banking |
+| [32016O0038](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016O0038) | 32016O0038 | CRR / CRD, SSM | banking |
+| [32016R0445](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0445) | 32016R0445 | CRR / CRD, SSM | banking, securities |
 | [32017D0846](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D0846) | 32017D0846 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
 | [32017D1400](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017D1400) | 32017D1400 | AIFMD, AML, CRR / CRD, Solvency II | banking, crypto, funds, insurance, payments, securities |
+| [32018D0010(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0010(01)) | 32018D0010(01) | CRR / CRD, SSM | banking |
+| [32018D0011(01)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018D0011(01)) | 32018D0011(01) | CRR / CRD, SSM | banking |
+| [32018R1845](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32018R1845) | 32018R1845 | CRR / CRD, SSM | banking |
+| [32020D1306](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1306) | 32020D1306 | CRR / CRD, SSM | banking |
+| [32020D1333](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32020D1333) | 32020D1333 | CRR / CRD, SSM | banking |
+| [32021D1074](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1074) | 32021D1074 | CRR / CRD, SSM | banking |
+| [32021D1439](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1439) | 32021D1439 | CRR / CRD, SSM | banking |
+| [32021D1442](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1442) | 32021D1442 | CRR / CRD, SSM | banking |
+| [32021D1443](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021D1443) | 32021D1443 | CRR / CRD, SSM | banking |
 | [32021R0763](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32021R0763) | 32021R0763 | BRRD, CRR / CRD | banking |
+| [32022R0504](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R0504) | 32022R0504 | CRR / CRD, SSM | banking |
+| [32023D0672](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0672) | 32023D0672 | CRR / CRD, SSM | banking |
+| [32023D0673](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32023D0673) | 32023D0673 | CRR / CRD, SSM | banking |
 | [32024R1618](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1618) | 32024R1618 | BRRD, CRR / CRD | banking |
+| [32026D1942](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D1942) | 32026D1942 | GDPR, SSM | banking, crypto, funds, insurance, payments |
+| [32026D2036](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2036) | 32026D2036 | CRR / CRD, SSM | banking |
+| [32026D2037](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2037) | 32026D2037 | CRR / CRD, SSM | banking |
+| [32026D2038](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2038) | 32026D2038 | BRRD, SSM | banking |
+| [32026D2039](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2039) | 32026D2039 | BRRD, SSM | banking |
+| [32026D2040](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32026D2040) | 32026D2040 | CRR / CRD, SSM | banking |

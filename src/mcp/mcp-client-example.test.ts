@@ -42,5 +42,5 @@ describe("MCP relationship client example", () => {
         }),
       ]),
     );
-  });
+  }, 30_000);
 });

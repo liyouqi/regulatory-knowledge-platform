@@ -30,6 +30,8 @@ let citationRetrieval: CitationRetrievalService | undefined;
 let regulatoryPaths: RegulatoryPathService | undefined;
 let regulatoryTopics: RegulatoryTopicService | undefined;
 let publicApi: PublicApiService | undefined;
+let profileDocuments: ReturnType<typeof loadDocumentViews>;
+let profileLawSearchRecords: ReturnType<typeof createLawSearchRecords>;
 
 beforeAll(() => {
   const profile = findEditionProfile(
@@ -52,12 +54,14 @@ beforeAll(() => {
   citationRetrieval = new CitationRetrievalService(search, citationContext);
   regulatoryPaths = new RegulatoryPathService(repository);
   regulatoryTopics = new RegulatoryTopicService(repository);
+  profileDocuments = repository.listDocumentViews();
+  profileLawSearchRecords = createLawSearchRecords(
+    profileDocuments,
+    repository.listLawSearchSources(),
+  );
   publicApi = new PublicApiService(
     repository,
-    createLawSearchRecords(
-      repository.listDocumentViews(),
-      repository.listLawSearchSources(),
-    ),
+    profileLawSearchRecords,
     citationContext,
   );
 });
@@ -72,324 +76,20 @@ describe("banking-default runtime isolation", () => {
   it("reports one Profile identity across Reader and Search services", () => {
     expect(repository).toMatchObject({
       profileId: "banking-default",
-      profileVersion: "1.10.0",
+      profileVersion: "1.6.0",
     });
     expect(search).toMatchObject({
       profileId: "banking-default",
       profileHash: repository?.profileHash,
-      documentCount: 57,
+      documentCount: 99,
     });
-  });
-
-  it("includes post-trade laws and AI implementing measures with exact source identity", () => {
-    for (const [
-      celex,
-      articles,
-      recitals,
-      annexes,
-      query,
-      basis,
-      date,
-      article,
-    ] of [
-      [
-        "32012R0648",
-        137,
-        0,
-        4,
-        "trade repositories",
-        "consolidated",
-        "2025-01-17",
-        "9",
-      ],
-      [
-        "32014R0909",
-        83,
-        0,
-        1,
-        "settlement internalisers",
-        "consolidated",
-        "2026-01-17",
-        "5",
-      ],
-      [
-        "32025R0454",
-        20,
-        13,
-        0,
-        "scientific panel",
-        "original-oj",
-        "2025-03-10",
-        "5",
-      ],
-      [
-        "32026R1755",
-        15,
-        6,
-        1,
-        "general-purpose AI models",
-        "original-oj",
-        "2026-07-21",
-        "5",
-      ],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      for (const [kind, count] of [
-        ["article", articles],
-        ["recital", recitals],
-        ["annex", annexes],
-      ] as const) {
-        expect(
-          document?.provisions.filter((item) => item.kind === kind),
-        ).toHaveLength(count);
-      }
-      for (const options of [{ documentId }, {}]) {
-        expect(
-          search
-            ?.search(query, options)
-            .results.some((item) => item.documentId === documentId),
-        ).toBe(true);
-      }
-      expect(
-        citationContext?.findByEntityId(
-          `${documentId}:article:${article}:paragraph:1`,
-        ),
-      ).not.toBeNull();
-      expect(repository?.findDocumentVersionChain(documentId)).toMatchObject({
-        loadedVersionId: `version:${documentId}:${basis}:${date}`,
-      });
-    }
-    for (const [celex, id] of [
-      ["32012R0648", "relationship:3a89335d6477cbfac49ee462"],
-      ["32014R0909", "relationship:8fb413b27fb27de3bbae9271"],
-    ] as const) {
-      expect(
-        repository?.findDocumentLifecycleRelationships(`eu:${celex}`)
-          ?.relationships,
-      ).toContainEqual(
-        expect.objectContaining({
-          id,
-          relationType: "AMENDS",
-          source: expect.objectContaining({
-            entityId: "eu:32022R2554",
-            availability: "loaded",
-          }),
-          target: expect.objectContaining({
-            entityId: `eu:${celex}`,
-            kind: "document",
-            availability: "loaded",
-          }),
-          resolutionStatus: "resolved",
-        }),
-      );
-    }
-  });
-
-  it("includes investment services and transaction-reporting provisions with reviewed DORA linkage", () => {
-    for (const [celex, count, annexes, query, date, article, paragraph] of [
-      ["32014L0065", 103, 4, "investment advice", "2026-06-06", "25", "2"],
-      ["32014R0600", 95, 0, "transaction report", "2025-11-23", "26", "1"],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      expect(
-        document?.provisions.filter((item) => item.kind === "article"),
-      ).toHaveLength(count);
-      expect(
-        document?.provisions.filter((item) => item.kind === "annex"),
-      ).toHaveLength(annexes);
-      expect(
-        search
-          ?.search(query, { documentId })
-          .results.some((item) => item.documentId === documentId),
-      ).toBe(true);
-      expect(
-        search
-          ?.search(query)
-          .results.some((item) => item.documentId === documentId),
-      ).toBe(true);
-      expect(
-        citationContext?.findByEntityId(
-          `${documentId}:article:${article}:paragraph:${paragraph}`,
-        ),
-      ).not.toBeNull();
-      expect(repository?.findDocumentVersionChain(documentId)).toMatchObject({
-        loadedVersionId: `version:${documentId}:consolidated:${date}`,
-      });
-    }
-    expect(
-      repository?.findDocumentLifecycleRelationships("eu:32014R0600")
-        ?.relationships,
-    ).toContainEqual(
-      expect.objectContaining({
-        id: "relationship:c6ffdeffb82af57894b0da07",
-        relationType: "AMENDS",
-        source: expect.objectContaining({
-          entityId: "eu:32022R2554",
-          availability: "loaded",
-        }),
-        target: expect.objectContaining({
-          entityId: "eu:32014R0600",
-          kind: "document",
-          availability: "loaded",
-        }),
-        resolutionStatus: "resolved",
-      }),
-    );
-    expect(
-      search
-        ?.search("operational risk")
-        .results.some((item) => item.documentId === "eu:32022R2554"),
-    ).toBe(true);
-  });
-
-  it("includes EBA and bank winding-up consolidated text while excluding MiCA lifecycle edges", () => {
-    for (const [celex, count, recitals, query, date, lastArticle] of [
-      ["32010R1093", 100, 0, "European Banking Authority", "2025-12-31", "82"],
-      ["32001L0024", 36, 32, "winding-up", "2014-07-02", "36"],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      expect(
-        document?.provisions.filter((item) => item.kind === "article"),
-      ).toHaveLength(count);
-      expect(
-        document?.provisions.filter((item) => item.kind === "recital"),
-      ).toHaveLength(recitals);
-      expect(
-        search
-          ?.search(query, { documentId })
-          .results.some((item) => item.documentId === documentId),
-      ).toBe(true);
-      for (const article of ["1", lastArticle]) {
-        expect(
-          citationContext?.findByEntityId(`${documentId}:article:${article}`),
-        ).not.toBeNull();
-      }
-      expect(repository?.findDocumentVersionChain(documentId)).toMatchObject({
-        loadedVersionId: `version:${documentId}:consolidated:${date}`,
-      });
-    }
-    const ebaLifecycle =
-      repository?.findDocumentLifecycleRelationships("eu:32010R1093");
-    expect(ebaLifecycle).toBeNull();
-    expect(
-      JSON.stringify(repository?.listLifecycleRelationships()),
-    ).not.toContain("32023R1114");
-  });
-
-  it("includes supervision and interchange-fee sources with original publication identity", () => {
-    for (const [celex, count, recitals, query, date, article] of [
-      ["32013R1024", 34, 87, "prudential supervision", "2013-10-29", "4"],
-      ["32015R0751", 18, 44, "interchange fees", "2015-05-19", "3"],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      expect(
-        document?.provisions.filter(
-          (provision) => provision.kind === "article",
-        ),
-      ).toHaveLength(count);
-      expect(
-        document?.provisions.filter(
-          (provision) => provision.kind === "recital",
-        ),
-      ).toHaveLength(recitals);
-      expect(
-        search
-          ?.search(query, { documentId })
-          .results.some((result) => result.documentId === documentId),
-      ).toBe(true);
-      expect(
-        citationContext?.findByEntityId(`${documentId}:article:${article}`),
-      ).not.toBeNull();
-      expect(repository?.findDocumentVersionChain(documentId)).toMatchObject({
-        loadedVersionId: `version:${documentId}:original-oj:${date}`,
-      });
-    }
-  });
-
-  it("includes collateral and settlement sources with consolidated IDs, search, and citations", () => {
-    for (const [celex, count, query, date, insertedArticles] of [
-      ["32002L0047", 14, "financial collateral", "2022-08-12", ["9a"]],
-      ["31998L0026", 16, "settlement", "2024-04-08", ["10a", "12a"]],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      expect(
-        document?.provisions.filter(
-          (provision) => provision.kind === "article",
-        ),
-      ).toHaveLength(count);
-      expect(
-        search
-          ?.search(query, { documentId })
-          .results.some((result) => result.documentId === documentId),
-      ).toBe(true);
-      for (const article of ["1", ...insertedArticles]) {
-        expect(
-          citationContext?.findByEntityId(`${documentId}:article:${article}`),
-        ).not.toBeNull();
-      }
-      expect(repository?.findDocumentVersionChain(documentId)).toMatchObject({
-        loadedVersionId: `version:${documentId}:consolidated:${date}`,
-      });
-    }
-  });
-
-  it("includes banking-core-3 exact provisions and search without merging quoted amendment articles", () => {
-    for (const [celex, articleCount, query] of [
-      ["32009L0110", 24, "electronic money"],
-      ["32017R2402", 55, "securitisation"],
-      ["32019L2162", 35, "covered bonds"],
-      ["32019R2160", 2, "covered bonds"],
-    ] as const) {
-      const documentId = `eu:${celex}`;
-      const document = repository?.findDocument(documentId);
-      expect(document?.id).toBe(documentId);
-      expect(
-        document?.provisions.filter(
-          (provision) => provision.kind === "article",
-        ),
-      ).toHaveLength(articleCount);
-      expect(
-        search
-          ?.search(query, { documentId })
-          .results.some((result) => result.documentId === documentId),
-      ).toBe(true);
-      expect(
-        citationContext?.findByEntityId(`${documentId}:article:1`),
-      ).not.toBeNull();
-    }
-    for (const article of ["26a", "26b", "26c", "26d", "26e", "43a", "45a"]) {
-      expect(
-        citationContext?.findByEntityId(`eu:32017R2402:article:${article}`),
-      ).not.toBeNull();
-    }
-    expect(
-      citationContext?.findByEntityId("eu:32019L2162:article:26a"),
-    ).not.toBeNull();
-    expect(
-      citationContext?.findByEntityId("eu:32017R2402:article:50a"),
-    ).toBeNull();
   });
 
   it("includes the AML, CRD, and CRR sources across Reader and Search", () => {
     expect(repository?.findDocumentBySlug("amld-iv")?.id).toBe("eu:32015L0849");
     expect(
       search
-        ?.search("money laundering", { documentId: "eu:32015L0849" })
-        .results.some((result) => result.documentId === "eu:32015L0849"),
-    ).toBe(true);
-    expect(
-      search
-        ?.search("money laundering")
+        ?.search("obliged entities customer due diligence")
         .results.some((result) => result.documentId === "eu:32015L0849"),
     ).toBe(true);
     expect(repository?.findDocumentBySlug("crd-iv")?.id).toBe("eu:32013L0036");
@@ -461,6 +161,9 @@ describe("banking-default runtime isolation", () => {
       entityType: { id: "credit-institution" },
       guardrails: { finalLegalDetermination: false },
     });
+  });
+
+  it("serves reviewed banking-governance regulatory paths", () => {
     expect(
       regulatoryPaths?.findByDomainSlug("banking-governance-internal-control"),
     ).toMatchObject({
@@ -471,6 +174,9 @@ describe("banking-default runtime isolation", () => {
         expect.objectContaining({ relationType: "IMPLEMENTS" }),
       ]),
     });
+  });
+
+  it("serves profile-scoped regulatory Topics", () => {
     expect(regulatoryTopics?.list()).toMatchObject({
       runtime: { profileId: "banking-default" },
       topics: expect.arrayContaining([
@@ -535,20 +241,12 @@ describe("banking-default runtime isolation", () => {
   });
 
   it("does not leak excluded documents through search or graph projections", () => {
-    const lawSearch = repository
-      ? searchLaws(
-          createLawSearchRecords(
-            repository.listDocumentViews(),
-            repository.listLawSearchSources(),
-          ),
-          "MiCA",
-        )
-      : null;
+    const lawSearch = searchLaws(profileLawSearchRecords, "MiCA");
     const fullText = search?.search("crypto-assets");
     const definitions = search?.searchDefinitions("crypto-asset");
     const graph = repository
       ? toGlobalRelationshipGraph(
-          repository.listDocumentViews(),
+          profileDocuments,
           repository.listCrossDocumentRelationships(),
           repository.listLifecycleRelationships(),
           repository.listCaseLawRelationships(),

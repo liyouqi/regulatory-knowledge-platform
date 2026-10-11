@@ -9,6 +9,7 @@ import {
   ExternalLink,
   FileDown,
   Network,
+  RefreshCw,
   Send,
   SlidersHorizontal,
   Sparkles,
@@ -24,6 +25,7 @@ import {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { HelpMenu } from "../../contact/web/HelpMenu";
 import type {
   MonitorAiMessage,
   MonitorExplainResponse,
@@ -483,6 +485,7 @@ export function MonitorPage() {
   const [error, setError] = useState("");
   const [mcpOpen, setMcpOpen] = useState(false);
   const [mcpCopied, setMcpCopied] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [reportMonth, setReportMonth] = useState<string | null>(null);
   const [selected, setSelected] = useState<{
     event: RegulatoryEvent;
@@ -561,6 +564,41 @@ export function MonitorPage() {
     setVisibleCount(PAGE_SIZE);
   }
 
+  async function refreshToday() {
+    setRefreshing(true);
+    setError("");
+    try {
+      const refreshResponse = await fetch("/api/monitor/refresh-today", {
+        method: "POST",
+      });
+      const refreshBody = (await refreshResponse.json()) as {
+        code?: string;
+        error?: string;
+      };
+      if (
+        !refreshResponse.ok &&
+        refreshBody.code !== "already_refreshed_today"
+      ) {
+        throw new Error(refreshBody.error ?? "Monitor refresh failed.");
+      }
+
+      const timelineResponse = await fetch(
+        `/api/monitor/timeline?year=${CURRENT_YEAR}`,
+      );
+      if (!timelineResponse.ok) {
+        throw new Error("The Monitor feed is unavailable.");
+      }
+      setFeed((await timelineResponse.json()) as MonitorTimeline);
+      setVisibleCount(PAGE_SIZE);
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : "Monitor refresh failed.",
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   const activeFilterCount = Object.values(filters).filter(
     (value) => value !== ALL,
   ).length;
@@ -575,6 +613,8 @@ export function MonitorPage() {
     ).length,
   }));
   const currentMonth = new Date().toISOString().slice(0, 7);
+  const refreshedToday =
+    feed?.generatedAt.slice(0, 10) === new Date().toISOString().slice(0, 10);
 
   return (
     <main className="monitor-root">
@@ -589,6 +629,23 @@ export function MonitorPage() {
               : "Loading latest edition"}
           </span>
           <div className="monitor-utility-actions">
+            <button
+              className="monitor-refresh-button"
+              disabled={!feed || refreshedToday || refreshing}
+              onClick={() => void refreshToday()}
+              type="button"
+            >
+              {refreshedToday ? (
+                <Check aria-hidden="true" size={15} />
+              ) : (
+                <RefreshCw aria-hidden="true" size={15} />
+              )}
+              {refreshing
+                ? "Refreshing…"
+                : refreshedToday
+                  ? "Refreshed today"
+                  : "Refresh today"}
+            </button>
             <button
               className="monitor-mcp-button"
               onClick={() => setMcpOpen((current) => !current)}
@@ -611,6 +668,7 @@ export function MonitorPage() {
               <FileDown aria-hidden="true" size={15} />
               Generate Monthly Report
             </button>
+            <HelpMenu surface="monitor" tone="light" />
           </div>
         </div>
         <a className="monitor-masthead" href="/monitor">

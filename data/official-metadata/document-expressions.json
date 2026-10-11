@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.13.0",
+  "version": "1.15.0",
   "records": [
     {
       "documentId": "eu:32013L0036",
@@ -432,6 +432,50 @@
       "reviewedAt": "2026-09-29T00:00:00.000Z"
     },
     {
+      "documentId": "eu:32009L0110",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R2402",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32019L2162",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32019R2160",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
       "documentId": "eu:eba:gl:2021:05",
       "language": "en",
       "issuers": ["European Banking Authority"],
@@ -476,61 +520,6 @@
       "reviewedAt": "2026-08-31T00:00:00.000Z"
     },
     {
-      "documentId": "eu:32009L0110",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "consolidated",
-      "currencyStatus": "current",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": null,
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T09:22:45Z"
-    },
-    {
-      "documentId": "eu:32017R2402",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "consolidated",
-      "currencyStatus": "current",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": null,
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T09:22:45Z"
-    },
-    {
-      "documentId": "eu:32019L2162",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "consolidated",
-      "currencyStatus": "current",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": null,
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T09:22:45Z"
-    },
-    {
-      "documentId": "eu:32019R2160",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "original_oj",
-      "currencyStatus": "historical",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T09:22:45Z"
-    },
-    {
-      "documentId": "eu:32002L0047",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "consolidated",
-      "currencyStatus": "current",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": null,
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T10:10:33Z"
-    },
-    {
       "documentId": "eu:31998L0026",
       "language": "en",
       "issuers": ["European Parliament", "Council of the European Union"],
@@ -539,40 +528,7 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T10:10:33Z"
-    },
-    {
-      "documentId": "eu:32013R1024",
-      "language": "en",
-      "issuers": ["Council of the European Union"],
-      "textKind": "original_oj",
-      "currencyStatus": "not_assessed",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T10:39:58Z"
-    },
-    {
-      "documentId": "eu:32015R0751",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "original_oj",
-      "currencyStatus": "not_assessed",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T10:39:58Z"
-    },
-    {
-      "documentId": "eu:32010R1093",
-      "language": "en",
-      "issuers": ["European Parliament", "Council of the European Union"],
-      "textKind": "consolidated",
-      "currencyStatus": "current",
-      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
-      "fallbackReason": null,
-      "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T13:03:44Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
       "documentId": "eu:32001L0024",
@@ -583,10 +539,10 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T13:03:44Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
-      "documentId": "eu:32014L0065",
+      "documentId": "eu:32002L0047",
       "language": "en",
       "issuers": ["European Parliament", "Council of the European Union"],
       "textKind": "consolidated",
@@ -594,10 +550,10 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T13:44:00Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
-      "documentId": "eu:32014R0600",
+      "documentId": "eu:32010R1093",
       "language": "en",
       "issuers": ["European Parliament", "Council of the European Union"],
       "textKind": "consolidated",
@@ -605,7 +561,7 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T13:44:00Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
       "documentId": "eu:32012R0648",
@@ -616,7 +572,40 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T15:02:32Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32013R1024",
+      "language": "en",
+      "issuers": ["Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014L0065",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0600",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
     },
     {
       "documentId": "eu:32014R0909",
@@ -627,7 +616,403 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T15:02:32Z"
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32015R0751",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32015R0061",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R0101",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32015R0063",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R1075",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32018R0389",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R0565",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R0587",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R0590",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32013R0149",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32013R0153",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R2251",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-05T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0241",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0183",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0529",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32018R0345",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R1401",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R2055",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32020R1423",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32026R0825",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32021R0923",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32024R0856",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32024R0857",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32022R2579",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32025R0791",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R0747",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0468",
+      "language": "en",
+      "issuers": ["European Central Bank"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R0445",
+      "language": "en",
+      "issuers": ["European Central Bank"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0527",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R0530",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32017R0180",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32022R2580",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32015R0081",
+      "language": "en",
+      "issuers": ["Council of the European Union"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32016R0451",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R1163",
+      "language": "en",
+      "issuers": ["European Central Bank"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32014R1151",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-06T00:00:00.000Z"
     },
     {
       "documentId": "eu:32025R0454",
@@ -638,7 +1023,7 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": "no_reviewed_consolidated_expression_loaded",
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T15:02:32Z"
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
     },
     {
       "documentId": "eu:32026R1755",
@@ -649,7 +1034,84 @@
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": "no_reviewed_consolidated_expression_loaded",
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-10-04T15:02:32Z"
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32020R1225",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32020R1226",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32020R1227",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32019R1851",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32024R1700",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32020R0447",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "original_oj",
+      "currencyStatus": "not_assessed",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": "no_reviewed_consolidated_expression_loaded",
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
+    },
+    {
+      "documentId": "eu:32018R1229",
+      "language": "en",
+      "issuers": ["European Commission"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-07T00:00:00.000Z"
     }
   ]
 }

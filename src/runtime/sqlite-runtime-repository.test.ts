@@ -336,18 +336,16 @@ describe("SQLite runtime repository", () => {
       "eu:32017R2402",
       "eu:32019L2162",
       "eu:32019R2160",
-      "eu:32002L0047",
       "eu:31998L0026",
-      "eu:32013R1024",
-      "eu:32015R0751",
-      "eu:32010R1093",
       "eu:32001L0024",
+      "eu:32002L0047",
+      "eu:32010R1093",
+      "eu:32012R0648",
+      "eu:32013R1024",
       "eu:32014L0065",
       "eu:32014R0600",
-      "eu:32012R0648",
       "eu:32014R0909",
-      "eu:32025R0454",
-      "eu:32026R1755",
+      "eu:32015R0751",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
     const additionalConsolidatedChains = [
       "eu:32016R0679",
@@ -358,6 +356,49 @@ describe("SQLite runtime repository", () => {
       "eu:32024R1620",
       "eu:32012R0260",
       "eu:32014L0017",
+      "eu:32015R0061",
+      "eu:32016R0101",
+      "eu:32015R0063",
+      "eu:32016R1075",
+      "eu:32018R0389",
+      "eu:32017R0565",
+      "eu:32017R0587",
+      "eu:32013R0149",
+      "eu:32013R0153",
+      "eu:32016R2251",
+      "eu:32014R0241",
+      "eu:32014R0183",
+      "eu:32014R0529",
+      "eu:32018R0345",
+      "eu:32016R1401",
+      "eu:32017R2055",
+      "eu:32020R1423",
+      "eu:32026R0825",
+      "eu:32021R0923",
+      "eu:32024R0856",
+      "eu:32024R0857",
+      "eu:32022R2579",
+      "eu:32025R0791",
+      "eu:32017R0747",
+      "eu:32014R0468",
+      "eu:32016R0445",
+      "eu:32014R0527",
+      "eu:32014R0530",
+      "eu:32017R0180",
+      "eu:32022R2580",
+      "eu:32015R0081",
+      "eu:32016R0451",
+      "eu:32014R1163",
+      "eu:32014R1151",
+      "eu:32025R0454",
+      "eu:32026R1755",
+      "eu:32020R1225",
+      "eu:32020R1226",
+      "eu:32020R1227",
+      "eu:32019R1851",
+      "eu:32024R1700",
+      "eu:32020R0447",
+      "eu:32018R1229",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
 
     expect(chain).toMatchObject({
@@ -539,7 +580,7 @@ describe("SQLite runtime repository", () => {
       }),
     );
     expect(repository?.relationshipCount).toBeGreaterThan(1_000);
-    expect(repository?.cellarRelationshipCount).toBe(12);
+    expect(repository?.cellarRelationshipCount).toBe(94);
     expect(repository?.unresolvedReferenceCount).toBeGreaterThan(0);
   });
 
@@ -597,8 +638,8 @@ describe("SQLite runtime repository", () => {
           relationship.target.documentId === "eu:32022R2554",
       ),
     ).toBe(true);
-    expect(repository?.lifecycleRelationshipCount).toBe(70);
-    expect(repository?.externalWorkCount).toBe(59);
+    expect(repository?.lifecycleRelationshipCount).toBe(535);
+    expect(repository?.externalWorkCount).toBe(456);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

@@ -7,6 +7,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { HelpMenu } from "../../contact/web/HelpMenu";
 import type { EarthNode } from "../contract/earth-contract";
 import {
   CDM,
@@ -320,6 +321,11 @@ export function EarthUniversePage({ graph }: { graph: MetadataGraph }) {
             <ListTree size={14} /> Structured
           </button>
         </div>
+        <HelpMenu
+          context={selected ? selected.label : undefined}
+          surface="galaxy"
+          tone="space"
+        />
       </header>
       <section className="earth-hero">
         <div>

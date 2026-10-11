@@ -19,6 +19,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
+import { HelpMenu } from "../../contact/web/HelpMenu";
 import {
   type EarthEdge,
   type EarthNode,
@@ -476,6 +477,11 @@ function EarthLegacyPage() {
             <ListTree aria-hidden="true" size={14} /> Structured
           </button>
         </div>
+        <HelpMenu
+          context={selected ? selected.label : undefined}
+          surface="galaxy"
+          tone="space"
+        />
       </header>
 
       <section className="earth-hero">

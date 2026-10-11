@@ -144,12 +144,19 @@ async function fetchSource(): Promise<void> {
   const discovery = discoverEnglishFmx(treeXml, expressionCelex);
   const responses = await Promise.all(
     discovery.contentItems.map(async (item) => {
-      const isXml = item.streamName.toLowerCase().endsWith(".xml");
-      const response = await fetchOfficial(
-        item.contentUrl,
-        isXml ? "application/xml;type=fmx4" : "application/zip",
+      const streamName = item.streamName.toLowerCase();
+      const isXml = streamName.endsWith(".xml");
+      const isTiff = /\.tiff?$/u.test(streamName);
+      const acceptedMediaType = isXml
+        ? "application/xml;type=fmx4"
+        : isTiff
+          ? "image/tiff"
+          : "application/zip";
+      const response = await fetchOfficial(item.contentUrl, acceptedMediaType);
+      assertMediaType(
+        response,
+        isXml ? "xml" : isTiff ? "image/tiff" : "application/zip",
       );
-      assertMediaType(response, isXml ? "xml" : "application/zip");
       const bytes = await readResponse(response, MAX_FMX_CONTENT_BYTES);
       return { item, response, bytes };
     }),

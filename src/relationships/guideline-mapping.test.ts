@@ -7,9 +7,10 @@ import {
 } from "./guideline-mapping";
 
 describe("reviewed Guideline mappings", () => {
+  const documents = loadDocumentViews();
+  const entities = buildExplicitReferences(documents).entities;
+
   it("publishes evidence-checked CRD mandate and EBA supplement edges", () => {
-    const documents = loadDocumentViews();
-    const entities = buildExplicitReferences(documents).entities;
     const relationships = buildGuidelineMappings(documents, entities);
 
     expect(relationships).toHaveLength(2);
@@ -32,8 +33,6 @@ describe("reviewed Guideline mappings", () => {
   });
 
   it("fails closed when reviewed evidence drifts", () => {
-    const documents = loadDocumentViews();
-    const entities = buildExplicitReferences(documents).entities;
     const mappings = structuredClone(loadGuidelineMappings());
     const first = mappings[0];
     if (!first) throw new Error("Missing Guideline mapping fixture");

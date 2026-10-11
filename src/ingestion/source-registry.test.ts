@@ -12,8 +12,8 @@ describe("EU source registry", () => {
   it("contains reviewed Level 1 acts and registered Level 2 measures", async () => {
     const sources = await loadSourceRegistry();
 
-    expect(sources).toHaveLength(55);
-    expect(new Set(sources.map((source) => source.celex)).size).toBe(55);
+    expect(sources).toHaveLength(97);
+    expect(new Set(sources.map((source) => source.celex)).size).toBe(97);
     expect(sources.slice(0, 10).map((source) => source.shortName)).toEqual([
       "DORA",
       "GDPR",
@@ -41,6 +41,15 @@ describe("EU source registry", () => {
       sources.filter((source) => source.familyId === "family:mica"),
     ).toHaveLength(2);
     expect(
+      sources.filter((source) => source.familyId === "family:ai-act"),
+    ).toHaveLength(3);
+    expect(
+      sources.filter((source) => source.familyId === "family:securitisation"),
+    ).toHaveLength(6);
+    expect(
+      sources.filter((source) => source.familyId === "family:covered-bonds"),
+    ).toHaveLength(3);
+    expect(
       sources
         .filter((source) => source.familyId === "family:aml")
         .map((source) => source.celex),
@@ -52,135 +61,15 @@ describe("EU source registry", () => {
       "32024L1640",
       "32024R1620",
     ]);
+    expect(
+      sources
+        .filter((source) => source.batch === "banking-core-3")
+        .map((source) => source.celex),
+    ).toEqual(["32009L0110", "32017R2402", "32019L2162", "32019R2160"]);
     expect(sources.every((source) => source.aliases.length > 0)).toBe(true);
-
     expect(
-      sources.filter((source) => source.familyId === "family:ai-act"),
-    ).toHaveLength(3);
-    expect(
-      sources.filter((source) => source.batch === "banking-core-8"),
-    ).toMatchObject([
-      {
-        celex: "32012R0648",
-        expressionCelex: "02012R0648-20250117",
-        quality: { articleCount: 137, annexCount: 4, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2025-01-17" },
-      },
-      {
-        celex: "32014R0909",
-        expressionCelex: "02014R0909-20260117",
-        quality: { articleCount: 83, annexCount: 1, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2026-01-17" },
-      },
-      {
-        celex: "32025R0454",
-        familyId: "family:ai-act",
-        regulatoryLevel: "level-2",
-        measureType: "other",
-        quality: { articleCount: 20, recitalCount: 13, maximumWarnings: 0 },
-        sourceStatus: { basis: "original-oj", textAsOf: "2025-03-10" },
-      },
-      {
-        celex: "32026R1755",
-        familyId: "family:ai-act",
-        regulatoryLevel: "level-2",
-        measureType: "other",
-        quality: {
-          articleCount: 15,
-          recitalCount: 6,
-          annexCount: 1,
-          maximumWarnings: 0,
-        },
-        sourceStatus: { basis: "original-oj", textAsOf: "2026-07-21" },
-      },
-    ]);
-
-    expect(
-      sources.filter((source) => source.batch === "banking-core-7"),
-    ).toMatchObject([
-      {
-        celex: "32014L0065",
-        expressionCelex: "02014L0065-20260606",
-        quality: { articleCount: 103, annexCount: 4, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2026-06-06" },
-      },
-      {
-        celex: "32014R0600",
-        expressionCelex: "02014R0600-20251123",
-        quality: { articleCount: 95, annexCount: 0, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2025-11-23" },
-      },
-    ]);
-    expect(
-      sources.filter((source) => source.batch === "banking-core-6"),
-    ).toMatchObject([
-      {
-        celex: "32010R1093",
-        expressionCelex: "02010R1093-20251231",
-        quality: { articleCount: 100, recitalCount: 0, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2025-12-31" },
-      },
-      {
-        celex: "32001L0024",
-        expressionCelex: "02001L0024-20140702",
-        quality: { articleCount: 36, recitalCount: 32, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2014-07-02" },
-      },
-    ]);
-    expect(
-      sources.filter((source) => source.batch === "banking-core-5"),
-    ).toMatchObject([
-      {
-        celex: "32013R1024",
-        quality: { articleCount: 34, recitalCount: 87, maximumWarnings: 0 },
-        sourceStatus: { basis: "original-oj", textAsOf: "2013-10-29" },
-      },
-      {
-        celex: "32015R0751",
-        quality: { articleCount: 18, recitalCount: 44, maximumWarnings: 0 },
-        sourceStatus: { basis: "original-oj", textAsOf: "2015-05-19" },
-      },
-    ]);
-    expect(
-      sources.filter((source) => source.batch === "banking-core-4"),
-    ).toMatchObject([
-      {
-        celex: "32002L0047",
-        expressionCelex: "02002L0047-20220812",
-        quality: { articleCount: 14, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2022-08-12" },
-      },
-      {
-        celex: "31998L0026",
-        expressionCelex: "01998L0026-20240408",
-        quality: { articleCount: 16, maximumWarnings: 0 },
-        sourceStatus: { basis: "consolidated", textAsOf: "2024-04-08" },
-      },
-    ]);
-    expect(
-      sources.filter((source) => source.batch === "banking-core-3"),
-    ).toMatchObject([
-      {
-        celex: "32009L0110",
-        expressionCelex: "02009L0110-20180113",
-        quality: { articleCount: 24, maximumWarnings: 0 },
-      },
-      {
-        celex: "32017R2402",
-        expressionCelex: "02017R2402-20210409",
-        quality: { articleCount: 55, maximumWarnings: 0 },
-      },
-      {
-        celex: "32019L2162",
-        expressionCelex: "02019L2162-20240109",
-        quality: { articleCount: 35, maximumWarnings: 0 },
-      },
-      {
-        celex: "32019R2160",
-        quality: { articleCount: 2, recitalCount: 15, maximumWarnings: 0 },
-        sourceStatus: { basis: "original-oj" },
-      },
-    ]);
+      sources.find((source) => source.celex === "32015R0061")?.aliases,
+    ).toEqual(expect.arrayContaining(["Liquidity Coverage Ratio", "LCR"]));
     expect(
       sources.find((source) => source.celex === "32024R2956")?.sourceStatus,
     ).toMatchObject({

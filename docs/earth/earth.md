@@ -8,7 +8,7 @@ The user-facing product name is **Galaxy**. Existing `/earth` routes, APIs,
 stable IDs, source directories and implementation names remain unchanged to
 preserve compatibility; they are internal boundaries, not displayed branding.
 
-## Current direction and installed collection — 2026-09-27
+## Current direction and installed collection — 2026-10-07
 
 This section supersedes the older Banking-10-first expansion restriction, SQLite-only presentation and two-color-only display policy below. Galaxy is a simple relationship-first visualization, not a legal reference or applicability engine. The target is 100% of a declared English financial-document scope, not an arbitrary 100-law cap. `/earth` now opens the metadata graph; the separate, existing 10-law Article explorer remains available at `/earth?view=reading` (806 audited Articles and 7,016 reading blocks). Full-text acquisition is not a prerequisite for adding graph nodes.
 
@@ -55,13 +55,13 @@ Directory coverage is **not all European financial law**. Dedicated EBA/ESMA/EIO
 
 ### Installed snapshot and relationship boundary
 
-The recursive-family refresh contains **1,129 included Works, 1,757 related English Works, 12 institutions and 11,822 supported metadata edges**, in **4,746,172 bytes**. Acquisition snapshot: `data/raw/earth/graph/2026-09-27T15-02-44-889Z/`. Compared with the initial directory-based graph, it adds 34 related files, two institutions and 516 relations without removing existing nodes or edges. Two expansion waves finished with an empty family frontier after scanning 1,268 Works. The generated family report is the current count source; DORA remains 14, MiCA 39, MiFID/MiFIR 111, and CRR/CRD is now 245. These counts include historical acts.
+The recursive-family refresh contains **1,133 included Works, 1,817 related English Works, 13 institutions and 12,190 supported metadata edges**, in **4,879,374 bytes**. Acquisition snapshot: `data/raw/earth/graph/2026-10-07T13-17-45-513Z/`. Compared with the previous installed graph, it adds 64 Work nodes, one institution and 368 relations without removing nodes or relations. Two expansion waves finished with an empty family frontier after scanning 1,348 Works. The generated family report is the current count source; the six added roots expose SRMR 32, SSM 122, DGSD 1, Securitisation 19, Covered Bonds 1 and CSDR 16 files. These counts include historical acts and follow only supported official legal-basis/completion paths.
 
 The earlier census returned 1,120 Works, but its explicit-seed UNION omitted eight cross-sector seeds. The graph build resolved those eight separately, yielding 1,128; the census query now resolves seeds through official `owl:sameAs` identities. The old 1,120 figure was directory discovery, not a completed seed-inclusive collection.
 
-The corrected seed-inclusive census was rerun at `data/raw/earth/census/2026-09-27T10-59-29-843Z/`: **1,129 distinct Works / CELEX identifiers**, 2,115 metadata rows, no missing English titles. The extra file beyond the first 1,128-work installation is the explicitly tagged BRRD root (`32014L0059`), promoted from one-hop context into the included collection. The graph refresh reused matching cached queries and acquired the newly required pages before publication.
+The seed-inclusive census was rerun at `data/raw/earth/census/2026-10-07T13-15-52-195Z/`: **1,133 distinct Works / CELEX identifiers**, 2,120 metadata rows, no missing English titles. SSM and CSDR are explicit cross-directory roots; the other added roots already lie in the configured financial directories. The graph refresh acquired the newly required official pages before publication.
 
-Seven Work predicates are published with their raw source direction and URI: `work_cites_work`, `resource_legal_based_on_resource_legal`, `resource_legal_completes_resource_legal`, `resource_legal_amends_resource_legal`, `resource_legal_corrects_resource_legal`, `resource_legal_repeals_resource_legal`, `resource_legal_implements_resource_legal`. Creator edges are separate `work_created_by_agent` metadata. Unsupported predicates are retained in raw acquisition and counted in the report, not renamed into supported relationships: 342 raw triples were excluded this way. Another 754 supported triples lack an English titled endpoint and are omitted from the published graph. No reverse-direction or inferred legal edges are invented.
+Seven Work predicates are published with their raw source direction and URI: `work_cites_work`, `resource_legal_based_on_resource_legal`, `resource_legal_completes_resource_legal`, `resource_legal_amends_resource_legal`, `resource_legal_corrects_resource_legal`, `resource_legal_repeals_resource_legal`, `resource_legal_implements_resource_legal`. Creator edges are separate `work_created_by_agent` metadata. Unsupported predicates are retained in raw acquisition and counted in the report, not renamed into supported relationships: 345 raw triples were excluded this way. Another 779 supported triples lack an English titled endpoint and are omitted from the published graph. No reverse-direction or inferred legal edges are invented.
 
 DORA (`32022R2554`) and its amending directive (`32022L2556`) have **two official `work_cites_work` triples, one in each direction**. Their direct bundle is included in the overview and when either file is selected. This is not an `AMENDS` edge between the two files.
 
@@ -108,7 +108,7 @@ Open the Vite URL printed by Terminal 2, normally `http://localhost:5173/earth`;
 Optional transfers:
 
 - `data/artifacts/earth/census.json`, `family-coverage.json` and `refresh-report.json` preserve discovery/change reports, but are not required by the UI. The family inventory documents and small Earth configuration travel through Git.
-- `data/raw/earth/graph/2026-09-27T15-02-44-889Z/` (about 23 MiB) preserves this run's queries, frozen census/configuration, baseline and completion manifest. Copy the entire snapshot folder only if offline reconstruction, provenance inspection or `earth:refresh -- --resume` is needed. The corresponding census is already frozen in `inputs.json`. A new `npm run earth:refresh` can fetch current official metadata without this old folder or model credentials.
+- `data/raw/earth/graph/2026-10-07T13-17-45-513Z/` (about 23 MiB) preserves this run's queries, frozen census/configuration, baseline and completion manifest. Copy the entire snapshot folder only if offline reconstruction, provenance inspection or `earth:refresh -- --resume` is needed. The corresponding census is already frozen in `inputs.json`. A new `npm run earth:refresh` can fetch current official metadata without this old folder or model credentials.
 - `data/artifacts/canonical/` is needed to rebuild the Platform Runtime from its current canonical documents, not to display the copied runtime. Full source/parser reproduction may additionally require the relevant `data/raw/` and other build inputs; follow the corpus onboarding runbook rather than treating the three runtime files as source inputs.
 - `.env` is optional for Earth itself. Transfer credentials securely only if Copilot/Monitor or other configured integrations are needed, and update any machine-specific paths. Existing Monitor data under `data/monitor/` is optional and separate from Earth.
 
@@ -116,7 +116,7 @@ Git commits contain the code/configuration and inventories, not these ignored da
 
 <!-- earth-inventory:start -->
 
-Installed metadata graph: **1129 included files**, **1757 related files outside directory scope**, **12 institutions**, **11822 displayed-category metadata relations**. Full text remains separate.
+Installed metadata graph: **1133 included files**, **1817 related files outside directory scope**, **13 institutions**, **12190 displayed-category metadata relations**. Full text remains separate.
 
 [Complete included-file table](earth-inventory.md). [Family coverage and related files](earth-families.md).
 
@@ -128,12 +128,18 @@ Installed metadata graph: **1129 included files**, **1757 related files outside 
 | [32012R0648](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32012R0648) | EMIR | EMIR | banking, funds, securities |
 | [32013L0036](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013L0036) | CRD IV | CRR / CRD | banking |
 | [32013R0575](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R0575) | CRR | CRR / CRD | banking |
+| [32013R1024](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R1024) | SSM Regulation | SSM | banking |
+| [32014L0049](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0049) | DGSD | DGSD | banking |
 | [32014L0059](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0059) | BRRD | BRRD | banking |
 | [32014L0065](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0065) | MiFID II | MiFID / MiFIR | banking, securities |
 | [32014R0600](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014R0600) | MiFIR | MiFID / MiFIR | banking, securities |
+| [32014R0806](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014R0806) | SRMR | SRMR | banking |
+| [32014R0909](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014R0909) | CSDR | CSDR | securities |
 | [32015L0849](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L0849) | AMLD IV | AML | banking, crypto, funds, insurance, payments |
 | [32015L2366](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015L2366) | PSD2 | PSD | banking, payments |
 | [32016R0679](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679) | GDPR | GDPR | banking, crypto, funds, insurance, payments |
+| [32017R2402](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R2402) | Securitisation Regulation | Securitisation | banking, funds, securities |
+| [32019L2162](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019L2162) | Covered Bonds Directive | Covered Bonds | banking, securities |
 | [32022L2555](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022L2555) | NIS2 | NIS2 | banking, crypto, funds, insurance, payments |
 | [32022L2556](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022L2556) | DORA Amending Directive | DORA | banking, funds, insurance, payments |
 | [32022R2554](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2554) | DORA | DORA | banking, crypto, funds, insurance, payments |

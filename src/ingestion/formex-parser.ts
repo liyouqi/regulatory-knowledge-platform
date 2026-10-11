@@ -93,25 +93,6 @@ function attributes(node: OrderedNode): Record<string, unknown> {
     : {};
 }
 
-function encodedQuotation(node: OrderedNode): string | undefined {
-  const tag = tagName(node);
-  if (tag !== "QUOT.START" && tag !== "QUOT.END") return undefined;
-  const code = String(attributes(node).CODE ?? "");
-  const characters: Record<string, string> = {
-    "2018": "‘",
-    "2019": "’",
-    "201C": "“",
-    "201D": "”",
-  };
-  const character = Object.hasOwn(characters, code)
-    ? characters[code]
-    : undefined;
-  if (!character || elementChildren(node).length > 0) {
-    throw new Error(`Unsupported Formex quotation marker: ${tag} CODE=${code}`);
-  }
-  return character;
-}
-
 function plainText(
   node: OrderedNode,
   excludedTags: ReadonlySet<string> = new Set(["NOTE"]),
@@ -121,8 +102,6 @@ function plainText(
     if ("#text" in current) return String(current["#text"] ?? "");
     const tag = tagName(current);
     if (!tag || excludedTags.has(tag)) return "";
-    const quotation = encodedQuotation(current);
-    if (quotation !== undefined) return quotation;
     const content = elementChildren(current).map(collect).join("");
     return blockTags.has(tag) ? ` ${content} ` : content;
   }
@@ -198,11 +177,6 @@ function orderedContentFromElement(
     }
     const tag = tagName(node);
     if (!tag || TEXT_EXCLUSIONS.has(tag)) return;
-    const quotation = encodedQuotation(node);
-    if (quotation !== undefined) {
-      appendText(quotation);
-      return;
-    }
     const resourceId = resolveResourceId(node);
     if (resourceId) {
       raw.push({ type: "resource", resourceId });
@@ -347,9 +321,7 @@ class FormexDocumentBuilder {
           : listType === "DASH"
             ? "dash"
             : `item-${itemIndex + 1}`;
-        let identityNumber = numberNode
-          ? plainText(numberNode, new Set(["QUOT.START", "QUOT.END"]))
-          : numberRaw;
+        let identityNumber = numberRaw;
         try {
           normalizeLegalNumber(identityNumber);
         } catch {
@@ -763,21 +735,13 @@ class FormexDocumentBuilder {
     const explicitNumber = titleElement
       ? firstDescendant(titleElement, "NO.P")
       : undefined;
-    const identityLabel = titleElement
-      ? plainText(
-          childElement(titleElement, "TI") ?? titleElement,
-          new Set(["NOTE", "QUOT.START", "QUOT.END"]),
-        )
-      : label;
     const labelledNumber = /^(?:section|part)\s+([a-z0-9.-]+)/iu.exec(
-      identityLabel,
+      label,
     )?.[1];
     const numberRaw = explicitNumber
       ? plainText(explicitNumber, new Set())
       : (labelledNumber ?? String(groupIndex));
-    let identityNumber = explicitNumber
-      ? plainText(explicitNumber, new Set(["QUOT.START", "QUOT.END"]))
-      : numberRaw;
+    let identityNumber = numberRaw;
     try {
       normalizeLegalNumber(identityNumber);
     } catch {
@@ -930,16 +894,7 @@ class FormexDocumentBuilder {
       : `ANNEX ${annexIndex}`;
     const labelMatch =
       /^annex\s+([ivxlcdm]+|\d+[a-z]?)(?:\s+([\s\S]+))?$/iu.exec(titleText);
-    const identityTitle = titleElement
-      ? plainText(
-          childElement(titleElement, "TI") ?? titleElement,
-          new Set(["NOTE", "QUOT.START", "QUOT.END"]),
-        )
-      : titleText;
-    const numberRaw =
-      /^annex\s+([ivxlcdm]+|\d+[a-z]?)(?:\s+([\s\S]+))?$/iu.exec(
-        identityTitle,
-      )?.[1] ?? String(annexIndex);
+    const numberRaw = labelMatch?.[1] ?? String(annexIndex);
     const label = labelMatch ? `ANNEX ${numberRaw}` : titleText;
     const occurrence = this.occurrence(this.documentId, "annex", numberRaw);
     const logicalId = provisionLogicalId(

@@ -65,7 +65,17 @@ const legacyMultiItemTreeNotice = treeNotice
     </MANIFESTATION_HAS_ITEM>
     <MANIFESTATION_HAS_ITEM>`,
   )
-  .replace("DORA_ENG.fmx4.zip", "LEGACY.01000101.xml");
+  .replace("DORA_ENG.fmx4.zip", "LEGACY.01000101.xml")
+  .replace(
+    "  </MANIFESTATION>\n</NOTICE>",
+    `<MANIFESTATION_HAS_ITEM>
+      <URI><VALUE>http://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_3</VALUE></URI>
+      <IDENTIFIER><VALUE>DOC_3</VALUE></IDENTIFIER>
+      <TECHMD><STREAM_NAME><VALUE>LEGACY.01000102.tif</VALUE></STREAM_NAME></TECHMD>
+    </MANIFESTATION_HAS_ITEM>
+  </MANIFESTATION>
+</NOTICE>`,
+  );
 
 describe("Cellar tree notice discovery", () => {
   it("upgrades official Cellar HTTP identifiers without accepting other hosts", () => {
@@ -141,6 +151,11 @@ describe("Cellar tree notice discovery", () => {
         contentUrl:
           "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_1",
         streamName: "LEGACY.doc.xml",
+      },
+      {
+        contentUrl:
+          "https://publications.europa.eu/resource/cellar/manifestation-fmx/DOC_3",
+        streamName: "LEGACY.01000102.tif",
       },
     ]);
   });

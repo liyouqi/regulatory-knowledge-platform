@@ -142,6 +142,9 @@ export function discoverEnglishFmx(
   const xmlItems = items.filter((candidate) =>
     streamNameOf(candidate)?.toLowerCase().endsWith(".xml"),
   );
+  const resourceItems = items.filter((candidate) =>
+    /\.tiff?$/iu.test(streamNameOf(candidate) ?? ""),
+  );
   const metadataBases = new Set(
     xmlItems
       .map((candidate) => streamNameOf(candidate))
@@ -175,7 +178,11 @@ export function discoverEnglishFmx(
   const selectedItems = zipItem
     ? [zipItem]
     : actItem
-      ? [actItem, ...xmlItems.filter((candidate) => candidate !== actItem)]
+      ? [
+          actItem,
+          ...xmlItems.filter((candidate) => candidate !== actItem),
+          ...resourceItems,
+        ]
       : [item];
   const contentItems = selectedItems.map((candidate) => {
     const candidateUrl = uriOf(candidate);

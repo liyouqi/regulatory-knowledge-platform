@@ -9,9 +9,11 @@ import { exportRagSnapshot, verifyRagSnapshot } from "./rag-snapshot";
 const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-rag-export-"));
 const databasePath = join(testDirectory, "regulatory.sqlite");
 const snapshotPath = join(testDirectory, "snapshot");
+let doraDocument: ReturnType<typeof loadDoraDocumentView>;
 
 beforeAll(() => {
-  buildRuntimeDatabase([loadDoraDocumentView()], [], databasePath);
+  doraDocument = loadDoraDocumentView();
+  buildRuntimeDatabase([doraDocument], [], databasePath);
   exportRagSnapshot({
     databasePath,
     outputPath: snapshotPath,
@@ -106,7 +108,7 @@ describe("RAG snapshot export", () => {
   });
 
   it("keeps exported text order contiguous when Reader content includes a formula resource", () => {
-    const document = structuredClone(loadDoraDocumentView());
+    const document = structuredClone(doraDocument);
     const block = document.provisions[0]?.blocks[0];
     if (!block) throw new Error("DORA test block is unavailable");
     block.text = "Before formula. After formula.";
