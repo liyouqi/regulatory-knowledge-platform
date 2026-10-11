@@ -56,6 +56,28 @@ data/artifacts/onboarding/
 
 Do not copy all of `data/artifacts/`; it contains large disposable builds. Copy only `canonical/` and `earth/` as listed above.
 
+### Inspect and maintain local data
+
+These maintenance commands do not fetch sources, rebuild data, or run during application startup:
+
+```bash
+npm run data:status
+npm run data:cleanup
+npm run data:cleanup -- --json
+```
+
+`data:status` reports logical file bytes, which can differ from Finder/APFS allocated-space statistics. `data:cleanup` defaults to a read-only preview with a plan ID and the proposed deletion list. It considers only successful historical builds under `data/artifacts/corpus-builds/`: generated `canonical/*/*/document.json` files and older `runtime.sqlite` files. All build reports remain at their original paths. Master Canonical, raw snapshots, the installed Runtime, Galaxy, Monitor, onboarding evidence and unrecognized files stay untouched.
+
+The default retains one database per Profile, preferring the current pinned manifest and then the newest database modification time. Use `--keep-per-profile 2` to retain two instead. Builds modified in the last 24 hours, incomplete/failed builds, builds with temporary files, and builds containing a configured active Runtime are skipped. Both the process environment and `.env` Runtime path are protected.
+
+Run cleanup between corpus builds. After reviewing the preview, execute explicitly:
+
+```bash
+npm run data:cleanup -- --apply --plan-id <ID-from-preview>
+```
+
+Omit `--plan-id` only if a fresh preview in the same command is acceptable. Apply verifies the retained databases, checks open target files using `lsof` (required on the machine applying cleanup), refuses symlink paths, concurrent cleanups and changed plans, and hashes protected data before/after. If an active cleanup crashes, inspect its PID in `data/artifacts/maintenance/cleanup.lock` before removing the stale lock. Receipts stay ignored under `data/artifacts/maintenance/`. Pruned generated files have no individual backup; retain the source snapshots, reports and corresponding code for reconstruction. A historical build with only reports/database remaining is a retained record, not a complete Canonical build directory; `corpus:build` regenerates its body files when run again. This policy does not change strict build verification or automatically promote/delete deployment releases.
+
 ## 4. Set up the new computer
 
 Node.js 24 or newer and npm 11 or newer are required.

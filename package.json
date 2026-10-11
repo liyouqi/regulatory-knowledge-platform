@@ -20,6 +20,8 @@
     "start": "node --import tsx src/server/index.ts",
     "check": "biome check . && tsc --noEmit",
     "check:fix": "biome check --write .",
+    "data:status": "node --import tsx src/maintenance/data-cli.ts status",
+    "data:cleanup": "node --import tsx src/maintenance/data-cli.ts cleanup",
     "source:list": "node --import tsx src/ingestion/cli.ts list",
     "source:fetch": "node --import tsx src/ingestion/cli.ts fetch",
     "source:verify": "node --import tsx src/ingestion/cli.ts verify",

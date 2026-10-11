@@ -129,6 +129,8 @@ npm run build
 | `npm run dev` | Develop the web app and API together. |
 | `npm run check` | Run formatting, linting, and TypeScript validation. |
 | `npm run check:fix` | Apply safe formatting and lint fixes. Review the diff afterwards. |
+| `npm run data:status` | Inspect local data file sizes without rebuilding. |
+| `npm run data:cleanup` | Preview conservative historical-build cleanup; `--apply` executes after review. See the [maintenance policy](docs/development-migration.md#inspect-and-maintain-local-data). |
 | `npm test` | Run fast unit tests. |
 | `npm run build` | Verify the production web build. |
 | `npm run corpus:update` | Audit consolidated-version candidates, refresh selected official sources, rebuild Canonical and experimental Runtime artifacts, verify Runtime, and write one report. |
