@@ -2098,6 +2098,8 @@ Topic 页面聚合：
 
 当前实现：Runtime `5.4.0` 发布首个有界 Topic/Taxonomy 0→1。版本控制的 `data/editorial/regulatory-topics.json` 定义 3 个 reviewed editorial Topics：`Major ICT incident reporting`、`ICT third-party risk`、`Banking governance and internal control`，并以 10 条 assignment 指向 exact loaded Document 或 Provision stable ID。独立 `regulatory-topic@1.0.0` builder 在 Edition/Profile compilation 后校验 endpoint、target kind、review lineage 和 evidence locator；只有至少保留 2 个 Document 且含 1 个 Provision assignment 的 Topic 才可 materialize，避免 Profile 产生残缺聚合。`regulatory_topics` 与 `topic_assignments` 独立于 Domain、Applicability 和主法律关系表；`GET /api/topics`、`GET /api/topics/:slug`、`/topics` 与 `/topics/:slug` 从同一 read-only Runtime projection 返回。Topic detail 只复用既有 `OFFICIAL_MAPPING` relationship 及 exact evidence，不复制法律关系，也固定声明 `applicabilityConclusion: false`。
 
+上述 10 条 assignment 是 0→1 初始切片的规模；后续沿用同一 contract 的专题增厚与业务场景核验见 [Banking Governance task audit](banking-governance-task-audit.md)。当前数量以 reviewed dataset 和 Runtime manifest 为准。该诊断不替代原有引用检索或 release gate，也不把导航覆盖当作法律适用性或真实用户价值证明。
+
 ## 23.2 Implementation Timeline
 
 参考 artificialintelligenceact.eu 的 timeline 产品形态。

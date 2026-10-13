@@ -212,7 +212,10 @@ export function RegulatoryTopicPage({
           <p>
             Topic membership is reviewed editorial navigation. Legal links are
             reused from existing OFFICIAL_MAPPING relationships with exact
-            evidence; open the cited provision for the loaded legal text.
+            evidence; open the cited provision for the loaded legal text. Check
+            the loaded version and official source in the Reader before using a
+            provision. Topic membership does not establish that the text is the
+            latest version or applies to your institution.
           </p>
         </div>
         <span>{detail.runtime.profileId}</span>
@@ -238,6 +241,9 @@ export function RegulatoryTopicPage({
                     ) : null}
                     <ArrowUpRight aria-hidden="true" size={14} />
                   </Link>
+                  <p className="topic-assignment-note">
+                    <small>Editorial navigation: {assignment.rationale}</small>
+                  </p>
                 </li>
               ))}
             </ul>

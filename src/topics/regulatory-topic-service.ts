@@ -30,7 +30,7 @@ export interface RegulatoryTopicRepository {
   readonly regulatoryTopicTaxonomyReviewedAt: string;
   listRegulatoryTopics(): RegulatoryTopic[];
   listTopicAssignments(topicId?: string): TopicAssignment[];
-  listDocumentViews(): DocumentView[];
+  findDocument(documentId: string): DocumentView | null;
   listDocumentSummaries(): DocumentSummary[];
   listCrossDocumentRelationships(): ProvisionRelationship[];
 }
@@ -97,20 +97,20 @@ export class RegulatoryTopicService {
         .listDocumentSummaries()
         .map((summary) => [summary.id, summary]),
     );
-    const documents = this.repository
-      .listDocumentViews()
-      .flatMap((document) => {
-        const documentAssignments = assignmentsByDocument.get(document.id);
-        const summary = summaries.get(document.id);
-        if (!documentAssignments || !summary) return [];
+    const documents = [...assignmentsByDocument.keys()]
+      .flatMap((documentId) => {
+        const documentAssignments = assignmentsByDocument.get(documentId);
+        const summary = summaries.get(documentId);
+        const view = this.repository.findDocument(documentId);
+        if (!view || !documentAssignments || !summary) return [];
         return [
           {
-            id: document.id,
-            slug: document.slug,
-            shortName: document.shortName,
-            officialTitle: document.officialTitle,
-            jurisdiction: document.jurisdiction,
-            documentType: document.documentType,
+            id: view.id,
+            slug: view.slug,
+            shortName: view.shortName,
+            officialTitle: view.officialTitle,
+            jurisdiction: view.jurisdiction,
+            documentType: view.documentType,
             regulatoryLevel: summary.regulatoryLevel,
             measureType: summary.measureType,
             defaultPath: summary.defaultPath,

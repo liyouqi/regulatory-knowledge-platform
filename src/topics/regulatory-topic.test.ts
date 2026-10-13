@@ -19,7 +19,7 @@ describe("reviewed Regulatory Topics", () => {
       "topic:ict-third-party-risk",
       "topic:major-ict-incident-reporting",
     ]);
-    expect(build.assignments).toHaveLength(10);
+    expect(build.assignments).toHaveLength(27);
     expect(build.assignments).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -35,6 +35,38 @@ describe("reviewed Regulatory Topics", () => {
         }),
       ]),
     );
+  });
+
+  it("publishes twenty governance entries without changing official relationship semantics", () => {
+    const build = buildRegulatoryTopics(documents, entities, knownDocumentIds);
+    const governance = build.assignments.filter(
+      (assignment) =>
+        assignment.topicId === "topic:banking-governance-internal-control",
+    );
+    expect(governance).toHaveLength(20);
+    expect(
+      new Set(governance.map((assignment) => assignment.targetDocumentId)).size,
+    ).toBe(3);
+    expect(
+      governance.every(
+        (assignment) =>
+          assignment.provenance === "EDITORIAL" &&
+          assignment.targetKind === "provision",
+      ),
+    ).toBe(true);
+    expect(
+      governance.find(
+        (assignment) =>
+          assignment.targetEntityId ===
+          "lu:cssf:circular-12-552:part:ii:provision:point-25",
+      )?.targetPath,
+    ).toBe("/read/circular-cssf-12-552/provisions/part-ii-provision-point-25");
+    expect(
+      governance.find(
+        (assignment) =>
+          assignment.targetEntityId === "eu:32013L0036:article:76",
+      )?.role,
+    ).toBe("primary");
   });
 
   it("fails closed when a selected assignment endpoint drifts", () => {

@@ -2,10 +2,10 @@
   "schemaVersion": "1.0.0",
   "taxonomy": {
     "id": "taxonomy:regulatory-topic",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "provenance": "EDITORIAL",
     "reviewStatus": "reviewed",
-    "reviewedAt": "2026-08-27T13:00:00Z"
+    "reviewedAt": "2026-10-12T00:00:00Z"
   },
   "topics": [
     {
@@ -21,7 +21,7 @@
     {
       "id": "topic:banking-governance-internal-control",
       "label": "Banking governance and internal control",
-      "description": "Reviewed navigation topic connecting CRD governance provisions, EBA internal-governance guidance, and Luxembourg supervisory material."
+      "description": "Reviewed navigation across CRD, EBA and CSSF provisions on management responsibilities, conflicts of interest, internal control independence, compliance and internal audit. Loaded versions and institutional applicability must be checked separately."
     }
   ],
   "assignments": [
@@ -144,6 +144,210 @@
       "rationale": "Point 7 addresses risk and compliance culture and internal control.",
       "reviewNote": "Editorial topic classification; the official PDF text remains authoritative.",
       "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-7"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:76",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Management body and risk strategy.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:32013L0036:article:76"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:32013L0036",
+      "targetEntityId": "eu:32013L0036:article:88",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Governance accountability.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:32013L0036:article:88"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:20",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Documented management body duties.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:20"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:105",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Institutional conflicts of interest.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:105"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:141",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Business lines and the internal control framework.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:141"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:175",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Independence of internal control functions.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:175"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:204",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Permanent compliance function.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:204"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:208",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Compliance policy and regulatory change.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:208"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "eu:eba:gl:2021:05",
+      "targetEntityId": "eu:eba:gl:2021:05:paragraph:214",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Internal audit independence and resources.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "eu:eba:gl:2021:05:paragraph:214"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-25",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: supervisory body records.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-25"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-41",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: audit committee and audit planning.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-41"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-105",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: internal control functions and lines of defence.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-105"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-109",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: internal control independence.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-109"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-117",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: annual internal control reporting.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-117"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-139",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: compliance charter.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-139"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-154",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: risk-based internal audit planning.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-154"
+    },
+    {
+      "topicId": "topic:banking-governance-internal-control",
+      "targetDocumentId": "lu:cssf:circular-12-552",
+      "targetEntityId": "lu:cssf:circular-12-552:part:ii:provision:point-168",
+      "targetKind": "provision",
+      "role": "supporting",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-12T00:00:00Z",
+      "rationale": "Navigation subject: Part II: conflicts of interest policy.",
+      "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
+      "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-168"
     }
   ]
 }
