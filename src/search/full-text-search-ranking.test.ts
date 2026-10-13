@@ -86,6 +86,24 @@ afterAll(() => {
 });
 
 describe("global full-text coverage", () => {
+  it("bounds question candidates and applies Document scope before question ranking", () => {
+    const query = "How should shared risk be managed by a bank?";
+    const scoped = search.search(query, { documentId: "fixture:b", limit: 2 });
+    // All fixture records within a law share one root Provision; question
+    // results intentionally keep its best evidence location only.
+    expect(scoped.results).toHaveLength(1);
+    expect(
+      scoped.results.every((result) => result.documentId === "fixture:b"),
+    ).toBe(true);
+    expect(
+      search.search(query, { documentId: "fixture:missing" }).results,
+    ).toEqual([]);
+    expect(search.search(query, { limit: 1 }).results).toHaveLength(1);
+    expect(
+      search.search("How should nonexistentterm unmatchedword be managed?")
+        .results,
+    ).toEqual([]);
+  });
   it("shows each law's best match before additional matches and preserves stable ties", () => {
     const response = search.search("shared risk", { limit: 6 });
     expect(response.results.map((result) => result.id)).toEqual([

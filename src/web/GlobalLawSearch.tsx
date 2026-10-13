@@ -287,6 +287,7 @@ export function GlobalLawSearch({
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [mode, setMode] = useState<SearchMode>("laws");
   const [query, setQuery] = useState("");
+  const [documentScope, setDocumentScope] = useState("");
   const [lawResponse, setLawResponse] = useState<LawSearchResponse | null>(
     null,
   );
@@ -369,7 +370,7 @@ export function GlobalLawSearch({
         ? `/api/search/laws?q=${encodeURIComponent(query)}`
         : mode === "definitions"
           ? `/api/search/definitions?q=${encodeURIComponent(query)}&limit=20`
-          : `/api/search/full-text?q=${encodeURIComponent(query)}&limit=20`;
+          : `/api/search/full-text?q=${encodeURIComponent(query)}&limit=20${documentScope ? `&documentId=${encodeURIComponent(documentScope)}` : ""}`;
 
     void fetch(endpoint, { signal: controller.signal })
       .then(async (fetchResponse) => {
@@ -401,7 +402,7 @@ export function GlobalLawSearch({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [mode, open, query]);
+  }, [documentScope, mode, open, query]);
 
   useEffect(() => {
     if (!open || mode !== "opened") return;
@@ -416,7 +417,12 @@ export function GlobalLawSearch({
   }, [mode, open]);
 
   useEffect(() => {
-    if (!open || mode !== "opened" || catalog.length > 0) return;
+    if (
+      !open ||
+      (mode !== "opened" && mode !== "fulltext") ||
+      catalog.length > 0
+    )
+      return;
     const controller = new AbortController();
     void fetch("/api/documents", { signal: controller.signal })
       .then(async (response) => {
@@ -719,6 +725,27 @@ export function GlobalLawSearch({
           id="law-search-results"
           role="tabpanel"
         >
+          {mode === "fulltext" ? (
+            <label className="search-status">
+              Evidence scope
+              <select
+                aria-label="Full-text evidence scope"
+                value={documentScope}
+                onChange={(event) => {
+                  setDocumentScope(event.target.value);
+                  setFullTextResponse(null);
+                  setSelectedIndex(0);
+                }}
+              >
+                <option value="">All loaded laws</option>
+                {catalog.map((document) => (
+                  <option key={document.id} value={document.id}>
+                    {document.shortName}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           {error ? (
             <p className="search-empty error-state" role="alert">
               {error}
@@ -779,8 +806,17 @@ export function GlobalLawSearch({
           fullTextResponse &&
           fullTextResults.length === 0 ? (
             <p className="search-empty">
-              No provision matches all of these terms.
+              No matching evidence location was found. Try fewer keywords or
+              select a law.
             </p>
+          ) : null}
+
+          {!error && mode === "fulltext" && fullTextResponse ? (
+            <output className="search-status">
+              Keyword-based evidence locations, not legal answers. Normalized
+              terms: {fullTextResponse.normalizedQuery || "none"}. Chinese
+              support is limited to a small search vocabulary.
+            </output>
           ) : null}
 
           {!error &&

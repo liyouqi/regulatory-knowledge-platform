@@ -4606,6 +4606,14 @@ kbd {
   text-align: center;
 }
 
+.search-status {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 12px 24px;
+}
+
 .search-fallback {
   align-items: center;
   display: flex;

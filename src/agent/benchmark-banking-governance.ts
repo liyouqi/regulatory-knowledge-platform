@@ -13,7 +13,10 @@ import { CitationRetrievalService } from "./citation-retrieval-service";
 const repository = new SqliteRuntimeRepository();
 const search = new SearchService();
 try {
-  const dataset = loadBankingGovernanceTasks();
+  const datasetArgument = process.argv.indexOf("--dataset");
+  const dataset = loadBankingGovernanceTasks(
+    datasetArgument >= 0 ? process.argv[datasetArgument + 1] : undefined,
+  );
   const documents = repository.listDocumentViews();
   const context = new CitationContextService(repository, documents);
   const report = evaluateBankingGovernance(

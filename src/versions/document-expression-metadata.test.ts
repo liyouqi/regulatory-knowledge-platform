@@ -18,6 +18,20 @@ function registeredDocumentIds(): Set<string> {
 }
 
 describe("reviewed document Expression metadata", () => {
+  it("marks the loaded 2025 CRD consolidation as historical without repinning its text", () => {
+    const record = loadDocumentExpressionMetadataDataset().records.find(
+      (item) => item.documentId === "eu:32013L0036",
+    );
+    expect(record).toMatchObject({
+      textKind: "consolidated",
+      currencyStatus: "historical",
+      fallbackReason: null,
+    });
+    expect(
+      loadSourceRegistrySync().find((source) => source.celex === "32013L0036")
+        ?.expressionCelex,
+    ).toBe("02013L0036-20250117");
+  });
   it("covers every registered source without an unspecified text kind", () => {
     const dataset = loadDocumentExpressionMetadataDataset();
     const registered = registeredDocumentIds();

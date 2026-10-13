@@ -71,6 +71,7 @@
     "relationships:benchmark": "node --import tsx src/relationships/benchmark-related-recitals.ts",
     "citation:benchmark": "node --import tsx src/agent/benchmark-citation-retrieval.ts",
     "banking:benchmark": "node --import tsx src/agent/benchmark-banking-governance.ts",
+    "banking:workflows": "node --import tsx src/agent/banking-workflow-cli.ts",
     "copilot:smoke": "node --import tsx src/copilot/smoke/live-smoke.ts",
     "search:benchmark": "node --import tsx src/search/benchmark-search.ts",
     "performance:benchmark": "npm run runtime:build && npm run build && node --import tsx src/performance/benchmark-reader.ts",

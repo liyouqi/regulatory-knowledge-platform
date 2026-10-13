@@ -288,6 +288,8 @@ The first reviewed national implementation mapping publishes `Circular CSSF 12/5
 
 ### Banking Governance regulatory path
 
+The [question-search and business-workflow continuation](docs/banking-governance-workflows.md) adds bounded business-question lexical retrieval, a selectable Full-text Document scope, a dated CRD/EBA/CSSF currency review and `npm run banking:workflows` evidence packs. It retains strict keyword/phrase/citation search and official legal text, marks the loaded 2025 CRD Expression historical without repinning it, and supplies a blank real-user trial template instead of simulated acceptance.
+
 The generic `/domains/:domainSlug` product surface and `GET /api/regulatory-paths/:domainSlug` service project the existing Runtime taxonomy, assignments, authorities, legal nature, Profile identity, and cross-document relationships into one evidence-bearing navigation path. The first path at `/domains/banking-governance-internal-control` displays CRD IV, EBA/GL/2021/05, and Circular CSSF 12/552 together with the existing `MANDATES`, `SUPPLEMENTS`, and `IMPLEMENTS` directions and their exact official evidence. It does not read curated JSON at request time, reverse edges for visual convenience, or treat an Edition/Profile as an institution-specific legal applicability conclusion. CRD, EBA, and CSSF Reader/Explorer context links back to the same generic path.
 
 ### DORA applicability navigator

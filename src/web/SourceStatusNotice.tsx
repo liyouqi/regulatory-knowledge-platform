@@ -11,6 +11,10 @@ export function SourceStatusNotice({ status }: { status: SourceStatus }) {
     <aside className="source-status-notice" aria-label="Legal text status">
       <strong>{basis}</strong>
       <span>Text as of {status.textAsOf}</span>
+      <span>
+        A loaded text date is not a latest-version certification. Check the
+        current official source before relying on this text.
+      </span>
       {status.checkedAt ? (
         <span>Status checked {status.checkedAt.slice(0, 10)}</span>
       ) : null}

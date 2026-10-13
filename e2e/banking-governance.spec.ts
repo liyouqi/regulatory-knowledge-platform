@@ -1,5 +1,78 @@
 import { expect, test } from "@playwright/test";
 
+test("a business question opens its exact CRD evidence and retains version cautions", async ({
+  page,
+}) => {
+  await page.goto("/topics/banking-governance-internal-control");
+  await expect(
+    page.getByRole("heading", {
+      name: "Banking governance and internal control",
+    }),
+  ).toBeVisible();
+  await page.keyboard.press("Meta+k");
+  const search = page.getByRole("dialog", { name: "Regulatory search" });
+  await search.getByRole("tab", { name: "Full text" }).click();
+  await search
+    .getByRole("textbox", { name: "Search full text across loaded laws" })
+    .fill("Who approves and periodically reviews a bank's risk strategy?");
+  await expect(
+    search.locator(".full-text-search-result").first(),
+  ).toContainText("CRD IV");
+  await expect(search.locator("output.search-status")).toContainText(
+    "not legal answers",
+  );
+  await search.locator(".full-text-search-result").first().click();
+  await expect(page).toHaveURL(/\/read\/crd-iv\/articles\/76/u);
+  await expect(
+    page.getByText(
+      "A loaded text date is not a latest-version certification.",
+      { exact: false },
+    ),
+  ).toBeVisible();
+});
+
+test("business-question scope is selectable and changes the actual request", async ({
+  page,
+}) => {
+  await page.goto("/topics/banking-governance-internal-control");
+  await expect(
+    page.getByRole("heading", {
+      name: "Banking governance and internal control",
+    }),
+  ).toBeVisible();
+  await page.keyboard.press("Meta+k");
+  const dialog = page.getByRole("dialog", { name: "Regulatory search" });
+  await dialog.getByRole("tab", { name: "Full text" }).click();
+  await expect(
+    dialog
+      .getByRole("combobox", { name: "Full-text evidence scope" })
+      .locator('option[value="eu:eba:gl:2021:05"]'),
+  ).toHaveCount(1);
+  await dialog
+    .getByRole("combobox", { name: "Full-text evidence scope" })
+    .selectOption("eu:eba:gl:2021:05");
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/search/full-text") &&
+      response.url().includes("documentId=eu%3Aeba%3Agl%3A2021%3A05"),
+  );
+  await dialog
+    .getByRole("textbox", { name: "Search full text across loaded laws" })
+    .fill(
+      "What independence and resources should the internal audit function have?",
+    );
+  const response = await responsePromise;
+  const payload = await response.json();
+  expect(payload.scopeDocumentId).toBe("eu:eba:gl:2021:05");
+  expect(payload.results.length).toBeGreaterThan(0);
+  expect(
+    payload.results.every(
+      (result: { documentId: string }) =>
+        result.documentId === "eu:eba:gl:2021:05",
+    ),
+  ).toBe(true);
+});
+
 test("governance Topic exposes editorial subjects and opens the exact Part II point", async ({
   page,
 }) => {

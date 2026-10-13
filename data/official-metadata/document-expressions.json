@@ -1,17 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "records": [
     {
       "documentId": "eu:32013L0036",
       "language": "en",
       "issuers": ["European Parliament", "Council of the European Union"],
       "textKind": "consolidated",
-      "currencyStatus": "current",
+      "currencyStatus": "historical",
       "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
       "fallbackReason": null,
       "reviewStatus": "reviewed",
-      "reviewedAt": "2026-09-29T00:00:00.000Z"
+      "reviewedAt": "2026-10-13T00:00:00.000Z"
     },
     {
       "documentId": "eu:32013R0575",

@@ -10,6 +10,7 @@ import type {
   SearchSnippetSegment,
 } from "../shared/legal";
 import { normalizeSearchText } from "./current-document-search";
+import { parseQuestionQuery, questionTermCoverage } from "./question-query";
 import {
   DEFAULT_RUNTIME_DATABASE_PATH,
   RUNTIME_DATABASE_SCHEMA_VERSION,
@@ -243,6 +244,7 @@ export class SearchService {
     options: { documentId?: string; limit?: number } = {},
   ): FullTextSearchResponse {
     const query = rawQuery.trim();
+    const question = parseQuestionQuery(query);
     const parsed = parseFullTextQuery(query);
     const limit = Math.max(1, Math.min(options.limit ?? 20, 50));
     if (!parsed) {
@@ -257,6 +259,69 @@ export class SearchService {
     const scopeClause = options.documentId
       ? "AND p.document_id = @documentId"
       : "";
+    if (question) {
+      const candidates = this.database
+        .prepare(`
+        SELECT p.record_id AS id, p.document_id AS documentId,
+          d.slug, d.short_name AS shortName, d.celex, d.local_id AS localId,
+          p.provision_id AS provisionId, p.kind, p.label, p.title, p.marker, p.path,
+          p.heading, p.body,
+          snippet(search_records_fts, -1, char(1), char(2), '…', 28) AS markedSnippet,
+          bm25(search_records_fts, 5.0, 1.0) AS rank
+        FROM search_records_fts
+        JOIN search_records p ON p.rowid = search_records_fts.rowid
+        JOIN documents d ON d.id = p.document_id
+        WHERE search_records_fts MATCH @matchExpression ${scopeClause}
+        ORDER BY rank ASC, p.document_id ASC, p.rowid ASC LIMIT 200
+      `)
+        .all({
+          matchExpression: question.matchExpression,
+          documentId: options.documentId,
+        }) as Array<SearchRow & { heading: string; body: string }>;
+      const rows = candidates
+        .map((row) => ({
+          row,
+          coverage: questionTermCoverage(question, row.heading, row.body),
+        }))
+        .filter(({ coverage }) => coverage >= 2)
+        .sort(
+          (left, right) =>
+            right.coverage - left.coverage ||
+            left.row.rank - right.row.rank ||
+            left.row.documentId.localeCompare(right.row.documentId) ||
+            left.row.id.localeCompare(right.row.id),
+        );
+      const roots = new Set<string>();
+      const selected = rows
+        .filter(({ row }) => {
+          const key = `${row.documentId}:${row.provisionId}`;
+          if (roots.has(key)) return false;
+          roots.add(key);
+          return true;
+        })
+        .slice(0, limit);
+      return {
+        query,
+        normalizedQuery: question.normalizedQuery,
+        scopeDocumentId: options.documentId,
+        indexBuildId: this.buildId,
+        results: selected.map(({ row }) => ({
+          id: row.id,
+          documentId: row.documentId,
+          slug: row.slug,
+          shortName: row.shortName,
+          celex: row.celex ?? undefined,
+          localId: row.localId ?? undefined,
+          provisionId: row.provisionId,
+          kind: row.kind,
+          label: row.label,
+          title: row.title ?? undefined,
+          marker: row.marker ?? undefined,
+          path: row.path,
+          snippet: parseMarkedSnippet(row.markedSnippet),
+        })),
+      };
+    }
     const ranking = options.documentId
       ? ""
       : `WITH matches AS MATERIALIZED (

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "banking-governance-tasks",
+  "version": "holdout-1.0.0",
+  "reviewedAt": "2026-10-13T00:00:00Z",
+  "questionOrigin": "editorial-scenarios-not-user-observations",
+  "topicSlug": "banking-governance-internal-control",
+  "topN": 5,
+  "sources": [
+    {
+      "documentId": "eu:32013L0036",
+      "sourceSnapshotId": "snapshot:cellar:32013L0036:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "sourceVersion": "Con-20250313194952000",
+      "sourceUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2025-01-17/eng",
+      "textAsOf": "2025-01-17"
+    },
+    {
+      "documentId": "eu:eba:gl:2021:05",
+      "sourceSnapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "sourceVersion": "eba-pdf-1.1.2-1529fbe9d55b",
+      "sourceUrl": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd",
+      "textAsOf": "2021-07-02"
+    },
+    {
+      "documentId": "lu:cssf:circular-12-552",
+      "sourceSnapshotId": "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "sourceVersion": "cssf-pdf-1.1.3-dbea9517a19d",
+      "sourceUrl": "https://www.cssf.lu/en/Document/circular-cssf-12-552/",
+      "textAsOf": "2024-08-29"
+    }
+  ],
+  "cases": [
+    {
+      "id": "banking-governance:holdout-1",
+      "query": "How are executive and supervisory management responsibilities separated?",
+      "questionZh": "管理机构的职责分工应在哪里记录？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:20",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "20"
+        },
+        "textSha256": "sha256:ad8ec6bca0f0329329373cf06430fe3e1760044ee17d4f42ee4a6ae4400c6184"
+      },
+      "navigationSubject": "Documented management body duties"
+    },
+    {
+      "id": "banking-governance:holdout-2",
+      "query": "What safeguards protect internal control staff remuneration and independence?",
+      "questionZh": "内部控制职能的独立性条件从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:175",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "53"
+        },
+        "textSha256": "sha256:21cae19453b8d81d261cd6294a18768ee0c6be789ee005426ed15dbb96520e71"
+      },
+      "navigationSubject": "Independence of internal control functions"
+    },
+    {
+      "id": "banking-governance:holdout-3",
+      "query": "Where is the regular assessment of changes in legislation addressed?",
+      "questionZh": "合规政策监督和法律变化评估从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:208",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "57"
+        },
+        "textSha256": "sha256:23f81f0fc10f8382c460972233d9e0fa5ba1dce7367c1de65f939d766a231d28"
+      },
+      "navigationSubject": "Compliance policy and regulatory change"
+    },
+    {
+      "id": "banking-governance:holdout-4",
+      "query": "What should Luxembourg supervisory board minutes document?",
+      "questionZh": "监督机构的会议记录要求从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-25",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "21"
+        },
+        "textSha256": "sha256:08c66abf8fce801aea59fb6d6a8bf3c5eef762cc12902429b78e8db350c594b4"
+      },
+      "navigationSubject": "Part II: supervisory body records"
+    },
+    {
+      "id": "banking-governance:holdout-5",
+      "query": "Who approves a Luxembourg bank compliance charter?",
+      "questionZh": "合规章程的内容与批准要求从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-139",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "50"
+        },
+        "textSha256": "sha256:c8c05900409ba07bf9bbf3c196b08740e113ee6b79e6273aa39d12f0b99d9f97"
+      },
+      "navigationSubject": "Part II: compliance charter"
+    },
+    {
+      "id": "banking-governance:holdout-6",
+      "query": "内部审计计划应按什么风险安排？",
+      "questionZh": "内部审计计划应按什么风险安排？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-154",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "56"
+        },
+        "textSha256": "sha256:b6b3e9ba666ef923efb9df937bad44d8bd0141fcbc25717208cfe34e923f8dff"
+      },
+      "navigationSubject": "Part II: risk-based internal audit planning"
+    }
+  ]
+}

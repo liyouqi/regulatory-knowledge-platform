@@ -79,14 +79,11 @@ export type BankingGovernanceTasks = z.infer<
   typeof bankingGovernanceTasksSchema
 >;
 
-export function loadBankingGovernanceTasks(): BankingGovernanceTasks {
+export function loadBankingGovernanceTasks(
+  inputPath = "data/benchmarks/banking-governance-tasks.json",
+): BankingGovernanceTasks {
   return bankingGovernanceTasksSchema.parse(
-    JSON.parse(
-      readFileSync(
-        resolve(process.cwd(), "data/benchmarks/banking-governance-tasks.json"),
-        "utf8",
-      ),
-    ),
+    JSON.parse(readFileSync(resolve(process.cwd(), inputPath), "utf8")),
   );
 }
 

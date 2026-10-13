@@ -103,6 +103,7 @@ import { Level2LibraryPage } from "./Level2LibraryPage";
 import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { RegulatoryPathPage } from "./RegulatoryPathPage";
 import { RegulatoryTopicPage } from "./RegulatoryTopicPage";
+import { SourceStatusNotice } from "./SourceStatusNotice";
 import { SupervisoryDecisionsPage } from "./SupervisoryDecisionsPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
@@ -1469,6 +1470,9 @@ function ReaderPage({
             <span key={entry.id}>{entry.title ?? entry.label}</span>
           ))}
         </div>
+        {legalDocument.sourceStatus ? (
+          <SourceStatusNotice status={legalDocument.sourceStatus} />
+        ) : null}
         <p className="provision-label">{activeProvision.label}</p>
         {activeProvision.title ? (
           <h2 id="provision-title">{activeProvision.title}</h2>
