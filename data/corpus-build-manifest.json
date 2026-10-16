@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "sources": [
     {
       "adapter": "eur-lex",
       "identifier": "32013L0036",
-      "snapshotId": "snapshot:cellar:32013L0036:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
-      "contentSha256": "sha256:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "snapshotId": "snapshot:cellar:32013L0036:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
+      "contentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
       "retention": {
         "status": "local-only"
       }

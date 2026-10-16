@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "crd-20260711",
+  "checkedOn": "2026-10-16",
+  "scope": "technical-source-fidelity-and-navigation-not-legal-applicability",
+  "parserVersion": "1.6.1",
+  "canonicalSchemaVersion": "1.2.0",
+  "beforeManifestVersion": "1.21.0",
+  "afterManifestVersion": "1.22.0",
+  "before": {
+    "source": {
+      "status": "active",
+      "familyId": "family:crd",
+      "shortName": "CRD IV",
+      "aliases": [
+        "Capital Requirements Directive",
+        "Capital Requirements Directive IV",
+        "Directive 2013/36/EU"
+      ],
+      "celex": "32013L0036",
+      "language": "ENG",
+      "documentType": "directive",
+      "regulatoryLevel": "level-1",
+      "measureType": "primary-act",
+      "publicationDate": "2013-06-27",
+      "quality": {
+        "articleCount": 178,
+        "recitalCount": 0,
+        "annexCount": 2,
+        "paragraphCount": 645,
+        "pointCount": 767,
+        "structuralNodeCount": 42,
+        "maximumWarnings": 0,
+        "textHashes": {
+          "eu:32013L0036:article:1:subparagraph:1": "sha256:09c7024672fc5a7c6acebb6c963d3b13956350eb191cfb0017d50e69e242498c",
+          "eu:32013L0036:article:165:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+          "eu:32013L0036:annex:i": "sha256:680575d5d9f70bdb8bf190afcd5f66b0edba34d30256966910b2da32c4d4d389",
+          "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152"
+        }
+      },
+      "sourceStatus": {
+        "basis": "consolidated",
+        "textAsOf": "2025-01-17",
+        "checkedAt": "2026-09-29T00:00:00Z",
+        "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2013/36",
+        "corrections": [
+          {
+            "date": "2013-08-02",
+            "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2013-08-02/oj/eng"
+          },
+          {
+            "date": "2017-01-25",
+            "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2017-01-25/oj/eng"
+          }
+        ]
+      },
+      "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2025-01-17/eng",
+      "expressionCelex": "02013L0036-20250117"
+    },
+    "pin": {
+      "adapter": "eur-lex",
+      "identifier": "32013L0036",
+      "snapshotId": "snapshot:cellar:32013L0036:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "contentSha256": "sha256:264bba80caeba75e2a61ac1b3f53e54ceb16329c0b996ab3d4da47c92a6670a7",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    "expressionMetadata": {
+      "documentId": "eu:32013L0036",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "historical",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-13T00:00:00.000Z"
+    }
+  },
+  "after": {
+    "source": {
+      "status": "active",
+      "familyId": "family:crd",
+      "shortName": "CRD IV",
+      "aliases": [
+        "Capital Requirements Directive",
+        "Capital Requirements Directive IV",
+        "Directive 2013/36/EU"
+      ],
+      "celex": "32013L0036",
+      "language": "ENG",
+      "documentType": "directive",
+      "regulatoryLevel": "level-1",
+      "measureType": "primary-act",
+      "publicationDate": "2013-06-27",
+      "quality": {
+        "articleCount": 197,
+        "recitalCount": 0,
+        "annexCount": 2,
+        "paragraphCount": 773,
+        "pointCount": 979,
+        "structuralNodeCount": 46,
+        "maximumWarnings": 0,
+        "textHashes": {
+          "eu:32013L0036:article:1:subparagraph:1": "sha256:09c7024672fc5a7c6acebb6c963d3b13956350eb191cfb0017d50e69e242498c",
+          "eu:32013L0036:article:165:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+          "eu:32013L0036:annex:i": "sha256:680575d5d9f70bdb8bf190afcd5f66b0edba34d30256966910b2da32c4d4d389",
+          "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152",
+          "eu:32013L0036:article:74:paragraph:1": "sha256:deb2a06e1f878fe097470ea7aab00f88751268bb6e8c1f8351089a4bb5c9ed97",
+          "eu:32013L0036:article:74:paragraph:3": "sha256:230beff666427a966f2681af56db1c17b0b66551b2d2e99f17994fc6af65bb04",
+          "eu:32013L0036:article:76:paragraph:1": "sha256:388095abded1570b2cdb421c1bd8f96daf08b906b94b0a8cead1f5c54b519601",
+          "eu:32013L0036:article:76:paragraph:5": "sha256:50d26d884ae51b6aac8571fd3577479cad0d2ee836e47c9de16159ae28d9fc1d",
+          "eu:32013L0036:article:76:paragraph:6": "sha256:abc4aa322d6ae81bfb05603ba93c8904e23707b8f483d15b6988f2b40ceb4365",
+          "eu:32013L0036:article:88:paragraph:1:point:e": "sha256:0f372aa542cabb96060af2bd0671e42be64d65fed6f3387c907a628eceb41e1c",
+          "eu:32013L0036:article:88:paragraph:3": "sha256:d1c5a0b7889b865986b8aaee044e5f3e010166af53c79ea4d631214f18e891f7"
+        }
+      },
+      "sourceStatus": {
+        "basis": "consolidated",
+        "textAsOf": "2026-07-11",
+        "checkedAt": "2026-10-16T00:00:00Z",
+        "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2013/36",
+        "corrections": [
+          {
+            "date": "2013-08-02",
+            "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2013-08-02/oj/eng"
+          },
+          {
+            "date": "2017-01-25",
+            "url": "https://eur-lex.europa.eu/eli/dir/2013/36/corrigendum/2017-01-25/oj/eng"
+          }
+        ]
+      },
+      "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2026-07-11/eng",
+      "expressionCelex": "02013L0036-20260711",
+      "structuralIdentityOverrides": [
+        {
+          "parentLogicalId": "eu:32013L0036:title:vii:chapter:3",
+          "kind": "section",
+          "number": "i",
+          "title": "Principles for conducting supervision on a consolidated basis",
+          "occurrence": 1,
+          "sourceContentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8"
+        },
+        {
+          "parentLogicalId": "eu:32013L0036:title:vii:chapter:3",
+          "kind": "section",
+          "number": "i",
+          "title": "Application of this Chapter to investment firm groups",
+          "occurrence": 2,
+          "sourceContentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8"
+        }
+      ]
+    },
+    "pin": {
+      "adapter": "eur-lex",
+      "identifier": "32013L0036",
+      "snapshotId": "snapshot:cellar:32013L0036:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
+      "contentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    "expressionMetadata": {
+      "documentId": "eu:32013L0036",
+      "language": "en",
+      "issuers": ["European Parliament", "Council of the European Union"],
+      "textKind": "consolidated",
+      "currencyStatus": "current",
+      "versionSelectionPolicy": "prefer_reviewed_consolidated_else_reviewed_official_publication",
+      "fallbackReason": null,
+      "reviewStatus": "reviewed",
+      "reviewedAt": "2026-10-16T00:00:00.000Z"
+    }
+  },
+  "comparison": {
+    "beforeQuality": {
+      "schemaVersion": "1.2.0",
+      "articleCount": 178,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 645,
+      "pointCount": 767,
+      "structuralNodeCount": 42,
+      "warningCount": 0
+    },
+    "afterQuality": {
+      "schemaVersion": "1.2.0",
+      "articleCount": 197,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 773,
+      "pointCount": 979,
+      "structuralNodeCount": 46,
+      "warningCount": 0
+    },
+    "retainedArticleCount": 178,
+    "addedArticleIds": [
+      "eu:32013L0036:article:4a",
+      "eu:32013L0036:article:21c",
+      "eu:32013L0036:article:27a",
+      "eu:32013L0036:article:27b",
+      "eu:32013L0036:article:27c",
+      "eu:32013L0036:article:27d",
+      "eu:32013L0036:article:27e",
+      "eu:32013L0036:article:27f",
+      "eu:32013L0036:article:27g",
+      "eu:32013L0036:article:27h",
+      "eu:32013L0036:article:27i",
+      "eu:32013L0036:article:27j",
+      "eu:32013L0036:article:27k",
+      "eu:32013L0036:article:27l",
+      "eu:32013L0036:article:48k",
+      "eu:32013L0036:article:48l",
+      "eu:32013L0036:article:87a",
+      "eu:32013L0036:article:91a",
+      "eu:32013L0036:article:110a"
+    ],
+    "removedArticleIds": [],
+    "addedProvisionCount": 395,
+    "removedProvisionIds": [
+      "eu:32013L0036:article:65:paragraph:3:point:a",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:i",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:ii",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:iii",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:iv",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:v",
+      "eu:32013L0036:article:65:paragraph:3:point:a:subpoint:vi",
+      "eu:32013L0036:article:65:paragraph:3:point:b",
+      "eu:32013L0036:article:65:paragraph:3:point:b:subpoint:i",
+      "eu:32013L0036:article:65:paragraph:3:point:b:subpoint:ii",
+      "eu:32013L0036:article:65:paragraph:3:point:b:subpoint:iii",
+      "eu:32013L0036:article:65:paragraph:3:point:b:subpoint:iv",
+      "eu:32013L0036:article:65:paragraph:3:point:c",
+      "eu:32013L0036:article:66:paragraph:1:point:aa",
+      "eu:32013L0036:article:66:paragraph:2:point:d",
+      "eu:32013L0036:article:66:paragraph:2:point:e",
+      "eu:32013L0036:article:66:paragraph:2:point:f",
+      "eu:32013L0036:article:67:paragraph:2:point:d",
+      "eu:32013L0036:article:67:paragraph:2:point:e",
+      "eu:32013L0036:article:67:paragraph:2:point:f",
+      "eu:32013L0036:article:67:paragraph:2:point:g",
+      "eu:32013L0036:article:70:subparagraph:1",
+      "eu:32013L0036:article:70:subparagraph:1:point:a",
+      "eu:32013L0036:article:70:subparagraph:1:point:b",
+      "eu:32013L0036:article:70:subparagraph:1:point:c",
+      "eu:32013L0036:article:70:subparagraph:1:point:d",
+      "eu:32013L0036:article:70:subparagraph:1:point:e",
+      "eu:32013L0036:article:70:subparagraph:1:point:f",
+      "eu:32013L0036:article:70:subparagraph:1:point:g",
+      "eu:32013L0036:article:70:subparagraph:1:point:h",
+      "eu:32013L0036:article:91:paragraph:12:point:a",
+      "eu:32013L0036:article:91:paragraph:12:point:b",
+      "eu:32013L0036:article:91:paragraph:12:point:c",
+      "eu:32013L0036:article:91:paragraph:12:point:d",
+      "eu:32013L0036:article:91:paragraph:12:point:e",
+      "eu:32013L0036:article:91:paragraph:12:point:f"
+    ],
+    "changedTextProvisionCount": 197,
+    "reparentedArticleIds": [],
+    "governance": [
+      {
+        "before": {
+          "number": "74",
+          "entityId": "eu:32013L0036:article:74",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']"
+          },
+          "textSha256": "sha256:8e52e9b87967334cc16bc99198e8945e3a8b9899d6b9f539874eddb8a96837e7"
+        },
+        "after": {
+          "number": "74",
+          "entityId": "eu:32013L0036:article:74",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']"
+          },
+          "textSha256": "sha256:5f8ab2d618a2f3cd14213e56d3d35cea6f474486bd0969eb9b504ab6d8d44f96"
+        }
+      },
+      {
+        "before": {
+          "number": "76",
+          "entityId": "eu:32013L0036:article:76",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[2]/ARTICLE[@IDENTIFIER='076']"
+          },
+          "textSha256": "sha256:3f31e4bc2a36328b5576f67e5a3a9c31ca1ad31c06eaf054c06ad8a814925d8c"
+        },
+        "after": {
+          "number": "76",
+          "entityId": "eu:32013L0036:article:76",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[2]/ARTICLE[@IDENTIFIER='076']"
+          },
+          "textSha256": "sha256:d7a4738b36e6801d3f341dc2f54482a44788dba3a9e3567ddfee230192c423f3"
+        }
+      },
+      {
+        "before": {
+          "number": "88",
+          "entityId": "eu:32013L0036:article:88",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[3]/ARTICLE[@IDENTIFIER='088']"
+          },
+          "textSha256": "sha256:44c4dc75efc95cbf559ecd30310419a5d6421673d8f29a89bf6d895af87dcd3b"
+        },
+        "after": {
+          "number": "88",
+          "entityId": "eu:32013L0036:article:88",
+          "sourceLocator": {
+            "kind": "xpath",
+            "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[3]/ARTICLE[@IDENTIFIER='088']"
+          },
+          "textSha256": "sha256:c807120b8233b6fd0f24735e8e460091d7bb47d448c774af096b65fcb21e484e"
+        }
+      }
+    ],
+    "unreviewedParserReparentedArticleIds": [
+      "eu:32013L0036:article:111",
+      "eu:32013L0036:article:112",
+      "eu:32013L0036:article:113",
+      "eu:32013L0036:article:114",
+      "eu:32013L0036:article:115",
+      "eu:32013L0036:article:116",
+      "eu:32013L0036:article:116a",
+      "eu:32013L0036:article:117",
+      "eu:32013L0036:article:118"
+    ],
+    "governanceHashMethod": "existing-citation-context-depth-first-textSegments-joined-with-newlines-not-official-reading-order"
+  },
+  "preservedBenchmarks": [
+    {
+      "path": "data/benchmarks/banking-governance-tasks.json",
+      "sha256": "sha256:e638f7b8e6c5c2f157d1ceaf7cf72ccc5b96a5ee4da899180ee4f6e7deeee43e"
+    },
+    {
+      "path": "data/benchmarks/banking-governance-holdout.json",
+      "sha256": "sha256:5093e33e4bf5a2a8874a270b27aa392848a00f81c4d9dddff133f94969081311"
+    }
+  ],
+  "limitations": [
+    "Current means latest English Formex consolidation observed on the checked date, not all applicable law.",
+    "Question texts and gold entity IDs are unchanged; only source lineage and affected text hashes are rebased.",
+    "Rebased holdout questions were already seen; this is a version-migration regression, not a new unseen evaluation.",
+    "Historical raw snapshots and evaluation reports are retained; the active runtime still serves only one selected expression.",
+    "Governance task text hashes describe the existing depth-first CitationContext projection, not official reading order; do not concatenate segments into a continuous legal quotation. Reader orderedContent is independently source-checked; CitationContext ordering remains a separate follow-up."
+  ],
+  "mappingReview": {
+    "entityId": "eu:32013L0036:article:74:paragraph:3",
+    "textUnchanged": true,
+    "sourceUrlBefore": "https://eur-lex.europa.eu/eli/dir/2013/36/2025-01-17/eng",
+    "sourceUrlAfter": "https://eur-lex.europa.eu/eli/dir/2013/36/2026-07-11/eng",
+    "relationshipDirectionsChanged": false
+  }
+}

@@ -1,6 +1,6 @@
 # Banking governance: question retrieval, currency review and workflow trial kit
 
-Scope: a local, bounded evidence-location workflow, not a legal-answer generator or a completed customer study. Baseline navigation was committed separately as `2b3925e`. No source pins, legal parsers, canonical contracts, relationship directions or release thresholds were changed in this continuation.
+Scope: a local, bounded evidence-location workflow, not a legal-answer generator or a completed customer study. This page records the **2026-10-13** continuation against the 2025 CRD pin; baseline navigation was committed separately as `2b3925e`. No source pins, legal parsers, canonical contracts, relationship directions or release thresholds changed in that continuation. The subsequent [2026-10-16 upgrade](crd-expression-upgrade-20261016.md) records the new CRD pin, identity fix and fresh evaluations; figures below remain historical.
 
 ## 1. Business-question search
 
@@ -21,7 +21,7 @@ The holdout queries/targets were written before evaluating the new algorithm and
 
 ```sh
 npm run banking:benchmark
-npm run banking:benchmark -- --dataset data/benchmarks/banking-governance-holdout.json
+npm run banking:benchmark -- --dataset data/benchmarks/banking-governance-holdout-crd-20260711.json
 npm run citation:benchmark
 npm run search:benchmark
 ```

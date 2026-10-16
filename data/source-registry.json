@@ -222,24 +222,31 @@
     "measureType": "primary-act",
     "publicationDate": "2013-06-27",
     "quality": {
-      "articleCount": 178,
+      "articleCount": 197,
       "recitalCount": 0,
       "annexCount": 2,
-      "paragraphCount": 645,
-      "pointCount": 767,
-      "structuralNodeCount": 42,
+      "paragraphCount": 773,
+      "pointCount": 979,
+      "structuralNodeCount": 46,
       "maximumWarnings": 0,
       "textHashes": {
         "eu:32013L0036:article:1:subparagraph:1": "sha256:09c7024672fc5a7c6acebb6c963d3b13956350eb191cfb0017d50e69e242498c",
         "eu:32013L0036:article:165:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
         "eu:32013L0036:annex:i": "sha256:680575d5d9f70bdb8bf190afcd5f66b0edba34d30256966910b2da32c4d4d389",
-        "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152"
+        "eu:32013L0036:annex:ii": "sha256:8b677fca5ffbcab113959708a7c2307a563dfbc35c42ba5f3fb132737a5d9152",
+        "eu:32013L0036:article:74:paragraph:1": "sha256:deb2a06e1f878fe097470ea7aab00f88751268bb6e8c1f8351089a4bb5c9ed97",
+        "eu:32013L0036:article:74:paragraph:3": "sha256:230beff666427a966f2681af56db1c17b0b66551b2d2e99f17994fc6af65bb04",
+        "eu:32013L0036:article:76:paragraph:1": "sha256:388095abded1570b2cdb421c1bd8f96daf08b906b94b0a8cead1f5c54b519601",
+        "eu:32013L0036:article:76:paragraph:5": "sha256:50d26d884ae51b6aac8571fd3577479cad0d2ee836e47c9de16159ae28d9fc1d",
+        "eu:32013L0036:article:76:paragraph:6": "sha256:abc4aa322d6ae81bfb05603ba93c8904e23707b8f483d15b6988f2b40ceb4365",
+        "eu:32013L0036:article:88:paragraph:1:point:e": "sha256:0f372aa542cabb96060af2bd0671e42be64d65fed6f3387c907a628eceb41e1c",
+        "eu:32013L0036:article:88:paragraph:3": "sha256:d1c5a0b7889b865986b8aaee044e5f3e010166af53c79ea4d631214f18e891f7"
       }
     },
     "sourceStatus": {
       "basis": "consolidated",
-      "textAsOf": "2025-01-17",
-      "checkedAt": "2026-09-29T00:00:00Z",
+      "textAsOf": "2026-07-11",
+      "checkedAt": "2026-10-16T00:00:00Z",
       "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2013/36",
       "corrections": [
         {
@@ -252,8 +259,26 @@
         }
       ]
     },
-    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2025-01-17/eng",
-    "expressionCelex": "02013L0036-20250117"
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2026-07-11/eng",
+    "expressionCelex": "02013L0036-20260711",
+    "structuralIdentityOverrides": [
+      {
+        "parentLogicalId": "eu:32013L0036:title:vii:chapter:3",
+        "kind": "section",
+        "number": "i",
+        "title": "Principles for conducting supervision on a consolidated basis",
+        "occurrence": 1,
+        "sourceContentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8"
+      },
+      {
+        "parentLogicalId": "eu:32013L0036:title:vii:chapter:3",
+        "kind": "section",
+        "number": "i",
+        "title": "Application of this Chapter to investment firm groups",
+        "occurrence": 2,
+        "sourceContentSha256": "sha256:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8"
+      }
+    ]
   },
   {
     "status": "active",

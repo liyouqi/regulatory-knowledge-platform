@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { z } from "zod";
-import { normalizeCelex } from "../canonical/ids";
+import { normalizeCelex, normalizeLegalNumber } from "../canonical/ids";
 import { sourceStatusSchema } from "../shared/source-status";
 
 export const sourceDefinitionSchema = z.object({
@@ -29,6 +29,29 @@ export const sourceDefinitionSchema = z.object({
   ]),
   publicationDate: z.string().date(),
   sourceStatus: sourceStatusSchema.optional(),
+  // Reviewed disambiguation only; never changes the official label or title.
+  structuralIdentityOverrides: z
+    .array(
+      z
+        .object({
+          parentLogicalId: z.string().min(1),
+          kind: z.enum([
+            "chapter",
+            "division",
+            "part",
+            "section",
+            "subsection",
+            "title",
+          ]),
+          number: z.string().transform(normalizeLegalNumber),
+          title: z.string().min(1),
+          occurrence: z.number().int().positive(),
+          sourceContentSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/u),
+        })
+        .strict(),
+    )
+    .min(1)
+    .optional(),
   quality: z
     .object({
       articleCount: z.number().int().positive(),

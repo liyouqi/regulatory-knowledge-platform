@@ -248,6 +248,11 @@ class FormexDocumentBuilder {
   private readonly resourceIdsByFileName: Map<string, string>;
   private displayOrder = 0;
   private readonly occurrenceCounts = new Map<string, number>();
+  private readonly structuralOverrideGroups = new Map<
+    string,
+    NonNullable<SourceDefinition["structuralIdentityOverrides"]>
+  >();
+  private readonly consumedStructuralOverrides = new Set<object>();
 
   constructor(
     private readonly source: SourceDefinition,
@@ -256,6 +261,34 @@ class FormexDocumentBuilder {
   ) {
     this.documentId = documentLogicalId(source.celex);
     this.version = sourceVersion(snapshot);
+    for (const override of source.structuralIdentityOverrides ?? []) {
+      if (override.sourceContentSha256 !== snapshot.content.sha256) {
+        throw new Error(
+          "Structural identity override source checksum mismatch",
+        );
+      }
+      const key = this.structuralGroupKey(
+        override.parentLogicalId,
+        override.kind,
+        override.number,
+      );
+      const group = this.structuralOverrideGroups.get(key) ?? [];
+      group.push(override);
+      this.structuralOverrideGroups.set(key, group);
+    }
+    for (const group of this.structuralOverrideGroups.values()) {
+      if (
+        new Set(group.map((rule) => rule.title)).size !== group.length ||
+        group
+          .map((rule) => rule.occurrence)
+          .sort((a, b) => a - b)
+          .some((value, index) => value !== index + 1)
+      ) {
+        throw new Error(
+          "Structural identity overrides require unique titles and contiguous occurrences",
+        );
+      }
+    }
     this.resources = resources.map((resource) => ({
       id: resourceLogicalId(this.documentId, resource.fileName),
       kind: "formula",
@@ -294,6 +327,36 @@ class FormexDocumentBuilder {
     const occurrence = (this.occurrenceCounts.get(key) ?? 0) + 1;
     this.occurrenceCounts.set(key, occurrence);
     return occurrence;
+  }
+
+  private structuralGroupKey(
+    parentId: string,
+    kind: string,
+    number: string,
+  ): string {
+    return `${parentId}:${kind}:${normalizeLegalNumber(number)}`;
+  }
+
+  private structuralOccurrence(
+    parentId: string,
+    kind: StructuralIdKind,
+    number: string,
+    title: string | undefined,
+  ): number {
+    const group = this.structuralOverrideGroups.get(
+      this.structuralGroupKey(parentId, kind, number),
+    );
+    if (!group) return this.occurrence(parentId, kind, number);
+    const rule = group.find((candidate) => candidate.title === title);
+    if (!rule)
+      throw new Error("Unreviewed structural identity in an overridden group");
+    if (this.consumedStructuralOverrides.has(rule)) {
+      throw new Error(
+        "Structural identity override matched multiple divisions",
+      );
+    }
+    this.consumedStructuralOverrides.add(rule);
+    return rule.occurrence;
   }
 
   versionedId(logicalId: string): string {
@@ -615,10 +678,12 @@ class FormexDocumentBuilder {
       ? childElement(titleElement, "STI")
       : undefined;
     const identity = divisionIdentity(label, divisionIndex);
-    const occurrence = this.occurrence(
+    const title = titleNode ? plainText(titleNode) : undefined;
+    const occurrence = this.structuralOccurrence(
       parentId,
       identity.kind,
       identity.number,
+      title,
     );
     const logicalId = structuralLogicalId(
       parentId,
@@ -639,7 +704,7 @@ class FormexDocumentBuilder {
       numberRaw: identity.number,
       numberNormalized: normalizeLegalNumber(identity.number),
       label,
-      title: titleNode ? plainText(titleNode) : undefined,
+      title,
       parentLogicalId: parentId,
     });
 
@@ -1019,6 +1084,12 @@ class FormexDocumentBuilder {
       ),
     );
 
+    if (
+      this.consumedStructuralOverrides.size !==
+      (this.source.structuralIdentityOverrides?.length ?? 0)
+    ) {
+      throw new Error("Unused structural identity override");
+    }
     const title =
       childElement(act, "TITLE") ??
       (rootTag === "CONS.ACT"

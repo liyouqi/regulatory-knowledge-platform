@@ -98,9 +98,18 @@ describe("banking-default runtime isolation", () => {
         ?.search("internal governance")
         .results.some((result) => result.documentId === "eu:32013L0036"),
     ).toBe(true);
-    expect(
-      search?.listDocumentDefinitions("eu:32013L0036")?.definitions,
-    ).toHaveLength(74);
+    const crdDefinitions =
+      search?.listDocumentDefinitions("eu:32013L0036")?.definitions;
+    // July 2026 adds twelve definitions in Article 3; retain exact coverage,
+    // rather than weakening the assertion to an open-ended minimum.
+    expect(crdDefinitions).toHaveLength(86);
+    expect(crdDefinitions?.map((definition) => definition.term)).toEqual(
+      expect.arrayContaining([
+        "internal control functions",
+        "key function holders",
+        "climate neutrality",
+      ]),
+    );
     expect(repository?.findDocumentBySlug("crr")?.id).toBe("eu:32013R0575");
     expect(repository?.findDocumentBySlug("crr-iii")?.id).toBe("eu:32024R1623");
     expect(repository?.findDocumentBySlug("crd-vi")?.id).toBe("eu:32024L1619");

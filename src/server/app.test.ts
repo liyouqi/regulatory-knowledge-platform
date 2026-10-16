@@ -525,8 +525,18 @@ describe("Document lookup", () => {
       value:
         "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']",
     });
-    expect(articleContext?.textSegments).toHaveLength(3);
-    expect(articleContext?.textSegments[2]).toMatchObject({
+    expect(articleContext?.textSegments).toHaveLength(8);
+    expect(
+      articleContext?.textSegments.map((segment) => segment.entityId),
+    ).toEqual([
+      "eu:32013L0036:article:74:paragraph:1",
+      ...["a", "b", "c", "d", "e"].map(
+        (point) => `eu:32013L0036:article:74:paragraph:1:point:${point}`,
+      ),
+      "eu:32013L0036:article:74:paragraph:2",
+      "eu:32013L0036:article:74:paragraph:3",
+    ]);
+    expect(articleContext?.textSegments[7]).toMatchObject({
       entityId: "eu:32013L0036:article:74:paragraph:3",
       text: expect.stringContaining("EBA shall issue guidelines"),
     });

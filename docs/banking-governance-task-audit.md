@@ -1,6 +1,6 @@
 # Banking governance: bounded business-task audit
 
-This records the initial navigation-only slice. The [2026-10-13 continuation](banking-governance-workflows.md) documents subsequent question-search changes, live source currency checks and three internal workflow walkthroughs; the historical 0/18 search results below are the frozen baseline, not the current search score.
+This records the initial navigation-only slice. The [2026-10-13 continuation](banking-governance-workflows.md) documents subsequent question-search changes, live source currency checks and three internal workflow walkthroughs. The [2026-10-16 CRD upgrade](crd-expression-upgrade-20261016.md) records the new source pin and rebased evaluations; the historical 0/18 search results and 2025 CRD pin below remain frozen, not current-state claims.
 
 This slice improves evidence navigation across the **already loaded** CRD, EBA/GL/2021/05 and Circular CSSF 12/552. It adds no legal documents, parsing rules, canonical contracts, relationship semantics, answer generator or public API. Official text and existing `MANDATES`, `SUPPLEMENTS` and `IMPLEMENTS` edges remain unchanged.
 

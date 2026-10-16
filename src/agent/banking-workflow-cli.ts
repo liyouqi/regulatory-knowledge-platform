@@ -49,7 +49,7 @@ try {
       readFileSync(
         resolve(
           process.cwd(),
-          "data/editorial/banking-governance-currency-review.json",
+          "data/editorial/banking-governance-currency-review-20261016.json",
         ),
         "utf8",
       ),

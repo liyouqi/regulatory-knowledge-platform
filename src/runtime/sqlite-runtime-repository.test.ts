@@ -434,8 +434,8 @@ describe("SQLite runtime repository", () => {
     expect(crdChain).toMatchObject({
       documentId: "eu:32013L0036",
       coverage: "source-status-only",
-      checkedAt: "2026-09-29T00:00:00Z",
-      loadedVersionId: "version:eu:32013L0036:consolidated:2025-01-17",
+      checkedAt: "2026-10-16T00:00:00Z",
+      loadedVersionId: "version:eu:32013L0036:consolidated:2026-07-11",
     });
     expect(crdChain?.nodes).toHaveLength(4);
     expect(crdChain?.nodes).toEqual(

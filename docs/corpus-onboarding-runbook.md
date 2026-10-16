@@ -119,6 +119,8 @@ Compare the official source with reported Articles, Recitals, Annexes, paragraph
 
 If the structure is materially new, stop and add a targeted parser fixture before continuing.
 
+Repeated division numbers require cross-expression identity review, not only count/hash checks. A same-number division inserted earlier can silently change source-order occurrence IDs. Formex 1.6.1 supports reviewed `structuralIdentityOverrides`: exact parent/kind/normalized number/title, occurrence and byte-exact raw-package `sourceContentSha256`. An overridden group requires complete one-to-one coverage and contiguous unique occurrences; changed bytes or unmatched/unused/duplicate rules fail closed. Preserve official labels/order, retain the old snapshot and verify both expressions before pinning. See the [CRD example](crd-expression-upgrade-20261016.md). The required high-intensity review applies before introducing overrides.
+
 ### 4. Publish the immutable Canonical artifact
 
 ```bash

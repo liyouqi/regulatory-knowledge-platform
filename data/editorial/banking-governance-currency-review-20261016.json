@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedOn": "2026-10-16",
+  "scope": "banking-governance-loaded-source-currency-not-legal-advice",
+  "rawEvidenceDirectory": "data/raw/currency-audit/2026-10-16",
+  "sources": [
+    {
+      "documentId": "eu:32013L0036",
+      "loadedSnapshotId": "snapshot:cellar:32013L0036:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
+      "status": "reviewed-latest-observed-expression-pinned",
+      "loadedTextAsOf": "2026-07-11",
+      "latestObservedTextAsOf": "2026-07-11",
+      "officialUrl": "https://publications.europa.eu/resource/celex/32013L0036?language=en",
+      "evidenceFile": "crd-tree-notice.xml",
+      "evidenceSha256": "sha256:4b73cd8c8d66e6e6cd65e58861992d319b201b9191d7efbe83f7789ec2f59c9e",
+      "nextAction": "Retain the previous 2025 pin and frozen evaluations. The 2026-07-11 English consolidation is source-fidelity gated; continue monitoring official versions and separately assess national transposition and institution-specific applicability."
+    },
+    {
+      "documentId": "eu:eba:gl:2021:05",
+      "loadedSnapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "status": "pinned-pdf-matches-review-ongoing",
+      "officialUrl": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd",
+      "evidenceFile": "eba-2021-05.pdf",
+      "evidenceSha256": "sha256:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "metadataEvidenceFile": "eba-page.html",
+      "metadataEvidenceSha256": "sha256:03ba6ed400d82f58b6899064f1431ae2d0651eb276a4855218a4fb53ca1a4c27",
+      "observedPublisherStatus": "In force",
+      "observedReviewStatus": "Ongoing review",
+      "nextAction": "Track the ongoing review; do not adopt consultation text as final law. The landing-page date fields do not replace paragraph 14's pinned legal-body application date."
+    },
+    {
+      "documentId": "lu:cssf:circular-12-552",
+      "loadedSnapshotId": "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "status": "pinned-pdf-matches-official-download",
+      "officialUrl": "https://www.cssf.lu/wp-content/uploads/cssf12_552eng.pdf",
+      "evidenceFile": "cssf-12-552.pdf",
+      "evidenceSha256": "sha256:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "observedLastAmendingCircular": "24/860",
+      "nextAction": "Preserve the loaded English PDF; check French text and institution-specific/national-law applicability before legal reliance."
+    }
+  ]
+}

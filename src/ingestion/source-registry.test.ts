@@ -82,15 +82,15 @@ describe("EU source registry", () => {
       sources.find((source) => source.celex === "32013L0036"),
     ).toMatchObject({
       familyId: "family:crd",
-      expressionCelex: "02013L0036-20250117",
+      expressionCelex: "02013L0036-20260711",
       quality: {
-        articleCount: 178,
+        articleCount: 197,
         annexCount: 2,
         maximumWarnings: 0,
       },
       sourceStatus: {
         basis: "consolidated",
-        textAsOf: "2025-01-17",
+        textAsOf: "2026-07-11",
         corrections: [{ date: "2013-08-02" }, { date: "2017-01-25" }],
       },
     });

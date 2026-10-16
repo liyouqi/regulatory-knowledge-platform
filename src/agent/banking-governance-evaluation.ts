@@ -80,7 +80,7 @@ export type BankingGovernanceTasks = z.infer<
 >;
 
 export function loadBankingGovernanceTasks(
-  inputPath = "data/benchmarks/banking-governance-tasks.json",
+  inputPath = "data/benchmarks/banking-governance-tasks-crd-20260711.json",
 ): BankingGovernanceTasks {
   return bankingGovernanceTasksSchema.parse(
     JSON.parse(readFileSync(resolve(process.cwd(), inputPath), "utf8")),

@@ -1,0 +1,82 @@
+# CRD expression upgrade — 2026-10-16
+
+Scope: upgrade the selected English CRD consolidation from `02013L0036-20250117` to `02013L0036-20260711`, retain earlier evidence, and repeat existing product checks. This is source-fidelity/navigation work, not a legal-applicability assessment or customer trial.
+
+## Official inputs and preservation
+
+The freshly downloaded [official CELLAR directory](https://publications.europa.eu/resource/celex/32013L0036?language=en) exposes English Formex consolidations through 2026-07-11, with no later effective or future English Formex candidate observed on the check date. The [July expression](https://eur-lex.europa.eu/eli/dir/2013/36/2026-07-11/eng) was acquired through the existing guarded adapter in an isolated workspace. Its content SHA-256 is `f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8`; source version is `Con-20261002141139000`.
+
+The old `264bba80caeb…` raw snapshot, quality baseline, source declaration and Expression metadata are retained. The version-controlled [transition receipt](../data/editorial/source-upgrades/crd-20260711.json) records both versions. Original benchmark files and earlier evaluation reports remain unchanged. Raw, Canonical and Runtime artifacts stay ignored by Git.
+
+Fresh EBA and CSSF PDF hashes still match their respective pins (`1529fbe9d55b…`, `dbea9517a19d…`). The EBA page still marks the final Guidelines in force with an ongoing review. Exact hashes are in the [dated currency review](../data/editorial/banking-governance-currency-review-20261016.json); raw receipts are in `data/raw/currency-audit/2026-10-16/`. These observations do not certify national transposition, institution-specific applicability, the prevailing French CSSF text or all currently applicable law.
+
+## Whole-document comparison
+
+| Parsed entity | January 2025 | July 2026 |
+|---|---:|---:|
+| Articles | 178 | 197 |
+| Recitals | 0 | 0 |
+| Annexes | 2 | 2 |
+| Paragraphs/subparagraphs | 645 | 773 |
+| Points/subpoints | 767 | 979 |
+| Structural nodes | 42 | 46 |
+| Warnings | 0 | 0 |
+
+All 178 prior Article IDs remain; 19 are added, none removed. At finer Provision/Block level, 395 IDs are added, 36 removed and 197 retained IDs have changed text. Removed Blocks belong to restructured Articles 65, 66, 67, 70 and 91; they are not silently redirected. Exact IDs are retained in the transition receipt.
+
+Articles 74, 76 and 88 all have changed bodies. Their root IDs, Reader routes and XPath locators remain stable. Official wording is not edited or silently corrected. Article 74(3)'s unchanged mandate excerpt was checked against the new source; only its official URL/review date advanced. `MANDATES`, `SUPPLEMENTS` and `IMPLEMENTS` semantics are unchanged.
+
+## Duplicate Section I: reviewed identity, not corrected text
+
+New official XML has two Section I divisions under Title VII / Chapter 3. The old source-order occurrence algorithm would give the inserted section an existing section's ID and move nine Articles to an `occurrence:2` parent.
+
+Parser **1.6.1** supports optional reviewed `structuralIdentityOverrides` in the source declaration. Exact parent ID, normalized kind/number and official title select an occurrence. `sourceContentSha256` binds each rule to the entire verified raw package, not a reconstructed title or Division body. Every rule must match once; the whole overridden group requires coverage with unique titles and contiguous unique occurrences. Changed bytes/titles, new unreviewed same-number divisions, unused rules and duplicate matches fail closed. Unconfigured sources retain the existing algorithm. Canonical schema 1.2.0 and ID syntax are unchanged.
+
+- `Principles for conducting supervision on a consolidated basis` keeps `eu:32013L0036:title:vii:chapter:3:section:i`.
+- `Application of this Chapter to investment firm groups` receives `…:section:i:occurrence:2` and contains new Article 110a.
+
+All 42 prior structural IDs/titles/parents and all 178 prior Article parents are checked across both verified snapshots. Official labels/titles/order are preserved. The required Sol High review identified the ID reuse and reviewed the bounded fix.
+
+## Evaluation boundaries
+
+New `banking-governance-tasks-crd-20260711.json` and `banking-governance-holdout-crd-20260711.json` retain all questions, case IDs, gold entity IDs and non-CRD evidence. Only version/date and CRD lineage/affected hashes are rebased. Default task/workflow selection uses matching new inputs. Rebased holdout questions were already seen: this is a migration regression, **not a new unseen evaluation**.
+
+The independent fidelity fixture compares all 197 Article bodies and both Annexes with XML traversal in official order, excluding notes/numbering/Article headings and ignoring whitespace only. Wording, punctuation and sequence remain significant.
+
+Governance task hashes instead cover the existing CitationContext depth-first `textSegments` projection joined by newlines. They are **not official reading-order hashes**. This pre-existing projection can place a parent's trailing text before nested list items; Reader uses `orderedContent` and is independently checked here. Fixing CitationContext's ordered projection is a separate follow-up. Do not concatenate those segments into a purported continuous legal quotation. This upgrade does not claim that contract was repaired.
+
+## Reproduce and roll back
+
+```sh
+npm run corpus:build -- --profile full-corpus
+npm run corpus:build -- --profile banking-default
+npm run check
+npm test
+npm run build
+npm run runtime:verify
+npm run banking:benchmark
+npm run banking:benchmark -- --dataset data/benchmarks/banking-governance-holdout-crd-20260711.json
+npm run banking:workflows
+npm run citation:benchmark
+npm run search:benchmark
+```
+
+The cross-expression test requires both retained CRD raw snapshots; a latest-only raw package cannot reproduce that historical comparison. Rebuild all EUR-Lex Canonical artifacts after the parser bump. Strict staging builds, development default selection and remote deployment remain separate operations.
+
+For runtime rollback, restart against the retained previous verified SQLite using the [runtime runbook](runtime-operation-runbook.md). A local hard link `data/artifacts/version-upgrades/crd-20260711/before-runtime.sqlite` preserves the previous immutable default without duplicating its disk blocks. Do not delete new raw bytes or restore an old registry while still selecting newer Canonical output. A full source/code rollback must restore matching pin, baseline, metadata, mapping URL, benchmark selection and currency review together, preferably in a separate checkout of prior revision `0f06189`.
+
+The current banking benchmark CLI opens the development default directly; unlike the server, it does not select a database from `REGULATORY_RUNTIME_DATABASE_PATH`. A historical replay must construct both Runtime repository and SearchService with the explicit retained SQLite path. Running the original dataset against the new default correctly fails the three CRD source/text checks; do not rewrite the frozen dataset to conceal that mismatch.
+
+## Verification results
+
+- Strict `full-corpus`: 101 Documents, 53,647 records, 16,713 relationships; `runtime-5.8.0-d78b5ce9fcdc05bd`.
+- Strict `banking-default`: 99 Documents, 51,161 records, 15,917 relationships; `runtime-5.8.0-6bdf93ffe2d3b666`.
+- Development default: `runtime-5.8.0-cb05a18e23c314da`, 101 Documents, 1,615 definitions, zero reviewed-input issues. Its retained non-CRD retrieval receipts differ from staging, so its content-derived build identity is distinct; counts and source/evidence checks agree.
+- `check`, production `build`, `runtime:verify` and `release:verify`: passed. Release verification checks 204 retained raw snapshots, 101 Canonical Documents and 101 Runtime Documents. No thresholds were relaxed.
+- Chrome browser regression: **4/4 passed**, including actual July text/date, scoped question requests, exact CSSF navigation and unchanged official relationship directions.
+- Citation Top-1: **3/3**; related-recital evaluation: **2/2**. Keyword/definition evaluation passed (8 law queries, 6 definition queries; warm keyword P95 11.463 ms, not business-question latency).
+- Migrated 18-question set: **18/18** evidence/navigation, **15/18** global and **17/18** scoped Top-5 retrieval. Rebased six-question set: **6/6** evidence/navigation, **3/6** global and **5/6** scoped. Scores are unchanged from the previous pin; both Chinese diagnostics still miss.
+- All three internal workflow walkthroughs passed. All four fresh currency receipts matched their recorded hashes. These remain technical checks, not observed user acceptance or complete legal answers.
+- Previous default `runtime-5.8.0-1f518b2e5c584f34` remains read-only verifiable through the retained hard link. An explicit-path service replay of its original frozen dataset passed **18/18** evidence/navigation, **15/18** global and **17/18** scoped retrieval. The old dataset deliberately fails the three CRD evidence checks against the new default, confirming that source drift is not silently accepted. Data is about **2.2 GiB**, including new parser artifacts and both staging profiles; no historical source was deleted.
+
+Final `npm test`: **99 files, 412 tests passed**, 458.40 seconds. Earlier runs exposed stale fixture counts (74 → 86 definitions; 3 → 8 Article 74 citation segments), which were replaced with exact counts and explicit new-term/segment checks. A separate Topic test/RPC timeout coincided with a roughly 20-minute system sleep confirmed in the macOS power log; rerunning with a temporary idle-sleep assertion passed without changing any timeout or release threshold. No remote push/deployment is part of this change.

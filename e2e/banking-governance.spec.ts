@@ -23,6 +23,12 @@ test("a business question opens its exact CRD evidence and retains version cauti
   );
   await search.locator(".full-text-search-result").first().click();
   await expect(page).toHaveURL(/\/read\/crd-iv\/articles\/76/u);
+  await expect(page.getByLabel("Legal text status")).toContainText(
+    "Text as of 2026-07-11",
+  );
+  await expect(page.locator(".provision-body")).toContainText(
+    "approves and at least every two years reviews",
+  );
   await expect(
     page.getByText(
       "A loaded text date is not a latest-version certification.",
