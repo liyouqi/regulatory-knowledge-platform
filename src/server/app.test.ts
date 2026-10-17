@@ -473,13 +473,14 @@ describe("Document lookup", () => {
     const context = findCitationContext(entityId);
 
     expect(context).toMatchObject({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       runtime: {
         profileId: "full-corpus",
         profileVersion: "1.0.0",
       },
       retrieval: {
         method: "stable-entity-id",
+        version: "1.1.0",
         requestedEntityId: entityId,
         resolvedEntityId: entityId,
         matchType: "exact",
@@ -525,7 +526,7 @@ describe("Document lookup", () => {
       value:
         "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']",
     });
-    expect(articleContext?.textSegments).toHaveLength(8);
+    expect(articleContext?.textSegments).toHaveLength(9);
     expect(
       articleContext?.textSegments.map((segment) => segment.entityId),
     ).toEqual([
@@ -533,10 +534,14 @@ describe("Document lookup", () => {
       ...["a", "b", "c", "d", "e"].map(
         (point) => `eu:32013L0036:article:74:paragraph:1:point:${point}`,
       ),
+      "eu:32013L0036:article:74:paragraph:1",
       "eu:32013L0036:article:74:paragraph:2",
       "eu:32013L0036:article:74:paragraph:3",
     ]);
-    expect(articleContext?.textSegments[7]).toMatchObject({
+    expect(articleContext?.textSegments[6].text).toContain(
+      "shall be gender neutral",
+    );
+    expect(articleContext?.textSegments[8]).toMatchObject({
       entityId: "eu:32013L0036:article:74:paragraph:3",
       text: expect.stringContaining("EBA shall issue guidelines"),
     });
@@ -556,7 +561,7 @@ describe("Document lookup", () => {
     );
 
     expect(result).toMatchObject({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       runtime: { profileId: "full-corpus" },
       retrieval: {
         method: "fts5-to-citation-context",

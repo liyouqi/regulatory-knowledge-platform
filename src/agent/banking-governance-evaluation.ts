@@ -80,7 +80,7 @@ export type BankingGovernanceTasks = z.infer<
 >;
 
 export function loadBankingGovernanceTasks(
-  inputPath = "data/benchmarks/banking-governance-tasks-crd-20260711.json",
+  inputPath = "data/benchmarks/banking-governance-tasks-ordered-1.1.json",
 ): BankingGovernanceTasks {
   return bankingGovernanceTasksSchema.parse(
     JSON.parse(readFileSync(resolve(process.cwd(), inputPath), "utf8")),
@@ -212,7 +212,7 @@ export function evaluateBankingGovernance(
   const count = (predicate: (item: (typeof cases)[number]) => boolean) =>
     cases.filter(predicate).length;
   return {
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     datasetId: dataset.id,
     datasetVersion: dataset.version,
     datasetSha256: `sha256:${createHash("sha256").update(JSON.stringify(dataset)).digest("hex")}`,
@@ -220,6 +220,7 @@ export function evaluateBankingGovernance(
     runtime: context.runtimeIdentity,
     method: {
       topN: dataset.topN,
+      evidenceTextProjection: "reader-ordered-content@1.1.0",
       queryRewriting: false,
       match: "exact-root-provision-or-descendant",
       retrievalIsDiagnosticOnly: true,

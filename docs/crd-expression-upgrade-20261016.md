@@ -43,7 +43,7 @@ New `banking-governance-tasks-crd-20260711.json` and `banking-governance-holdout
 
 The independent fidelity fixture compares all 197 Article bodies and both Annexes with XML traversal in official order, excluding notes/numbering/Article headings and ignoring whitespace only. Wording, punctuation and sequence remain significant.
 
-Governance task hashes instead cover the existing CitationContext depth-first `textSegments` projection joined by newlines. They are **not official reading-order hashes**. This pre-existing projection can place a parent's trailing text before nested list items; Reader uses `orderedContent` and is independently checked here. Fixing CitationContext's ordered projection is a separate follow-up. Do not concatenate those segments into a purported continuous legal quotation. This upgrade does not claim that contract was repaired.
+The frozen July-CRD task hashes cover the then-existing CitationContext depth-first `textSegments` projection joined by newlines, **not official reading-order hashes**. This upgrade did not repair that service. The subsequent [2026-10-17 projection fix](citation-text-order-fix-20261017.md) implements Reader order with separately versioned datasets and an explicit 1.1 contract; the historical files and results here remain unchanged.
 
 ## Reproduce and roll back
 

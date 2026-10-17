@@ -39,7 +39,7 @@ export function evaluateBankingWorkflows(
   observations: CurrencyObservation[],
 ) {
   return {
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     runtime: report.runtime,
     datasetSha256: report.datasetSha256,
     walkThroughKind: "internal-editorial-scenarios",

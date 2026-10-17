@@ -1,5 +1,55 @@
 import { expect, test } from "@playwright/test";
 
+test("internal citation HTTP contracts expose ordered runs and versioned nested contexts", async ({
+  request,
+}) => {
+  const id = "eu:32013L0036:article:74";
+  const response = await request.get(
+    `http://localhost:3000/api/internal/citation-context/${encodeURIComponent(id)}`,
+  );
+  expect(response.ok()).toBe(true);
+  const context = await response.json();
+  expect(context.schemaVersion).toBe("1.1.0");
+  expect(context.retrieval.version).toBe("1.1.0");
+  expect(context.textProjection).toEqual({
+    scope: "text-only",
+    order: "reader-ordered-content",
+    markerInsertion: "none",
+    omittedResourceCount: 0,
+  });
+  expect(
+    context.textSegments.map(
+      (s: { entityId: string; contentIndex: number }) => [
+        s.entityId,
+        s.contentIndex,
+      ],
+    ),
+  ).toEqual([
+    [`${id}:paragraph:1`, 0],
+    ...["a", "b", "c", "d", "e"].map((p) => [
+      `${id}:paragraph:1:point:${p}`,
+      0,
+    ]),
+    [`${id}:paragraph:1`, 6],
+    [`${id}:paragraph:2`, 0],
+    [`${id}:paragraph:3`, 0],
+  ]);
+  const retrieval = await request.get(
+    "http://localhost:3000/api/internal/citation-retrieval",
+    {
+      params: {
+        q: "EBA shall issue guidelines arrangements processes mechanisms",
+        limit: 1,
+      },
+    },
+  );
+  expect(retrieval.ok()).toBe(true);
+  const result = await retrieval.json();
+  expect(result.schemaVersion).toBe("1.1.0");
+  expect(result.retrieval.version).toBe("1.0.0");
+  expect(result.results[0].context.schemaVersion).toBe("1.1.0");
+});
+
 test("a business question opens its exact CRD evidence and retains version cautions", async ({
   page,
 }) => {

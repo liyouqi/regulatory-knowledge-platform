@@ -36,7 +36,7 @@ describe("citation retrieval service", () => {
     );
 
     expect(result).toMatchObject({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       runtime: { profileId: "full-corpus" },
       retrieval: {
         method: "fts5-to-citation-context",

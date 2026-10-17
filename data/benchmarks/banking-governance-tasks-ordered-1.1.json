@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "banking-governance-tasks",
+  "version": "3.0.0",
+  "reviewedAt": "2026-10-17T00:00:00Z",
+  "questionOrigin": "editorial-scenarios-not-user-observations",
+  "topicSlug": "banking-governance-internal-control",
+  "topN": 5,
+  "sources": [
+    {
+      "documentId": "eu:32013L0036",
+      "sourceSnapshotId": "snapshot:cellar:32013L0036:f0487f64f04b46a000251a76ca0311f470e5428fe4fc32686c9c7f35e11d3ee8",
+      "sourceVersion": "Con-20261002141139000",
+      "sourceUrl": "https://eur-lex.europa.eu/eli/dir/2013/36/2026-07-11/eng",
+      "textAsOf": "2026-07-11"
+    },
+    {
+      "documentId": "eu:eba:gl:2021:05",
+      "sourceSnapshotId": "snapshot:eba:eba-gl-2021-05:1529fbe9d55b5df01852318206d6c61810730fc9249b4236b16f702eda765230",
+      "sourceVersion": "eba-pdf-1.1.2-1529fbe9d55b",
+      "sourceUrl": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/internal-governance/guidelines-internal-governance-under-crd",
+      "textAsOf": "2021-07-02"
+    },
+    {
+      "documentId": "lu:cssf:circular-12-552",
+      "sourceSnapshotId": "snapshot:cssf:circular-12-552:dbea9517a19d7946dea29f5b232faeea92e3c5227b486cfb1cd3763f907f677d",
+      "sourceVersion": "cssf-pdf-1.1.3-dbea9517a19d",
+      "sourceUrl": "https://www.cssf.lu/en/Document/circular-cssf-12-552/",
+      "textAsOf": "2024-08-29"
+    }
+  ],
+  "cases": [
+    {
+      "id": "banking-governance:governance-arrangements",
+      "query": "What governance arrangements must a bank put in place?",
+      "questionZh": "银行治理安排应从哪些条款开始查？",
+      "documentId": "eu:32013L0036",
+      "expectedEvidence": {
+        "entityId": "eu:32013L0036:article:74",
+        "sourceLocator": {
+          "kind": "xpath",
+          "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[1]/ARTICLE[@IDENTIFIER='074']"
+        },
+        "textSha256": "sha256:6d81bb1d407f100278f3fdc0b006fcae5b6c1c9e0e3ad6839870f3b9d43be0d4"
+      },
+      "navigationSubject": "Governance arrangements and proportionality"
+    },
+    {
+      "id": "banking-governance:risk-strategy",
+      "query": "Who approves and periodically reviews a bank's risk strategy?",
+      "questionZh": "谁负责批准并定期审查银行的风险策略？",
+      "documentId": "eu:32013L0036",
+      "expectedEvidence": {
+        "entityId": "eu:32013L0036:article:76",
+        "sourceLocator": {
+          "kind": "xpath",
+          "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[2]/ARTICLE[@IDENTIFIER='076']"
+        },
+        "textSha256": "sha256:2937c8c417f4e03161564243ea26c6321a82f8e3994b0a653dd32ac69da0a6f1"
+      },
+      "navigationSubject": "Management body and risk strategy"
+    },
+    {
+      "id": "banking-governance:governance-accountability",
+      "query": "Who is accountable for governance arrangements and preventing conflicts of interest?",
+      "questionZh": "治理安排和利益冲突防范由谁承担责任？",
+      "documentId": "eu:32013L0036",
+      "expectedEvidence": {
+        "entityId": "eu:32013L0036:article:88",
+        "sourceLocator": {
+          "kind": "xpath",
+          "value": "/CONS.ACT/CONS.DOC/ENACTING.TERMS/DIVISION[7]/DIVISION[2]/DIVISION[2]/DIVISION[3]/ARTICLE[@IDENTIFIER='088']"
+        },
+        "textSha256": "sha256:69e82b501d8d6ab327e616c6edee270346dae28d33a1d34e862c22e8ca83bd24"
+      },
+      "navigationSubject": "Governance accountability"
+    },
+    {
+      "id": "banking-governance:documented-duties",
+      "query": "Where should management body duties and responsibilities be documented?",
+      "questionZh": "管理机构的职责分工应在哪里记录？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:20",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "20"
+        },
+        "textSha256": "sha256:ad8ec6bca0f0329329373cf06430fe3e1760044ee17d4f42ee4a6ae4400c6184"
+      },
+      "navigationSubject": "Documented management body duties"
+    },
+    {
+      "id": "banking-governance:institutional-conflicts",
+      "query": "Who oversees conflicts of interest policies at institutional level?",
+      "questionZh": "机构层面的利益冲突政策由谁监督？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:105",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "39"
+        },
+        "textSha256": "sha256:d9f37be4b35ba38e2592cbcd93a7e8f3825c7340ad35a0110af8c678784b21e8"
+      },
+      "navigationSubject": "Institutional conflicts of interest"
+    },
+    {
+      "id": "banking-governance:business-line-controls",
+      "query": "Who manages risks incurred by business lines under the internal control framework?",
+      "questionZh": "内控框架下业务条线的风险管理从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:141",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "47"
+        },
+        "textSha256": "sha256:c2fc9cbe3627a29fc239577df610e9861509144c34187749c5739d901a5162d4"
+      },
+      "navigationSubject": "Business lines and the internal control framework"
+    },
+    {
+      "id": "banking-governance:control-independence",
+      "query": "How must internal control functions remain independent from the activities they monitor?",
+      "questionZh": "内部控制职能的独立性条件从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:175",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "53"
+        },
+        "textSha256": "sha256:21cae19453b8d81d261cd6294a18768ee0c6be789ee005426ed15dbb96520e71"
+      },
+      "navigationSubject": "Independence of internal control functions"
+    },
+    {
+      "id": "banking-governance:permanent-compliance",
+      "query": "Does a bank need a permanent compliance function and a head of compliance?",
+      "questionZh": "常设合规职能和负责人要求从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:204",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "57"
+        },
+        "textSha256": "sha256:b87d46a02766f77b10d1529bdad9b5e2aa26d3c2e5c9f1694b212edca5496677"
+      },
+      "navigationSubject": "Permanent compliance function"
+    },
+    {
+      "id": "banking-governance:regulatory-change",
+      "query": "Who oversees the compliance policy and regularly assesses changes in law?",
+      "questionZh": "合规政策监督和法律变化评估从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:208",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "57"
+        },
+        "textSha256": "sha256:23f81f0fc10f8382c460972233d9e0fa5ba1dce7367c1de65f939d766a231d28"
+      },
+      "navigationSubject": "Compliance policy and regulatory change"
+    },
+    {
+      "id": "banking-governance:audit-resources",
+      "query": "What independence and resources should the internal audit function have?",
+      "questionZh": "内部审计的独立性和资源要求从哪里查？",
+      "documentId": "eu:eba:gl:2021:05",
+      "expectedEvidence": {
+        "entityId": "eu:eba:gl:2021:05:paragraph:214",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "58"
+        },
+        "textSha256": "sha256:5721fe5431bd8ed953d22f166b6ff7973c3d4691f680fdf89f221c2de63b057d"
+      },
+      "navigationSubject": "Internal audit independence and resources"
+    },
+    {
+      "id": "banking-governance:board-records",
+      "query": "What must the supervisory body record in meeting minutes?",
+      "questionZh": "监督机构的会议记录要求从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-25",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "21"
+        },
+        "textSha256": "sha256:08c66abf8fce801aea59fb6d6a8bf3c5eef762cc12902429b78e8db350c594b4"
+      },
+      "navigationSubject": "Part II: supervisory body records"
+    },
+    {
+      "id": "banking-governance:audit-charter",
+      "query": "Who confirms the internal audit charter and multi-annual audit plan?",
+      "questionZh": "内部审计章程和多年审计计划由谁确认？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-41",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "24"
+        },
+        "textSha256": "sha256:d524ec9d0f27e8b76d70ee5eb681760b7ee65080daaf3272a4c7b1e904d25b6b"
+      },
+      "navigationSubject": "Part II: audit committee and audit planning"
+    },
+    {
+      "id": "banking-governance:lines-of-defence",
+      "query": "Which internal control functions form the second and third lines of defence?",
+      "questionZh": "第二道和第三道防线对应哪些内控职能？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-105",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "40"
+        },
+        "textSha256": "sha256:e8d97ac7455d5d7272afedc1ac26c0e7275e3248c8858e7cd0be9195aaf0d1b9"
+      },
+      "navigationSubject": "Part II: internal control functions and lines of defence"
+    },
+    {
+      "id": "banking-governance:incompatible-tasks",
+      "query": "When is an internal control function's independence incompatible with its staff's tasks or remuneration?",
+      "questionZh": "内控人员的任务和薪酬何时影响独立性？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-109",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "41"
+        },
+        "textSha256": "sha256:e04ae50023721ecad671c966939148b2c979ba72ad8aa0272d2876f2ca2a29db"
+      },
+      "navigationSubject": "Part II: internal control independence"
+    },
+    {
+      "id": "banking-governance:annual-control-report",
+      "query": "Must each internal control function prepare an annual summary report?",
+      "questionZh": "内部控制职能的年度汇总报告要求从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-117",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "43"
+        },
+        "textSha256": "sha256:87d1a0fc9ac4571d46d89ec419bda8225e484dfdd8986db631c903714ad5cffc"
+      },
+      "navigationSubject": "Part II: annual internal control reporting"
+    },
+    {
+      "id": "banking-governance:compliance-charter",
+      "query": "Who approves the compliance charter and what does it describe?",
+      "questionZh": "合规章程的内容与批准要求从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-139",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "50"
+        },
+        "textSha256": "sha256:c8c05900409ba07bf9bbf3c196b08740e113ee6b79e6273aa39d12f0b99d9f97"
+      },
+      "navigationSubject": "Part II: compliance charter"
+    },
+    {
+      "id": "banking-governance:risk-based-audit",
+      "query": "What planning horizon and risk-based coverage should internal audit use?",
+      "questionZh": "内部审计计划的周期与风险导向覆盖从哪里查？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-154",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "56"
+        },
+        "textSha256": "sha256:b6b3e9ba666ef923efb9df937bad44d8bd0141fcbc25717208cfe34e923f8dff"
+      },
+      "navigationSubject": "Part II: risk-based internal audit planning"
+    },
+    {
+      "id": "banking-governance:conflicts-zh",
+      "query": "银行应该如何管理利益冲突？",
+      "questionZh": "银行应该如何管理利益冲突？",
+      "documentId": "lu:cssf:circular-12-552",
+      "expectedEvidence": {
+        "entityId": "lu:cssf:circular-12-552:part:ii:provision:point-168",
+        "sourceLocator": {
+          "kind": "pdf-page",
+          "value": "60"
+        },
+        "textSha256": "sha256:25d7131802091029100cdc7dcbf40841e6cfe42852a6f5d05d1e1780ce7f1997"
+      },
+      "navigationSubject": "Part II: conflicts of interest policy"
+    }
+  ]
+}

@@ -70,7 +70,7 @@ export class CitationRetrievalService {
     }
 
     return citationRetrievalResponseSchema.parse({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       query: searchResponse.query,
       normalizedQuery: searchResponse.normalizedQuery,
       scopeDocumentId: searchResponse.scopeDocumentId,

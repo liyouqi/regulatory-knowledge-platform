@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedOn": "2026-10-17",
+  "scope": "reader-order-text-only-service-projection-not-legal-source-change",
+  "runtimeBuildId": "runtime-5.8.0-cb05a18e23c314da",
+  "beforeContextVersion": "1.0.0",
+  "afterContextVersion": "1.1.0",
+  "afterRetrievalSchemaVersion": "1.1.0",
+  "retrievalAlgorithmVersion": "1.0.0",
+  "sourcePinsChanged": false,
+  "canonicalChanged": false,
+  "questionsChanged": false,
+  "goldEntityIdsChanged": false,
+  "preservedBenchmarks": [
+    {
+      "path": "data/benchmarks/banking-governance-tasks-crd-20260711.json",
+      "sha256": "sha256:8821152aaa63591166941484861832816413fa0605ce9868cbcfbdebfb7f15e5"
+    },
+    {
+      "path": "data/benchmarks/banking-governance-holdout-crd-20260711.json",
+      "sha256": "sha256:6bc6e371f1811936d7f1e0c1f0ce1c12536f4b9d65ff5ae23af71a6889e7247c"
+    }
+  ],
+  "projectionHashChanges": [
+    {
+      "caseId": "banking-governance:governance-arrangements",
+      "entityId": "eu:32013L0036:article:74",
+      "before": "sha256:5f8ab2d618a2f3cd14213e56d3d35cea6f474486bd0969eb9b504ab6d8d44f96",
+      "after": "sha256:6d81bb1d407f100278f3fdc0b006fcae5b6c1c9e0e3ad6839870f3b9d43be0d4"
+    },
+    {
+      "caseId": "banking-governance:risk-strategy",
+      "entityId": "eu:32013L0036:article:76",
+      "before": "sha256:d7a4738b36e6801d3f341dc2f54482a44788dba3a9e3567ddfee230192c423f3",
+      "after": "sha256:2937c8c417f4e03161564243ea26c6321a82f8e3994b0a653dd32ac69da0a6f1"
+    },
+    {
+      "caseId": "banking-governance:governance-accountability",
+      "entityId": "eu:32013L0036:article:88",
+      "before": "sha256:c807120b8233b6fd0f24735e8e460091d7bb47d448c774af096b65fcb21e484e",
+      "after": "sha256:69e82b501d8d6ab327e616c6edee270346dae28d33a1d34e862c22e8ca83bd24"
+    }
+  ],
+  "limitations": [
+    "Exact ordered text runs preserve existing entity IDs and source locators; an entity can occur more than once.",
+    "contentIndex is the original BodyBlock.orderedContent array index, scoped to the same source/runtime; it is not a stable citation ID.",
+    "Markers are metadata and never inserted. Resources are counted but omitted without OCR/placeholders; an empty textSegments array is valid.",
+    "This is a projection migration regression over already-seen questions, not a new unseen holdout or legal-applicability assessment."
+  ]
+}

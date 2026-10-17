@@ -9,9 +9,10 @@ import type {
   ProvisionView,
 } from "../shared/legal";
 import type { DocumentRegulatoryContext } from "../shared/regulatory-context";
+import { projectCitationText } from "./citation-text-projection";
 
 export const CITATION_CONTEXT_RETRIEVER = "stable-entity-id";
-export const CITATION_CONTEXT_RETRIEVER_VERSION = "1.0.0";
+export const CITATION_CONTEXT_RETRIEVER_VERSION = "1.1.0";
 
 export interface CitationContextRepository {
   readonly buildId: string;
@@ -40,17 +41,28 @@ function indexBlock(
   document: DocumentView,
   provision: ProvisionView,
   block: BodyBlock,
+  seenBlocks: Set<string>,
+  topLevel: boolean,
 ): void {
-  if (block.id !== provision.id) {
+  if (seenBlocks.has(block.id))
+    throw new Error(`Duplicate or cyclic citation block: ${block.id}`);
+  seenBlocks.add(block.id);
+  if (block.id === provision.id) {
+    if (
+      !topLevel ||
+      provision.blocks.length !== 1 ||
+      block.children.length !== 0
+    ) {
+      throw new Error(`Invalid citation provision self block: ${block.id}`);
+    }
+  } else {
+    if (index.has(block.id))
+      throw new Error(`Duplicate citation entity: ${block.id}`);
     index.set(block.id, { document, provision, block });
   }
   for (const child of block.children) {
-    indexBlock(index, document, provision, child);
+    indexBlock(index, document, provision, child, seenBlocks, false);
   }
-}
-
-function flattenBlocks(blocks: BodyBlock[]): BodyBlock[] {
-  return blocks.flatMap((block) => [block, ...flattenBlocks(block.children)]);
 }
 
 export class CitationContextService {
@@ -60,13 +72,30 @@ export class CitationContextService {
     private readonly repository: CitationContextRepository,
     documents = repository.listDocumentViews(),
   ) {
+    const documentIds = new Set(documents.map((document) => document.id));
+    if (documentIds.size !== documents.length)
+      throw new Error("Duplicate citation document ID");
     for (const document of documents) {
       for (const provision of document.provisions) {
+        if (this.entities.has(provision.id))
+          throw new Error(`Duplicate citation entity: ${provision.id}`);
         this.entities.set(provision.id, { document, provision });
+        const seenBlocks = new Set<string>();
         for (const block of provision.blocks) {
-          indexBlock(this.entities, document, provision, block);
+          indexBlock(
+            this.entities,
+            document,
+            provision,
+            block,
+            seenBlocks,
+            true,
+          );
         }
       }
+    }
+    for (const id of documentIds) {
+      if (this.entities.has(id))
+        throw new Error(`Citation entity collides with document: ${id}`);
     }
   }
 
@@ -91,7 +120,11 @@ export class CitationContextService {
       document.id,
       provision.id,
     );
-    if (!relationships || !regulatoryContext) return null;
+    if (!relationships || !regulatoryContext) {
+      throw new Error(
+        `Citation context missing for loaded entity: ${entityId}`,
+      );
+    }
     if (
       relationships.buildId !== this.repository.buildId ||
       regulatoryContext.buildId !== this.repository.buildId ||
@@ -104,10 +137,10 @@ export class CitationContextService {
       ? `${provision.path}#${block.anchor}`
       : provision.path;
     const sourceLocator = block?.sourceLocator ?? provision.sourceLocator;
-    const segments = flattenBlocks(block ? [block] : provision.blocks);
+    const projection = projectCitationText(block ? [block] : provision.blocks);
 
     return citationContextSchema.parse({
-      schemaVersion: "1.0.0",
+      schemaVersion: "1.1.0",
       runtime: {
         buildId: this.repository.buildId,
         profileId: this.repository.profileId,
@@ -157,14 +190,7 @@ export class CitationContextService {
           path: provision.path,
         },
       },
-      textSegments: segments.map((segment) => ({
-        entityId: segment.id,
-        kind: segment.kind,
-        marker: segment.marker,
-        text: segment.text,
-        anchor: segment.anchor,
-        sourceLocator: segment.sourceLocator,
-      })),
+      ...projection,
       relationships,
       regulatoryContext,
     });

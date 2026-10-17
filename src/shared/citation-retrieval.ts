@@ -14,7 +14,7 @@ export const citationRetrievalResultSchema = z
 
 export const citationRetrievalResponseSchema = z
   .object({
-    schemaVersion: z.literal("1.0.0"),
+    schemaVersion: z.literal("1.1.0"),
     query: z.string(),
     normalizedQuery: z.string(),
     scopeDocumentId: z.string().min(1).optional(),

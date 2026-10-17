@@ -7,6 +7,9 @@ import { sourceStatusSchema } from "./source-status";
 export const citationTextSegmentSchema = z
   .object({
     entityId: z.string().min(1),
+    // Original BodyBlock.orderedContent index, scoped to this source/runtime;
+    // the pair (entityId, contentIndex) is a run locator, not a new stable ID.
+    contentIndex: z.number().int().nonnegative(),
     kind: z.enum([
       "paragraph",
       "subparagraph",
@@ -26,7 +29,7 @@ export const citationTextSegmentSchema = z
 
 export const citationContextSchema = z
   .object({
-    schemaVersion: z.literal("1.0.0"),
+    schemaVersion: z.literal("1.1.0"),
     runtime: z
       .object({
         buildId: z.string().min(1),
@@ -38,7 +41,7 @@ export const citationContextSchema = z
     retrieval: z
       .object({
         method: z.literal("stable-entity-id"),
-        version: z.literal("1.0.0"),
+        version: z.literal("1.1.0"),
         requestedEntityId: z.string().min(1),
         resolvedEntityId: z.string().min(1),
         matchType: z.literal("exact"),
@@ -98,10 +101,19 @@ export const citationContextSchema = z
           .strict(),
       })
       .strict(),
-    textSegments: z.array(citationTextSegmentSchema).min(1),
+    textSegments: z.array(citationTextSegmentSchema),
+    textProjection: z
+      .object({
+        scope: z.literal("text-only"),
+        order: z.literal("reader-ordered-content"),
+        markerInsertion: z.literal("none"),
+        omittedResourceCount: z.number().int().nonnegative(),
+      })
+      .strict(),
     relationships: provisionRelationshipsResponseSchema,
     regulatoryContext: documentRegulatoryContextSchema,
   })
   .strict();
 
 export type CitationContext = z.infer<typeof citationContextSchema>;
+export type CitationTextSegment = z.infer<typeof citationTextSegmentSchema>;

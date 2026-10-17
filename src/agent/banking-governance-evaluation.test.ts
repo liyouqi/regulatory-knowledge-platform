@@ -44,7 +44,7 @@ function emptyRetrieval() {
   return {
     search: vi.fn(
       (query: string): CitationRetrievalResponse => ({
-        schemaVersion: "1.0.0",
+        schemaVersion: "1.1.0",
         query,
         normalizedQuery: query,
         runtime: services.context.runtimeIdentity,
