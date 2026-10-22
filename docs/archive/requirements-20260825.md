@@ -1,5 +1,7 @@
 # Regulatory Knowledge Platform — 产品需求规格说明书
 
+> 2026-08-25 的原始设计稿，保留供查阅。当前安装步骤见 [启动指南](../getting-started.md)，接口和数据行为以现有代码及合同文档为准。
+
 > 文档版本：v3.5 Profile Compilation Implemented
 > 日期：2026-08-25
 > 产品语言：English  
@@ -2098,7 +2100,7 @@ Topic 页面聚合：
 
 当前实现：Runtime `5.4.0` 发布首个有界 Topic/Taxonomy 0→1。版本控制的 `data/editorial/regulatory-topics.json` 定义 3 个 reviewed editorial Topics：`Major ICT incident reporting`、`ICT third-party risk`、`Banking governance and internal control`，并以 10 条 assignment 指向 exact loaded Document 或 Provision stable ID。独立 `regulatory-topic@1.0.0` builder 在 Edition/Profile compilation 后校验 endpoint、target kind、review lineage 和 evidence locator；只有至少保留 2 个 Document 且含 1 个 Provision assignment 的 Topic 才可 materialize，避免 Profile 产生残缺聚合。`regulatory_topics` 与 `topic_assignments` 独立于 Domain、Applicability 和主法律关系表；`GET /api/topics`、`GET /api/topics/:slug`、`/topics` 与 `/topics/:slug` 从同一 read-only Runtime projection 返回。Topic detail 只复用既有 `OFFICIAL_MAPPING` relationship 及 exact evidence，不复制法律关系，也固定声明 `applicabilityConclusion: false`。
 
-上述 10 条 assignment 是 0→1 初始切片的规模；后续沿用同一 contract 的专题增厚与业务场景核验见 [Banking Governance task audit](banking-governance-task-audit.md)。当前数量以 reviewed dataset 和 Runtime manifest 为准。该诊断不替代原有引用检索或 release gate，也不把导航覆盖当作法律适用性或真实用户价值证明。
+上述 10 条 assignment 是 0→1 初始切片的规模；后续沿用同一 contract 的专题增厚与业务场景核验见 [Banking Governance task audit](../evaluation/banking-governance.md)。当前数量以 reviewed dataset 和 Runtime manifest 为准。该诊断不替代原有引用检索或 release gate，也不把导航覆盖当作法律适用性或真实用户价值证明。
 
 ## 23.2 Implementation Timeline
 
@@ -2264,7 +2266,7 @@ Phase 3 在公开 API 之前提供稳定的内部 machine-facing service output�
 
 Canonical build 只依赖可审核、可重复执行的 source、mapping、metadata 与 deterministic builders。Phase 4 只把这些已经稳定的 service outputs 适配为 versioned Public API / MCP。
 
-当前实现：Runtime Reader payload 保留 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator`。截至 2026-10-17，`citation-context-service` 以 `stable-entity-id@1.1.0` exact match 组装 schema **1.1.0** 的 context：逐项遍历已有 `orderedContent`，不把父段后续文字提前到列点之前。每个 text run 保留实体 ID、anchor、source locator 和原始 `contentIndex`；同一实体可多次出现，不得按 ID 去重。`contentIndex` 仅在同一 source/Runtime identity 内定位原 block 的数组项，不是新的 stable ID。`textProjection` 固定声明 text-only、Reader order、markerInsertion=none，并按出现次数计数未转写的公式；空/仅公式目标允许空 textSegments。内部 `GET /api/internal/citation-context/:entityId` 对未知/Profile-excluded ID 返回 not-found；已加载对象的重复/缺失/换序 child references 或不完整 context 抛错，不能静默回退。CitationRetrieval 的外层 schema 同步升级 **1.1.0**，FTS 算法仍为 **1.0.0**，保留 searchRank/rank、document scope 与 1–10 limit；仅真正未索引的搜索实体可回退到其自身 root，不能吞掉损坏 exact context 的异常。CRD/CSSF/EBA 三题 Top-1 100% 门槛不变，rank/score 不是法律置信度。Canonical、parser、source pins、法律关系及独立 Public API/MCP DTO 不受此次投影修复影响。迁移与验证见 [引用顺序修复记录](citation-text-order-fix-20261017.md)。
+当前实现：Runtime Reader payload 保留 `sourceSnapshotId` 与 Provision/Body Block 的 Canonical `sourceLocator`。截至 2026-10-17，`citation-context-service` 以 `stable-entity-id@1.1.0` exact match 组装 schema **1.1.0** 的 context：逐项遍历已有 `orderedContent`，不把父段后续文字提前到列点之前。每个 text run 保留实体 ID、anchor、source locator 和原始 `contentIndex`；同一实体可多次出现，不得按 ID 去重。`contentIndex` 仅在同一 source/Runtime identity 内定位原 block 的数组项，不是新的 stable ID。`textProjection` 固定声明 text-only、Reader order、markerInsertion=none，并按出现次数计数未转写的公式；空/仅公式目标允许空 textSegments。内部 `GET /api/internal/citation-context/:entityId` 对未知/Profile-excluded ID 返回 not-found；已加载对象的重复/缺失/换序 child references 或不完整 context 抛错，不能静默回退。CitationRetrieval 的外层 schema 同步升级 **1.1.0**，FTS 算法仍为 **1.0.0**，保留 searchRank/rank、document scope 与 1–10 limit；仅真正未索引的搜索实体可回退到其自身 root，不能吞掉损坏 exact context 的异常。CRD/CSSF/EBA 三题 Top-1 100% 门槛不变，rank/score 不是法律置信度。Canonical、parser、source pins、法律关系及独立 Public API/MCP DTO 不受此次投影修复影响。迁移与验证见 [引用顺序修复记录](../reviews/citations-20261017.md)。
 
 当前离线交换实现：`platform-rag-export@1.1.0` 只从已经编译并验证的 deployment-fixed Runtime/Profile 生成 immutable English JSONL snapshot，固定包含 manifest、Legal Works、reviewed issuer/Expression currency/source identity、完整 Provision/Body Block 层级、exact ordered content 和已发布 relationship records。导出器以 read-only/query-only 模式打开 SQLite，不调用 acquisition adapter、不读取网络、不重新解析 raw source；已有输出目录拒绝覆盖，完整 schema、stable-ID reference、parent/root/ordered-child reference、document order、record count、byte count 与 SHA-256 验证通过后才从 staging promote。AMLD IV Article 13(1) 固定为 intro → points (a)–(d) → trailing text 的 release semantic case。Snapshot 保留 relation direction、provenance、evidence、builder 和 record-level review status；TF-IDF 边仍为 `candidate`，metadata-only Case/外部 Work/Decision endpoint 不伪装成已加载全文。RAG 负责按 complete Legal Work 和 stable Document ID 选择 corpus、chunk/index/eval 和 atomic release；跨边界关系只允许保留 metadata stub 或排除，不自动导入另一法规。Platform 不维护依赖另一个项目当前状态的 delta 清单。旧 contract 1.0 snapshot 不原地覆盖，使用新 immutable ID 生成修正版。交换契约和导入约束见 `docs/rag-snapshot-export.md`。
 

@@ -1,10 +1,10 @@
 # 卢森堡核心法与法国法典来源盘点
 
-日期：2026-10-22。本轮完成候选来源冻结、逐表示清单和下一解析工作包审阅。**新增 Reader 文档为 0，全库仍为 121，banking-default 仍为 99。** 未修改生产代码、active registry、Corpus manifest、Canonical 或关系语义；完整回归的 pretest 会重建同输入 Runtime，字节差异另见下方验证记录。此前 AMF 正文接入的完成状态见[上一轮验收](amf-publishing-review-20261021.md)。
+日期：2026-10-22。本轮完成候选来源冻结、逐表示清单和下一解析工作包审阅。**新增 Reader 文档为 0，全库仍为 121，banking-default 仍为 99。** 未修改生产代码、active registry、Corpus manifest、Canonical 或关系语义；完整回归的 pretest 会重建同输入 Runtime，字节差异另见下方验证记录。此前 AMF 正文接入的完成状态见[上一轮验收](amf-20261021.md)。
 
 ## 取得的材料
 
-[逐法来源与哈希清单](national-core-source-snapshots-20261022.csv)记录 12 部 LU 法律的原始 ELI、截止日、发布者合并区间候选、未来版本数、JSON/XML/HTML/PDF 哈希、PDF 页数和获取时间。原始字节保存在 ignored 的 `data/raw/national-core/2026-10-22/`；页级提取、几何 text items、字体和验证报告在 ignored 的 `data/artifacts/national-core-20261022/`。这些不是已发布 Canonical 或 Runtime。
+[逐法来源与哈希清单](../data/lu-source-snapshots-20261022.csv)记录 12 部 LU 法律的原始 ELI、截止日、发布者合并区间候选、未来版本数、JSON/XML/HTML/PDF 哈希、PDF 页数和获取时间。原始字节保存在 ignored 的 `data/raw/national-core/2026-10-22/`；页级提取、几何 text items、字体和验证报告在 ignored 的 `data/artifacts/national-core-20261022/`。这些不是已发布 Canonical 或 Runtime。
 
 清单另逐种表示记录版本依据：JSON 请求及响应 URI、XML 的 `originalVersion` 与 FRBR Expression、HTML 自述合并标题、PDF 的原始 ModDate 和版本对齐审阅状态。保险 PDF 标题日期与所选日期相符，正文保真尚未审阅；其余 PDF 版本对齐仍标 `not-assessed`。任何表示都不能借用另一表示的日期补空。
 
@@ -52,7 +52,7 @@
 
 ## 下一解析与发布顺序
 
-[专门方案](legilux-candidate-contract-plan-20261022.md)已通过 Sol High **candidate-only** 审阅，范围限 SIF/SICAR/RAIF。审阅要求逐表示记录版本依据、保留保险 PDF 权威性冲突、显式拒绝 DTD/自定义实体/外部解析、区分源字节哈希与 XML 标准规范化后的树。上述要求已写入方案，未开始新的解析实施。
+[专门方案](../plans/legilux.md)已通过 Sol High **candidate-only** 审阅，范围限 SIF/SICAR/RAIF。审阅要求逐表示记录版本依据、保留保险 PDF 权威性冲突、显式拒绝 DTD/自定义实体/外部解析、区分源字节哈希与 XML 标准规范化后的树。上述要求已写入方案，未开始新的解析实施。
 
 1. SIF/SICAR/RAIF：先解释 XML/HTML 版本身份，完成独立候选树、附件/注释/删除标识和复杂布局对照；不修改发布数据。
 2. 候选保真通过后，单独审阅 Legilux Canonical/稳定 ID/日期与权威性合同，再接入 Reader、检索、引用、国家页、API/MCP/RAG。

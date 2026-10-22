@@ -2,6 +2,7 @@
   "name": "regulatory-knowledge-platform",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scarfSettings": {
     "enabled": false

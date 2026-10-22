@@ -20,7 +20,7 @@ Consumers must parse the new inner and outer schemas, retain array order and rep
 
 ## Evidence and frozen benchmarks
 
-The [projection review receipt](../data/editorial/citation-text-projection-review.json) records old file checksums and the three changed CRD projection hashes. The original datasets and the July-CRD datasets remain byte-for-byte unchanged. New defaults are `banking-governance-tasks-ordered-1.1.json` and the separately selected `banking-governance-holdout-ordered-1.1.json`. Questions, gold entity IDs, source pins, locators and source URLs are identical to the July-CRD datasets; only projection hashes, dataset version and review date change. These are already-seen migration regressions, not a new unseen holdout.
+The [projection review receipt](../../data/editorial/citation-text-projection-review.json) records old file checksums and the three changed CRD projection hashes. The original datasets and the July-CRD datasets remain byte-for-byte unchanged. New defaults are `banking-governance-tasks-ordered-1.1.json` and the separately selected `banking-governance-holdout-ordered-1.1.json`. Questions, gold entity IDs, source pins, locators and source URLs are identical to the July-CRD datasets; only projection hashes, dataset version and review date change. These are already-seen migration regressions, not a new unseen holdout.
 
 No currency acquisition was repeated: the workflow continues using the matching **2026-10-16** source review. This change makes no new latest-law, institutional-applicability or real-user-value claim.
 

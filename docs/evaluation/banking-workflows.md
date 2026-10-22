@@ -1,6 +1,6 @@
 # Banking governance: question retrieval, currency review and workflow trial kit
 
-Scope: a local, bounded evidence-location workflow, not a legal-answer generator or a completed customer study. This page records the **2026-10-13** continuation against the 2025 CRD pin; baseline navigation was committed separately as `2b3925e`. No source pins, legal parsers, canonical contracts, relationship directions or release thresholds changed in that continuation. The subsequent [2026-10-16 upgrade](crd-expression-upgrade-20261016.md) records the new CRD pin, identity fix and fresh evaluations; figures below remain historical.
+Scope: a local, bounded evidence-location workflow, not a legal-answer generator or a completed customer study. This page records the **2026-10-13** continuation against the 2025 CRD pin; baseline navigation was committed separately as `2b3925e`. No source pins, legal parsers, canonical contracts, relationship directions or release thresholds changed in that continuation. The subsequent [2026-10-16 upgrade](../reviews/crd-20261016.md) records the new CRD pin, identity fix and fresh evaluations; figures below remain historical.
 
 ## 1. Business-question search
 
@@ -60,7 +60,7 @@ All three pass the bounded technical walk-through (source/text integrity → sco
 
 ## 4. Actual user trial — pending, not simulated
 
-Use [the blank CSV template](templates/banking-governance-user-trial.csv). Ask an actual banking compliance/internal-control colleague to perform one or more tasks:
+Use [the blank CSV template](banking-governance-user-trial.csv). Ask an actual banking compliance/internal-control colleague to perform one or more tasks:
 
 1. Record institution type/jurisdiction and an anonymous participant code; no client transactions or personal information.
 2. Write their own business question before searching; do not hand them a copied legal-text fragment.

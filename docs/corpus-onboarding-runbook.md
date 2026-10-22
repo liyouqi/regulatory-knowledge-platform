@@ -42,13 +42,13 @@ An `active` or `queued` row contains the existing source fields. A `planned` row
 
 ## Refresh the current experimental corpus
 
-Daily development and first setup use a separate current-source workflow:
+An existing installation uses a separate current-source workflow. For first installation, start with the bounded official-DORA path in [Getting started](getting-started.md); a full-source update additionally needs the verified AMF snapshot described below.
 
 ```bash
 npm run corpus:update
 ```
 
-This command downloads the currently selected official bytes for every registered EUR-Lex, CSSF, and EBA source, audits all registered EUR-Lex acts from the verified CELLAR tree notices already stored in those snapshots, selects the newest verified local snapshot, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, atomically rebuilds the default Runtime SQLite, and verifies that artifact through the read-only Reader/Search services. Use `--skip-fetch` for a fully local rebuild; that mode performs the same audit from local tree notices and marks it as not freshly fetched.
+This command downloads the currently selected official bytes for registered EUR-Lex, CSSF, EBA, and German national-law sources. It retains already verified AMF snapshots rather than fetching AMF afresh; a clean checkout without the active AMF snapshot cannot complete this full-source update. See [AMF import and publication evidence](reviews/amf-20261021.md). The command audits registered EUR-Lex acts from verified CELLAR tree notices, selects the newest verified local snapshots, runs the existing Canonical parsers, validates the version-controlled reviewed datasets, atomically rebuilds the default Runtime SQLite, and verifies that artifact through the read-only Reader/Search services. Use `--skip-fetch` when all required local snapshots are present; that mode performs the same audit from local tree notices and marks it as not freshly fetched.
 
 The same command also processes every `queued` EUR-Lex row. It fetches the official source, parses a candidate under ignored `data/artifacts/onboarding/`, and records a suggested quality baseline as `review-required`; a failure is recorded as `blocked` without removing any active Reader document. Queued and planned rows never enter Canonical production selection, the Runtime, strict manifests, or RAG exports. After review, promoting a row means adding the reviewed quality data, changing its status to `active`, and pinning the exact snapshot in the release manifest. Routine users still operate one command and read one report at `data/artifacts/refresh/build-report.json`.
 
@@ -119,7 +119,7 @@ Compare the official source with reported Articles, Recitals, Annexes, paragraph
 
 If the structure is materially new, stop and add a targeted parser fixture before continuing.
 
-Repeated division numbers require cross-expression identity review, not only count/hash checks. A same-number division inserted earlier can silently change source-order occurrence IDs. Formex 1.6.1 supports reviewed `structuralIdentityOverrides`: exact parent/kind/normalized number/title, occurrence and byte-exact raw-package `sourceContentSha256`. An overridden group requires complete one-to-one coverage and contiguous unique occurrences; changed bytes or unmatched/unused/duplicate rules fail closed. Preserve official labels/order, retain the old snapshot and verify both expressions before pinning. See the [CRD example](crd-expression-upgrade-20261016.md). The required high-intensity review applies before introducing overrides.
+Repeated division numbers require cross-expression identity review, not only count/hash checks. A same-number division inserted earlier can silently change source-order occurrence IDs. Formex 1.6.1 supports reviewed `structuralIdentityOverrides`: exact parent/kind/normalized number/title, occurrence and byte-exact raw-package `sourceContentSha256`. An overridden group requires complete one-to-one coverage and contiguous unique occurrences; changed bytes or unmatched/unused/duplicate rules fail closed. Preserve official labels/order, retain the old snapshot and verify both expressions before pinning. See the [CRD example](reviews/crd-20261016.md). The required high-intensity review applies before introducing overrides.
 
 ### 4. Publish the immutable Canonical artifact
 
@@ -150,7 +150,7 @@ npm test
 npm run build
 ```
 
-The command requires the manifest source set to match all three source registries exactly, verifies every snapshot and reviewed quality baseline, hashes required reviewed relationship/Profile inputs, rebuilds every Canonical document through its existing builder, and verifies the resulting staging SQLite through the read-only Runtime services. Generated Canonical files, SQLite, and `build-report.json` stay under ignored `data/artifacts/corpus-builds/`; promotion remains separate.
+The command requires the manifest source set to match the EUR-Lex, CSSF, EBA, national-law and active AMF registries exactly, verifies every snapshot and reviewed quality baseline, hashes required reviewed relationship/Profile inputs, rebuilds every Canonical document through its existing builder, and verifies the resulting staging SQLite through the read-only Runtime services. Generated Canonical files, SQLite, and `build-report.json` stay under ignored `data/artifacts/corpus-builds/`; promotion remains separate.
 
 For local application testing, run `REGULATORY_EDITION_PROFILE=<profileId> npm run dev` so the `predev` build uses the intended Profile. Production serves the already verified SQLite artifact and does not compile or switch Profiles at startup.
 
@@ -181,6 +181,20 @@ For a batch such as four payment laws:
 
 The batch is not “four file imports.” Acquisition and parsing are deterministic; legal nature, applicability, taxonomy, and ambiguous relationship semantics remain explicit review gates.
 
+## Add a CSSF source
+
+CSSF uses `data/cssf-source-registry.json` and a separate HTML/PDF adapter. For example:
+
+```bash
+npm run cssf:source:list
+npm run cssf:source:fetch -- --id circular-25-893
+npm run cssf:source:verify -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+npm run cssf:canonical:inspect -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+npm run cssf:canonical:build -- --snapshot data/raw/cssf/circular-25-893/<snapshot-directory>
+```
+
+Use the same sequence for a registered HTML source, such as `communication-2025-04-09-ict-risk-updates`. Review headings, paragraphs, nested lists, notes and source locators against the official file. The tagged-PDF profiles also check numbering and page evidence. Unsupported structures require parser review before publication; keep official headings, subjects and source notes separate from legal-body text.
+
 ## Add an EBA guideline using the current commands
 
 Register its official page/PDF, stable `eu:eba:*` Document ID, family, aliases, publication date, and Level 3 measure type in `data/eba-source-registry.json`. Then run:
@@ -195,6 +209,46 @@ npm run eba:canonical:build -- --snapshot data/raw/eba/<local-id>/<snapshot-dire
 
 Inspection must identify the exact legal-body page range separately from cover/report/consultation material, preserve numbered provisions and annexes, and publish count/hash gates before the source enters the corpus manifest. Record guideline legal nature and status in reviewed official metadata; record Domain assignments separately as editorial data. A CRD/CRR or other legal-basis relation becomes a published edge only through an evidence-checked reviewed mapping.
 
+## Add or update an official Level 2 mapping
+
+1. Ingest the RTS or ITS as a normal official document using the steps above. Give it the same `familyId` as its Level 1 act, `regulatoryLevel: "level-2"`, and the correct `measureType`.
+2. Verify the adopted act and its exact legal basis in EUR-Lex. Do not map a draft technical standard as an adopted act.
+3. Add one record per mandate Article to `data/official-mappings/level2.json`. Preserve the Level 1 Article/entity IDs, an exact mandate excerpt, the Level 2 CELEX/official title/document number, the adoption-basis wording, both official URLs, and `OFFICIAL_MAPPING` provenance.
+4. Rebuild and run the dedicated gates:
+
+   ```bash
+   npm run runtime:build
+   npx vitest run src/relationships/official-mapping.test.ts
+   npm run check
+   npm test
+   npm run build
+   ```
+
+The builder rejects missing documents, invalid Article endpoints, an official-title mismatch, or mandate evidence that is not present in the loaded official Article. It emits `Article → MANDATES → RTS/ITS` and `RTS/ITS → ADOPTED_UNDER → Article` into the same relationship table. The UI and API never read the curated JSON directly.
+
+
+## EU stable identity rules
+
+- EU document: `eu:<CELEX>`, for example `eu:32022R2554`.
+- Article: `eu:<CELEX>:article:<number>`.
+- Nested provisions append their kind and normalized legal number.
+- Repeated local numbering appends `:occurrence:<n>` only from the second occurrence.
+- A source-specific version is separate: `<logical-id>@<source-version>`.
+
+Logical IDs never contain a content hash or UI URL. Content hashes prove text integrity; they do not define the legal entity.
+
+
+## CELLAR relationship inputs
+
+The source commands write raw responses, checksums and candidates under ignored `data/raw/`; they do not change published relationships. Verify and review a candidate before updating the corresponding file in `data/official-metadata/`.
+
+| Commands | Reviewed file | Published scope |
+| --- | --- | --- |
+| `cellar:relations:fetch`, `cellar:relations:verify` | `cellar-focused-relations.json` | `resource_legal_based_on_resource_legal` → `ADOPTED_UNDER`; `resource_legal_completes_resource_legal` → `SUPPLEMENTS`, only between loaded Documents |
+| `cellar:lifecycle:fetch`, `cellar:lifecycle:verify` | `cellar-lifecycle-relations.json` | `AMENDS` / `CORRECTS` in the Document graph; external Works remain metadata-only |
+
+Run these with `npm run <command>`. Focused edges retain `OFFICIAL_METADATA` provenance, both CELLAR Work URIs and the exact predicate locator. `work_cites_work` is excluded from that slice. Article graphs exclude document-scoped edges, and external Works link to official metadata rather than a local Reader route.
+
 ## Corpus orchestration
 
 Use:
@@ -205,7 +259,7 @@ npm run corpus:build -- --profile <profileId>
 
 The orchestrator:
 
-1. read version-controlled EUR-Lex, CSSF, EBA, and Profile manifests;
+1. read version-controlled source registries and Profile manifests;
 2. locate the exact approved local snapshots pinned by ID and checksum;
 3. verify checksums;
 4. run existing Canonical builders without duplicating parser logic;
@@ -234,4 +288,4 @@ A new document is onboarded only when:
 - intended Profile inclusion/exclusion is tested;
 - Runtime build, verification, ordinary gates, and dedicated gates pass;
 - the build report records source, parser, schema, Profile, relationship, and Runtime identities;
-- known limitations and deferred 1→100 work are added to `docs/coverage-backlog.md`.
+- known limitations and deferred 1→100 work are added to `docs/plans/coverage.md`.

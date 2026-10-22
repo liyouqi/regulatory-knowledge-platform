@@ -2,6 +2,8 @@
 
 This is the single source of truth for moving the whole development environment. Git carries the code and reviewed configuration; the items below cover local secrets, downloaded legal sources, and generated product data that Git intentionally ignores.
 
+This guide is for a trusted transfer of an existing installation. For a new public checkout use [Getting started](getting-started.md). The local-only files below are not a public release bundle or issue attachment.
+
 ## 1. Finish work on the old computer
 
 ```bash
