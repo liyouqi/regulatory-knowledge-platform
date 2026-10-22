@@ -4,6 +4,8 @@ A project for reading and searching European financial regulation. It keeps the 
 
 [中文](README.zh-CN.md) · [Getting started](docs/getting-started.md) · [Documentation](docs/README.md) · [Corpus](docs/corpus-status.md)
 
+![Search for DORA Article 28 and open a cited provision](docs/media/search-reader.gif)
+
 ## Features
 
 - Read a law by Article or browse the whole document.
@@ -13,6 +15,24 @@ A project for reading and searching European financial regulation. It keeps the 
 - Use the read-only REST API, four local MCP tools or an offline RAG snapshot.
 
 Reading and search do not require an LLM. Copilot, Monitor and Earth use separate configuration and data.
+
+<details>
+<summary>Browse by country</summary>
+
+Filter the directory, open France, and read the AMF General Regulation.
+
+![Country directory to the French AMF Reader](docs/media/countries.gif)
+
+</details>
+
+<details>
+<summary>Explore references and related measures</summary>
+
+Open the Article graph, filter its relationships, and inspect a connected measure.
+
+![DORA Article 20 relationship graph and source details](docs/media/relationships.gif)
+
+</details>
 
 ## Coverage
 

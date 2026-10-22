@@ -60,3 +60,13 @@ The resulting local service uses the banking Profile. Changing an environment va
 - [Cloud Run](cloud-run-deployment.md) and [Runtime operations](runtime-operation-runbook.md): release, verification and rollback.
 
 Keep `.env`, raw downloads and generated artifacts out of Git. A trusted move to another computer follows the migration guide; public source distribution is tracked in the [release plan](plans/open-source.md).
+
+## Record README demos
+
+With the full corpus running locally, Google Chrome installed, and `ffmpeg` on your PATH:
+
+```bash
+node scripts/record-readme-demos.mjs
+```
+
+The script records real page interactions and replaces the three GIFs in `docs/media/` after all scenes pass. Frames, MP4 originals and a capture report stay under ignored `data/artifacts/readme-demos/`. Set `README_DEMO_BASE_URL` for a different local address; `README_DEMO_BROWSER_CHANNEL` defaults to `chrome`.

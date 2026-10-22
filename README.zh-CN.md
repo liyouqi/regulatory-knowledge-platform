@@ -4,6 +4,8 @@
 
 [English](README.md) · [启动指南](docs/getting-started.md) · [文档目录](docs/README.md) · [法规列表](docs/corpus-status.md)
 
+![搜索 DORA 第 28 条并预览引用的条文](docs/media/search-reader.gif)
+
 ## 能做什么
 
 - 按条文阅读，或者浏览整部法规。
@@ -13,6 +15,24 @@
 - 通过只读 REST API、4 个本地 MCP 工具或离线 RAG 快照调用数据。
 
 阅读和检索不需要大模型。Copilot、Monitor 和 Earth 有各自的配置和数据要求。
+
+<details>
+<summary>按国家找材料</summary>
+
+筛选国家，进入法国页面，再打开 AMF 总规则原文。
+
+![从国家目录进入法国 AMF 阅读器](docs/media/countries.gif)
+
+</details>
+
+<details>
+<summary>查看法规关系</summary>
+
+从条文打开关系图，筛选关系，再查看关联文件的详情。
+
+![DORA 第 20 条的关系图和关联文件详情](docs/media/relationships.gif)
+
+</details>
 
 ## 目前收录了什么
 
