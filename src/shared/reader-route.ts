@@ -220,3 +220,15 @@ export function parseQuickGo(value: string): {
   }
   return null;
 }
+
+export function countryPath(code?: string): string {
+  return code
+    ? `/countries/${encodeURIComponent(code.toLowerCase())}`
+    : "/countries";
+}
+
+export function parseCountryPath(pathname: string): { code?: string } | null {
+  if (/^\/countries\/?$/u.test(pathname)) return {};
+  const match = /^\/countries\/([a-z]{2})\/?$/iu.exec(pathname);
+  return match ? { code: match[1].toLowerCase() } : null;
+}

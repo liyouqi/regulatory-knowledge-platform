@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  type ContentLayout,
+  type ContentRole,
+  contentLayoutSchema,
+  contentRoleSchema,
+  validateContentLayout,
+} from "./content-unit";
 import { sourceLocatorSchema } from "./source-locator";
 import { sourceStatusSchema } from "./source-status";
 
@@ -17,46 +24,77 @@ export const breadcrumbSchema = z.object({
 });
 
 export const bodyBlockSchema: z.ZodType<BodyBlock> = z.lazy(() =>
-  z.object({
-    id: z.string().min(1),
-    kind: z.enum([
-      "paragraph",
-      "subparagraph",
-      "point",
-      "subpoint",
-      "recital",
-      "annex",
-      "annex-part",
-      "other",
-    ]),
-    marker: z.string().optional(),
-    text: z.string(),
-    anchor: z.string().min(1),
-    sourceLocator: sourceLocatorSchema,
-    orderedContent: z.array(
-      z.discriminatedUnion("type", [
-        z.object({ type: z.literal("text"), text: z.string().min(1) }),
-        z.object({ type: z.literal("child"), childId: z.string().min(1) }),
-        z.object({
-          type: z.literal("resource"),
-          resource: z.object({
-            id: z.string().min(1),
-            kind: z.literal("formula"),
-            mediaType: z.literal("image/png"),
-            dataUrl: z.string().startsWith("data:image/png;base64,"),
-            sourceFileName: z.string().min(1),
-            sourceSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
-            renditionSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
-          }),
-        }),
+  z
+    .object({
+      id: z.string().min(1),
+      kind: z.enum([
+        "paragraph",
+        "subparagraph",
+        "point",
+        "subpoint",
+        "recital",
+        "annex",
+        "annex-part",
+        "other",
       ]),
-    ),
-    children: z.array(bodyBlockSchema),
-  }),
+      contentRole: contentRoleSchema.optional(),
+      contentLayout: z.array(contentLayoutSchema).optional(),
+      marker: z.string().optional(),
+      text: z.string(),
+      anchor: z.string().min(1),
+      sourceLocator: sourceLocatorSchema,
+      orderedContent: z.array(
+        z.discriminatedUnion("type", [
+          z.object({
+            type: z.literal("text"),
+            text: z.string().min(1),
+            contentRole: contentRoleSchema.optional(),
+            sourceLocator: sourceLocatorSchema.optional(),
+          }),
+          z.object({ type: z.literal("child"), childId: z.string().min(1) }),
+          z.object({
+            type: z.literal("resource"),
+            resource: z.object({
+              id: z.string().min(1),
+              kind: z.literal("formula"),
+              mediaType: z.literal("image/png"),
+              dataUrl: z.string().startsWith("data:image/png;base64,"),
+              sourceFileName: z.string().min(1),
+              sourceSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+              renditionSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+            }),
+          }),
+        ]),
+      ),
+      children: z.array(bodyBlockSchema),
+    })
+    .superRefine((block, context) => {
+      if (!block.contentLayout) return;
+      try {
+        const runs = block.orderedContent;
+        if (runs.some((run) => run.type !== "text"))
+          throw new Error("Structured content requires text runs only");
+        validateContentLayout(
+          runs as Extract<
+            BodyBlock["orderedContent"][number],
+            { type: "text" }
+          >[],
+          block.contentLayout,
+        );
+      } catch (error) {
+        context.addIssue({
+          code: "custom",
+          path: ["contentLayout"],
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }),
 );
 
 export interface BodyBlock {
   id: string;
+  contentRole?: ContentRole;
+  contentLayout?: ContentLayout[];
   kind:
     | "paragraph"
     | "subparagraph"
@@ -71,7 +109,12 @@ export interface BodyBlock {
   anchor: string;
   sourceLocator: z.infer<typeof sourceLocatorSchema>;
   orderedContent: Array<
-    | { type: "text"; text: string }
+    | {
+        type: "text";
+        text: string;
+        contentRole?: ContentRole;
+        sourceLocator?: z.infer<typeof sourceLocatorSchema>;
+      }
     | { type: "child"; childId: string }
     | {
         type: "resource";
@@ -90,6 +133,8 @@ export interface BodyBlock {
 }
 
 export const provisionViewSchema = z.object({
+  officialSourceUrl: z.string().url().optional(),
+  contentRole: contentRoleSchema.optional(),
   id: z.string().min(1),
   kind: z.enum(["article", "recital", "annex", "other"]),
   collectionId: collectionIdSchema,
@@ -136,9 +181,30 @@ export const contentCollectionSchema = z.object({
   roots: z.array(tocNodeSchema),
 });
 
-export const documentViewSchema = z.object({
+export const sourceAcquisitionSchema = z
+  .object({
+    retrievedAt: z.null(),
+    importedAt: z.string().datetime(),
+    capturedOn: z.literal("2026-10-20"),
+    captureDateBasis: z.literal("archived-probe-directory"),
+    retrievalTimestampBasis: z.literal("date-only-official-probe"),
+  })
+  .strict();
+export const scopedSourceNoteViewSchema = z
+  .object({
+    scope: z.enum(["document", "structure"]),
+    ownerId: z.string().min(1),
+    ownerSourceUrl: z.string().url(),
+    ownerLabel: z.string().min(1),
+    position: z.number().int().nonnegative(),
+    contentHash: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+    block: bodyBlockSchema,
+  })
+  .strict();
+const documentViewObjectSchema = z.object({
   id: z.string().min(1),
-  jurisdiction: z.enum(["EU", "LU"]),
+  language: z.enum(["en", "de", "fr"]).optional(),
+  jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
   celex: z.string().min(1).optional(),
   localId: z.string().min(1).optional(),
@@ -155,6 +221,12 @@ export const documentViewSchema = z.object({
   sourceUrl: z.string().url(),
   sourceSnapshotId: z.string().min(1),
   asOf: z.string().date(),
+  publicationDate: z.string().date().nullable().optional(),
+  publicationDateBasis: z
+    .literal("aggregate-with-multiple-component-publications")
+    .optional(),
+  sourceAcquisition: sourceAcquisitionSchema.optional(),
+  scopedSourceNotes: z.array(scopedSourceNoteViewSchema).optional(),
   lastChecked: z.string().datetime(),
   sourceVersion: z.string().min(1),
   sourceStatus: sourceStatusSchema.optional(),
@@ -163,6 +235,68 @@ export const documentViewSchema = z.object({
   collections: z.array(contentCollectionSchema).min(1),
   provisions: z.array(provisionViewSchema),
 });
+export const documentViewSchema = documentViewObjectSchema.superRefine(
+  (document, context) => {
+    const error = (message: string) =>
+      context.addIssue({ code: "custom", message });
+    if (document.jurisdiction !== "FR") {
+      if (
+        document.publicationDate === null ||
+        document.sourceAcquisition ||
+        document.scopedSourceNotes ||
+        document.publicationDateBasis ||
+        document.language === "fr" ||
+        document.sourceStatus?.textAsOfBasis === "publisher-version-date" ||
+        document.sourceStatus?.textAuthorityStatus === "publisher-consolidation"
+      )
+        error("AMF source metadata is restricted to the French aggregate");
+      return;
+    }
+    if (
+      document.id !== "fr:amf:rg" ||
+      document.language !== "fr" ||
+      document.publicationDate !== null ||
+      !document.publicationDateBasis ||
+      !document.sourceAcquisition ||
+      !document.scopedSourceNotes ||
+      document.sourceStatus?.textAsOfBasis !== "publisher-version-date" ||
+      document.sourceStatus?.textAuthorityStatus !==
+        "publisher-consolidation" ||
+      document.sourceStatus?.textAsOf !== document.asOf ||
+      !document.sourceStatus?.checkedAt ||
+      document.lastChecked !== document.sourceStatus.checkedAt
+    )
+      error(
+        "French aggregate requires explicit unknown dates and publisher-version provenance",
+      );
+    const owners = new Set<string>();
+    const visit = (node: TocNode) => {
+      if (node.type === "group") owners.add(node.id);
+      for (const child of node.children) visit(child);
+    };
+    for (const collection of document.collections)
+      for (const node of collection.roots) visit(node);
+    const seen = new Set<string>();
+    const noteOnly = (block: BodyBlock) =>
+      block.contentRole === "source-note" &&
+      block.children.every(noteOnly) &&
+      block.orderedContent.every(
+        (entry) => entry.type === "text" && entry.contentRole === "source-note",
+      );
+    for (const note of document.scopedSourceNotes ?? []) {
+      const key = `${note.ownerId}:${note.position}`;
+      if (
+        seen.has(key) ||
+        !noteOnly(note.block) ||
+        (note.scope === "document"
+          ? note.ownerId !== document.id
+          : !owners.has(note.ownerId))
+      )
+        error("Invalid publisher note ownership or content role");
+      seen.add(key);
+    }
+  },
+);
 
 export const documentSummarySchema = z.object({
   id: z.string().min(1),
@@ -255,26 +389,46 @@ export const lawSearchTargetSchema = z.object({
   path: z.string().startsWith("/"),
 });
 
-export const lawSearchResultSchema = z.object({
-  id: z.string().min(1),
-  familyId: z.string().startsWith("family:"),
-  regulatoryLevel: documentSummarySchema.shape.regulatoryLevel,
-  measureType: documentSummarySchema.shape.measureType,
-  slug: z.string().regex(/^[a-z0-9-]+$/),
-  shortName: z.string().min(1),
-  officialTitle: z.string().min(1),
-  documentType: documentViewSchema.shape.documentType,
-  publicationDate: z.string().date(),
-  celex: z.string().min(1).optional(),
-  localId: z.string().min(1).optional(),
-  aliases: z.array(z.string().min(1)),
-  readerPath: z.string().startsWith("/"),
-  explorerPath: z.string().startsWith("/"),
-  provenance: z.enum(["official", "fixture"]),
-  matchReason: lawSearchMatchReasonSchema,
-  score: z.number().nonnegative(),
-  target: lawSearchTargetSchema.optional(),
-});
+export const lawSearchResultSchema = z
+  .object({
+    id: z.string().min(1),
+    familyId: z.string().startsWith("family:"),
+    regulatoryLevel: documentSummarySchema.shape.regulatoryLevel,
+    measureType: documentSummarySchema.shape.measureType,
+    slug: z.string().regex(/^[a-z0-9-]+$/),
+    shortName: z.string().min(1),
+    officialTitle: z.string().min(1),
+    documentType: documentViewObjectSchema.shape.documentType,
+    publicationDate: z.string().date().nullable(),
+    publicationDateBasis: z
+      .literal("aggregate-with-multiple-component-publications")
+      .optional(),
+    publisherVersionDate: z.string().date().optional(),
+    celex: z.string().min(1).optional(),
+    localId: z.string().min(1).optional(),
+    aliases: z.array(z.string().min(1)),
+    readerPath: z.string().startsWith("/"),
+    explorerPath: z.string().startsWith("/"),
+    provenance: z.enum(["official", "fixture"]),
+    matchReason: lawSearchMatchReasonSchema,
+    score: z.number().nonnegative(),
+    target: lawSearchTargetSchema.optional(),
+  })
+  .superRefine((result, context) => {
+    if (
+      result.id === "fr:amf:rg"
+        ? result.publicationDate !== null ||
+          !result.publicationDateBasis ||
+          !result.publisherVersionDate
+        : result.publicationDate === null ||
+          result.publicationDateBasis !== undefined ||
+          result.publisherVersionDate !== undefined
+    )
+      context.addIssue({
+        code: "custom",
+        message: "Law search publication date provenance mismatch",
+      });
+  });
 
 export const lawSearchResponseSchema = z.object({
   query: z.string(),
@@ -315,7 +469,7 @@ export const fullTextSearchResponseSchema = z.object({
 export const definitionSearchResultSchema = z.object({
   id: z.string().min(1),
   documentId: z.string().min(1),
-  jurisdiction: z.enum(["EU", "LU"]),
+  jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
   shortName: z.string().min(1),
   celex: z.string().min(1).optional(),
@@ -373,13 +527,13 @@ export interface ExplorerNode {
 
 export const explorerDocumentSchema = z.object({
   id: z.string().min(1),
-  jurisdiction: z.enum(["EU", "LU"]),
+  jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
   slug: z.string().regex(/^[a-z0-9-]+$/),
   celex: z.string().min(1).optional(),
   localId: z.string().min(1).optional(),
   shortName: z.string().min(1),
   officialTitle: z.string().min(1),
-  documentType: documentViewSchema.shape.documentType,
+  documentType: documentViewObjectSchema.shape.documentType,
   sourceUrl: z.string().url(),
   asOf: z.string().date(),
   lastChecked: z.string().datetime(),

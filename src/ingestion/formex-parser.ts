@@ -57,6 +57,7 @@ export interface FormexParseResult {
 export interface FormexAnnexDocument {
   fileName: string;
   xml: string;
+  quotedAnnex?: FormexAnnexDocument;
 }
 
 function tagName(node: OrderedNode): string | undefined {
@@ -952,31 +953,37 @@ class FormexDocumentBuilder {
     fileName: string,
     annexIndex: number,
     sourceLocator = `${fileName}#/ANNEX`,
+    quotedAnnex?: { fileName: string; node: OrderedNode },
+    parentAnnexId?: string,
   ): void {
     const titleElement = childElement(annex, "TITLE");
     const titleText = titleElement
       ? plainText(childElement(titleElement, "TI") ?? titleElement)
       : `ANNEX ${annexIndex}`;
     const labelMatch =
-      /^annex\s+([ivxlcdm]+|\d+[a-z]?)(?:\s+([\s\S]+))?$/iu.exec(titleText);
+      /^annex\s+([ivxlcdm]+[a-z]?|\d+[a-z]?)(?:\s+([\s\S]+))?$/iu.exec(
+        titleText,
+      );
     const numberRaw = labelMatch?.[1] ?? String(annexIndex);
     const label = labelMatch ? `ANNEX ${numberRaw}` : titleText;
-    const occurrence = this.occurrence(this.documentId, "annex", numberRaw);
-    const logicalId = provisionLogicalId(
-      this.documentId,
-      "annex",
-      numberRaw,
-      occurrence,
-    );
+    const parentId = parentAnnexId ?? this.documentId;
+    const kind = parentAnnexId ? "annex-part" : "annex";
+    const occurrence = this.occurrence(parentId, kind, numberRaw);
+    const logicalId = provisionLogicalId(parentId, kind, numberRaw, occurrence);
     const contents = childElement(annex, "CONTENTS");
-    const text = plainText(contents ?? annex, TEXT_EXCLUSIONS);
+    const contentsText = plainText(contents ?? annex, TEXT_EXCLUSIONS);
     const titleNode = titleElement
       ? childElement(titleElement, "STI")
       : undefined;
     const title = titleNode
       ? plainText(titleNode)
       : labelMatch?.[2]?.trim() || undefined;
+    const text =
+      parentAnnexId && title
+        ? normalizeText(`${title} ${contentsText}`)
+        : contentsText;
     const annexXpath = sourceLocator;
+    const provisionIndex = this.provisions.length;
 
     this.provisions.push({
       logicalId,
@@ -985,16 +992,37 @@ class FormexDocumentBuilder {
       displayOrder: this.nextOrder(),
       sourceLocator: { kind: "xpath", value: annexXpath },
       parserWarnings: titleElement ? [] : ["Annex has no TITLE element."],
-      kind: "annex",
+      kind,
       numberRaw,
       numberNormalized: normalizeLegalNumber(numberRaw),
       label,
       title,
       text,
       contentHash: sha256(text),
-      parentLogicalId: this.documentId,
+      parentLogicalId: parentId,
       structuralPath: [],
     });
+
+    if (quotedAnnex) {
+      this.addAnnex(
+        quotedAnnex.node,
+        quotedAnnex.fileName,
+        1,
+        `${quotedAnnex.fileName}#/ANNEX`,
+        undefined,
+        logicalId,
+      );
+      const child = this.provisions[provisionIndex + 1];
+      if (!child || child.parentLogicalId !== logicalId)
+        throw new Error("Missing quoted annex child");
+      this.provisions[provisionIndex] = {
+        ...this.provisions[provisionIndex],
+        text: child.text,
+        contentHash: sha256(child.text),
+        orderedContent: [{ type: "child", childLogicalId: child.logicalId }],
+      };
+      return;
+    }
 
     if (!contents) {
       this.warnings.push(`Annex ${numberRaw} has no CONTENTS element.`);
@@ -1044,7 +1072,11 @@ class FormexDocumentBuilder {
 
   build(
     act: OrderedNode,
-    annexes: Array<{ fileName: string; node: OrderedNode }>,
+    annexes: Array<{
+      fileName: string;
+      node: OrderedNode;
+      quotedAnnex?: { fileName: string; node: OrderedNode };
+    }>,
     rootTag: "ACT" | "CONS.ACT" = "ACT",
   ): FormexParseResult {
     const legalBody =
@@ -1072,8 +1104,14 @@ class FormexDocumentBuilder {
         `${legalBodyPath}/ENACTING.TERMS`,
       );
     }
-    annexes.forEach(({ fileName, node }, index) =>
-      this.addAnnex(node, fileName, index + 1),
+    annexes.forEach(({ fileName, node, quotedAnnex }, index) =>
+      this.addAnnex(
+        node,
+        fileName,
+        index + 1,
+        `${fileName}#/ANNEX`,
+        quotedAnnex,
+      ),
     );
     directElements(legalBody, "CONS.ANNEX").forEach((node, index) =>
       this.addAnnex(
@@ -1245,13 +1283,29 @@ export function parseFormexAct(
   const act = parseRoot(xml, ["ACT", "CONS.ACT"]);
   if (!act) throw new Error("Formex XML has no ACT or CONS.ACT root element");
   const rootTag = tagName(act) as "ACT" | "CONS.ACT";
-  const annexes = annexDocuments.map(({ fileName, xml: annexXml }) => {
-    const node = parseRoot(annexXml, ["ANNEX"]);
-    if (!node) {
-      throw new Error(`Formex XML has no ANNEX root element: ${fileName}`);
-    }
-    return { fileName, node };
-  });
+  const annexes = annexDocuments.map(
+    ({ fileName, xml: annexXml, quotedAnnex }) => {
+      const node = parseRoot(annexXml, ["ANNEX"]);
+      if (!node) {
+        throw new Error(`Formex XML has no ANNEX root element: ${fileName}`);
+      }
+      const quotedNode = quotedAnnex
+        ? parseRoot(quotedAnnex.xml, ["ANNEX"])
+        : undefined;
+      if (quotedAnnex && !quotedNode)
+        throw new Error(
+          `Formex XML has no quoted ANNEX root: ${quotedAnnex.fileName}`,
+        );
+      return {
+        fileName,
+        node,
+        quotedAnnex:
+          quotedAnnex && quotedNode
+            ? { fileName: quotedAnnex.fileName, node: quotedNode }
+            : undefined,
+      };
+    },
+  );
   return new FormexDocumentBuilder(source, snapshot, resources).build(
     act,
     annexes,

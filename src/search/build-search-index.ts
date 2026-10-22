@@ -1,6 +1,8 @@
 import { loadDocumentViews } from "../data/document-repository";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   findEditionProfile,
@@ -40,6 +42,10 @@ const manifest = buildRuntimeDatabase(
     ...loadSourceRegistrySync(),
     ...loadCssfSourceRegistrySync(),
     ...loadEbaSourceRegistrySync(),
+    ...loadNationalSourceRegistrySync(),
+    ...loadAmfSourceRegistrySync().filter(
+      (source) => source.status === "active",
+    ),
   ],
   outputPath ?? DEFAULT_RUNTIME_DATABASE_PATH,
   profile,

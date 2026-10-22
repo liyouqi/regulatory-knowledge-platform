@@ -177,7 +177,7 @@ describe("Regulatory MCP server", () => {
     );
 
     expect(result?.isError).not.toBe(true);
-    expect(payload.meta.contractVersion).toBe("1.3.0");
+    expect(payload.meta.contractVersion).toBe("1.5.0");
     expect(payload.data.groups.mandates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

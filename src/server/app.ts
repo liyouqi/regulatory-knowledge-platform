@@ -11,6 +11,7 @@ import { CopilotContextResolver } from "../copilot/context/copilot-context-resol
 import { ConfiguredPrivateAiProvider } from "../copilot/providers/configured-private-ai-provider";
 import { loadPrivateAiConfig } from "../copilot/providers/private-ai-config";
 import { CopilotService } from "../copilot/service/copilot-service";
+import { CountryService } from "../countries/country-service";
 import { RegulatoryDossierService } from "../dossiers/regulatory-dossier-service";
 import { createEarthFeatureRouter } from "../earth/api/earth-feature-router";
 import { createMetadataGraphRouter } from "../earth/api/metadata-graph-router";
@@ -57,6 +58,7 @@ const citationRetrievalService = new CitationRetrievalService(
   searchService,
   citationContextService,
 );
+const countryService = new CountryService(runtimeRepository);
 const regulatoryPathService = new RegulatoryPathService(runtimeRepository);
 const regulatoryTopicService = new RegulatoryTopicService(runtimeRepository);
 const ebaQaService = new EbaQaService(runtimeRepository);
@@ -142,6 +144,14 @@ export function findRegulatoryPath(domainSlug: string) {
 
 export function findApplicability(slug: string, entityTypeId?: string) {
   return runtimeRepository.findApplicabilityBySlug(slug, entityTypeId);
+}
+
+export function listCountries() {
+  return countryService.list();
+}
+
+export function findCountry(code: string) {
+  return countryService.find(code);
 }
 
 export function listRegulatoryTopics() {
@@ -423,6 +433,19 @@ app.get("/api/applicability/:slug", (request, response) => {
     return;
   }
   response.json(result);
+});
+
+app.get("/api/countries", (_request, response) => {
+  response.json(listCountries());
+});
+
+app.get("/api/countries/:code", (request, response) => {
+  const country = findCountry(request.params.code);
+  if (!country) {
+    response.status(404).json({ error: "Country not found" });
+    return;
+  }
+  response.json(country);
 });
 
 app.get("/api/topics", (_request, response) => {

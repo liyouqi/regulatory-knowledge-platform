@@ -11,15 +11,16 @@ describe("reviewed Regulatory Topics", () => {
   const entities = buildExplicitReferences(documents).entities;
   const knownDocumentIds = new Set(documents.map((document) => document.id));
 
-  it("publishes three cross-file, provision-linked editorial topics", () => {
+  it("publishes four cross-file, provision-linked editorial topics", () => {
     const build = buildRegulatoryTopics(documents, entities, knownDocumentIds);
 
     expect(build.topics.map((topic) => topic.id)).toEqual([
       "topic:banking-governance-internal-control",
+      "topic:fund-management-organisation-risk",
       "topic:ict-third-party-risk",
       "topic:major-ict-incident-reporting",
     ]);
-    expect(build.assignments).toHaveLength(27);
+    expect(build.assignments).toHaveLength(33);
     expect(build.assignments).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

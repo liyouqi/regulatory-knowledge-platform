@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "phase-3-banking-pilot",
-  "version": "1.22.0",
+  "version": "1.27.0",
   "sources": [
     {
       "adapter": "eur-lex",
@@ -728,119 +728,153 @@
       "identifier": "32014R0527",
       "snapshotId": "snapshot:cellar:32014R0527:6a7387e492ca85d96355ab7fabdb39abebe1b763d344b041bf2f3d762a42fdcd",
       "contentSha256": "sha256:6a7387e492ca85d96355ab7fabdb39abebe1b763d344b041bf2f3d762a42fdcd",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014R0530",
       "snapshotId": "snapshot:cellar:32014R0530:1fa6419d926b9f94f85446c9c486f323bf6d692072cf345f1c7951b0e35d325f",
       "contentSha256": "sha256:1fa6419d926b9f94f85446c9c486f323bf6d692072cf345f1c7951b0e35d325f",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32017R0180",
       "snapshotId": "snapshot:cellar:32017R0180:bdc97930de09bc70f36b07bc06755d3e2099e4f681e505a7944bf09c6bcff94f",
       "contentSha256": "sha256:bdc97930de09bc70f36b07bc06755d3e2099e4f681e505a7944bf09c6bcff94f",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32022R2580",
       "snapshotId": "snapshot:cellar:32022R2580:af7429b943ac0ed7dc2ffeb803bfe74bed925a03064ade638358c7debe756ea2",
       "contentSha256": "sha256:af7429b943ac0ed7dc2ffeb803bfe74bed925a03064ade638358c7debe756ea2",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32015R0081",
       "snapshotId": "snapshot:cellar:32015R0081:eb58e79396cfa03e4c51b19823ad62405ca1c6b6376ace919cc2bb6742ec6384",
       "contentSha256": "sha256:eb58e79396cfa03e4c51b19823ad62405ca1c6b6376ace919cc2bb6742ec6384",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32016R0451",
       "snapshotId": "snapshot:cellar:32016R0451:e545ad6da361ec4d162e6f744edbcfa227ca82cd88aebf47d71eb2b9e70bbd57",
       "contentSha256": "sha256:e545ad6da361ec4d162e6f744edbcfa227ca82cd88aebf47d71eb2b9e70bbd57",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014R1163",
       "snapshotId": "snapshot:cellar:32014R1163:ae7c1a92d7e7788ea617ae48b8346219ca566e94878b778b07cbe769a924f168",
       "contentSha256": "sha256:ae7c1a92d7e7788ea617ae48b8346219ca566e94878b778b07cbe769a924f168",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32014R1151",
       "snapshotId": "snapshot:cellar:32014R1151:decf7f43526a3978030c287f6ded10de637c2f08dc8929423f9931cc6ab941ef",
       "contentSha256": "sha256:decf7f43526a3978030c287f6ded10de637c2f08dc8929423f9931cc6ab941ef",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32025R0454",
       "snapshotId": "snapshot:cellar:32025R0454:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
       "contentSha256": "sha256:1f49c4e49b13eca22c6c62d406dedd2c17280e0bce1cee9fe45f89ed6447cdb3",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32026R1755",
       "snapshotId": "snapshot:cellar:32026R1755:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
       "contentSha256": "sha256:78331eaee1d557ed51182a319f733209c1247f9b033aa91d33fcedf258e8de24",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32020R1225",
       "snapshotId": "snapshot:cellar:32020R1225:b7fe221b4e21afe5d6110ff5eadb71850eb7b744f1ba20be6f738061d204939d",
       "contentSha256": "sha256:b7fe221b4e21afe5d6110ff5eadb71850eb7b744f1ba20be6f738061d204939d",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32020R1226",
       "snapshotId": "snapshot:cellar:32020R1226:ebecc1e920afec2a843f20af2c35aab9625c81048ab2625b0afef83542eb14f0",
       "contentSha256": "sha256:ebecc1e920afec2a843f20af2c35aab9625c81048ab2625b0afef83542eb14f0",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32020R1227",
       "snapshotId": "snapshot:cellar:32020R1227:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
       "contentSha256": "sha256:1f8d2d4d4fe105d6d6b31df283a6d2c3d662700ec6d36274af1ec58f2f363bf5",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32019R1851",
       "snapshotId": "snapshot:cellar:32019R1851:a594eabfbb0f17d798fef2e9c002deb2cff8bd58648a75b7b5a14788cbcdbb8d",
       "contentSha256": "sha256:a594eabfbb0f17d798fef2e9c002deb2cff8bd58648a75b7b5a14788cbcdbb8d",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32024R1700",
       "snapshotId": "snapshot:cellar:32024R1700:6528c421b72600157bf225ed1e35aeb73b07bea30df53ac763a00d63320852cb",
       "contentSha256": "sha256:6528c421b72600157bf225ed1e35aeb73b07bea30df53ac763a00d63320852cb",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32020R0447",
       "snapshotId": "snapshot:cellar:32020R0447:39f43b09be7d0cf81d5f0e6ebc1cdee6cf4588e135480bcdec19655dac2e1b92",
       "contentSha256": "sha256:39f43b09be7d0cf81d5f0e6ebc1cdee6cf4588e135480bcdec19655dac2e1b92",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "eur-lex",
       "identifier": "32018R1229",
       "snapshotId": "snapshot:cellar:32018R1229:1484572e792e78940e1f377be37f86f5afc2f34cb0b739459606b5e2b1e66132",
       "contentSha256": "sha256:1484572e792e78940e1f377be37f86f5afc2f34cb0b739459606b5e2b1e66132",
-      "retention": { "status": "local-only" }
+      "retention": {
+        "status": "local-only"
+      }
     },
     {
       "adapter": "cssf",
@@ -877,6 +911,186 @@
       "retention": {
         "status": "local-only"
       }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R1286",
+      "snapshotId": "snapshot:cellar:32014R1286:a7937f66f7e9732d15e56aa8de09a18679302715385507e55e5ef908f702c48b",
+      "contentSha256": "sha256:a7937f66f7e9732d15e56aa8de09a18679302715385507e55e5ef908f702c48b",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32016R0438",
+      "snapshotId": "snapshot:cellar:32016R0438:3c556ce403549a7b683a6fc06708c07821064b827901dad740230a89b6adeb63",
+      "contentSha256": "sha256:3c556ce403549a7b683a6fc06708c07821064b827901dad740230a89b6adeb63",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32010L0043",
+      "snapshotId": "snapshot:cellar:32010L0043:9ecbff33ffcf6acb1d9481e84b8948c4952da8913182f13bf5bac9ddc246a343",
+      "contentSha256": "sha256:9ecbff33ffcf6acb1d9481e84b8948c4952da8913182f13bf5bac9ddc246a343",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32019L2034",
+      "snapshotId": "snapshot:cellar:32019L2034:238185717c23f51a39a8d2a87aa703761b200fb93f8e54239399b2ef807e50c1",
+      "contentSha256": "sha256:238185717c23f51a39a8d2a87aa703761b200fb93f8e54239399b2ef807e50c1",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32016R1011",
+      "snapshotId": "snapshot:cellar:32016R1011:5bc584be6f968a22c687a6f716e93891c1f3647dd14bea74b7b950a1391c55d4",
+      "contentSha256": "sha256:5bc584be6f968a22c687a6f716e93891c1f3647dd14bea74b7b950a1391c55d4",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32011L0061",
+      "snapshotId": "snapshot:cellar:32011L0061:41c144904b62b33e7e4a8936338b836513dde85442b9a1a43c4e4b495e73ff4f",
+      "contentSha256": "sha256:41c144904b62b33e7e4a8936338b836513dde85442b9a1a43c4e4b495e73ff4f",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32014R0596",
+      "snapshotId": "snapshot:cellar:32014R0596:8dc47314169a24165225906741e6852cf9407464f337c452087bb5ebbe7ac919",
+      "contentSha256": "sha256:8dc47314169a24165225906741e6852cf9407464f337c452087bb5ebbe7ac919",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32017R1129",
+      "snapshotId": "snapshot:cellar:32017R1129:72e85897fb7db98705fe69b32421b7784bb49d963e5befb4c7e8d9fa660cf1a2",
+      "contentSha256": "sha256:72e85897fb7db98705fe69b32421b7784bb49d963e5befb4c7e8d9fa660cf1a2",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32013R0231",
+      "snapshotId": "snapshot:cellar:32013R0231:971697d4ea1aaf8f0f8ed77bf95052e7bb64241f2e6c64b1f91ac3e74ede9751",
+      "contentSha256": "sha256:971697d4ea1aaf8f0f8ed77bf95052e7bb64241f2e6c64b1f91ac3e74ede9751",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32019R2033",
+      "snapshotId": "snapshot:cellar:32019R2033:a1d860716f929e01b09da8e8ac3b9662cbefed9b1a5713616fa41a8ce6ab28d1",
+      "contentSha256": "sha256:a1d860716f929e01b09da8e8ac3b9662cbefed9b1a5713616fa41a8ce6ab28d1",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32010L0044",
+      "snapshotId": "snapshot:cellar:32010L0044:ab7a067c2940c07a97b41a6a0641c7e5c5e982626d0100d87a56a0b05330f354",
+      "contentSha256": "sha256:ab7a067c2940c07a97b41a6a0641c7e5c5e982626d0100d87a56a0b05330f354",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32017R1131",
+      "snapshotId": "snapshot:cellar:32017R1131:ffc3ad8c83b34c5621b6ab68ef746df22bd94711399fb7100c33301a31686604",
+      "contentSha256": "sha256:ffc3ad8c83b34c5621b6ab68ef746df22bd94711399fb7100c33301a31686604",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32015R0760",
+      "snapshotId": "snapshot:cellar:32015R0760:0bedb16982b49ec3d48659ae3417bd0c83de4c2368f846bb27f162c2aa5b5050",
+      "contentSha256": "sha256:0bedb16982b49ec3d48659ae3417bd0c83de4c2368f846bb27f162c2aa5b5050",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32009L0065",
+      "snapshotId": "snapshot:cellar:32009L0065:b6ae4114475b115afc6253d9d26e07ba74ea5922f0ef2d7c7ebb3835192e7e9e",
+      "contentSha256": "sha256:b6ae4114475b115afc6253d9d26e07ba74ea5922f0ef2d7c7ebb3835192e7e9e",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "eur-lex",
+      "identifier": "32024L0927",
+      "snapshotId": "snapshot:cellar:32024L0927:6c6f0ea7a8c66eef7dd8d5c8c316dbf224c6fb64ab369fc00b3419e4b5b3f828",
+      "contentSha256": "sha256:6c6f0ea7a8c66eef7dd8d5c8c316dbf224c6fb64ab369fc00b3419e4b5b3f828",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "national",
+      "identifier": "de-gwg-2017",
+      "snapshotId": "snapshot:national:de-gwg-2017:e6c3dda080da5cbf6a3b3657feb8184380c09542c154e3bad8828dc2230f3d2f",
+      "contentSha256": "sha256:e6c3dda080da5cbf6a3b3657feb8184380c09542c154e3bad8828dc2230f3d2f",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "national",
+      "identifier": "de-wpig",
+      "snapshotId": "snapshot:national:de-wpig:5401a3133af8a9d32d1903e5b719941f40b9bc2bbaf7c5d1cb99fb9bd865d828",
+      "contentSha256": "sha256:5401a3133af8a9d32d1903e5b719941f40b9bc2bbaf7c5d1cb99fb9bd865d828",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "national",
+      "identifier": "de-kagb",
+      "snapshotId": "snapshot:national:de-kagb:34e8b51e7eb71d4f0ff91aef63ff57074c0b0d89fa79d1bd6bbe48d060d03ab4",
+      "contentSha256": "sha256:34e8b51e7eb71d4f0ff91aef63ff57074c0b0d89fa79d1bd6bbe48d060d03ab4",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "national",
+      "identifier": "de-kwg",
+      "snapshotId": "snapshot:national:de-kwg:0128447811ca198413d61fb6e36181f4a563903debcb7eebba2baa7608e755ed",
+      "contentSha256": "sha256:0128447811ca198413d61fb6e36181f4a563903debcb7eebba2baa7608e755ed",
+      "retention": {
+        "status": "local-only"
+      }
+    },
+    {
+      "adapter": "amf",
+      "identifier": "fr-amf-rg",
+      "snapshotId": "snapshot:amf:fr-amf-rg:77779fb29c2f9fffdcc5951f155f1393265a895b480a0f68f98329884c231fb4",
+      "contentSha256": "sha256:77779fb29c2f9fffdcc5951f155f1393265a895b480a0f68f98329884c231fb4",
+      "retention": {
+        "status": "local-only"
+      }
     }
   ],
   "requiredReviewedInputs": [
@@ -888,16 +1102,20 @@
     "data/benchmarks/related-recitals.json",
     "data/editorial/regulatory-domains.json",
     "data/editorial/regulatory-topics.json",
+    "data/editorial/countries.json",
     "data/official-mappings/level2.json",
     "data/official-mappings/guidelines.json",
     "data/official-mappings/national-implementations.json",
     "data/official-mappings/applicability.json",
     "data/official-metadata/authorities.json",
+    "data/official-metadata/document-expressions.json",
     "data/official-metadata/legal-natures.json",
     "data/official-metadata/implementation-timelines.json",
     "data/official-metadata/supervisory-decisions.json",
     "data/official-metadata/cellar-case-law.json",
     "data/official-metadata/cellar-focused-relations.json",
-    "data/official-metadata/cellar-lifecycle-relations.json"
+    "data/official-metadata/cellar-lifecycle-relations.json",
+    "data/national-source-registry.json",
+    "data/amf-source-registry.json"
   ]
 }

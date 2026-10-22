@@ -5,11 +5,15 @@ import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { loadDocumentViews } from "../data/document-repository";
+import { AMF_HTML_PARSER_VERSION } from "../ingestion/amf-canonical-parser";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
 import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { EBA_GUIDELINES_PDF_PARSER_VERSION } from "../ingestion/eba-guidelines-pdf-parser";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
+import { NATIONAL_XML_PARSER_VERSION } from "../ingestion/national-xml-parser";
 import type { QualityDrift } from "../ingestion/quality-drift";
 import {
   type SourceDefinition,
@@ -33,7 +37,7 @@ import {
 } from "./consolidated-expression-audit";
 import { writeCorpusStatus } from "./corpus-status";
 
-type Adapter = "eur-lex" | "cssf" | "eba";
+type Adapter = "eur-lex" | "cssf" | "eba" | "national" | "amf";
 
 interface SnapshotSelection {
   adapter: Adapter;
@@ -66,10 +70,12 @@ interface OnboardingReport {
 }
 
 function currentParserVersions(adapter: Adapter): ReadonlySet<string> {
+  if (adapter === "amf") return new Set([`html-${AMF_HTML_PARSER_VERSION}`]);
   if (adapter === "eur-lex") return new Set([FORMEX_PARSER_VERSION]);
   if (adapter === "eba") {
     return new Set([EBA_GUIDELINES_PDF_PARSER_VERSION]);
   }
+  if (adapter === "national") return new Set([NATIONAL_XML_PARSER_VERSION]);
   return new Set([
     `html-${CSSF_HTML_PARSER_VERSION}`,
     `pdf-${CSSF_PDF_PARSER_VERSION}`,
@@ -173,8 +179,14 @@ async function latestSnapshot(
   const root = resolve(
     process.cwd(),
     "data/raw",
-    adapter === "eur-lex" ? "eur-lex" : adapter,
-    identifier,
+    adapter === "eur-lex"
+      ? "eur-lex"
+      : adapter === "national"
+        ? "national"
+        : adapter === "amf"
+          ? "amf-snapshots"
+          : adapter,
+    ...(adapter === "amf" ? [] : [identifier]),
   );
   let entries: Dirent[];
   try {
@@ -193,10 +205,16 @@ async function latestSnapshot(
         try {
           const snapshot = JSON.parse(
             await readFile(resolve(directory, "snapshot.json"), "utf8"),
-          ) as { snapshotId?: unknown; retrievedAt?: unknown };
+          ) as {
+            snapshotId?: unknown;
+            retrievedAt?: unknown;
+            importedAt?: unknown;
+          };
           if (
-            typeof snapshot.snapshotId !== "string" ||
-            typeof snapshot.retrievedAt !== "string"
+            adapter === "amf"
+              ? typeof snapshot.importedAt !== "string"
+              : typeof snapshot.snapshotId !== "string" ||
+                typeof snapshot.retrievedAt !== "string"
           ) {
             return null;
           }
@@ -204,8 +222,11 @@ async function latestSnapshot(
             adapter,
             identifier,
             directory,
-            snapshotId: snapshot.snapshotId,
-            retrievedAt: snapshot.retrievedAt,
+            snapshotId: snapshot.snapshotId as string,
+            retrievedAt:
+              adapter === "amf"
+                ? (snapshot.importedAt as string)
+                : (snapshot.retrievedAt as string),
           };
         } catch {
           return null;
@@ -267,10 +288,16 @@ async function findCanonicalReport(
         : selection.adapter === "cssf"
           ? candidate.report.sourceDefinitionHash === sourceMetadataHash
           : true) &&
-      (strict
-        ? candidate.report.qualityStatus === undefined
-        : candidate.report.qualityStatus !== undefined &&
-          candidate.directoryName.includes(`-refresh-quality-${qualityHash}-`)),
+      (selection.adapter === "national"
+        ? strict
+          ? candidate.report.qualityStatus === "matched"
+          : candidate.report.qualityStatus !== undefined
+        : strict
+          ? candidate.report.qualityStatus === undefined
+          : candidate.report.qualityStatus !== undefined &&
+            candidate.directoryName.includes(
+              `-refresh-quality-${qualityHash}-`,
+            )),
   );
   if (candidate) return candidate.report;
   throw new Error(
@@ -378,13 +405,26 @@ async function refreshCorpus(): Promise<void> {
   );
   const cssfSources = loadCssfSourceRegistrySync();
   const ebaSources = loadEbaSourceRegistrySync();
-  await writeCorpusStatus(eurLexCatalog, cssfSources, ebaSources);
+  const nationalSources = loadNationalSourceRegistrySync();
+  const amfSources = loadAmfSourceRegistrySync();
+  await writeCorpusStatus(
+    eurLexCatalog,
+    cssfSources,
+    ebaSources,
+    resolve(process.cwd(), "docs/corpus-status.md"),
+    nationalSources,
+    amfSources,
+  );
   const selectedCssfSources = batch ? [] : cssfSources;
   const selectedEbaSources = batch ? [] : ebaSources;
+  const selectedNationalSources = batch ? [] : nationalSources;
+  const selectedAmfSources = batch
+    ? []
+    : amfSources.filter((source) => source.status === "active");
 
   if (!skipFetch) {
     console.log(
-      `Fetching ${selectedEurLexSources.length + selectedCssfSources.length + selectedEbaSources.length} active and ${queuedSources.length} queued official sources...`,
+      `Fetching ${selectedEurLexSources.length + selectedCssfSources.length + selectedEbaSources.length + selectedNationalSources.length} active and ${queuedSources.length} queued official sources; retaining ${selectedAmfSources.length} verified AMF snapshots...`,
     );
     for (const source of selectedEurLexSources) {
       await runTypeScript("src/ingestion/cli.ts", [
@@ -407,6 +447,13 @@ async function refreshCorpus(): Promise<void> {
         source.localId,
       ]);
     }
+    for (const source of selectedNationalSources) {
+      await runTypeScript("src/ingestion/national-cli.ts", [
+        "fetch",
+        "--id",
+        source.localId,
+      ]);
+    }
   }
 
   const onboarding = await processQueuedSources(queuedSources, skipFetch);
@@ -415,11 +462,19 @@ async function refreshCorpus(): Promise<void> {
     ...eurLexSources.map((source) => latestSnapshot("eur-lex", source.celex)),
     ...cssfSources.map((source) => latestSnapshot("cssf", source.localId)),
     ...ebaSources.map((source) => latestSnapshot("eba", source.localId)),
+    ...nationalSources.map((source) =>
+      latestSnapshot("national", source.localId),
+    ),
+    ...selectedAmfSources.map((source) =>
+      latestSnapshot("amf", source.localId),
+    ),
   ]);
   const selectedIdentities = new Set([
     ...selectedEurLexSources.map((source) => `eur-lex:${source.celex}`),
     ...selectedCssfSources.map((source) => `cssf:${source.localId}`),
     ...selectedEbaSources.map((source) => `eba:${source.localId}`),
+    ...selectedNationalSources.map((source) => `national:${source.localId}`),
+    ...selectedAmfSources.map((source) => `amf:${source.localId}`),
   ]);
   const buildSelections = selections.filter((selection) =>
     selectedIdentities.has(`${selection.adapter}:${selection.identifier}`),
@@ -439,11 +494,16 @@ async function refreshCorpus(): Promise<void> {
         ? "src/ingestion/canonical-cli.ts"
         : selection.adapter === "cssf"
           ? "src/ingestion/cssf-canonical-cli.ts"
-          : "src/ingestion/eba-canonical-cli.ts";
+          : selection.adapter === "eba"
+            ? "src/ingestion/eba-canonical-cli.ts"
+            : selection.adapter === "amf"
+              ? "src/ingestion/amf-canonical-cli.ts"
+              : "src/ingestion/national-canonical-cli.ts";
     await runTypeScript(script, [
+      ...(selection.adapter === "amf" ? ["build"] : []),
       "--snapshot",
       selection.directory,
-      ...(strict ? [] : ["--allow-drift"]),
+      ...(strict || selection.adapter === "amf" ? [] : ["--allow-drift"]),
     ]);
   }
 
@@ -454,7 +514,13 @@ async function refreshCorpus(): Promise<void> {
   console.log("Building and verifying Runtime SQLite...");
   const runtime = buildRuntimeDatabase(
     loadDocumentViews(),
-    [...eurLexSources, ...cssfSources, ...ebaSources],
+    [
+      ...eurLexSources,
+      ...cssfSources,
+      ...ebaSources,
+      ...nationalSources,
+      ...amfSources,
+    ],
     DEFAULT_RUNTIME_DATABASE_PATH,
     profile,
     { reviewValidationMode: strict ? "strict" : "report" },
@@ -499,6 +565,14 @@ async function refreshCorpus(): Promise<void> {
     ...ebaSources.map(
       (source) =>
         [`eba:${source.localId}`, { quality: source.quality }] as const,
+    ),
+    ...nationalSources.map(
+      (source) =>
+        [`national:${source.localId}`, { quality: source.quality }] as const,
+    ),
+    ...selectedAmfSources.map(
+      (source) =>
+        [`amf:${source.localId}`, { quality: source.quality }] as const,
     ),
   ]);
   const sourceReports = await Promise.all(
@@ -545,6 +619,7 @@ async function refreshCorpus(): Promise<void> {
     versionAudit,
     catalog: {
       active: eurLexSources.length,
+      national: nationalSources.length,
       queued: queuedSources.length,
       planned: eurLexCatalog.filter((source) => source.status === "planned")
         .length,

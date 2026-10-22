@@ -50,7 +50,7 @@ test("internal citation HTTP contracts expose ordered runs and versioned nested 
   expect(result.results[0].context.schemaVersion).toBe("1.1.0");
 });
 
-test("a business question opens its exact CRD evidence and retains version cautions", async ({
+test("a business question retains CRD evidence in the global top five and opens its exact version", async ({
   page,
 }) => {
   await page.goto("/topics/banking-governance-internal-control");
@@ -65,14 +65,22 @@ test("a business question opens its exact CRD evidence and retains version cauti
   await search
     .getByRole("textbox", { name: "Search full text across loaded laws" })
     .fill("Who approves and periodically reviews a bank's risk strategy?");
-  await expect(
-    search.locator(".full-text-search-result").first(),
-  ).toContainText("CRD IV");
+  const results = search.locator(".full-text-search-result");
+  const crdEvidence = results.filter({ hasText: "CRD IV · Article 76" });
+  await expect(crdEvidence).toHaveCount(1);
+  expect(await results.allTextContents()).toEqual(
+    expect.arrayContaining([expect.stringContaining("CRD IV · Article 76")]),
+  );
+  expect(
+    (await results.allTextContents()).findIndex((text) =>
+      text.includes("CRD IV · Article 76"),
+    ),
+  ).toBeLessThan(5);
   await expect(search.locator("output.search-status")).toContainText(
     "not legal answers",
   );
-  await search.locator(".full-text-search-result").first().click();
-  await expect(page).toHaveURL(/\/read\/crd-iv\/articles\/76/u);
+  await crdEvidence.click();
+  await expect(page).toHaveURL(/\/read\/crd-iv\/articles\/76(?:#.+)?$/u);
   await expect(page.getByLabel("Legal text status")).toContainText(
     "Text as of 2026-07-11",
   );

@@ -9,7 +9,7 @@ export const DEFAULT_DOCUMENT_EXPRESSION_METADATA_PATH = resolve(
 
 export const documentExpressionMetadataRecordSchema = z.object({
   documentId: z.string().min(1),
-  language: z.literal("en"),
+  language: z.enum(["en", "de", "fr"]),
   issuers: z.array(z.string().min(1)).min(1),
   textKind: z.enum(["original_oj", "consolidated", "original_publication"]),
   currencyStatus: z.enum(["current", "historical", "not_assessed"]),

@@ -112,6 +112,8 @@ export class CitationContextService {
     const resolved = this.entities.get(entityId);
     if (!resolved) return null;
     const { document, provision, block } = resolved;
+    const role = block?.contentRole ?? provision.contentRole;
+    if (role && role !== "operative-text") return null;
     const relationships = this.repository.findProvisionRelationships(
       document.id,
       provision.id,
@@ -160,6 +162,7 @@ export class CitationContextService {
       document: {
         id: document.id,
         jurisdiction: document.jurisdiction,
+        ...(document.language ? { language: document.language } : {}),
         shortName: document.shortName,
         officialTitle: document.officialTitle,
         documentType: document.documentType,
@@ -176,6 +179,7 @@ export class CitationContextService {
       target: {
         entityId,
         rootProvisionId: provision.id,
+        ...(role ? { contentRole: role } : {}),
         kind: block?.kind ?? provision.kind,
         label: block?.marker ?? provision.label,
         title: block ? null : (provision.title ?? null),

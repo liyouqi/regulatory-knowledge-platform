@@ -1,7 +1,14 @@
 import { createHash } from "node:crypto";
+import {
+  type ContentUnit,
+  contentUnitsText,
+  projectContentUnits,
+  validateContentLayout,
+} from "../shared/content-unit";
 import { documentLogicalId } from "./ids";
 import type { CanonicalDocument } from "./schema";
 import { canonicalDocumentSchema } from "./schema";
+import { validateAmfDocument } from "./validate-amf";
 
 export function sha256(value: string | Uint8Array): string {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
@@ -9,6 +16,68 @@ export function sha256(value: string | Uint8Array): string {
 
 export function validateCanonicalDocument(input: unknown): CanonicalDocument {
   const document = canonicalDocumentSchema.parse(input);
+  if (document.schemaVersion === "1.5.0") validateAmfDocument(document);
+  if (
+    document.schemaVersion === "1.3.0" ||
+    document.schemaVersion === "1.4.0"
+  ) {
+    if (
+      document.logicalId !==
+        `de:gii:${document.identifiers.nationalId.toLowerCase()}` ||
+      document.source.sourceStatus?.textAuthorityStatus !==
+        "non-authoritative-consolidation" ||
+      document.source.sourceStatus?.textAsOfBasis !== "last-amendment-act-date"
+    )
+      throw new Error("Invalid national identity or source authority status");
+    const checkRole = (unit: ContentUnit, parentRole?: string) => {
+      if (parentRole === "source-note" && unit.contentRole !== parentRole)
+        throw new Error("Source note cannot contain operative text");
+      if (unit.type === "element") {
+        if (document.schemaVersion === "1.4.0") {
+          if (unit.columnCount !== undefined && unit.name !== "table")
+            throw new Error("Column count belongs only to a table");
+          if (
+            (unit.columnStart !== undefined || unit.columnSpan !== undefined) &&
+            unit.name !== "cell"
+          )
+            throw new Error("Column start and span belong only to a cell");
+          if (unit.name === "table" && unit.columnCount === undefined)
+            throw new Error("Table must have a column count");
+          if (
+            unit.name === "cell" &&
+            (unit.columnStart === undefined || unit.columnSpan === undefined)
+          )
+            throw new Error("Cell must have column start and span");
+        }
+        for (const child of unit.children) checkRole(child, unit.contentRole);
+      }
+    };
+    for (const provision of document.provisions) {
+      if (
+        provision.parentLogicalId ||
+        !provision.logicalId.startsWith(`${document.logicalId}:norm:`)
+      )
+        throw new Error("National citations must identify source norms only");
+      for (const unit of provision.orderedUnits) checkRole(unit);
+      for (const role of ["operative-text", "source-note", "toc"] as const)
+        if (
+          provision.roleHashes[role] !==
+          sha256(contentUnitsText(provision.orderedUnits, role))
+        )
+          throw new Error(
+            `Content role hash mismatch: ${provision.logicalId} ${role}`,
+          );
+      if (
+        provision.text !==
+        contentUnitsText(provision.orderedUnits, provision.contentRole)
+      )
+        throw new Error(
+          `National content projection mismatch: ${provision.logicalId}`,
+        );
+      const projected = projectContentUnits(provision.orderedUnits);
+      validateContentLayout(projected.orderedContent, projected.contentLayout);
+    }
+  }
   const entities = [
     document,
     ...document.structuralNodes,

@@ -7143,3 +7143,129 @@ kbd {
     flex: none;
   }
 }
+
+.country-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+}
+.country-filters label {
+  display: grid;
+  gap: .5rem;
+  font-size: .85rem;
+}
+.country-filters input,
+.country-filters select {
+  padding: .7rem;
+  background: var(--panel);
+  color: inherit;
+  border: 1px solid var(--line);
+  border-radius: .4rem;
+  min-width: 15rem;
+}
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  padding: 0 2rem 2rem;
+}
+.country-card {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  color: inherit;
+  text-decoration: none;
+}
+.country-card:hover {
+  border-color: var(--accent);
+}
+.country-card h2,
+.country-card h3,
+.country-card p {
+  margin: 0;
+}
+.country-card p,
+.country-card small {
+  color: var(--muted);
+}
+.country-code {
+  font-size: .85rem;
+  letter-spacing: .12em;
+}
+.country-detail {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--line);
+}
+.country-detail .country-grid {
+  padding: 1rem 0;
+}
+.country-detail a {
+  color: inherit;
+}
+.country-detail p {
+  max-width: 75ch;
+  line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .country-filters,
+  .country-detail {
+    padding: 1rem;
+  }
+  .country-grid {
+    padding: 0 1rem 1rem;
+  }
+  .country-filters label,
+  .country-filters input,
+  .country-filters select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.structured-legal-content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}
+.source-paragraph {
+  margin-block: .75rem;
+}
+.source-list {
+  margin-left: 1.25rem;
+}
+.source-list-marker {
+  font-weight: 500;
+}
+.source-list-item {
+  margin: .25rem 0 .5rem 1rem;
+}
+.source-table {
+  display: table;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.source-table-row {
+  display: table-row;
+}
+.source-table-cell {
+  display: table-cell;
+  padding: .25rem .5rem;
+  border-bottom: 1px solid var(--line);
+}
+.publisher-note {
+  margin: 1rem 0;
+  padding: .75rem 1rem;
+  border-left: 3px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: .88em;
+}
+.publisher-note > strong,
+.source-content-label {
+  font-size: .85rem;
+  color: var(--muted);
+}

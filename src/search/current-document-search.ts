@@ -42,7 +42,7 @@ export function normalizeSearchText(value: string): string {
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/[’']/gu, "")
-    .replace(/[^a-z0-9]+/gu, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim()
     .replace(/\s+/gu, " ");
 }
@@ -66,6 +66,7 @@ function blockRecords(
   blocks: BodyBlock[],
 ): CurrentDocumentSearchRecord[] {
   return blocks.flatMap((block) => {
+    if (block.contentRole && block.contentRole !== "operative-text") return [];
     const current = block.text.trim()
       ? [
           record({
@@ -89,6 +90,8 @@ export function buildCurrentDocumentSearchIndex(
   document: DocumentView,
 ): CurrentDocumentSearchIndex {
   const records = document.provisions.flatMap((provision) => {
+    if (provision.contentRole && provision.contentRole !== "operative-text")
+      return [];
     const headingText = [provision.label, provision.title]
       .filter(Boolean)
       .join(" ");

@@ -24,6 +24,7 @@ export function normalizeLawQuery(value: string): string {
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/&/gu, " and ")
+    .replace(/§+/gu, " paragraf ")
     .replace(/[’']/gu, "")
     .replace(/[^a-z0-9]+/gu, " ")
     .trim()
@@ -209,22 +210,25 @@ function rankLawAnchor(
 
 function parseProvisionIntent(query: string) {
   const match =
-    /^(.*?)\s+(articles?|art|recitals?|rec|annex(?:es)?|ann)\s+([a-z0-9]+)$/u.exec(
+    /^(.*?)\s+(articles?|art|paragraf(?:en)?|recitals?|rec|annex(?:es)?|ann)\s+([a-z0-9]+(?: (?:[0-9]+|a|bis|ter|quater))*)$/u.exec(
       query,
     );
   if (!match?.[1]) return null;
   const token = match[2];
-  const kind = token.startsWith("art")
-    ? "article"
-    : token.startsWith("rec")
-      ? "recital"
-      : "annex";
+  const kind =
+    token.startsWith("art") || token.startsWith("paragraf")
+      ? "article"
+      : token.startsWith("rec")
+        ? "recital"
+        : "annex";
   return { lawQuery: match[1], kind, number: match[3] } as const;
 }
 
 function parseIncompleteProvisionIntent(query: string) {
   const match =
-    /^(.*?)\s+(articles?|art|recitals?|rec|annex(?:es)?|ann)$/u.exec(query);
+    /^(.*?)\s+(articles?|art|paragraf(?:en)?|recitals?|rec|annex(?:es)?|ann)$/u.exec(
+      query,
+    );
   return match?.[1] ? { lawQuery: match[1] } : null;
 }
 
@@ -267,20 +271,32 @@ export function createLawSearchRecords(
         shortName: document.shortName,
         officialTitle: document.officialTitle,
         documentType: document.documentType,
-        publicationDate: document.asOf,
+        publicationDate: document.jurisdiction === "FR" ? null : document.asOf,
+        ...(document.jurisdiction === "FR"
+          ? {
+              publicationDateBasis: document.publicationDateBasis,
+              publisherVersionDate: document.asOf,
+            }
+          : {}),
         celex: document.celex,
         localId: document.localId,
         aliases: source.aliases,
         readerPath,
         explorerPath: explorerPath(document.slug),
         provenance: document.provenance,
-        provisions: document.provisions.map((provision) => ({
-          kind: provision.kind,
-          number: provision.number,
-          label: provision.label,
-          title: provision.title,
-          path: provision.path,
-        })),
+        provisions: document.provisions
+          .filter(
+            (provision) =>
+              !provision.contentRole ||
+              provision.contentRole === "operative-text",
+          )
+          .map((provision) => ({
+            kind: provision.kind,
+            number: provision.number,
+            label: provision.label,
+            title: provision.title,
+            path: provision.path,
+          })),
       },
     ];
   });

@@ -1,7 +1,11 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  setTimeout as yieldForIo,
+  setImmediate as yieldToEventLoop,
+} from "node:timers/promises";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { loadDoraDocumentView } from "../data/document-repository";
 import {
   FullTextSearchService,
@@ -14,10 +18,19 @@ const testDirectory = mkdtempSync(join(tmpdir(), "regulatory-search-"));
 const firstPath = join(testDirectory, "search.sqlite");
 const secondPath = join(testDirectory, "search-rebuilt.sqlite");
 let service: FullTextSearchService | undefined;
+let dora: ReturnType<typeof loadDoraDocumentView>;
 
-beforeAll(() => {
-  buildRuntimeDatabase([loadDoraDocumentView()], [], firstPath);
+beforeAll(async () => {
+  dora = loadDoraDocumentView();
+  buildRuntimeDatabase([structuredClone(dora)], [], firstPath);
   service = new FullTextSearchService(firstPath);
+  // Allow test-runner communication after synchronous fixture work.
+  await yieldToEventLoop();
+});
+
+afterEach(async () => {
+  // Process pending worker messages between synchronous test cases.
+  await yieldForIo(0);
 });
 
 afterAll(() => {
@@ -27,13 +40,9 @@ afterAll(() => {
 
 describe("SQLite FTS5 search artifact", () => {
   it("rebuilds with a stable content-derived build ID", () => {
-    const first = buildRuntimeDatabase(
-      [loadDoraDocumentView()],
-      [],
-      secondPath,
-    );
+    const first = buildRuntimeDatabase([structuredClone(dora)], [], secondPath);
     const second = buildRuntimeDatabase(
-      [loadDoraDocumentView()],
+      [structuredClone(dora)],
       [],
       secondPath,
     );

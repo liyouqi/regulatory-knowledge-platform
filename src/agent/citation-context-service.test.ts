@@ -153,6 +153,7 @@ describe("ordered citation context", () => {
         ).toBe(projection.textSegments.length);
         count++;
         if (
+          (p.contentRole === undefined || p.contentRole === "operative-text") &&
           p.blocks.length === 1 &&
           p.blocks[0].id === p.id &&
           !p.blocks[0].children.length &&

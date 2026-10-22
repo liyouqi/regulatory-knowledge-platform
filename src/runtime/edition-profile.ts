@@ -17,7 +17,7 @@ const familyIdSchema = z.string().regex(/^family:[a-z0-9-]+$/u);
 const documentIdSchema = z
   .string()
   .regex(
-    /^(?:eu:3[0-9]{4}[A-Z][0-9]{4}|eu:eba:gl:\d{4}:\d{2}|lu:cssf:[a-z0-9][a-z0-9-]*)$/u,
+    /^(?:eu:3[0-9]{4}[A-Z][0-9]{4}|eu:eba:gl:\d{4}:\d{2}|lu:cssf:[a-z0-9][a-z0-9-]*|de:gii:bjnr[0-9]+|fr:amf:rg)$/u,
   );
 
 export const editionProfileSchema = z

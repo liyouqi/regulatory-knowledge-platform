@@ -43,6 +43,9 @@ function TopicHeader({
       </Link>
       <div className="topbar-actions">
         <ThemeToggle onToggle={onToggleTheme} theme={theme} />
+        <Link className="view-switch" to="/countries">
+          Countries
+        </Link>
         <Link className="view-switch active" to={topicCatalogPath()}>
           <Layers3 aria-hidden="true" size={15} /> Topics
         </Link>

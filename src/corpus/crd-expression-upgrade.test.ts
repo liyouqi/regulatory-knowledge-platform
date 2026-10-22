@@ -61,7 +61,10 @@ describe("reviewed CRD expression upgrade", () => {
         (record) => record.documentId === "eu:32013L0036",
       ),
     ).toEqual(upgrade.after.expressionMetadata);
-    expect(FORMEX_PARSER_VERSION).toBe(upgrade.parserVersion);
+    // The historical upgrade retains its reviewed parser; the current corpus
+    // uses 1.6.2, whose same-snapshot regression preserves the published IDs.
+    expect(upgrade.parserVersion).toBe("1.6.1");
+    expect(FORMEX_PARSER_VERSION).toBe("1.6.2");
     expect(upgrade.before.source).toMatchObject({
       celex: "32013L0036",
       expressionCelex: "02013L0036-20250117",

@@ -5,8 +5,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { CitationContextService } from "../agent/citation-context-service";
 import { CitationRetrievalService } from "../agent/citation-retrieval-service";
 import { loadDocumentViews } from "../data/document-repository";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import { RegulatoryPathService } from "../paths/regulatory-path-service";
 import { PublicApiService } from "../public-api/public-api-service";
@@ -44,6 +46,10 @@ beforeAll(() => {
       ...loadSourceRegistrySync(),
       ...loadCssfSourceRegistrySync(),
       ...loadEbaSourceRegistrySync(),
+      ...loadNationalSourceRegistrySync(),
+      ...loadAmfSourceRegistrySync().filter(
+        (source) => source.status === "active",
+      ),
     ],
     databasePath,
     profile,

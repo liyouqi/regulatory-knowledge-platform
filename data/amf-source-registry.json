@@ -1,0 +1,48 @@
+[
+  {
+    "status": "active",
+    "localId": "fr-amf-rg",
+    "documentId": "fr:amf:rg",
+    "familyId": "family:national-fr",
+    "authority": "AMF",
+    "jurisdiction": "FR",
+    "language": "fr",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": null,
+    "sourceVersionDate": "2026-09-11",
+    "checkedAt": "2026-10-21T18:06:47Z",
+    "contentUrl": "https://www.amf-france.org/fr/eli/fr/aai/amf/rg",
+    "versionUrl": "https://www.amf-france.org/fr/eli/fr/aai/amf/rg/20260911/notes",
+    "componentPublications": [
+      {
+        "component": "Book I",
+        "date": "2004-10-29",
+        "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000254713"
+      },
+      {
+        "component": "Books II–VI",
+        "date": "2004-11-24",
+        "url": "https://www.legifrance.gouv.fr/jorf/jo/2004/11/24/0273"
+      }
+    ],
+    "quality": {
+      "inputSha256": "sha256:77779fb29c2f9fffdcc5951f155f1393265a895b480a0f68f98329884c231fb4",
+      "astSha256": "sha256:9d5255c0b2aac12985b60b9c80a7f9ea075f91353a588592c96d126f92976fcb",
+      "baselineSha256": "sha256:f214d67d8bcc6e3d0ef481f5e1f78c73bc3a1004bfda782505e570b4d63a228a",
+      "groups": 693,
+      "articles": 1821,
+      "notes": 132,
+      "documentNotes": 1,
+      "groupNotes": 63,
+      "articleNotes": 68,
+      "maximumWarnings": 0
+    },
+    "shortName": "AMF RG",
+    "officialTitle": " Règlement général de l'AMF en vigueur au 11/09/2026",
+    "aliases": ["Règlement général AMF"],
+    "topics": ["financial markets"],
+    "pageUrl": "https://www.amf-france.org/fr/eli/fr/aai/amf/rg/20260911/notes"
+  }
+]

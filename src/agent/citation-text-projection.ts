@@ -12,6 +12,7 @@ export function projectCitationText(
   let omittedResourceCount = 0;
   const seen = new Set<string>();
   const visit = (block: BodyBlock): void => {
+    if (block.contentRole && block.contentRole !== "operative-text") return;
     if (seen.has(block.id))
       throw new Error(`Duplicate or cyclic citation block: ${block.id}`);
     seen.add(block.id);
@@ -30,14 +31,16 @@ export function projectCitationText(
     }
     for (const [contentIndex, item] of block.orderedContent.entries()) {
       if (item.type === "text") {
+        if (item.contentRole && item.contentRole !== "operative-text") continue;
         textSegments.push({
           entityId: block.id,
           contentIndex,
           kind: block.kind,
           marker: block.marker,
           text: item.text,
+          ...(item.contentRole ? { contentRole: item.contentRole } : {}),
           anchor: block.anchor,
-          sourceLocator: block.sourceLocator,
+          sourceLocator: item.sourceLocator ?? block.sourceLocator,
         });
       } else if (item.type === "resource") {
         omittedResourceCount += 1;

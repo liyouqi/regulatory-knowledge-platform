@@ -83,6 +83,72 @@ describe("Formex content boundary", () => {
     ]);
   });
 
+  it("preserves a numbered quoted outer annex and binds its nested source", () => {
+    const outer =
+      '<ANNEX><TITLE><TI><P>ANNEX II</P></TI></TITLE><CONTENTS><QUOT.S><P><QUOT.START/><INCL.ELEMENT FILEREF="leaf.xml" TYPE="FORMEX.DOC"/><QUOT.END/></P></QUOT.S></CONTENTS></ANNEX>';
+    const leaf =
+      "<ANNEX><TITLE><TI><P>ANNEX V</P></TI></TITLE><CONTENTS><P>Quoted legal text.</P></CONTENTS></ANNEX>";
+    const result = extractFormexPackage(
+      zipSync({
+        "act.xml": strToU8("<ACT/>"),
+        "outer.xml": strToU8(outer),
+        "leaf.xml": strToU8(leaf),
+      }),
+    );
+    expect(result.annexes).toEqual([
+      {
+        fileName: "outer.xml",
+        xml: outer,
+        quotedAnnex: { fileName: "leaf.xml", xml: leaf },
+      },
+    ]);
+  });
+
+  it.each([
+    "mixed",
+    "missing",
+    "multiple",
+    "cycle",
+    "shared",
+    "unbalanced",
+    "reversed",
+    "outside",
+  ])("rejects unsafe annex inclusion: %s", (shape) => {
+    const include = (target: string) =>
+      `<INCL.ELEMENT FILEREF="${target}" TYPE="FORMEX.DOC"/>`;
+    const wrapper = (body: string) =>
+      `<ANNEX><TITLE><TI><P>ANNEX</P></TI></TITLE><CONTENTS>${body}</CONTENTS></ANNEX>`;
+    const leaf =
+      "<ANNEX><TITLE><TI><P>ANNEX I</P></TI></TITLE><CONTENTS><P>Legal text.</P></CONTENTS></ANNEX>";
+    const body =
+      shape === "mixed"
+        ? `<P>Keep this legal text.${include("leaf.xml")}</P>`
+        : shape === "multiple"
+          ? `<P>${include("leaf.xml")}${include("other.xml")}</P>`
+          : shape === "reversed"
+            ? `<QUOT.S><P><QUOT.END/>${include("leaf.xml")}<QUOT.START/></P></QUOT.S>`
+            : shape === "outside"
+              ? `<QUOT.S><P>${include("leaf.xml")}<QUOT.START/><QUOT.END/></P></QUOT.S>`
+              : shape === "unbalanced"
+                ? `<QUOT.S><P><QUOT.START/>${include("leaf.xml")}</P></QUOT.S>`
+                : `<P>${include(shape === "missing" ? "absent.xml" : "leaf.xml")}</P>`;
+    const files: Record<string, Uint8Array> = {
+      "act.xml": strToU8("<ACT/>"),
+      "outer.xml": strToU8(
+        ["unbalanced", "reversed", "outside"].includes(shape)
+          ? wrapper(body).replace("ANNEX</P>", "ANNEX II</P>")
+          : wrapper(body),
+      ),
+      "leaf.xml": strToU8(
+        shape === "cycle" ? wrapper(`<P>${include("outer.xml")}</P>`) : leaf,
+      ),
+      "other.xml": strToU8(leaf),
+    };
+    if (shape === "shared")
+      files["second.xml"] = strToU8(wrapper(`<P>${include("leaf.xml")}</P>`));
+    expect(() => extractFormexPackage(zipSync(files))).toThrow();
+  });
+
   it("rejects an ambiguous package with multiple ACT candidates", () => {
     const zip = zipSync({
       "ONE.xml": strToU8("<ACT />"),

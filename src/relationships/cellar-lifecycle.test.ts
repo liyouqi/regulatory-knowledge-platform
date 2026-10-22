@@ -15,10 +15,10 @@ describe("CELLAR lifecycle runtime builder", () => {
     expect(build.works).toHaveLength(530);
     expect(
       build.works.filter((work) => work.availability === "loaded"),
-    ).toHaveLength(74);
+    ).toHaveLength(79);
     expect(
       build.works.filter((work) => work.availability === "external"),
-    ).toHaveLength(456);
+    ).toHaveLength(451);
     expect(
       build.relationships.filter((item) => item.relationType === "AMENDS"),
     ).toHaveLength(250);
@@ -29,7 +29,7 @@ describe("CELLAR lifecycle runtime builder", () => {
       build.relationships.filter(
         (item) => item.resolutionStatus === "external",
       ),
-    ).toHaveLength(498);
+    ).toHaveLength(483);
     expect(
       build.relationships.filter(
         (item) => item.resolutionStatus === "resolved",

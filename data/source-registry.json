@@ -3638,5 +3638,565 @@
       }
     },
     "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2018/1229/2024-09-02/eng"
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:ucits",
+    "shortName": "UCITS",
+    "aliases": [
+      "Undertakings for Collective Investment in Transferable Securities Directive"
+    ],
+    "celex": "32009L0065",
+    "expressionCelex": "02009L0065-20260416",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2009-11-17",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2009/65/2026-04-16/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-04-16",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2009/65",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 139,
+      "recitalCount": 0,
+      "annexCount": 5,
+      "paragraphCount": 498,
+      "pointCount": 574,
+      "structuralNodeCount": 36,
+      "maximumWarnings": 22,
+      "textHashes": {
+        "eu:32009L0065:article:1:paragraph:1": "sha256:467ca44bbcb7cd6cc2a6f5be211a45dd65e78262e139bd9201c964a8bc90c242",
+        "eu:32009L0065:article:62:paragraph:1": "sha256:8290bbb178534eeb531caf9114213f3f479c628241d966c26eb17d1eb216a699",
+        "eu:32009L0065:article:119:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32009L0065:annex:i": "sha256:bb524df11b3366fa6b02baabd5d302097dfa228e173f3d589fb064ce40df5e64",
+        "eu:32009L0065:annex:ii": "sha256:ec5f7e0a4560f881433f1e1e04dae4b8ac7d3e4ae378f48fa182f6559a8d5ea5",
+        "eu:32009L0065:annex:iia": "sha256:255a20cc8aeffc8cc3692159f29bcd440d556fb57181496b2a9d740185e19673",
+        "eu:32009L0065:annex:iii": "sha256:88c70e82277646d41db9bc5989cfe066cc7b56f186c8006a090cee692b2480ff",
+        "eu:32009L0065:annex:iv": "sha256:ee7cf11999eecf10170ea41b0e326a6949f1a22c45558f5f94c7377e09e34ff4"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:aifmd",
+    "shortName": "AIFMD Level 2",
+    "aliases": ["Commission Delegated Regulation (EU) No 231/2013"],
+    "celex": "32013R0231",
+    "expressionCelex": "02013R0231-20240212",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2013-03-22",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2013/231/2024-02-12/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-02-12",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2013/231",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 117,
+      "recitalCount": 0,
+      "annexCount": 4,
+      "paragraphCount": 395,
+      "pointCount": 545,
+      "structuralNodeCount": 25,
+      "maximumWarnings": 6,
+      "textHashes": {
+        "eu:32013R0231:article:1:subparagraph:1": "sha256:4f4c3e3aeac4b8fa03324d0d6f14d711b86d7b379f76001668143df0d4cc0350",
+        "eu:32013R0231:article:117:subparagraph:2": "sha256:dca0ca67038d3a96612d62329de522352c4f7295b86aaad311e6417a14d690f6",
+        "eu:32013R0231:annex:i": "sha256:fc2663c1b8fd2494353a08bc1066ad8141a7345a0d55cf6c92a9778caae9ff02",
+        "eu:32013R0231:annex:iv": "sha256:60df0d6bba8b6ac85bf5ab6748258fe28f3e1f5b8fba9bd010254cbb029249a6"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:aifmd",
+    "shortName": "AIFMD II",
+    "aliases": ["Directive (EU) 2024/927"],
+    "celex": "32024L0927",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2024-03-26",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2024/927/oj/eng",
+    "quality": {
+      "articleCount": 5,
+      "recitalCount": 68,
+      "annexCount": 4,
+      "paragraphCount": 26,
+      "pointCount": 304,
+      "structuralNodeCount": 0,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32024L0927:article:1:subparagraph:1": "sha256:e218ae7161632caedf2512fed40d4b3c35602b271fc33fee25b459c280f12aff",
+        "eu:32024L0927:article:3:paragraph:1": "sha256:016e3629416ca65ca3f927482e3e54b060ca2a5264b7f097680b3501599b9fe6",
+        "eu:32024L0927:article:5:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32024L0927:annex:i": "sha256:f39aea3e1c6c9da827e435ac391067a3a26d855737fceed31d3fce4e16868a72",
+        "eu:32024L0927:annex:ii": "sha256:5a529d283381d3535f0b18ab4f49a3681e5c2a83650bf6e6d2b471cf4218986c",
+        "eu:32024L0927:annex:ii:annex-part:v": "sha256:5a529d283381d3535f0b18ab4f49a3681e5c2a83650bf6e6d2b471cf4218986c",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:1": "sha256:425111089e262f93a89252aa47a5e33f677a0e69b6a2c407143ae8d801ed8b0a",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:2": "sha256:baf0ee10ae4f4fbaace3c72702ea0b4bd8132ebb8ec8f5be98800fadcf5fc2e6",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:3": "sha256:5173d092701e8add0534cbdd31f3b2ac4f0d8e5e375a90278598a39ac64c4e93",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:4": "sha256:8200e6a5c7cf83e13527ca9512b07d3f6deb60253b4467ae296af0d328b80a5b",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:5": "sha256:9d26973ae3e6e93f0d9f5c1ded997f4009fc8a46b80828422ea499e4d8a10eb0",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:6": "sha256:f590de25d837a3ffe70076f1970718922f3d3f56ba7fc0675e830ba3beba6086",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:7": "sha256:bee11504a32f37da7102f16cfb21d3eb18f09ecfe4db17c641720000f14e0b14",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:8": "sha256:e080a65eb11700683d2b021b681e4f8895b0c1056eec57848d121ecafbfaab17",
+        "eu:32024L0927:annex:ii:annex-part:v:paragraph:9": "sha256:901d4e32821f98183c6cea39a36216cdc53cb988b453aa9de3c8bc5de1b20d9c",
+        "eu:32024L0927:annex:iii": "sha256:89e1cb7b693f59935bc2b6040657ad1d4a2f0cb0d09e229e9c1ae2e448a159bf",
+        "eu:32024L0927:annex:iv": "sha256:c4a7b54c1995fa4833ed9df046049b7f28e685f548be4e513240771675a00936",
+        "eu:32024L0927:annex:iv:annex-part:iia": "sha256:c4a7b54c1995fa4833ed9df046049b7f28e685f548be4e513240771675a00936",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:1": "sha256:425111089e262f93a89252aa47a5e33f677a0e69b6a2c407143ae8d801ed8b0a",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:2": "sha256:baf0ee10ae4f4fbaace3c72702ea0b4bd8132ebb8ec8f5be98800fadcf5fc2e6",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:3": "sha256:5173d092701e8add0534cbdd31f3b2ac4f0d8e5e375a90278598a39ac64c4e93",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:4": "sha256:8200e6a5c7cf83e13527ca9512b07d3f6deb60253b4467ae296af0d328b80a5b",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:5": "sha256:9d26973ae3e6e93f0d9f5c1ded997f4009fc8a46b80828422ea499e4d8a10eb0",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:6": "sha256:f590de25d837a3ffe70076f1970718922f3d3f56ba7fc0675e830ba3beba6086",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:7": "sha256:bee11504a32f37da7102f16cfb21d3eb18f09ecfe4db17c641720000f14e0b14",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:8": "sha256:e080a65eb11700683d2b021b681e4f8895b0c1056eec57848d121ecafbfaab17",
+        "eu:32024L0927:annex:iv:annex-part:iia:paragraph:9": "sha256:901d4e32821f98183c6cea39a36216cdc53cb988b453aa9de3c8bc5de1b20d9c"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:mar",
+    "shortName": "MAR",
+    "aliases": ["Market Abuse Regulation"],
+    "celex": "32014R0596",
+    "expressionCelex": "02014R0596-20260605",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-06-12",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/596/2026-06-05/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-06-05",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/596",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 42,
+      "recitalCount": 0,
+      "annexCount": 2,
+      "paragraphCount": 209,
+      "pointCount": 313,
+      "structuralNodeCount": 7,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R0596:article:1:subparagraph:1": "sha256:38b1d4f7294f1d10e24d40e2cc9afb5460cbac5d71f426887204c556c8683a00",
+        "eu:32014R0596:article:39:paragraph:4": "sha256:eeb1c5553c09455c1c30518e117d3d5c54b9f5e068178ff07d735b1df476a47b",
+        "eu:32014R0596:annex:i": "sha256:4cc9a547dc0e4ee786647be5a632b49f044b889b3ed9887d7aa6594eef632026",
+        "eu:32014R0596:annex:ii": "sha256:4af5be06aba93ee1b40160df84a94e59b7b708b51ac5c883a4c994f7c32a4785"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:prospectus",
+    "shortName": "Prospectus Regulation",
+    "aliases": ["Regulation (EU) 2017/1129"],
+    "celex": "32017R1129",
+    "expressionCelex": "02017R1129-20260605",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2017-06-30",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2017/1129/2026-06-05/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-06-05",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2017/1129",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 54,
+      "recitalCount": 0,
+      "annexCount": 9,
+      "paragraphCount": 453,
+      "pointCount": 460,
+      "structuralNodeCount": 10,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R1129:article:1:paragraph:1": "sha256:0c279f0e9a105ed597c2008785d869d3e775ebc5f67f312114ddb16565566bb8",
+        "eu:32017R1129:article:49:paragraph:3": "sha256:448fa96feb2717f2f1ff81afe487e0b9ef59d5e0cd6841cc2928e55d647f63b0",
+        "eu:32017R1129:annex:i": "sha256:2f0c2b125453f399904018030071a6a83f37a579fe940575cb5af80a1f6e85c6",
+        "eu:32017R1129:annex:ix": "sha256:ab90beb91fbee7b5c520c382f35095c397ff17bd95713a079bdab32b156af173"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:priips",
+    "shortName": "PRIIPs",
+    "aliases": ["Regulation (EU) No 1286/2014"],
+    "celex": "32014R1286",
+    "expressionCelex": "02014R1286-20240109",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2014-12-09",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2014/1286/2024-01-09/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-09",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2014/1286",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 35,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 106,
+      "pointCount": 145,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32014R1286:article:1:subparagraph:1": "sha256:ef510b2a010cdc5b4afef0e4c8c53594160f5ab4d2983fb26b250df207956b94",
+        "eu:32014R1286:article:34:subparagraph:2": "sha256:fcbee7c5cacf487382d67d5f32ec9ec3453c3fe57e81934836625047e91417d0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:ifd",
+    "shortName": "IFD",
+    "aliases": ["Directive (EU) 2019/2034"],
+    "celex": "32019L2034",
+    "expressionCelex": "02019L2034-20241224",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-05",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2019/2034/2024-12-24/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-12-24",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2019/2034",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 70,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 199,
+      "pointCount": 360,
+      "structuralNodeCount": 20,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019L2034:article:1:subparagraph:1": "sha256:9409dbd04ae2e7af547005ed38f53dc5864dfd678254b9a850a2af34e3cf0ed6",
+        "eu:32019L2034:article:69:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:ucits",
+    "shortName": "UCITS Organisational Requirements",
+    "aliases": ["Commission Directive 2010/43/EU"],
+    "celex": "32010L0043",
+    "expressionCelex": "02010L0043-20220801",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2010-07-10",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2010/43/2022-08-01/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2022-08-01",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2010/43",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 49,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 137,
+      "pointCount": 159,
+      "structuralNodeCount": 19,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32010L0043:article:1:subparagraph:1": "sha256:66edb09dbf1d3e742a13cc89026c89788ce45ad4f96470ab5cbe24b4f1f288dd",
+        "eu:32010L0043:article:48:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:aifmd",
+    "shortName": "AIFMD",
+    "aliases": ["Alternative Investment Fund Managers Directive"],
+    "celex": "32011L0061",
+    "expressionCelex": "02011L0061-20260416",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2011-07-01",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2011/61/2026-04-16/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-04-16",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2011/61",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 77,
+      "recitalCount": 0,
+      "annexCount": 5,
+      "paragraphCount": 450,
+      "pointCount": 665,
+      "structuralNodeCount": 18,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32011L0061:article:1:subparagraph:1": "sha256:b547e333ec81246350bba74fbe6e06506612b32571cd2269319f3424ebf0ec26",
+        "eu:32011L0061:article:71:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0",
+        "eu:32011L0061:annex:i": "sha256:202c86daae07ac26e4bce42ca19b22ede22912ffb4b97bdbcd8cdccd2072d5fc",
+        "eu:32011L0061:annex:v": "sha256:255a20cc8aeffc8cc3692159f29bcd440d556fb57181496b2a9d740185e19673"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:ucits",
+    "shortName": "UCITS Depositary Obligations",
+    "aliases": ["Commission Delegated Regulation (EU) 2016/438"],
+    "celex": "32016R0438",
+    "expressionCelex": "02016R0438-20200401",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2016-03-24",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/438/2020-04-01/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2020-04-01",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg_del/2016/438",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 25,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 74,
+      "pointCount": 102,
+      "structuralNodeCount": 4,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R0438:article:1:subparagraph:1": "sha256:0520b8db14863bd63cb8a448e5e4821ec00f2d7edd50983fb94594587519a7c6",
+        "eu:32016R0438:article:25:subparagraph:2": "sha256:222cf645e0281b2b903735f9ee7d09546996db97fc058247f123ce416f623bca"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:benchmarks",
+    "shortName": "BMR",
+    "aliases": ["Benchmark Regulation"],
+    "celex": "32016R1011",
+    "expressionCelex": "02016R1011-20260101",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2016-06-29",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2016/1011/2026-01-01/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2026-01-01",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2016/1011",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 83,
+      "recitalCount": 0,
+      "annexCount": 3,
+      "paragraphCount": 407,
+      "pointCount": 602,
+      "structuralNodeCount": 27,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32016R1011:article:1:subparagraph:1": "sha256:c8f07b437b17e114a51b07f3662125c6dcbfaf995a9bcad24aa3ffd6ba38b851",
+        "eu:32016R1011:article:59:subparagraph:4": "sha256:6554217bc385334ccf0707c74a604cc94baf94ab22f44c1692c1039d40e2f890",
+        "eu:32016R1011:annex:i": "sha256:c5a343319becea94c6ac1783d9efa1069f0586fbace310c58661b3bd91304dc5",
+        "eu:32016R1011:annex:iii": "sha256:62e89fa969c565a1fba0c90d04bd8e28580988a6ea1a09b2adce4b8018c3a713"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "financial-first",
+    "familyId": "family:ifr",
+    "shortName": "IFR",
+    "aliases": ["Regulation (EU) 2019/2033"],
+    "celex": "32019R2033",
+    "expressionCelex": "02019R2033-20240109",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2019-12-05",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2019/2033/2024-01-09/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-09",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2019/2033",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 67,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 205,
+      "pointCount": 511,
+      "structuralNodeCount": 26,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32019R2033:article:1:paragraph:1": "sha256:e4d967a5ef83e0c3eb29063c09f40581d6c6b257798588f4aebf6b0b3956ae62",
+        "eu:32019R2033:article:66:paragraph:3": "sha256:4068c9465864bb7f92a2084084c7668bc23e6c3eff9aadda6648218e519e55dc"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:ucits",
+    "shortName": "UCITS Mergers and Master-Feeder Structures",
+    "aliases": ["Commission Directive 2010/44/EU"],
+    "celex": "32010L0044",
+    "expressionCelex": "02010L0044-20100710",
+    "language": "ENG",
+    "documentType": "directive",
+    "regulatoryLevel": "level-2",
+    "measureType": "other",
+    "publicationDate": "2010-07-10",
+    "eliUrl": "https://eur-lex.europa.eu/eli/dir/2010/44/2010-07-10/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2010-07-10",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/dir/2010/44",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 36,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 72,
+      "pointCount": 121,
+      "structuralNodeCount": 17,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32010L0044:article:1:subparagraph:1": "sha256:62c038db60084d48c2ddef71b14409dead975e4ae1502f3f66cf3fc6af2872d9",
+        "eu:32010L0044:article:36:subparagraph:1": "sha256:a10b8fc122568129fb74f91aac29ca08b598b0badc5fba6a19942970570782c0"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:money-market-funds",
+    "shortName": "Money Market Funds Regulation",
+    "aliases": ["Regulation (EU) 2017/1131"],
+    "celex": "32017R1131",
+    "expressionCelex": "02017R1131-20241224",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2017-06-30",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2017/1131/2024-12-24/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-12-24",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2017/1131",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 48,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 165,
+      "pointCount": 255,
+      "structuralNodeCount": 12,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32017R1131:article:1:paragraph:1": "sha256:ab6176d889c4476394174704ac5d58086ac10c7356930a6be2480443badc1d3f",
+        "eu:32017R1131:article:47:subparagraph:2": "sha256:b5aa85edaeb550636f9970cd60056afd71cbc789ed3dd2d40f8a095f4fa0d904"
+      }
+    }
+  },
+  {
+    "status": "active",
+    "batch": "funds-first",
+    "familyId": "family:eltif",
+    "shortName": "ELTIF Regulation",
+    "aliases": ["Regulation (EU) 2015/760"],
+    "celex": "32015R0760",
+    "expressionCelex": "02015R0760-20240110",
+    "language": "ENG",
+    "documentType": "regulation",
+    "regulatoryLevel": "level-1",
+    "measureType": "primary-act",
+    "publicationDate": "2015-05-19",
+    "eliUrl": "https://eur-lex.europa.eu/eli/reg/2015/760/2024-01-10/eng",
+    "sourceStatus": {
+      "basis": "consolidated",
+      "textAsOf": "2024-01-10",
+      "checkedAt": "2026-10-20T00:00:00Z",
+      "currentVersionUrl": "https://eur-lex.europa.eu/eli/reg/2015/760",
+      "corrections": []
+    },
+    "quality": {
+      "articleCount": 40,
+      "recitalCount": 0,
+      "annexCount": 0,
+      "paragraphCount": 136,
+      "pointCount": 195,
+      "structuralNodeCount": 9,
+      "maximumWarnings": 0,
+      "textHashes": {
+        "eu:32015R0760:article:1:paragraph:1": "sha256:ab4fd3e6a4f302e0debe699d546b0d4cdcff95b89284f1b5fbb9b4ef94d1403d",
+        "eu:32015R0760:article:38:subparagraph:2": "sha256:df0b8e73e8a92b86c76fd1b8de91b8e99276f2efbe202b3c6d45b88028bbec63"
+      }
+    }
   }
 ]

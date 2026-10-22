@@ -10,7 +10,7 @@ import {
 export const regulatoryPathDocumentSchema = z
   .object({
     id: z.string().min(1),
-    jurisdiction: z.enum(["EU", "LU"]),
+    jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
     slug: z.string().regex(/^[a-z0-9-]+$/),
     shortName: z.string().min(1),
     officialTitle: z.string().min(1),

@@ -35,7 +35,7 @@ curl --get http://localhost:3000/api/v1/laws/resolve \
 
 | Parameter | Values |
 |---|---|
-| `jurisdiction` | `EU`, `LU` |
+| `jurisdiction` | `EU`, `LU`, `DE` |
 | `documentType` | `regulation`, `directive`, `law`, `circular`, `guidance`, `other` |
 | `regulatoryLevel` | `level-1`, `level-2`, `level-3` |
 | `measureType` | `primary-act`, `rts`, `its`, `guideline`, `qa`, `other` |
@@ -71,7 +71,7 @@ curl --header "Authorization: Bearer local-development-key-2026" \
 
 Both documentation routes are intentionally readable without an API key so a developer can discover and generate a client before receiving data access. They contain only the public contract and locally served Swagger assets—no legal corpus payload, configured key, raw/Canonical path, SQLite detail, or client identity. Regulatory operations remain protected: select **Authorize** in Swagger UI and enter a configured Bearer API key before using **Try it out**. When no key is configured, the documentation still loads while regulatory operations return `503 SERVICE_NOT_CONFIGURED`.
 
-The OpenAPI `info.version` equals the response `contractVersion`. Its response schemas are release-tested with AJV against representative live service outputs for discovery, resolve, structure, exact Provision, relationships, and errors. Swagger UI is pinned through `swagger-ui-dist` and does not fetch a CDN at runtime. The OpenAPI document is a compatibility artifact, not another business schema or data source; implementation DTO validation remains in the existing Public API service boundary.
+The OpenAPI `info.version` equals the response `contractVersion` (`1.5.0`). Its response schemas are release-tested with AJV against representative live service outputs for discovery, resolve, structure, exact Provision, relationships, and errors. Swagger UI is pinned through `swagger-ui-dist` and does not fetch a CDN at runtime. The OpenAPI document is a compatibility artifact, not another business schema or data source; implementation DTO validation remains in the existing Public API service boundary. German (`DE`) records may expose `language: "de"`; French AMF (`FR`) records expose `language: "fr"`; EU and Luxembourg records retain their existing English DTO shape, and `language` is omitted when unavailable. Language identifies text language only; it does not indicate a translation, determine governing law, or establish legal applicability. Public Provision and citation data expose `contentRole` as a machine-readable value where supplied by the source document.
 
 ## Relationship boundary
 
@@ -101,7 +101,7 @@ Every regulatory operation response contains:
 {
   "meta": {
     "apiVersion": "v1",
-    "contractVersion": "1.3.0",
+    "contractVersion": "1.5.0",
     "profilePolicy": "deployment-fixed",
     "runtime": {
       "buildId": "runtime-...",
@@ -167,3 +167,6 @@ A valid resolve query with no corpus match returns `200` with `bestMatch: null` 
 - `GET /api/v1/openapi.json` documents this boundary and is validated against representative service payloads; `GET /api/docs` is only its interactive renderer.
 
 Authentication and bounded single-process protection are implemented, but this is not yet an account, billing, distributed-quota, audit-log, or abuse-management system. Keep Cloud Run at one instance when relying on this limiter as the deployment quota, or add an external gateway/distributed limiter in a later operational slice. MCP remains outside this REST compatibility boundary.
+
+
+French AMF records require `publicationDate: null` and `publicationDateBasis: "aggregate-with-multiple-component-publications"`. `asOf` is the publisher version date, not a publication or effective date. Other jurisdictions retain optional, non-null publication dates. AMF document structure includes 64 scoped publisher notes with owner, source position, exact normalized block and `contentHash`; these are context metadata rather than Provision/citation entities. The 68 article notes remain in their source position and role. Normalized layouts preserve links, superscripts, italics and ordered/unordered lists. No AMF implementation or transposition relationships are inferred.

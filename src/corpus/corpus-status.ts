@@ -1,7 +1,15 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import {
+  type AmfSourceDefinition,
+  loadAmfSourceRegistrySync,
+} from "../ingestion/amf-source-registry";
 import type { CssfSourceDefinition } from "../ingestion/cssf-source-registry";
 import type { EbaSourceDefinition } from "../ingestion/eba-source-registry";
+import {
+  type NationalSourceDefinition,
+  loadNationalSourceCatalogSync,
+} from "../ingestion/national-source-registry";
 import type { SourceCatalogEntry } from "../ingestion/source-registry";
 
 interface StatusItem {
@@ -34,6 +42,8 @@ export function renderCorpusStatus(
   eurLex: SourceCatalogEntry[],
   cssf: CssfSourceDefinition[],
   eba: EbaSourceDefinition[],
+  national: NationalSourceDefinition[] = loadNationalSourceCatalogSync(),
+  amf: AmfSourceDefinition[] = loadAmfSourceRegistrySync(),
 ): string {
   const published: StatusItem[] = [
     ...eurLex
@@ -43,6 +53,12 @@ export function renderCorpusStatus(
       .map((source) => ({ name: source.shortName })),
     ...cssf.map((source) => ({ name: source.shortName })),
     ...eba.map((source) => ({ name: source.shortName })),
+    ...national
+      .filter((source) => source.status === "active")
+      .map((source) => ({ name: source.shortName })),
+    ...amf
+      .filter((source) => source.status === "active")
+      .map((source) => ({ name: source.shortName })),
   ];
   const queued = eurLex
     .filter((source) => source.status === "queued")
@@ -50,6 +66,13 @@ export function renderCorpusStatus(
   const planned = eurLex
     .filter((source) => source.status === "planned")
     .map((source) => ({ name: source.shortName, batch: source.batch }));
+
+  const nationalCandidates = national
+    .filter((source) => source.status === "candidate")
+    .map((source) => ({ name: source.shortName }));
+  const amfCandidates = amf
+    .filter((source) => source.status === "candidate")
+    .map((source) => ({ name: source.shortName }));
 
   return `# Reader Corpus Status
 
@@ -67,7 +90,15 @@ ${plannedByBatch(queued)}
 
 ${plannedByBatch(planned)}
 
-Published documents are available to the Runtime/Reader. Queued laws are isolated onboarding candidates. Planned laws are visible backlog only.
+## National law candidates — ${nationalCandidates.length}
+
+${names(nationalCandidates)}
+
+## AMF candidates — ${amfCandidates.length}
+
+${names(amfCandidates)}
+
+Published documents are available to the Runtime/Reader. Queued EUR-Lex laws are isolated onboarding candidates. National law candidates are not published or included in the corpus count. Planned laws are visible backlog only.
 `;
 }
 
@@ -76,8 +107,10 @@ export async function writeCorpusStatus(
   cssf: CssfSourceDefinition[],
   eba: EbaSourceDefinition[],
   outputPath = resolve(process.cwd(), "docs/corpus-status.md"),
+  national: NationalSourceDefinition[] = loadNationalSourceCatalogSync(),
+  amf: AmfSourceDefinition[] = loadAmfSourceRegistrySync(),
 ): Promise<void> {
-  const content = renderCorpusStatus(eurLex, cssf, eba);
+  const content = renderCorpusStatus(eurLex, cssf, eba, national, amf);
   try {
     if ((await readFile(outputPath, "utf8")) === content) return;
   } catch (error) {

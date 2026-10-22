@@ -6,11 +6,37 @@ export function SourceStatusNotice({ status }: { status: SourceStatus }) {
     status.basis === "original-oj"
       ? "Original Official Journal text"
       : "Consolidated text";
+  const currentSourceIsEurLex = new URL(
+    status.currentVersionUrl,
+  ).hostname.endsWith("eur-lex.europa.eu");
 
   return (
     <aside className="source-status-notice" aria-label="Legal text status">
       <strong>{basis}</strong>
-      <span>Text as of {status.textAsOf}</span>
+      <span>
+        {status.textAsOfBasis === "last-amendment-act-date"
+          ? "Last amendment act date"
+          : status.textAsOfBasis === "publisher-version-date"
+            ? "Publisher version date"
+            : "Text as of"}{" "}
+        {status.textAsOf}
+      </span>
+      {status.textAuthorityStatus === "non-authoritative-consolidation" ? (
+        <span>
+          Non-authoritative consolidation
+          {status.authorityNote ? `: ${status.authorityNote}` : ""}
+        </span>
+      ) : status.authorityNote ? (
+        <span>{status.authorityNote}</span>
+      ) : null}
+      {status.textAuthorityStatus === "publisher-consolidation" ? (
+        <span>
+          Publisher consolidation; aggregate publication date is not recorded.
+        </span>
+      ) : null}
+      {status.sourceNotes?.map((note, index) => (
+        <span key={`${index}-${note}`}>{note}</span>
+      ))}
       <span>
         A loaded text date is not a latest-version certification. Check the
         current official source before relying on this text.
@@ -30,7 +56,9 @@ export function SourceStatusNotice({ status }: { status: SourceStatus }) {
         </span>
       ) : null}
       <a href={status.currentVersionUrl} rel="noreferrer" target="_blank">
-        View current EUR-Lex version
+        {currentSourceIsEurLex
+          ? "View current EUR-Lex version"
+          : "View current source text"}
       </a>
     </aside>
   );

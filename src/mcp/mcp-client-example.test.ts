@@ -17,7 +17,7 @@ describe("MCP relationship client example", () => {
     const output = JSON.parse(stdout);
 
     expect(output).toMatchObject({
-      meta: { contractVersion: "1.3.0" },
+      meta: { contractVersion: "1.5.0" },
       resolution: {
         documentId: "eu:32022R2554",
         entityId: "eu:32022R2554:article:28",

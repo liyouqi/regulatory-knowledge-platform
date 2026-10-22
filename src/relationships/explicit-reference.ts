@@ -101,7 +101,10 @@ function addBodyEntities(
           };
     if (!entity) throw new Error(`Missing root entity ${rootProvision.id}`);
     if (block.id !== rootProvision.id) entities.push(entity);
-    if (block.text.trim()) {
+    if (
+      (!block.contentRole || block.contentRole === "operative-text") &&
+      block.text.trim()
+    ) {
       textSources.push({ document, entity, rootProvision, text: block.text });
     }
     addBodyEntities(

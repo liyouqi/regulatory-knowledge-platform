@@ -4,9 +4,11 @@ import { resolve } from "node:path";
 import { toDocumentView } from "../canonical/to-document-view";
 import { validateCanonicalDocument } from "../canonical/validate";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
+import { AMF_HTML_PARSER_VERSION } from "../ingestion/amf-canonical-parser";
 import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
 import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
 import { EBA_GUIDELINES_PDF_PARSER_VERSION } from "../ingestion/eba-guidelines-pdf-parser";
+import { NATIONAL_XML_PARSER_VERSION } from "../ingestion/national-xml-parser";
 import { type DocumentView, documentViewSchema } from "../shared/legal";
 import { doraCanonicalFixture } from "./dora-fixture";
 
@@ -27,7 +29,11 @@ function officialCandidates(artifactRoot: string, identifier: string) {
           entry.name.endsWith(`-parser-cssf-pdf-${CSSF_PDF_PARSER_VERSION}`) ||
           entry.name.endsWith(
             `-parser-eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`,
-          )),
+          ) ||
+          entry.name.endsWith(
+            `-parser-national-xml-${NATIONAL_XML_PARSER_VERSION}`,
+          ) ||
+          entry.name.endsWith(`-parser-amf-html-${AMF_HTML_PARSER_VERSION}`)),
     )
     .map((entry) => ({
       name: entry.name,
@@ -78,11 +84,15 @@ function documentBuildId(
   const parserToken =
     document.source.sourceSystem === "eba"
       ? `eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`
-      : document.source.sourceVersion.startsWith("cssf-pdf-")
-        ? `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`
-        : document.source.sourceSystem === "cssf"
-          ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
-          : FORMEX_PARSER_VERSION;
+      : document.source.sourceSystem === "gii"
+        ? `national-xml-${NATIONAL_XML_PARSER_VERSION}`
+        : document.source.sourceVersion.startsWith("cssf-pdf-")
+          ? `cssf-pdf-${CSSF_PDF_PARSER_VERSION}`
+          : document.source.sourceSystem === "cssf"
+            ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
+            : document.source.sourceSystem === "amf"
+              ? `amf-html-${AMF_HTML_PARSER_VERSION}`
+              : FORMEX_PARSER_VERSION;
   return `canonical-${document.schemaVersion}-parser-${parserToken}-${document.source.sha256.slice(7, 19)}${sourceStatusToken}`;
 }
 

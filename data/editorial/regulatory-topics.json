@@ -2,10 +2,10 @@
   "schemaVersion": "1.0.0",
   "taxonomy": {
     "id": "taxonomy:regulatory-topic",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "provenance": "EDITORIAL",
     "reviewStatus": "reviewed",
-    "reviewedAt": "2026-10-12T00:00:00Z"
+    "reviewedAt": "2026-10-20T00:00:00Z"
   },
   "topics": [
     {
@@ -22,6 +22,11 @@
       "id": "topic:banking-governance-internal-control",
       "label": "Banking governance and internal control",
       "description": "Reviewed navigation across CRD, EBA and CSSF provisions on management responsibilities, conflicts of interest, internal control independence, compliance and internal audit. Loaded versions and institutional applicability must be checked separately."
+    },
+    {
+      "id": "topic:fund-management-organisation-risk",
+      "label": "Fund management organisation and risk",
+      "description": "Reviewed starting provisions across loaded UCITS and AIFMD on authorisation, delegation and risk management. Check the loaded versions and institutional scope."
     }
   ],
   "assignments": [
@@ -348,6 +353,78 @@
       "rationale": "Navigation subject: Part II: conflicts of interest policy.",
       "reviewNote": "Editorial navigation, checked against the pinned loaded provision; not a legal summary or an institution-specific applicability conclusion. Consult the Reader source/version and official text.",
       "evidenceLocator": "lu:cssf:circular-12-552:part:ii:provision:point-168"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32009L0065",
+      "targetEntityId": "eu:32009L0065:article:6",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for management-company authorisation; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32009L0065:article:6"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32009L0065",
+      "targetEntityId": "eu:32009L0065:article:13",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for delegation; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32009L0065:article:13"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32009L0065",
+      "targetEntityId": "eu:32009L0065:article:51",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for risk management; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32009L0065:article:51"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32011L0061",
+      "targetEntityId": "eu:32011L0061:article:6",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for AIFM authorisation; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32011L0061:article:6"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32011L0061",
+      "targetEntityId": "eu:32011L0061:article:15",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for risk management; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32011L0061:article:15"
+    },
+    {
+      "topicId": "topic:fund-management-organisation-risk",
+      "targetDocumentId": "eu:32011L0061",
+      "targetEntityId": "eu:32011L0061:article:20",
+      "targetKind": "provision",
+      "role": "primary",
+      "assignmentVersion": "1.0.0",
+      "reviewedAt": "2026-10-20T00:00:00Z",
+      "rationale": "Editorial starting provision for delegation; verify the complete official text in Reader.",
+      "reviewNote": "Editorial navigation, not an applicability or compliance conclusion.",
+      "evidenceLocator": "eu:32011L0061:article:20"
     }
   ]
 }

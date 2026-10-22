@@ -105,6 +105,66 @@ const tableAnnexXml = `<?xml version="1.0" encoding="UTF-8"?>
 </ANNEX>`;
 
 describe("Formex ACT parser", () => {
+  it("retains Roman annex suffixes without falling back to source order", () => {
+    const result = parseFormexAct(xml, source, snapshot, [
+      {
+        fileName: "suffix.xml",
+        xml: "<ANNEX><TITLE><TI><P>ANNEX IIA</P></TI></TITLE><CONTENTS><P>Suffix annex text.</P></CONTENTS></ANNEX>",
+      },
+    ]);
+    expect(
+      result.document.provisions.find((item) => item.kind === "annex"),
+    ).toMatchObject({
+      logicalId: "eu:32025R0001:annex:iia",
+      numberRaw: "IIA",
+      label: "ANNEX IIA",
+    });
+  });
+
+  it("keeps the legal outer annex identity and the quoted annex source hierarchy", () => {
+    const result = parseFormexAct(xml, source, snapshot, [
+      {
+        fileName: "outer.xml",
+        xml: '<ANNEX><TITLE><TI><P>ANNEX II</P></TI></TITLE><CONTENTS><QUOT.S><P><QUOT.START/><INCL.ELEMENT FILEREF="leaf.xml" TYPE="FORMEX.DOC"/><QUOT.END/></P></QUOT.S></CONTENTS></ANNEX>',
+        quotedAnnex: {
+          fileName: "leaf.xml",
+          xml: "<ANNEX><TITLE><TI><P>ANNEX V</P></TI><STI><P>Tools</P></STI></TITLE><CONTENTS><NP><NO.P>1.</NO.P><TXT>First quoted rule.</TXT></NP><NP><NO.P>2.</NO.P><TXT>Second quoted rule.</TXT></NP></CONTENTS></ANNEX>",
+        },
+      },
+    ]);
+    expect(
+      result.document.provisions
+        .filter((item) => item.kind === "annex")
+        .map((item) => item.logicalId),
+    ).toEqual(["eu:32025R0001:annex:ii"]);
+    const nested = result.document.provisions.find(
+      (item) => item.logicalId === "eu:32025R0001:annex:ii:annex-part:v",
+    );
+    expect(nested).toMatchObject({
+      parentLogicalId: "eu:32025R0001:annex:ii",
+      label: "ANNEX V",
+      sourceLocator: { value: "leaf.xml#/ANNEX" },
+    });
+    const view = toDocumentView(result.document, "quoted-annex-test");
+    const annex = view.provisions.find(
+      (item) => item.id === "eu:32025R0001:annex:ii",
+    );
+    expect(
+      result.document.provisions.find(
+        (item) => item.logicalId === "eu:32025R0001:annex:ii",
+      )?.orderedContent,
+    ).toEqual([{ type: "child", childLogicalId: nested?.logicalId }]);
+    expect(annex?.blocks[0].id).toBe(nested?.logicalId);
+    expect(annex?.blocks[0].children.map((item) => item.text)).toEqual([
+      "First quoted rule.",
+      "Second quoted rule.",
+    ]);
+    expect(annex?.blocks[0].orderedContent?.[0]).toEqual({
+      type: "text",
+      text: "Tools",
+    });
+  });
+
   it("preserves legal hierarchy, stable IDs, and normalized text", () => {
     const { document, report } = parseFormexAct(xml, source, snapshot);
 

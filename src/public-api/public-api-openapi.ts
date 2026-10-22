@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { contentRoleSchema, layoutNameSchema } from "../shared/content-unit";
 import {
   PUBLIC_API_CONTRACT_VERSION,
   PUBLIC_API_VERSION,
@@ -44,6 +45,7 @@ const documentReferenceProperties = {
   slug: { type: "string", pattern: "^[a-z0-9-]+$" },
   shortName: nonEmptyString,
   officialTitle: nonEmptyString,
+  language: { type: "string", enum: ["en", "de", "fr"] },
   documentType: {
     type: "string",
     enum: publicDocumentTypeSchema.options,
@@ -51,7 +53,18 @@ const documentReferenceProperties = {
   celex: nonEmptyString,
   localId: nonEmptyString,
   sourceUrl: { type: "string", format: "uri" },
+  sourceStatus: reference("SourceStatus"),
   asOf: { type: "string", format: "date" },
+  publicationDate: {
+    type: ["string", "null"],
+    format: "date",
+    description:
+      "Null only for FR aggregate publications with no single publication date.",
+  },
+  publicationDateBasis: {
+    type: "string",
+    const: "aggregate-with-multiple-component-publications",
+  },
   provenance: { type: "string", const: "official" },
 };
 const documentReferenceRequired = [
@@ -134,10 +147,29 @@ const schemas = {
       ),
     }),
   }),
-  DocumentReference: closedObject(
-    documentReferenceProperties,
-    documentReferenceRequired,
-  ),
+  DocumentReference: {
+    ...closedObject(documentReferenceProperties, documentReferenceRequired),
+    oneOf: [
+      {
+        properties: {
+          jurisdiction: { const: "FR" },
+          publicationDate: { type: "null" },
+          publicationDateBasis: {
+            const: "aggregate-with-multiple-component-publications",
+          },
+        },
+        required: ["jurisdiction", "publicationDate", "publicationDateBasis"],
+      },
+      {
+        properties: {
+          jurisdiction: { not: { const: "FR" } },
+          publicationDate: { type: "string", format: "date" },
+        },
+        required: ["jurisdiction"],
+        not: { required: ["publicationDateBasis"] },
+      },
+    ],
+  },
   LawTarget: closedObject({
     entityId: nonEmptyString,
     kind: {
@@ -215,38 +247,64 @@ const schemas = {
     },
     ["id", "kind", "label", "children"],
   ),
-  StructureDocumentReference: closedObject(
-    {
-      ...documentReferenceProperties,
-      sourceSnapshotId: nonEmptyString,
-      sourceVersion: nonEmptyString,
-      lastChecked: { type: "string", format: "date-time" },
-      canonicalBuildId: nonEmptyString,
-    },
-    [
-      ...documentReferenceRequired,
-      "sourceSnapshotId",
-      "sourceVersion",
-      "lastChecked",
-      "canonicalBuildId",
+  StructureDocumentReference: {
+    ...closedObject(
+      {
+        ...documentReferenceProperties,
+        sourceSnapshotId: nonEmptyString,
+        sourceVersion: nonEmptyString,
+        lastChecked: { type: "string", format: "date-time" },
+        canonicalBuildId: nonEmptyString,
+      },
+      [
+        ...documentReferenceRequired,
+        "sourceSnapshotId",
+        "sourceVersion",
+        "lastChecked",
+        "canonicalBuildId",
+      ],
+    ),
+    oneOf: [
+      {
+        properties: {
+          jurisdiction: { const: "FR" },
+          publicationDate: { type: "null" },
+          publicationDateBasis: {
+            const: "aggregate-with-multiple-component-publications",
+          },
+        },
+        required: ["jurisdiction", "publicationDate", "publicationDateBasis"],
+      },
+      {
+        properties: {
+          jurisdiction: { not: { const: "FR" } },
+          publicationDate: { type: "string", format: "date" },
+        },
+        required: ["jurisdiction"],
+        not: { required: ["publicationDateBasis"] },
+      },
     ],
-  ),
+  },
   LawStructureResponse: closedObject({
     meta: reference("Meta"),
-    data: closedObject({
-      document: reference("StructureDocumentReference"),
-      collections: arrayOf(
-        closedObject({
-          id: {
-            type: "string",
-            enum: ["articles", "recitals", "annexes", "provisions"],
-          },
-          label: nonEmptyString,
-          count: { type: "integer", minimum: 0 },
-          roots: arrayOf(reference("StructureNode")),
-        }),
-      ),
-    }),
+    data: closedObject(
+      {
+        document: reference("StructureDocumentReference"),
+        scopedSourceNotes: arrayOf(reference("ScopedSourceNote")),
+        collections: arrayOf(
+          closedObject({
+            id: {
+              type: "string",
+              enum: ["articles", "recitals", "annexes", "provisions"],
+            },
+            label: nonEmptyString,
+            count: { type: "integer", minimum: 0 },
+            roots: arrayOf(reference("StructureNode")),
+          }),
+        ),
+      },
+      ["document", "collections"],
+    ),
   }),
   SourceLocator: closedObject({
     kind: {
@@ -254,6 +312,128 @@ const schemas = {
       enum: ["xml-id", "xpath", "css-selector", "pdf-page", "fixture"],
     },
     value: nonEmptyString,
+  }),
+  ContentLayout: closedObject(
+    {
+      name: { type: "string", enum: [...layoutNameSchema.options, "run"] },
+      contentRole: { type: "string", enum: contentRoleSchema.options },
+      sourceLocator: reference("SourceLocator"),
+      contentIndex: { type: "integer", minimum: 0 },
+      columnCount: { type: "integer", minimum: 1 },
+      columnStart: { type: "integer", minimum: 1 },
+      columnSpan: { type: "integer", minimum: 1 },
+      href: { type: "string", format: "uri" },
+      listStyle: { type: "string", enum: ["ordered", "unordered"] },
+      children: arrayOf(reference("ContentLayout")),
+    },
+    ["name", "contentRole", "sourceLocator", "children"],
+  ),
+  ContentRun: closedObject(
+    {
+      type: { const: "text" },
+      text: nonEmptyString,
+      contentRole: { type: "string", enum: contentRoleSchema.options },
+      sourceLocator: reference("SourceLocator"),
+    },
+    ["type", "text"],
+  ),
+  BodyBlock: closedObject(
+    {
+      id: nonEmptyString,
+      kind: {
+        type: "string",
+        enum: [
+          "paragraph",
+          "subparagraph",
+          "point",
+          "subpoint",
+          "recital",
+          "annex",
+          "annex-part",
+          "other",
+        ],
+      },
+      contentRole: { type: "string", enum: contentRoleSchema.options },
+      contentLayout: arrayOf(reference("ContentLayout")),
+      marker: { type: "string" },
+      text: { type: "string" },
+      anchor: nonEmptyString,
+      sourceLocator: reference("SourceLocator"),
+      orderedContent: arrayOf({
+        oneOf: [
+          reference("ContentRun"),
+          closedObject({ type: { const: "child" }, childId: nonEmptyString }),
+          closedObject({
+            type: { const: "resource" },
+            resource: closedObject({
+              id: nonEmptyString,
+              kind: { const: "formula" },
+              mediaType: { const: "image/png" },
+              dataUrl: { type: "string", pattern: "^data:image/png;base64," },
+              sourceFileName: nonEmptyString,
+              sourceSha256: {
+                type: "string",
+                pattern: "^sha256:[a-f0-9]{64}$",
+              },
+              renditionSha256: {
+                type: "string",
+                pattern: "^sha256:[a-f0-9]{64}$",
+              },
+            }),
+          }),
+        ],
+      }),
+      children: arrayOf(reference("BodyBlock")),
+    },
+    [
+      "id",
+      "kind",
+      "text",
+      "anchor",
+      "sourceLocator",
+      "orderedContent",
+      "children",
+    ],
+  ),
+  ScopedSourceNote: closedObject({
+    scope: { type: "string", enum: ["document", "structure"] },
+    ownerId: nonEmptyString,
+    ownerSourceUrl: { type: "string", format: "uri" },
+    ownerLabel: nonEmptyString,
+    position: { type: "integer", minimum: 0 },
+    contentHash: { type: "string", pattern: "^sha256:[a-f0-9]{64}$" },
+    block: reference("BodyBlock"),
+  }),
+  SourceStatus: closedObject(
+    {
+      basis: { type: "string", enum: ["original-oj", "consolidated"] },
+      textAsOf: { type: "string", format: "date" },
+      checkedAt: { type: "string", format: "date-time" },
+      currentVersionUrl: { type: "string", format: "uri" },
+      corrections: arrayOf(
+        closedObject({
+          date: { type: "string", format: "date" },
+          url: { type: "string", format: "uri" },
+        }),
+      ),
+      textAuthorityStatus: {
+        type: "string",
+        enum: ["non-authoritative-consolidation", "publisher-consolidation"],
+      },
+      textAsOfBasis: {
+        type: "string",
+        enum: ["last-amendment-act-date", "publisher-version-date"],
+      },
+      authorityNote: { type: "string" },
+      sourceNotes: arrayOf({ type: "string" }),
+    },
+    ["basis", "textAsOf", "currentVersionUrl", "corrections"],
+  ),
+  SourceNote: closedObject({
+    contentRole: { type: "string", const: "source-note" },
+    contentIndex: { type: "integer", minimum: 0 },
+    text: { type: "string" },
+    sourceLocator: reference("SourceLocator"),
   }),
   TextBlock: closedObject(
     {
@@ -274,6 +454,10 @@ const schemas = {
       marker: nonEmptyString,
       text: { type: "string" },
       sourceLocator: reference("SourceLocator"),
+      contentRole: { type: "string", enum: contentRoleSchema.options },
+      sourceNotes: arrayOf(reference("SourceNote")),
+      contentLayout: arrayOf(reference("ContentLayout")),
+      orderedContent: arrayOf(reference("ContentRun")),
       children: arrayOf(reference("TextBlock")),
     },
     ["entityId", "kind", "text", "sourceLocator", "children"],
@@ -282,35 +466,52 @@ const schemas = {
     meta: reference("Meta"),
     data: closedObject({
       document: reference("DocumentReference"),
-      provision: closedObject({
-        entityId: nonEmptyString,
-        kind: {
-          type: "string",
-          enum: ["article", "recital", "annex", "other"],
-        },
-        collectionId: {
-          type: "string",
-          enum: ["articles", "recitals", "annexes", "provisions"],
-        },
-        number: nonEmptyString,
-        label: nonEmptyString,
-        title: nullableString,
-        breadcrumbs: arrayOf(
-          closedObject(
-            {
-              id: nonEmptyString,
-              kind: nonEmptyString,
-              label: nonEmptyString,
-              title: nonEmptyString,
-            },
-            ["id", "kind", "label"],
+      provision: closedObject(
+        {
+          entityId: nonEmptyString,
+          kind: {
+            type: "string",
+            enum: ["article", "recital", "annex", "other"],
+          },
+          contentRole: { type: "string", enum: contentRoleSchema.options },
+          collectionId: {
+            type: "string",
+            enum: ["articles", "recitals", "annexes", "provisions"],
+          },
+          number: nonEmptyString,
+          label: nonEmptyString,
+          title: nullableString,
+          breadcrumbs: arrayOf(
+            closedObject(
+              {
+                id: nonEmptyString,
+                kind: nonEmptyString,
+                label: nonEmptyString,
+                title: nonEmptyString,
+              },
+              ["id", "kind", "label"],
+            ),
           ),
-        ),
-        previousEntityId: nullableString,
-        nextEntityId: nullableString,
-        sourceLocator: reference("SourceLocator"),
-        blocks: arrayOf(reference("TextBlock")),
-      }),
+          previousEntityId: nullableString,
+          nextEntityId: nullableString,
+          sourceLocator: reference("SourceLocator"),
+          officialSourceUrl: { type: "string", format: "uri" },
+          blocks: arrayOf(reference("TextBlock")),
+        },
+        [
+          "entityId",
+          "kind",
+          "collectionId",
+          "number",
+          "label",
+          "title",
+          "breadcrumbs",
+          "previousEntityId",
+          "nextEntityId",
+          "sourceLocator",
+          "blocks",
+        ],
+      ),
       source: closedObject({
         officialUrl: { type: "string", format: "uri" },
         sourceSnapshotId: nonEmptyString,
@@ -391,14 +592,25 @@ const schemas = {
   ProvisionRelationshipsResponse: closedObject({
     meta: reference("Meta"),
     data: closedObject({
-      provision: closedObject({
-        entityId: nonEmptyString,
-        documentId: nonEmptyString,
-        documentShortName: nonEmptyString,
-        kind: nonEmptyString,
-        label: nonEmptyString,
-        title: nullableString,
-      }),
+      provision: closedObject(
+        {
+          entityId: nonEmptyString,
+          documentId: nonEmptyString,
+          documentShortName: nonEmptyString,
+          kind: nonEmptyString,
+          contentRole: { type: "string", enum: contentRoleSchema.options },
+          label: nonEmptyString,
+          title: nullableString,
+        },
+        [
+          "entityId",
+          "documentId",
+          "documentShortName",
+          "kind",
+          "label",
+          "title",
+        ],
+      ),
       relationshipCount: { type: "integer", minimum: 0 },
       groups: reference("RelationshipGroups"),
     }),

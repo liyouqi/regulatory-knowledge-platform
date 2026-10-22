@@ -15,7 +15,7 @@ describe("corpus build manifest", () => {
     const sources = validateCorpusBuildManifestSources(manifest);
 
     expect(sources).toHaveLength(manifest.sources.length);
-    expect(sources).toHaveLength(101);
+    expect(sources).toHaveLength(121);
     expect(sources).toContainEqual(
       expect.objectContaining({
         manifest: expect.objectContaining({

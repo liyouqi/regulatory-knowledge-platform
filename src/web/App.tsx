@@ -65,6 +65,7 @@ import {
   implementationTimelinePath,
   isLevel2MandateQueryPath,
   parseApplicabilityPath,
+  parseCountryPath,
   parseDossierPath,
   parseEbaQaPath,
   parseExplorerPath,
@@ -94,6 +95,7 @@ import {
   trackProductEvent,
 } from "../telemetry/web/product-analytics";
 import { ApplicabilityPage } from "./ApplicabilityPage";
+import { CountryPage } from "./CountryPage";
 import { DocumentVersionHistory } from "./DocumentVersionHistory";
 import { ExplorerPage } from "./ExplorerPage";
 import { GlobalLawSearch } from "./GlobalLawSearch";
@@ -104,6 +106,7 @@ import { Level2MandateQueryPage } from "./Level2MandateQueryPage";
 import { RegulatoryPathPage } from "./RegulatoryPathPage";
 import { RegulatoryTopicPage } from "./RegulatoryTopicPage";
 import { SourceStatusNotice } from "./SourceStatusNotice";
+import { StructuredContent } from "./StructuredContent";
 import { SupervisoryDecisionsPage } from "./SupervisoryDecisionsPage";
 import { type ThemeMode, ThemeToggle } from "./ThemeToggle";
 import { definedTermRanges } from "./defined-terms";
@@ -195,6 +198,7 @@ function TocTree({
 
 function LegalBlock({
   block,
+  language,
   definitions,
   provisionPath,
   relationships,
@@ -202,6 +206,7 @@ function LegalBlock({
   onPreview,
 }: {
   block: BodyBlock;
+  language?: "en" | "de" | "fr";
   definitions: DefinitionSearchResult[];
   provisionPath: string;
   relationships: ProvisionRelationship[];
@@ -262,6 +267,13 @@ function LegalBlock({
     setCopied(true);
     globalThis.setTimeout(() => setCopied(false), 1600);
   }
+
+  if (block.contentLayout)
+    return (
+      <div className={`legal-block ${block.kind}`} id={block.anchor}>
+        <StructuredContent block={block} language={language} />
+      </div>
+    );
 
   return (
     <div className={`legal-block ${block.kind}`} id={block.anchor}>
@@ -360,6 +372,7 @@ function LegalBlock({
             {run.children.map((child) => (
               <LegalBlock
                 block={child}
+                language={language}
                 definitions={definitions}
                 key={child.id}
                 onDefinitionPreview={onDefinitionPreview}
@@ -1387,6 +1400,9 @@ function ReaderPage({
               <ShieldCheck aria-hidden="true" size={15} /> Applicability
             </Link>
           ) : null}
+          <Link className="view-switch" to="/countries">
+            Countries
+          </Link>
           {documentSummary?.hasTopicAssignments ? (
             <Link className="view-switch" to={topicCatalogPath()}>
               <RouteIcon aria-hidden="true" size={15} /> Topics
@@ -1473,6 +1489,30 @@ function ReaderPage({
         {legalDocument.sourceStatus ? (
           <SourceStatusNotice status={legalDocument.sourceStatus} />
         ) : null}
+        {legalDocument.scopedSourceNotes
+          ?.filter(
+            (note) =>
+              note.scope === "document" ||
+              activeProvision.breadcrumbs.some(
+                (entry) => entry.id === note.ownerId,
+              ),
+          )
+          .map((note) => (
+            <section
+              className="publisher-context-note"
+              key={`${note.ownerId}:${note.position}`}
+              data-note-owner={note.ownerId}
+              data-copilot-ignore-selection="true"
+            >
+              <p className="source-content-label">
+                Publisher context: {note.ownerLabel}
+              </p>
+              <StructuredContent
+                block={note.block}
+                language={legalDocument.language}
+              />
+            </section>
+          ))}
         <p className="provision-label">{activeProvision.label}</p>
         {activeProvision.title ? (
           <h2 id="provision-title">{activeProvision.title}</h2>
@@ -1485,6 +1525,7 @@ function ReaderPage({
           {activeProvision.blocks.map((block) => (
             <LegalBlock
               block={block}
+              language={legalDocument.language}
               definitions={inlineDefinitions}
               key={block.id}
               onDefinitionPreview={setPreviewDefinition}
@@ -1715,6 +1756,7 @@ export function App() {
     location.pathname.startsWith("/monitor/");
   const earth =
     location.pathname === "/earth" || location.pathname.startsWith("/earth/");
+  const country = parseCountryPath(location.pathname);
   const explorer = parseExplorerPath(location.pathname);
   const ebaQa = parseEbaQaPath(location.pathname);
   const dossier = parseDossierPath(location.pathname);
@@ -1776,6 +1818,13 @@ export function App() {
     <>
       {monitor ? (
         <MonitorPage />
+      ) : country ? (
+        <CountryPage
+          code={country.code}
+          onOpenSearch={() => setSearchOpen(true)}
+          onToggleTheme={toggleTheme}
+          theme={theme}
+        />
       ) : regulatoryTopic ? (
         <RegulatoryTopicPage
           onOpenSearch={() => setSearchOpen(true)}

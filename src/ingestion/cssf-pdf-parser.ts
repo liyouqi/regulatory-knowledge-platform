@@ -1,5 +1,9 @@
 import { CANONICAL_SCHEMA_VERSION } from "../canonical/schema";
-import type { CanonicalDocument, Provision } from "../canonical/schema";
+import type {
+  CanonicalDocument,
+  LegacyCanonicalDocument,
+  Provision,
+} from "../canonical/schema";
 import { sha256, validateCanonicalDocument } from "../canonical/validate";
 import { buildCssfConsolidatedCircularFromSemanticEvents } from "./cssf-consolidated-pdf-parser";
 import type { CssfSourceSnapshot } from "./cssf-snapshot";
@@ -102,7 +106,7 @@ export function buildCssfCircularFromSemanticEvents(
   }
   const documentId = cssfDocumentLogicalId(source.localId);
   const sourceVersion = `cssf-pdf-${CSSF_PDF_PARSER_VERSION}-${snapshot.content.sha256.slice(7, 19)}`;
-  const structuralNodes: CanonicalDocument["structuralNodes"] = [];
+  const structuralNodes: LegacyCanonicalDocument["structuralNodes"] = [];
   const roots: MutableProvision[] = [];
   const introduction: MutableProvision = {
     logicalId: `${documentId}:provision:introduction`,
@@ -120,7 +124,9 @@ export function buildCssfCircularFromSemanticEvents(
   roots.push(introduction);
   const warnings: string[] = [];
   const introductionNotes: MutableProvision[] = [];
-  let currentChapter: CanonicalDocument["structuralNodes"][number] | undefined;
+  let currentChapter:
+    | LegacyCanonicalDocument["structuralNodes"][number]
+    | undefined;
   let currentRoot: MutableProvision | undefined;
   let currentLetter: MutableProvision | undefined;
   let introductionBlock = 0;

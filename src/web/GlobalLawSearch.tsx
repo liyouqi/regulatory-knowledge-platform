@@ -104,7 +104,10 @@ function LawResultRow({
             ? result.documentType
             : result.measureType.toUpperCase()}
           {" · "}
-          {result.publicationDate.slice(0, 4)} · {identifierLabel(result)}
+          {result.publicationDate
+            ? result.publicationDate.slice(0, 4)
+            : `Publisher version ${result.publisherVersionDate}; publication date not recorded`}{" "}
+          · {identifierLabel(result)}
         </span>
       </span>
       <span className="law-result-action">

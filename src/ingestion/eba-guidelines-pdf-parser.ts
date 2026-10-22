@@ -1,5 +1,9 @@
 import { CANONICAL_SCHEMA_VERSION } from "../canonical/schema";
-import type { CanonicalDocument, Provision } from "../canonical/schema";
+import type {
+  CanonicalDocument,
+  LegacyCanonicalDocument,
+  Provision,
+} from "../canonical/schema";
 import { sha256, validateCanonicalDocument } from "../canonical/validate";
 import type { EbaSourceSnapshot } from "./eba-snapshot";
 import type { EbaSourceDefinition } from "./eba-source-registry";
@@ -106,7 +110,7 @@ export function buildEbaGuidelinesFromSemanticEvents(
   }
   const documentId = source.documentId;
   const sourceVersion = `eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}-${snapshot.content.sha256.slice(7, 19)}`;
-  const structuralNodes: CanonicalDocument["structuralNodes"] = [];
+  const structuralNodes: LegacyCanonicalDocument["structuralNodes"] = [];
   const roots: MutableProvision[] = [];
   const warnings = [
     "Excluded Final Report front matter on PDF pages 1-12 from the Guidelines legal body.",

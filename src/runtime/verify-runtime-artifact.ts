@@ -10,6 +10,7 @@ export interface RuntimeArtifactVerification {
   profileId: string;
   profileVersion: string;
   profileHash: string;
+  countries: number;
   documents: number;
   records: number;
   definitions: number;
@@ -47,11 +48,26 @@ export interface RuntimeArtifactVerification {
 
 export function verifyRuntimeArtifact(
   databasePath = runtimeDatabasePath(),
+  expectedDocumentIds?: ReadonlySet<string>,
 ): RuntimeArtifactVerification {
   const search = new SearchService(databasePath);
   const repository = new SqliteRuntimeRepository(databasePath);
   try {
     const documents = repository.listDocumentViews();
+    // Repository reads already perform complete Reader validation.
+    if (expectedDocumentIds !== undefined) {
+      const actualIds = new Set(documents.map((document) => document.id));
+      const missing = [...expectedDocumentIds].filter(
+        (id) => !actualIds.has(id),
+      );
+      const unexpected = [...actualIds].filter(
+        (id) => !expectedDocumentIds.has(id),
+      );
+      if (missing.length || unexpected.length)
+        throw new Error(
+          `Runtime documents differ from the source registries: missing [${missing.join(", ")}], unexpected [${unexpected.join(", ")}]`,
+        );
+    }
     const summaries = repository.listDocumentSummaries();
     if (documents.length !== search.documentCount) {
       throw new Error(
@@ -81,6 +97,7 @@ export function verifyRuntimeArtifact(
       profileId: repository.profileId,
       profileVersion: repository.profileVersion,
       profileHash: repository.profileHash,
+      countries: repository.countryCount,
       documents: documents.length,
       records: search.recordCount,
       definitions: search.definitionCount,

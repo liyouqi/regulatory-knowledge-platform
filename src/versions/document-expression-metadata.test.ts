@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   loadDocumentExpressionMetadataDataset,
@@ -14,6 +16,10 @@ function registeredDocumentIds(): Set<string> {
       (source) => `lu:cssf:${source.localId}`,
     ),
     ...loadEbaSourceRegistrySync().map((source) => source.documentId),
+    ...loadNationalSourceRegistrySync().map((source) => source.documentId),
+    ...loadAmfSourceRegistrySync()
+      .filter((source) => source.status === "active")
+      .map((source) => source.documentId),
   ]);
 }
 
@@ -38,7 +44,7 @@ describe("reviewed document Expression metadata", () => {
     const registered = registeredDocumentIds();
     const selected = selectDocumentExpressionMetadata(registered, dataset);
 
-    expect(selected).toHaveLength(101);
+    expect(selected).toHaveLength(121);
     expect(new Set(selected.map((record) => record.documentId))).toEqual(
       registered,
     );

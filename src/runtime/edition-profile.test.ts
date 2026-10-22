@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { loadDocumentViews } from "../data/document-repository";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import {
   compileEditionProfile,
@@ -15,6 +17,8 @@ const sources = [
   ...loadSourceRegistrySync(),
   ...loadCssfSourceRegistrySync(),
   ...loadEbaSourceRegistrySync(),
+  ...loadNationalSourceRegistrySync(),
+  ...loadAmfSourceRegistrySync().filter((source) => source.status === "active"),
 ];
 const registry = loadEditionProfileRegistrySync();
 
@@ -33,7 +37,7 @@ describe("Edition/Profile compilation", () => {
     ).toBe(false);
   });
 
-  it("keeps stable IDs while excluding the complete MiCA family", () => {
+  it("keeps stable IDs while excluding MiCA and the unselected financial families", () => {
     const full = compileEditionProfile(
       findEditionProfile("full-corpus", registry),
       documents,
@@ -68,7 +72,25 @@ describe("Edition/Profile compilation", () => {
       banking.sources.some((source) => source.familyId === "family:mica"),
     ).toBe(false);
     expect(banking.excludedCelexes).toEqual(
-      new Set(["32023R1114", "32025R0305"]),
+      new Set([
+        "32023R1114",
+        "32025R0305",
+        "32009L0065",
+        "32011L0061",
+        "32013R0231",
+        "32024L0927",
+        "32010L0043",
+        "32016R0438",
+        "32014R0596",
+        "32017R1129",
+        "32014R1286",
+        "32016R1011",
+        "32019R2033",
+        "32019L2034",
+        "32010L0044",
+        "32017R1131",
+        "32015R0760",
+      ]),
     );
     expect(
       banking.documents.find((document) => document.id === "eu:32022R2554")?.id,

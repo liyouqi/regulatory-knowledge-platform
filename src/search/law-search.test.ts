@@ -249,3 +249,39 @@ describe("Find Laws deterministic ranking", () => {
     ).toEqual(["ai-act", "dora", "nis2"]);
   });
 });
+
+describe("AMF source article lookup", () => {
+  const amf: LawSearchRecord = {
+    ...base,
+    id: "fr:amf:rg",
+    slug: "amf-rg",
+    familyId: "family:national-fr",
+    shortName: "AMF RG",
+    aliases: ["Règlement général AMF"],
+    publicationDate: null,
+    publicationDateBasis: "aggregate-with-multiple-component-publications",
+    publisherVersionDate: "2026-09-11",
+    provisions: ["212-19", "212-19-bis", "422-120-8", "422-120-A"].map(
+      (number) => ({
+        kind: "article",
+        number,
+        label: `Article ${number}`,
+        path: `/read/amf-rg/articles/${number}`,
+      }),
+    ),
+  };
+  it.each(["212-19", "212-19-bis", "422-120-8", "422-120-A"])(
+    "keeps the full article number %s",
+    (number) => {
+      expect(
+        searchLaws([amf], `AMF RG article ${number}`).bestMatch,
+      ).toMatchObject({
+        publicationDate: null,
+        target: { number, path: `/read/amf-rg/articles/${number}` },
+      });
+    },
+  );
+  it("does not resolve a missing suffix to its base article", () => {
+    expect(searchLaws([amf], "AMF RG article 212-19-ter").results).toEqual([]);
+  });
+});

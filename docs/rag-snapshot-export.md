@@ -18,7 +18,7 @@ reviewed source and metadata
 
 The exporter opens the existing Runtime SQLite in read-only/query-only mode. It does not invoke source acquisition, inspect websites, parse raw files, or silently refresh legal data.
 
-`npm run corpus:update` does not change this boundary. It may report newer consolidated-expression candidates, but only the reviewed expression compiled into the selected Runtime can appear in an export. Candidate audit data, raw snapshots, quality drift, and update reports are not part of Snapshot contract 1.1.0.
+`npm run corpus:update` does not change this boundary. It may report newer consolidated-expression candidates, but only the reviewed expression compiled into the selected Runtime can appear in an export. Candidate audit data, raw snapshots, quality drift, and update reports are not part of Snapshot contract 1.3.0.
 
 ## Export
 
@@ -46,7 +46,7 @@ Generated snapshots live under ignored `exports/`; they are transfer artifacts, 
 
 The earlier local snapshot `full-corpus-en-2026-08-31` used contract 1.0.0 and is superseded because it did not preserve mixed text/list source order. Do not import it. Immutable snapshots are not repaired in place; the corrected handoff is the separately named `full-corpus-en-2026-08-31-r2` snapshot.
 
-## Snapshot contract 1.1.0
+## Snapshot contract 1.3.0
 
 ```text
 regulatory-export-<snapshot-id>/
@@ -65,7 +65,11 @@ Every JSONL line is one complete UTF-8 JSON object. Every file ends in a newline
 - byte size and SHA-256 of every JSONL file;
 - export schema and generator versions.
 
-The current contract is English-only. `documents.jsonl` emits one loaded Legal Work per line and embeds its single English Expression. It preserves Platform stable IDs, CELEX or authority-local identifiers, family, Level, measure type, official source, issuer names, source snapshot/version, and text-as-of date. Every Expression states `text_kind`, `currency_status`, the reviewed version-selection policy, and a fallback reason when the loaded text is not consolidated. `not_assessed` is an explicit review outcome and must not be interpreted as current.
+`documents.jsonl` emits one loaded Legal Work per line and embeds its single reviewed Expression. Document, Expression, and Provision `language` values are `en`, `de` or `fr` and must agree. Expression IDs end in the actual language (`@en`, `@de` or `@fr`); existing English stable IDs and original text are unchanged. `manifest.languages` is the sorted, deduplicated set present in the exported documents. Language identifies the text language only: it does not indicate a translation, determine governing law, or establish legal applicability. The exporter rejects a conflict between an explicit Reader language and reviewed Expression metadata, and German and French documents cannot fall back to English. The contract preserves Platform stable IDs, CELEX or authority-local identifiers, family, Level, measure type, official source, issuer names, source snapshot/version, and text-as-of date. Every Expression states `text_kind`, `currency_status`, the reviewed version-selection policy, and a fallback reason when the loaded text is not consolidated. `not_assessed` is an explicit review outcome and must not be interpreted as current.
+
+Optional `source_status` fields preserve `text_authority_status`, `text_as_of_basis`, `authority_note`, and `source_notes` on both Document and Expression. Missing optional fields remain missing. German source records must carry `text_authority_status=non-authoritative-consolidation`; a date with `text_as_of_basis=last-amendment-act-date` is the last amendment act date, not an asserted effective date.
+
+French AMF records use `date_document: null`, `publication_date_basis=aggregate-with-multiple-component-publications` and Expression `retrieved_at: null`. Expression `imported_at`, `captured_on`, `capture_date_basis` and `retrieval_timestamp_basis` record the actual import time and date-only archived capture evidence; it never invents an acquisition timestamp. `text_as_of=2026-09-11` is a publisher version label, with `text_authority_status=publisher-consolidation` and `text_as_of_basis=publisher-version-date`; currency remains `not_assessed`. The document includes 693 `structure_owner_ids` and 64 `scoped_source_notes`, each with owner ID/URL/label, original position, exact block and `content_hash`. These notes are excluded from provision text and relationship endpoints. The other 68 notes remain article `source_notes`; full source article URLs distinguish `212-19` from `212-19 bis`. French and German inline runs concatenate directly in source order; the legacy English policy is unchanged.
 
 Lifecycle, applicability dates, and legal effect remain `null` when the current Platform record does not assert them. Importers must preserve `null` as “not asserted”; they must not convert it to `active`, `current`, or `binding` by inference. `document_stage=published` only states that the loaded source is a published instrument.
 
@@ -81,12 +85,14 @@ Lifecycle, applicability dates, and legal effect remain `null` when the current 
 - `direct_text` for the entity's own source text;
 - `text` for deterministic subtree text when children exist;
 - `text_scope` so a RAG chunker can avoid accidental duplicate indexing.
+- machine-readable `content_role` (`operative-text`, `source-note`, or `toc`). Missing Reader roles default to `operative-text`; explicit TOC roles remain `toc`.
+- `source_notes` as separate `{content_role, text, source_locator, content_index}` records. Source-note text is excluded from `direct_text`, `text`, and ordered operative text and receives no synthetic stable ID.
 
 Root Article records normally have `text_scope=subtree`. Paragraphs containing points also have subtree text; their point records remain independently addressable. A RAG importer should deliberately choose its chunk granularity instead of indexing every `text` field blindly.
 
 The ordered-content contract is required for structures where a paragraph contains introductory text, a nested list, and a trailing subparagraph. The release verifier includes a reviewed semantic case for AMLD IV Article 13(1): its intro, points (a)–(d), and trailing text must remain in that order.
 
-Formula image resources remain outside Snapshot contract 1.1.0. When a Reader block interleaves text/children with a formula resource, the exporter omits the non-text resource and renumbers the remaining `ordered_content_blocks` contiguously without changing their relative order or `direct_text`. This keeps the existing contract valid for consolidated CRR provisions without pretending that an omitted formula is text.
+Formula image resources remain outside Snapshot contract 1.3.0. When a Reader block interleaves text/children with a formula resource, the exporter omits the non-text resource and renumbers the remaining operative `ordered_content_blocks` contiguously without changing their relative order or `direct_text`. This keeps the contract valid for consolidated CRR provisions without pretending that an omitted formula is text.
 
 `relationships.jsonl` preserves relationship direction, Platform type, RAG-friendly normalized type, stable endpoints, exact evidence, official source, provenance, builder identity, resolution status, and per-record review status. It includes:
 
@@ -137,6 +143,6 @@ Two non-blocking corrections are queued for the next ordinary Platform data upda
 
 These corrections preserve Work IDs, Provision IDs, and relationship semantics. They must be released as a new complete immutable snapshot ID; never overwrite the existing r2 handoff.
 
-## Deliberate 1.1 omissions
+## Deliberate 1.2 omissions
 
-Snapshot 1.1.0 does not export chunks, embeddings, indexes, answers, UI data, or API/MCP transport. It also does not yet publish multilingual Expressions, the regulatory Domain/Topic taxonomy, applicability projections, or implementation timelines as separate interchange files. Those are future contract additions and must require a schema-version review rather than being smuggled into existing fields.
+Snapshot 1.3.0 does not export chunks, embeddings, indexes, answers, UI data, or API/MCP transport. It also does not publish the regulatory Domain/Topic taxonomy, applicability projections, or implementation timelines as separate interchange files. Those remain future contract additions and must require a schema-version review. The verifier continues to accept immutable English 1.1.0 and English/German 1.2.0 snapshots with their original shapes and generator versions. Older contracts do not accept the French additions.

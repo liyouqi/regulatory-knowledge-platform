@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { contentRoleSchema } from "./content-unit";
 import { provisionRelationshipsResponseSchema } from "./legal";
 import { documentRegulatoryContextSchema } from "./regulatory-context";
 import { sourceLocatorSchema } from "./source-locator";
@@ -20,6 +21,7 @@ export const citationTextSegmentSchema = z
       "annex-part",
       "other",
     ]),
+    contentRole: contentRoleSchema.optional(),
     marker: z.string().min(1).optional(),
     text: z.string(),
     anchor: z.string().min(1),
@@ -53,7 +55,8 @@ export const citationContextSchema = z
     document: z
       .object({
         id: z.string().min(1),
-        jurisdiction: z.enum(["EU", "LU"]),
+        jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
+        language: z.enum(["en", "de", "fr"]).optional(),
         shortName: z.string().min(1),
         officialTitle: z.string().min(1),
         documentType: z.enum([
@@ -79,6 +82,7 @@ export const citationContextSchema = z
       .object({
         entityId: z.string().min(1),
         rootProvisionId: z.string().min(1),
+        contentRole: contentRoleSchema.optional(),
         kind: z.string().min(1),
         label: z.string().min(1),
         title: z.string().nullable(),

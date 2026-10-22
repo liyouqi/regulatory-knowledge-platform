@@ -27,9 +27,9 @@ describe("release corpus verification", () => {
   it("verifies EUR-Lex, CSSF, and EBA registries through Runtime", async () => {
     const verification = await verifyCorpus();
     expect(verification).toMatchObject({
-      sourceRegistryDocuments: 101,
-      canonicalDocuments: 101,
-      runtimeDocuments: 101,
+      sourceRegistryDocuments: 121,
+      canonicalDocuments: 121,
+      runtimeDocuments: 121,
       runtimeProfileId: "full-corpus",
     });
     expect(verification.verifiedRawSnapshots).toBeGreaterThanOrEqual(

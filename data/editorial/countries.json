@@ -1,0 +1,454 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "2026-10-20",
+  "countries": [
+    {
+      "code": "LU",
+      "slug": "lu",
+      "name": "Luxembourg",
+      "nameZh": "卢森堡",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Legilux",
+        "url": "https://legilux.public.lu/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "FR",
+      "slug": "fr",
+      "name": "France",
+      "nameZh": "法国",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Légifrance",
+        "url": "https://www.legifrance.gouv.fr/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "DE",
+      "slug": "de",
+      "name": "Germany",
+      "nameZh": "德国",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Gesetze im Internet",
+        "url": "https://www.gesetze-im-internet.de/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.015040Z",
+        "evidenceUrl": "https://www.gesetze-im-internet.de/"
+      }
+    },
+    {
+      "code": "IE",
+      "slug": "ie",
+      "name": "Ireland",
+      "nameZh": "爱尔兰",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Irish Statute Book",
+        "url": "https://www.irishstatutebook.ie/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.015355Z",
+        "evidenceUrl": "https://www.irishstatutebook.ie/"
+      }
+    },
+    {
+      "code": "NL",
+      "slug": "nl",
+      "name": "Netherlands",
+      "nameZh": "荷兰",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Overheid.nl wetten",
+        "url": "https://wetten.overheid.nl/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.015561Z",
+        "evidenceUrl": "https://wetten.overheid.nl/"
+      }
+    },
+    {
+      "code": "IT",
+      "slug": "it",
+      "name": "Italy",
+      "nameZh": "意大利",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Normattiva",
+        "url": "https://www.normattiva.it/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.320982Z",
+        "evidenceUrl": "https://www.normattiva.it/"
+      }
+    },
+    {
+      "code": "ES",
+      "slug": "es",
+      "name": "Spain",
+      "nameZh": "西班牙",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "BOE",
+        "url": "https://www.boe.es/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.323569Z",
+        "evidenceUrl": "https://www.boe.es/"
+      }
+    },
+    {
+      "code": "BE",
+      "slug": "be",
+      "name": "Belgium",
+      "nameZh": "比利时",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "eJustice",
+        "url": "https://www.ejustice.just.fgov.be/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "AT",
+      "slug": "at",
+      "name": "Austria",
+      "nameZh": "奥地利",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "RIS",
+        "url": "https://www.ris.bka.gv.at/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.611221Z",
+        "evidenceUrl": "https://www.ris.bka.gv.at/"
+      }
+    },
+    {
+      "code": "PT",
+      "slug": "pt",
+      "name": "Portugal",
+      "nameZh": "葡萄牙",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Diário da República",
+        "url": "https://diariodarepublica.pt/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "BG",
+      "slug": "bg",
+      "name": "Bulgaria",
+      "nameZh": "保加利亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "State Gazette",
+        "url": "https://dv.parliament.bg/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "HR",
+      "slug": "hr",
+      "name": "Croatia",
+      "nameZh": "克罗地亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Narodne novine",
+        "url": "https://narodne-novine.nn.hr/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "CY",
+      "slug": "cy",
+      "name": "Cyprus",
+      "nameZh": "塞浦路斯",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Government Printer",
+        "url": "https://www.mof.gov.cy/gpo",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "CZ",
+      "slug": "cz",
+      "name": "Czechia",
+      "nameZh": "捷克",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "e-Sbírka",
+        "url": "https://www.e-sbirka.cz/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "DK",
+      "slug": "dk",
+      "name": "Denmark",
+      "nameZh": "丹麦",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Retsinformation",
+        "url": "https://www.retsinformation.dk/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "EE",
+      "slug": "ee",
+      "name": "Estonia",
+      "nameZh": "爱沙尼亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Riigi Teataja",
+        "url": "https://www.riigiteataja.ee/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "FI",
+      "slug": "fi",
+      "name": "Finland",
+      "nameZh": "芬兰",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Finlex",
+        "url": "https://www.finlex.fi/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "GR",
+      "slug": "gr",
+      "name": "Greece",
+      "nameZh": "希腊",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Εθνικό Τυπογραφείο",
+        "url": "https://www.et.gr/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "HU",
+      "slug": "hu",
+      "name": "Hungary",
+      "nameZh": "匈牙利",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "National Legislation Database",
+        "url": "https://njt.hu/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "LV",
+      "slug": "lv",
+      "name": "Latvia",
+      "nameZh": "拉脱维亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Likumi.lv",
+        "url": "https://likumi.lv/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "LT",
+      "slug": "lt",
+      "name": "Lithuania",
+      "nameZh": "立陶宛",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "e-TAR",
+        "url": "https://www.e-tar.lt/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "MT",
+      "slug": "mt",
+      "name": "Malta",
+      "nameZh": "马耳他",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Legislation Malta",
+        "url": "https://legislation.mt/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "PL",
+      "slug": "pl",
+      "name": "Poland",
+      "nameZh": "波兰",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "ELI",
+        "url": "https://eli.gov.pl/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "RO",
+      "slug": "ro",
+      "name": "Romania",
+      "nameZh": "罗马尼亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Legislatie",
+        "url": "https://legislatie.just.ro/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "SK",
+      "slug": "sk",
+      "name": "Slovakia",
+      "nameZh": "斯洛伐克",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Slov-Lex",
+        "url": "https://www.slov-lex.sk/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "SI",
+      "slug": "si",
+      "name": "Slovenia",
+      "nameZh": "斯洛文尼亚",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "PISRS",
+        "url": "https://pisrs.si/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "SE",
+      "slug": "se",
+      "name": "Sweden",
+      "nameZh": "瑞典",
+      "group": "EU",
+      "legislationPortal": {
+        "label": "Svensk författningssamling",
+        "url": "https://svenskforfattningssamling.se/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "NO",
+      "slug": "no",
+      "name": "Norway",
+      "nameZh": "挪威",
+      "group": "EEA-EFTA",
+      "legislationPortal": {
+        "label": "Lovdata",
+        "url": "https://lovdata.no/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "IS",
+      "slug": "is",
+      "name": "Iceland",
+      "nameZh": "冰岛",
+      "group": "EEA-EFTA",
+      "legislationPortal": {
+        "label": "Althingi",
+        "url": "https://www.althingi.is/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "LI",
+      "slug": "li",
+      "name": "Liechtenstein",
+      "nameZh": "列支敦士登",
+      "group": "EEA-EFTA",
+      "legislationPortal": {
+        "label": "Liechtenstein legal information",
+        "url": "https://www.gesetze.li/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    },
+    {
+      "code": "GB",
+      "slug": "gb",
+      "name": "United Kingdom",
+      "nameZh": "英国",
+      "group": "OTHER",
+      "legislationPortal": {
+        "label": "Legislation.gov.uk",
+        "url": "https://www.legislation.gov.uk/",
+        "reviewStatus": "reviewed",
+        "checkedAt": "2026-10-20T16:35:03.907812Z",
+        "evidenceUrl": "https://www.legislation.gov.uk/"
+      }
+    },
+    {
+      "code": "CH",
+      "slug": "ch",
+      "name": "Switzerland",
+      "nameZh": "瑞士",
+      "group": "OTHER",
+      "legislationPortal": {
+        "label": "Fedlex",
+        "url": "https://www.fedlex.admin.ch/",
+        "reviewStatus": "pending",
+        "checkedAt": null,
+        "evidenceUrl": "https://e-justice.europa.eu/topics/legislation-and-case-law/national-legislation_en"
+      }
+    }
+  ]
+}

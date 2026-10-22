@@ -11,6 +11,12 @@ import { dirname, relative, resolve } from "node:path";
 import { z } from "zod";
 import { FORMEX_PARSER_VERSION } from "../canonical/versions";
 import { loadDocumentViews } from "../data/document-repository";
+import { AMF_HTML_PARSER_VERSION } from "../ingestion/amf-canonical-parser";
+import { readVerifiedAmfSourceSnapshot } from "../ingestion/amf-snapshot";
+import {
+  type AmfSourceDefinition,
+  loadAmfSourceRegistrySync,
+} from "../ingestion/amf-source-registry";
 import { CSSF_HTML_PARSER_VERSION } from "../ingestion/cssf-html-parser";
 import { CSSF_PDF_PARSER_VERSION } from "../ingestion/cssf-pdf-parser";
 import { readVerifiedCssfSourceSnapshot } from "../ingestion/cssf-snapshot";
@@ -24,6 +30,12 @@ import {
   type EbaSourceDefinition,
   loadEbaSourceRegistrySync,
 } from "../ingestion/eba-source-registry";
+import { readVerifiedNationalSourceSnapshot } from "../ingestion/national-snapshot";
+import {
+  type NationalSourceDefinition,
+  loadNationalSourceRegistrySync,
+} from "../ingestion/national-source-registry";
+import { NATIONAL_XML_PARSER_VERSION } from "../ingestion/national-xml-parser";
 import { readVerifiedSourceSnapshot } from "../ingestion/snapshot";
 import {
   type SourceDefinition,
@@ -64,7 +76,7 @@ const retentionSchema = z.discriminatedUnion("status", [
 
 export const corpusBuildSourceSchema = z
   .object({
-    adapter: z.enum(["eur-lex", "cssf", "eba"]),
+    adapter: z.enum(["eur-lex", "cssf", "eba", "national", "amf"]),
     identifier: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9-]*$/u),
     snapshotId: z.string().startsWith("snapshot:"),
     contentSha256: sha256Schema,
@@ -126,7 +138,12 @@ export interface CorpusBuildOptions {
 }
 
 interface RegisteredCorpusSource {
-  definition: SourceDefinition | CssfSourceDefinition | EbaSourceDefinition;
+  definition:
+    | SourceDefinition
+    | CssfSourceDefinition
+    | EbaSourceDefinition
+    | NationalSourceDefinition
+    | AmfSourceDefinition;
   manifest: CorpusBuildSource;
   parserVersion: string;
 }
@@ -221,15 +238,20 @@ export function selectManifestSnapshotPath(
 }
 
 function findSnapshotPath(source: CorpusBuildSource): string {
-  const root = resolve(
+  const baseRoot = resolve(
     process.cwd(),
     source.adapter === "eur-lex"
       ? "data/raw/eur-lex"
       : source.adapter === "cssf"
         ? "data/raw/cssf"
-        : "data/raw/eba",
-    source.identifier,
+        : source.adapter === "eba"
+          ? "data/raw/eba"
+          : source.adapter === "amf"
+            ? "data/raw/amf-snapshots"
+            : "data/raw/national",
   );
+  const root =
+    source.adapter === "amf" ? baseRoot : resolve(baseRoot, source.identifier);
   const matches = snapshotDirectories(root).filter((directory) => {
     const value = JSON.parse(
       readFileSync(resolve(directory, "snapshot.json"), "utf8"),
@@ -244,11 +266,17 @@ function assertExactCoverage(
   euSources: SourceDefinition[],
   cssfSources: CssfSourceDefinition[],
   ebaSources: EbaSourceDefinition[],
+  nationalSources: NationalSourceDefinition[],
+  amfSources: AmfSourceDefinition[] = loadAmfSourceRegistrySync().filter(
+    (s) => s.status === "active",
+  ),
 ): void {
   const expected = new Set([
     ...euSources.map((source) => `eur-lex:${source.celex}`),
     ...cssfSources.map((source) => `cssf:${source.localId}`),
     ...ebaSources.map((source) => `eba:${source.localId}`),
+    ...nationalSources.map((source) => `national:${source.localId}`),
+    ...amfSources.map((source) => `amf:${source.localId}`),
   ]);
   const actual = new Set(
     manifest.sources.map((source) => `${source.adapter}:${source.identifier}`),
@@ -275,7 +303,9 @@ function assertExactCanonicalDocuments(
         ? `eu:${source.manifest.identifier}`
         : source.manifest.adapter === "cssf"
           ? `lu:cssf:${source.manifest.identifier}`
-          : (source.definition as EbaSourceDefinition).documentId,
+          : source.manifest.adapter === "eba"
+            ? (source.definition as EbaSourceDefinition).documentId
+            : (source.definition as NationalSourceDefinition).documentId,
     ),
   );
   const actual = new Set(documents.map((document) => document.id));
@@ -290,12 +320,20 @@ function assertExactCanonicalDocuments(
 
 function parserVersion(
   source: CorpusBuildSource,
-  definition: SourceDefinition | CssfSourceDefinition | EbaSourceDefinition,
+  definition:
+    | SourceDefinition
+    | CssfSourceDefinition
+    | EbaSourceDefinition
+    | NationalSourceDefinition
+    | AmfSourceDefinition,
 ): string {
   if (source.adapter === "eur-lex") return FORMEX_PARSER_VERSION;
+  if (source.adapter === "national")
+    return `national-xml-${NATIONAL_XML_PARSER_VERSION}`;
   if (source.adapter === "eba") {
     return `eba-pdf-${EBA_GUIDELINES_PDF_PARSER_VERSION}`;
   }
+  if (source.adapter === "amf") return `amf-html-${AMF_HTML_PARSER_VERSION}`;
   const cssf = definition as CssfSourceDefinition;
   return cssf.contentMediaType === "text/html"
     ? `cssf-html-${CSSF_HTML_PARSER_VERSION}`
@@ -308,7 +346,18 @@ export function validateCorpusBuildManifestSources(
   const euSources = loadSourceRegistrySync();
   const cssfSources = loadCssfSourceRegistrySync();
   const ebaSources = loadEbaSourceRegistrySync();
-  assertExactCoverage(manifest, euSources, cssfSources, ebaSources);
+  const nationalSources = loadNationalSourceRegistrySync();
+  const amfSources = loadAmfSourceRegistrySync().filter(
+    (source) => source.status === "active",
+  );
+  assertExactCoverage(
+    manifest,
+    euSources,
+    cssfSources,
+    ebaSources,
+    nationalSources,
+    amfSources,
+  );
 
   return manifest.sources.map((source) => {
     const definition =
@@ -318,21 +367,33 @@ export function validateCorpusBuildManifestSources(
           ? cssfSources.find(
               (candidate) => candidate.localId === source.identifier,
             )
-          : ebaSources.find(
-              (candidate) => candidate.localId === source.identifier,
-            );
+          : source.adapter === "eba"
+            ? ebaSources.find(
+                (candidate) => candidate.localId === source.identifier,
+              )
+            : source.adapter === "amf"
+              ? amfSources.find(
+                  (candidate) => candidate.localId === source.identifier,
+                )
+              : nationalSources.find(
+                  (candidate) => candidate.localId === source.identifier,
+                );
     if (!definition) {
       throw new Error(`Source is not registered: ${source.identifier}`);
     }
     const quality =
       source.adapter === "eur-lex"
         ? (definition as SourceDefinition).quality
-        : source.adapter === "eba"
-          ? (definition as EbaSourceDefinition).quality
-          : (definition as CssfSourceDefinition).contentMediaType ===
-              "text/html"
-            ? (definition as CssfSourceDefinition).quality
-            : (definition as CssfSourceDefinition).pdfQuality;
+        : source.adapter === "amf"
+          ? (definition as AmfSourceDefinition).quality
+          : source.adapter === "national"
+            ? (definition as NationalSourceDefinition).quality
+            : source.adapter === "eba"
+              ? (definition as EbaSourceDefinition).quality
+              : (definition as CssfSourceDefinition).contentMediaType ===
+                  "text/html"
+                ? (definition as CssfSourceDefinition).quality
+                : (definition as CssfSourceDefinition).pdfQuality;
     if (!quality) {
       throw new Error(
         `Source has no reviewed quality baseline: ${source.identifier}`,
@@ -376,7 +437,11 @@ export async function resolveCorpusBuildSources(
         ? await readVerifiedSourceSnapshot(snapshotPath)
         : source.adapter === "cssf"
           ? await readVerifiedCssfSourceSnapshot(snapshotPath)
-          : await readVerifiedEbaSourceSnapshot(snapshotPath);
+          : source.adapter === "eba"
+            ? await readVerifiedEbaSourceSnapshot(snapshotPath)
+            : source.adapter === "amf"
+              ? await readVerifiedAmfSourceSnapshot(snapshotPath)
+              : await readVerifiedNationalSourceSnapshot(snapshotPath);
     assertCorpusSnapshotChecksum(
       source.identifier,
       verified.snapshot.content.sha256,
@@ -396,13 +461,18 @@ function runCanonicalBuilder(source: ResolvedCorpusSource, outputPath: string) {
       ? "src/ingestion/canonical-cli.ts"
       : source.manifest.adapter === "cssf"
         ? "src/ingestion/cssf-canonical-cli.ts"
-        : "src/ingestion/eba-canonical-cli.ts";
+        : source.manifest.adapter === "eba"
+          ? "src/ingestion/eba-canonical-cli.ts"
+          : source.manifest.adapter === "amf"
+            ? "src/ingestion/amf-canonical-cli.ts"
+            : "src/ingestion/national-canonical-cli.ts";
   const result = spawnSync(
     process.execPath,
     [
       "--import",
       "tsx",
       script,
+      ...(source.manifest.adapter === "amf" ? ["build"] : []),
       "--snapshot",
       source.snapshotPath,
       "--output",
@@ -460,6 +530,8 @@ export async function buildCorpus(
         cssfHtml: CSSF_HTML_PARSER_VERSION,
         cssfPdf: CSSF_PDF_PARSER_VERSION,
         ebaPdf: EBA_GUIDELINES_PDF_PARSER_VERSION,
+        nationalXml: NATIONAL_XML_PARSER_VERSION,
+        amfHtml: AMF_HTML_PARSER_VERSION,
       },
     }),
   );
@@ -545,6 +617,10 @@ export async function buildCorpus(
       ...loadSourceRegistrySync(),
       ...loadCssfSourceRegistrySync(),
       ...loadEbaSourceRegistrySync(),
+      ...loadNationalSourceRegistrySync(),
+      ...loadAmfSourceRegistrySync().filter(
+        (source) => source.status === "active",
+      ),
     ];
     buildRuntimeDatabase(documents, runtimeSources, runtimePath, profile);
     const verification = verifyRuntimeArtifact(runtimePath);

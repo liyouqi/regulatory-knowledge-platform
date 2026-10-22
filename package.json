@@ -80,7 +80,16 @@
     "pretest": "npm run runtime:build -- --review-mode report",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "national:source:fetch": "node --import tsx src/ingestion/national-cli.ts fetch",
+    "national:source:verify": "node --import tsx src/ingestion/national-cli.ts verify",
+    "national:canonical:build": "node --import tsx src/ingestion/national-canonical-cli.ts",
+    "national:canonical:inspect": "node --import tsx src/ingestion/national-canonical-cli.ts --inspect",
+    "amf:candidate:inspect": "node --import tsx src/ingestion/amf-candidate-cli.ts",
+    "amf:source:import": "node --import tsx src/ingestion/amf-cli.ts import",
+    "amf:source:verify": "node --import tsx src/ingestion/amf-cli.ts verify",
+    "amf:canonical:build": "node --import tsx src/ingestion/amf-canonical-cli.ts build",
+    "amf:canonical:inspect": "node --import tsx src/ingestion/amf-canonical-cli.ts inspect"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",

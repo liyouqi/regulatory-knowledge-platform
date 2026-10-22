@@ -1,3 +1,4 @@
+import { contentUnitsText, projectContentUnits } from "../shared/content-unit";
 import type {
   BodyBlock,
   CollectionId,
@@ -184,7 +185,12 @@ function toBodyBlock(
       ? provision.numberRaw
       : provision.label
     : undefined;
+  const structured = provision.orderedUnits
+    ? projectContentUnits(provision.orderedUnits)
+    : undefined;
   return {
+    ...(provision.contentRole ? { contentRole: provision.contentRole } : {}),
+    ...(structured ? { contentLayout: structured.contentLayout } : {}),
     id: provision.logicalId,
     kind: bodyKind(provision),
     marker,
@@ -194,7 +200,9 @@ function toBodyBlock(
         : provision.text,
     anchor: relativeProvisionAnchor(rootId, provision.logicalId),
     sourceLocator: provision.sourceLocator,
-    orderedContent: orderedContent(provision, directChildren, resources),
+    orderedContent:
+      structured?.orderedContent ??
+      orderedContent(provision, directChildren, resources),
     children: nested,
   };
 }
@@ -281,7 +289,12 @@ function structuredToc(
       }),
     );
     return [...groups, ...directProvisions]
-      .filter((node) => node.type === "provision" || node.children.length > 0)
+      .filter(
+        (node) =>
+          document.schemaVersion === "1.5.0" ||
+          node.type === "provision" ||
+          node.children.length > 0,
+      )
       .sort((left, right) => left.displayOrder - right.displayOrder)
       .map(({ displayOrder: _displayOrder, ...node }) => node);
   }
@@ -350,6 +363,13 @@ export function toDocumentView(
         ? relativeProvisionAnchor(document.logicalId, provision.logicalId)
         : sourceNumber;
     return {
+      ...("officialSourceUrl" in provision &&
+      typeof provision.officialSourceUrl === "string"
+        ? { officialSourceUrl: provision.officialSourceUrl }
+        : {}),
+      ...((provision as Provision).contentRole
+        ? { contentRole: (provision as Provision).contentRole }
+        : {}),
       id: provision.logicalId,
       kind,
       collectionId,
@@ -420,6 +440,11 @@ export function toDocumentView(
   return {
     id: document.logicalId,
     jurisdiction: document.jurisdiction,
+    ...(document.schemaVersion === "1.5.0"
+      ? { language: "fr" as const }
+      : document.language === "de"
+        ? { language: "de" as const }
+        : {}),
     slug,
     celex: document.identifiers.celex,
     localId: document.identifiers.localId,
@@ -428,13 +453,57 @@ export function toDocumentView(
     documentType: document.documentType,
     sourceUrl: document.source.canonicalUrl,
     sourceSnapshotId: document.sourceSnapshotId,
-    asOf: document.publicationDate,
-    lastChecked: document.source.retrievedAt,
+    asOf:
+      document.schemaVersion === "1.5.0"
+        ? document.source.sourceStatus.textAsOf
+        : document.publicationDate,
+    lastChecked:
+      document.schemaVersion === "1.5.0"
+        ? document.source.sourceStatus.checkedAt
+        : document.source.retrievedAt,
     sourceVersion: document.source.sourceVersion,
     sourceStatus: document.source.sourceStatus,
     buildId,
     provenance: document.source.provenance,
     collections,
     provisions,
+    ...(document.schemaVersion === "1.5.0"
+      ? {
+          publicationDate: document.publicationDate,
+          publicationDateBasis: document.publicationDateBasis,
+          sourceAcquisition: {
+            retrievedAt: document.source.retrievedAt,
+            importedAt: document.source.importedAt,
+            capturedOn: document.source.capturedOn,
+            captureDateBasis: document.source.captureDateBasis,
+            retrievalTimestampBasis: document.source.retrievalTimestampBasis,
+          },
+          scopedSourceNotes: document.scopedSourceNotes.map((note, index) => {
+            const projected = projectContentUnits(note.orderedUnits);
+            return {
+              scope: note.scope,
+              ownerId: note.ownerId,
+              ownerSourceUrl: note.ownerSourceUrl,
+              ownerLabel:
+                note.scope === "document"
+                  ? document.officialTitle
+                  : (structuralById.get(note.ownerId)?.label ?? ""),
+              position: note.position,
+              contentHash: note.contentHash,
+              block: {
+                id: `publisher-note:${note.ownerId}:${note.position}`,
+                kind: "other" as const,
+                contentRole: "source-note" as const,
+                text: contentUnitsText(note.orderedUnits, "source-note"),
+                anchor: `publisher-note-${index}`,
+                sourceLocator: note.sourceLocator,
+                orderedContent: projected.orderedContent,
+                contentLayout: projected.contentLayout,
+                children: [],
+              },
+            };
+          }),
+        }
+      : {}),
   };
 }

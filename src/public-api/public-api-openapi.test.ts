@@ -144,8 +144,65 @@ describe("Public API OpenAPI 3.1 contract", () => {
     expect(JSON.stringify(publicApiOpenApiDocument)).not.toContain("data/raw");
   });
 
+  it("documents optional German document metadata and content authority fields", () => {
+    const schemas = publicApiOpenApiDocument.components.schemas;
+    const document = schemas.DocumentReference;
+    const sourceStatus = schemas.SourceStatus;
+    const provision =
+      schemas.ProvisionResponse.properties.data.properties.provision;
+    const textBlock = schemas.TextBlock;
+
+    expect(document.properties.jurisdiction.enum).toEqual([
+      "EU",
+      "LU",
+      "DE",
+      "FR",
+    ]);
+    expect(document.properties.language.enum).toEqual(["en", "de", "fr"]);
+    expect(document.properties.sourceStatus.$ref).toBe(
+      "#/components/schemas/SourceStatus",
+    );
+    expect(document.required).not.toContain("language");
+    expect(document.required).not.toContain("sourceStatus");
+    expect(sourceStatus.properties.textAuthorityStatus.enum).toEqual([
+      "non-authoritative-consolidation",
+      "publisher-consolidation",
+    ]);
+    expect(sourceStatus.properties.textAsOfBasis.enum).toEqual([
+      "last-amendment-act-date",
+      "publisher-version-date",
+    ]);
+    expect(sourceStatus.properties.authorityNote.type).toBe("string");
+    expect(sourceStatus.properties.sourceNotes.items).toMatchObject({
+      type: "string",
+    });
+    expect(provision.properties.contentRole.enum).toEqual([
+      "operative-text",
+      "source-note",
+      "toc",
+    ]);
+    expect(provision.required).not.toContain("contentRole");
+    expect(textBlock.properties.sourceNotes.items).toMatchObject({
+      $ref: "#/components/schemas/SourceNote",
+    });
+  });
+
   it("validates representative service responses against documented JSON Schemas", () => {
+    const amfArticle = repository
+      ?.findDocument("fr:amf:rg")
+      ?.provisions.find((provision) => provision.number === "223-2");
+    if (!amfArticle) throw new Error("Missing AMF linked-text fixture");
     const cases = [
+      [
+        "LawResolveResponse",
+        success(
+          service?.resolveLaw("AMF RG article 212-19", undefined, {
+            jurisdiction: "FR",
+          }),
+        ),
+      ],
+      ["LawStructureResponse", success(service?.getLawStructure("fr:amf:rg"))],
+      ["ProvisionResponse", success(service?.getProvision(amfArticle.id))],
       ["DiscoveryResponse", success(service?.discover())],
       [
         "LawResolveResponse",

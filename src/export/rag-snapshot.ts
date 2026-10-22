@@ -14,6 +14,11 @@ import { RUNTIME_DATABASE_SCHEMA_VERSION } from "../search/sqlite-search-index";
 import { type BodyBlock, documentViewSchema } from "../shared/legal";
 import { sourceStatusSchema } from "../shared/source-status";
 import {
+  verifyAmfRagDocument,
+  verifyAmfRagProvisions,
+} from "./amf-rag-validation";
+import {
+  LEGACY_RAG_SNAPSHOT_SCHEMA_VERSION,
   RAG_SNAPSHOT_GENERATOR_VERSION,
   RAG_SNAPSHOT_SCHEMA_VERSION,
   type RagDocument,
@@ -21,10 +26,17 @@ import {
   type RagRelationship,
   type RagRelationshipEndpoint,
   type RagSnapshotManifest,
+  type VerifiedRagSnapshotManifest,
+  legacyRagDocumentSchema,
+  legacyRagProvisionSchema,
+  legacyRagSnapshotManifestSchema,
   ragDocumentSchema,
   ragProvisionSchema,
   ragRelationshipSchema,
   ragSnapshotManifestSchema,
+  v12RagDocumentSchema,
+  v12RagProvisionSchema,
+  v12RagSnapshotManifestSchema,
 } from "./rag-snapshot-contract";
 
 const OUTPUT_FILES = [
@@ -43,13 +55,13 @@ interface ExportOptions {
 
 interface DocumentRow {
   id: string;
-  jurisdiction: "EU" | "LU";
+  jurisdiction: "EU" | "LU" | "DE" | "FR";
   celex: string | null;
   localId: string | null;
   shortName: string;
   officialTitle: string;
   documentType: RagDocument["document_type"];
-  publicationDate: string;
+  publicationDate: string | null;
   sourceUrl: string;
   sourceStatusJson: string | null;
   lastChecked: string;
@@ -65,6 +77,7 @@ interface DocumentRow {
   currencyStatus: RagDocument["expressions"][number]["currency_status"];
   versionSelectionPolicy: RagDocument["expressions"][number]["version_selection_policy"];
   fallbackReason: RagDocument["expressions"][number]["fallback_reason"];
+  expressionLanguage?: "en" | "de" | "fr";
 }
 
 interface RelationshipRow {
@@ -112,26 +125,65 @@ function sha256(value: string | Buffer): string {
 }
 
 function expressionId(document: RagDocument): string {
-  return `${document.document_id}@${document.text_as_of}@en`;
+  return `${document.document_id}@${document.text_as_of}@${document.language}`;
 }
 
 function sourceLocatorLabel(locator: { kind: string; value: string }): string {
   return `${locator.kind}:${locator.value}`;
 }
 
-function blockText(block: BodyBlock): string {
+function blockText(
+  block: BodyBlock,
+  language: RagDocument["language"],
+): string {
   const children = new Map(block.children.map((child) => [child.id, child]));
-  const content = block.orderedContent.map((item) => {
-    if (item.type === "text") return item.text;
-    if (item.type === "resource") return "";
+  if (language === "en") {
+    const content = block.orderedContent.map((item) => {
+      if (item.type === "text") {
+        const role = item.contentRole ?? block.contentRole ?? "operative-text";
+        return role === "operative-text" ? item.text : "";
+      }
+      if (item.type === "resource") return "";
+      const child = children.get(item.childId);
+      if (!child) {
+        throw new Error(
+          `Body block ${block.id} references missing child ${item.childId}`,
+        );
+      }
+      return blockText(child, language);
+    });
+    return [
+      [block.marker, content[0]].filter(Boolean).join(" ").trim(),
+      ...content.slice(1),
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  const content: string[] = [];
+  let inlineText = "";
+  for (const item of block.orderedContent) {
+    if (item.type === "text") {
+      const role = item.contentRole ?? block.contentRole ?? "operative-text";
+      if (role === "operative-text") {
+        inlineText += item.text;
+      }
+      continue;
+    }
+    if (item.type === "resource") continue;
+    if (inlineText) {
+      content.push(inlineText);
+      inlineText = "";
+    }
     const child = children.get(item.childId);
     if (!child) {
       throw new Error(
         `Body block ${block.id} references missing child ${item.childId}`,
       );
     }
-    return blockText(child);
-  });
+    content.push(blockText(child, language));
+  }
+  if (inlineText) content.push(inlineText);
   return [
     [block.marker, content[0]].filter(Boolean).join(" ").trim(),
     ...content.slice(1),
@@ -140,10 +192,19 @@ function blockText(block: BodyBlock): string {
     .join("\n");
 }
 
-function directBlockText(block: BodyBlock): string {
+function directBlockText(
+  block: BodyBlock,
+  language: RagDocument["language"],
+): string {
   return block.orderedContent
-    .flatMap((item) => (item.type === "text" ? [item.text] : []))
-    .join("\n");
+    .flatMap((item) =>
+      item.type === "text" &&
+      (item.contentRole ?? block.contentRole ?? "operative-text") ===
+        "operative-text"
+        ? [item.text]
+        : [],
+    )
+    .join(language === "en" ? "\n" : "");
 }
 
 function orderedContentBlocks(
@@ -152,7 +213,17 @@ function orderedContentBlocks(
   const content: RagProvision["ordered_content_blocks"] = [];
   for (const item of block.orderedContent) {
     if (item.type === "text") {
-      content.push({ order: content.length, type: "text", text: item.text });
+      if (
+        (item.contentRole ?? block.contentRole ?? "operative-text") ===
+        "operative-text"
+      ) {
+        content.push({
+          order: content.length,
+          type: "text",
+          text: item.text,
+          ...(item.sourceLocator ? { source_locator: item.sourceLocator } : {}),
+        });
+      }
     } else if (item.type === "child") {
       content.push({
         order: content.length,
@@ -162,6 +233,23 @@ function orderedContentBlocks(
     }
   }
   return content;
+}
+
+function sourceNotes(block: BodyBlock): RagProvision["source_notes"] {
+  return block.orderedContent.flatMap((item, contentIndex) => {
+    if (item.type !== "text") return [];
+    const role = item.contentRole ?? block.contentRole ?? "operative-text";
+    return role === "source-note"
+      ? [
+          {
+            content_role: "source-note" as const,
+            text: item.text,
+            source_locator: item.sourceLocator ?? block.sourceLocator,
+            content_index: contentIndex,
+          },
+        ]
+      : [];
+  });
 }
 
 function blockReferences(id: string): {
@@ -190,7 +278,10 @@ function exportProvisions(
       ),
       [provision.label, provision.title].filter(Boolean).join(" — "),
     ];
-    const rootText = provision.blocks.map(blockText).filter(Boolean).join("\n");
+    const rootText = provision.blocks
+      .map((block) => blockText(block, document.language))
+      .filter(Boolean)
+      .join("\n");
     const selfBlock = provision.blocks.find(
       (block) => block.id === provision.id,
     );
@@ -199,7 +290,9 @@ function exportProvisions(
         provision_id: provision.id,
         document_id: document.document_id,
         expression_id: expression,
-        language: "en",
+        language: document.language,
+        content_role: provision.contentRole ?? "operative-text",
+        source_notes: selfBlock ? sourceNotes(selfBlock) : [],
         parent_provision_id: null,
         root_provision_id: provision.id,
         unit_type: provision.kind,
@@ -221,14 +314,17 @@ function exportProvisions(
               type: "child" as const,
               provision_id: block.id,
             })),
-        direct_text: selfBlock ? directBlockText(selfBlock) : "",
+        direct_text: selfBlock
+          ? directBlockText(selfBlock, document.language)
+          : "",
         text: rootText,
         text_scope: provision.blocks.some(
           (block) => block.id !== provision.id || block.children.length > 0,
         )
           ? "subtree"
           : "direct",
-        official_source_url: document.official_page_url,
+        official_source_url:
+          provision.officialSourceUrl ?? document.official_page_url,
         review_status: reviewStatus,
       }),
     );
@@ -246,7 +342,9 @@ function exportProvisions(
           provision_id: block.id,
           document_id: document.document_id,
           expression_id: expression,
-          language: "en",
+          language: document.language,
+          content_role: block.contentRole ?? "operative-text",
+          source_notes: sourceNotes(block),
           parent_provision_id: parentId,
           root_provision_id: provision.id,
           unit_type: block.kind === "annex-part" ? "annex_part" : block.kind,
@@ -262,10 +360,11 @@ function exportProvisions(
           source_locator_label: sourceLocatorLabel(block.sourceLocator),
           document_order: documentOrder++,
           ordered_content_blocks: orderedContentBlocks(block),
-          direct_text: directBlockText(block),
-          text: blockText(block),
+          direct_text: directBlockText(block, document.language),
+          text: blockText(block, document.language),
           text_scope: block.children.length > 0 ? "subtree" : "direct",
-          official_source_url: document.official_page_url,
+          official_source_url:
+            provision.officialSourceUrl ?? document.official_page_url,
           review_status: reviewStatus,
         }),
       );
@@ -660,7 +759,8 @@ function loadDocuments(database: Database.Database): Array<{
         em.issuers_json AS issuersJson, em.text_kind AS textKind,
         em.currency_status AS currencyStatus,
         em.version_selection_policy AS versionSelectionPolicy,
-        em.fallback_reason AS fallbackReason
+        em.fallback_reason AS fallbackReason,
+        em.language AS expressionLanguage
       FROM documents d
       JOIN document_views v ON v.document_id = d.id
       JOIN document_expression_metadata em ON em.document_id = d.id
@@ -673,6 +773,57 @@ function loadDocuments(database: Database.Database): Array<{
       ? sourceStatusSchema.parse(JSON.parse(row.sourceStatusJson))
       : undefined;
     const textAsOf = status?.textAsOf ?? view.asOf;
+    const language =
+      view.language ??
+      row.expressionLanguage ??
+      (row.jurisdiction === "DE" ? "de" : "en");
+    const expressionLanguage = row.expressionLanguage ?? language;
+    if (language !== expressionLanguage) {
+      throw new Error(
+        `Document ${row.id} Reader language ${language} conflicts with reviewed Expression language ${expressionLanguage}`,
+      );
+    }
+    if (row.jurisdiction === "DE" && language !== "de") {
+      throw new Error(`German document ${row.id} must use language de`);
+    }
+    if (row.jurisdiction === "DE" && row.expressionLanguage !== "de") {
+      throw new Error(
+        `German document ${row.id} must have reviewed Expression language de`,
+      );
+    }
+    const sourceStatus = {
+      ...(row.jurisdiction === "FR" && status?.checkedAt
+        ? { checked_at: status.checkedAt }
+        : {}),
+      ...(status?.textAuthorityStatus
+        ? { text_authority_status: status.textAuthorityStatus }
+        : {}),
+      ...(status?.textAsOfBasis
+        ? { text_as_of_basis: status.textAsOfBasis }
+        : {}),
+      ...(status?.authorityNote
+        ? { authority_note: status.authorityNote }
+        : {}),
+      ...(status?.sourceNotes ? { source_notes: status.sourceNotes } : {}),
+    };
+    if (
+      row.jurisdiction === "DE" &&
+      status?.textAuthorityStatus !== "non-authoritative-consolidation"
+    ) {
+      throw new Error(
+        `German document ${row.id} is missing non-authoritative text status`,
+      );
+    }
+    const structureOwnerIds: string[] = [];
+    const visitOwner = (
+      node: (typeof view.collections)[number]["roots"][number],
+    ): void => {
+      if (node.type === "group") structureOwnerIds.push(node.id);
+      for (const child of node.children) visitOwner(child);
+    };
+    for (const collection of view.collections) {
+      for (const root of collection.roots) visitOwner(root);
+    }
     const review = row.provenance === "official" ? "validated" : "fixture";
     const draft = {
       document_id: row.id,
@@ -686,7 +837,10 @@ function loadDocuments(database: Database.Database): Array<{
       title: row.officialTitle,
       jurisdiction: row.jurisdiction,
       jurisdictions: [row.jurisdiction],
-      language: "en",
+      language,
+      ...(Object.keys(sourceStatus).length
+        ? { source_status: sourceStatus }
+        : {}),
       document_type: row.documentType,
       regulatory_level: row.regulatoryLevel.replace("-", "_"),
       measure_type: row.measureType.replace("-", "_"),
@@ -696,6 +850,23 @@ function loadDocuments(database: Database.Database): Array<{
         row.currencyStatus === "not_assessed" ? null : row.currencyStatus,
       legal_effect: null,
       date_document: row.publicationDate,
+      ...(view.publicationDateBasis
+        ? { publication_date_basis: view.publicationDateBasis }
+        : {}),
+      ...(view.scopedSourceNotes
+        ? {
+            structure_owner_ids: structureOwnerIds,
+            scoped_source_notes: view.scopedSourceNotes.map((note) => ({
+              scope: note.scope,
+              owner_id: note.ownerId,
+              owner_source_url: note.ownerSourceUrl,
+              owner_label: note.ownerLabel,
+              position: note.position,
+              content_hash: note.contentHash,
+              block: note.block,
+            })),
+          }
+        : {}),
       date_entry_into_force: null,
       date_application: null,
       date_repeal: null,
@@ -708,9 +879,12 @@ function loadDocuments(database: Database.Database): Array<{
       review_status: review,
       expressions: [
         {
-          expression_id: `${row.id}@${textAsOf}@en`,
+          expression_id: `${row.id}@${textAsOf}@${language}`,
           document_id: row.id,
-          language: "en",
+          language,
+          ...(Object.keys(sourceStatus).length
+            ? { source_status: sourceStatus }
+            : {}),
           expression_date: textAsOf,
           text_kind: row.textKind,
           currency_status: row.currencyStatus,
@@ -718,7 +892,18 @@ function loadDocuments(database: Database.Database): Array<{
           fallback_reason: row.fallbackReason,
           official_status: row.provenance,
           official_source_url: row.sourceUrl,
-          retrieved_at: row.lastChecked,
+          retrieved_at: view.sourceAcquisition
+            ? view.sourceAcquisition.retrievedAt
+            : row.lastChecked,
+          ...(view.sourceAcquisition
+            ? {
+                imported_at: view.sourceAcquisition.importedAt,
+                captured_on: view.sourceAcquisition.capturedOn,
+                capture_date_basis: view.sourceAcquisition.captureDateBasis,
+                retrieval_timestamp_basis:
+                  view.sourceAcquisition.retrievalTimestampBasis,
+              }
+            : {}),
           source_snapshot_id: view.sourceSnapshotId,
           source_version: row.sourceVersion,
           review_status: review,
@@ -804,7 +989,9 @@ export function exportRagSnapshot(options: ExportOptions): RagSnapshotManifest {
       snapshot_id: options.snapshotId,
       created_at: options.createdAt ?? new Date().toISOString(),
       as_of_date: options.asOfDate,
-      languages: ["en"],
+      languages: [
+        ...new Set(documents.map((document) => document.language)),
+      ].sort(),
       profile_id: manifestValue(database, "profileId"),
       profile_version: manifestValue(database, "profileVersion"),
       profile_hash: manifestValue(database, "profileHash"),
@@ -867,18 +1054,59 @@ function parseJsonl<T>(
     });
 }
 
-export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
+export function projectRagOrderedDirectText(
+  blocks: RagProvision["ordered_content_blocks"],
+  language: RagDocument["language"] | undefined,
+  version: "1.1.0" | "1.2.0" | "1.3.0",
+): string {
+  return blocks
+    .flatMap((block) =>
+      block.type === "text" && block.content_role !== "source-note"
+        ? [block.text]
+        : [],
+    )
+    .join(
+      version !== "1.1.0" &&
+        (language === "de" || (version === "1.3.0" && language === "fr"))
+        ? ""
+        : "\n",
+    );
+}
+
+export function verifyRagSnapshot(
+  inputPath: string,
+): VerifiedRagSnapshotManifest {
   const resolvedInput = resolve(inputPath);
-  const manifest = ragSnapshotManifestSchema.parse(
-    JSON.parse(readFileSync(join(resolvedInput, "manifest.json"), "utf8")),
-  );
+  const rawManifest = JSON.parse(
+    readFileSync(join(resolvedInput, "manifest.json"), "utf8"),
+  ) as { schema_version?: string };
+  const legacy =
+    rawManifest.schema_version === LEGACY_RAG_SNAPSHOT_SCHEMA_VERSION;
+  const v12 = rawManifest.schema_version === "1.2.0";
+  const manifest = legacy
+    ? legacyRagSnapshotManifestSchema.parse(rawManifest)
+    : v12
+      ? v12RagSnapshotManifestSchema.parse(rawManifest)
+      : ragSnapshotManifestSchema.parse(rawManifest);
   const documents = parseJsonl(
     join(resolvedInput, "documents.jsonl"),
-    ragDocumentSchema,
+    (legacy
+      ? legacyRagDocumentSchema
+      : v12
+        ? v12RagDocumentSchema
+        : ragDocumentSchema) as {
+      parse(value: unknown): RagDocument;
+    },
   );
   const provisions = parseJsonl(
     join(resolvedInput, "provisions.jsonl"),
-    ragProvisionSchema,
+    (legacy
+      ? legacyRagProvisionSchema
+      : v12
+        ? v12RagProvisionSchema
+        : ragProvisionSchema) as {
+      parse(value: unknown): RagProvision;
+    },
   );
   const relationships = parseJsonl(
     join(resolvedInput, "relationships.jsonl"),
@@ -910,13 +1138,28 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
   ) {
     throw new Error("Snapshot record totals do not match manifest");
   }
+  if (!legacy) {
+    const actualLanguages = [
+      ...new Set(documents.map((document) => document.language)),
+    ].sort();
+    if (
+      JSON.stringify(actualLanguages) !== JSON.stringify(manifest.languages)
+    ) {
+      throw new Error("Manifest languages do not match document languages");
+    }
+  }
   const documentIds = new Set<string>();
+  const documentLanguages = new Map<string, RagDocument["language"]>();
   const expressionIds = new Set<string>();
   for (const document of documents) {
     if (documentIds.has(document.document_id)) {
       throw new Error(`Duplicate document_id: ${document.document_id}`);
     }
     documentIds.add(document.document_id);
+    if (!legacy && !v12 && document.jurisdiction === "FR") {
+      verifyAmfRagDocument(document);
+    }
+    if (!legacy) documentLanguages.set(document.document_id, document.language);
     for (const expression of document.expressions) {
       if (expression.document_id !== document.document_id) {
         throw new Error(
@@ -927,8 +1170,45 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
         throw new Error(`Duplicate expression_id: ${expression.expression_id}`);
       }
       expressionIds.add(expression.expression_id);
+      if (!legacy && expression.language !== document.language) {
+        throw new Error(
+          `Expression ${expression.expression_id} language differs from its Document`,
+        );
+      }
+      if (
+        !legacy &&
+        expression.expression_id !==
+          `${document.document_id}@${expression.expression_date}@${expression.language}`
+      ) {
+        throw new Error(
+          `Expression ${expression.expression_id} does not encode its language`,
+        );
+      }
+      if (
+        !legacy &&
+        document.jurisdiction === "DE" &&
+        expression.source_status?.text_authority_status !==
+          "non-authoritative-consolidation"
+      ) {
+        throw new Error(
+          `German Expression ${expression.expression_id} lacks required authority status`,
+        );
+      }
+    }
+    if (!legacy && document.jurisdiction === "DE") {
+      if (
+        document.language !== "de" ||
+        document.source_status?.text_authority_status !==
+          "non-authoritative-consolidation"
+      ) {
+        throw new Error(
+          `German document ${document.document_id} lacks required language or authority status`,
+        );
+      }
     }
   }
+  if (!legacy && !v12 && documentIds.has("fr:amf:rg"))
+    verifyAmfRagProvisions(provisions);
   const provisionIds = new Set<string>();
   const provisionDocumentIds = new Map<string, string>();
   const provisionParentIds = new Map<string, string | null>();
@@ -948,6 +1228,23 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
       );
     }
     provisionIds.add(provision.provision_id);
+    if (!legacy) {
+      const document = documents.find(
+        (item) => item.document_id === provision.document_id,
+      );
+      const expression = document?.expressions.find(
+        (item) => item.expression_id === provision.expression_id,
+      );
+      if (
+        !document ||
+        provision.language !== document.language ||
+        expression?.language !== provision.language
+      ) {
+        throw new Error(
+          `Provision ${provision.provision_id} language differs from its Document or Expression`,
+        );
+      }
+    }
     provisionDocumentIds.set(provision.provision_id, provision.document_id);
     provisionParentIds.set(
       provision.provision_id,
@@ -1017,13 +1314,51 @@ export function verifyRagSnapshot(inputPath: string): RagSnapshotManifest {
         }
       }
     }
-    const orderedDirectText = provision.ordered_content_blocks
-      .flatMap((block) => (block.type === "text" ? [block.text] : []))
-      .join("\n");
+    const orderedDirectText = projectRagOrderedDirectText(
+      provision.ordered_content_blocks,
+      documentLanguages.get(provision.document_id),
+      legacy ? "1.1.0" : v12 ? "1.2.0" : "1.3.0",
+    );
     if (orderedDirectText !== provision.direct_text) {
       throw new Error(
         `Provision ${provision.provision_id} direct_text differs from ordered content`,
       );
+    }
+    if (!legacy) {
+      if (
+        provision.content_role !== "operative-text" &&
+        (provision.direct_text.length > 0 || provision.text.length > 0)
+      ) {
+        throw new Error(
+          `Non-operative Provision ${provision.provision_id} must not contain direct_text or text`,
+        );
+      }
+      if (
+        provision.ordered_content_blocks.some(
+          (block) =>
+            block.type === "text" &&
+            (block.content_role ?? "operative-text") !== "operative-text",
+        )
+      ) {
+        throw new Error(
+          `Provision ${provision.provision_id} ordered content must contain operative text only`,
+        );
+      }
+      for (const note of provision.source_notes) {
+        if (note.content_role !== "source-note") {
+          throw new Error(
+            `Provision ${provision.provision_id} has invalid source note role`,
+          );
+        }
+      }
+      const noteIndexes = provision.source_notes.map(
+        (note) => note.content_index,
+      );
+      if (new Set(noteIndexes).size !== noteIndexes.length) {
+        throw new Error(
+          `Provision ${provision.provision_id} has duplicate source-note content indexes`,
+        );
+      }
     }
   }
   if (documentIds.has("eu:32015L0849")) {

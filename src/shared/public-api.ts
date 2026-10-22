@@ -1,11 +1,21 @@
 import { z } from "zod";
-import { lawSearchMatchReasonSchema } from "./legal";
+import {
+  type ContentLayout,
+  type ContentRole,
+  contentLayoutSchema,
+  contentRoleSchema,
+} from "./content-unit";
+import {
+  lawSearchMatchReasonSchema,
+  scopedSourceNoteViewSchema,
+} from "./legal";
 import { sourceLocatorSchema } from "./source-locator";
+import { sourceStatusSchema } from "./source-status";
 
 export const PUBLIC_API_VERSION = "v1";
-export const PUBLIC_API_CONTRACT_VERSION = "1.3.0";
+export const PUBLIC_API_CONTRACT_VERSION = "1.5.0";
 
-export const publicJurisdictionSchema = z.enum(["EU", "LU"]);
+export const publicJurisdictionSchema = z.enum(["EU", "LU", "DE", "FR"]);
 export const publicDocumentTypeSchema = z.enum([
   "regulation",
   "directive",
@@ -80,7 +90,7 @@ export const publicApiErrorResponseSchema = z
   })
   .strict();
 
-const publicDocumentReferenceSchema = z
+const publicDocumentReferenceBaseSchema = z
   .object({
     id: z.string().min(1),
     jurisdiction: publicJurisdictionSchema,
@@ -88,13 +98,36 @@ const publicDocumentReferenceSchema = z
     shortName: z.string().min(1),
     officialTitle: z.string().min(1),
     documentType: publicDocumentTypeSchema,
+    language: z.enum(["en", "de", "fr"]).optional(),
     celex: z.string().min(1).optional(),
     localId: z.string().min(1).optional(),
     sourceUrl: z.string().url(),
+    sourceStatus: sourceStatusSchema.optional(),
     asOf: z.string().date(),
+    publicationDate: z.string().date().nullable().optional(),
+    publicationDateBasis: z
+      .literal("aggregate-with-multiple-component-publications")
+      .optional(),
     provenance: z.literal("official"),
   })
   .strict();
+
+const frPublicationDate = (document: {
+  jurisdiction: string;
+  publicationDate?: string | null;
+  publicationDateBasis?: string;
+}) =>
+  document.jurisdiction === "FR"
+    ? document.publicationDate === null &&
+      document.publicationDateBasis ===
+        "aggregate-with-multiple-component-publications"
+    : document.publicationDate !== null &&
+      document.publicationDateBasis === undefined;
+export const publicDocumentReferenceSchema =
+  publicDocumentReferenceBaseSchema.refine(frPublicationDate, {
+    message:
+      "FR requires a null publication date and aggregate basis; other jurisdictions require a non-null date when present",
+  });
 
 const publicLawResultSchema = z
   .object({
@@ -193,12 +226,18 @@ export const publicLawStructureResponseSchema = z
     meta: publicApiMetaSchema,
     data: z
       .object({
-        document: publicDocumentReferenceSchema.extend({
-          sourceSnapshotId: z.string().min(1),
-          sourceVersion: z.string().min(1),
-          lastChecked: z.string().datetime(),
-          canonicalBuildId: z.string().min(1),
-        }),
+        document: publicDocumentReferenceBaseSchema
+          .extend({
+            sourceSnapshotId: z.string().min(1),
+            sourceVersion: z.string().min(1),
+            lastChecked: z.string().datetime(),
+            canonicalBuildId: z.string().min(1),
+          })
+          .refine(frPublicationDate, {
+            message:
+              "FR requires a null publication date and aggregate basis; other jurisdictions require a non-null date when present",
+          }),
+        scopedSourceNotes: z.array(scopedSourceNoteViewSchema).optional(),
         collections: z.array(
           z
             .object({
@@ -226,7 +265,21 @@ export interface PublicTextBlock {
     | "annex-part"
     | "other";
   marker?: string;
+  contentRole?: ContentRole;
+  sourceNotes?: Array<{
+    contentRole: "source-note";
+    contentIndex: number;
+    text: string;
+    sourceLocator: z.infer<typeof sourceLocatorSchema>;
+  }>;
   text: string;
+  contentLayout?: ContentLayout[];
+  orderedContent?: Array<{
+    type: "text";
+    text: string;
+    contentRole?: ContentRole;
+    sourceLocator?: z.infer<typeof sourceLocatorSchema>;
+  }>;
   sourceLocator: z.infer<typeof sourceLocatorSchema>;
   children: PublicTextBlock[];
 }
@@ -246,7 +299,31 @@ const publicTextBlockSchema: z.ZodType<PublicTextBlock> = z.lazy(() =>
         "other",
       ]),
       marker: z.string().min(1).optional(),
+      contentRole: contentRoleSchema.optional(),
+      sourceNotes: z
+        .array(
+          z
+            .object({
+              contentRole: z.literal("source-note"),
+              contentIndex: z.number().int().nonnegative(),
+              text: z.string(),
+              sourceLocator: sourceLocatorSchema,
+            })
+            .strict(),
+        )
+        .optional(),
       text: z.string(),
+      contentLayout: z.array(contentLayoutSchema).optional(),
+      orderedContent: z
+        .array(
+          z.object({
+            type: z.literal("text"),
+            text: z.string().min(1),
+            contentRole: contentRoleSchema.optional(),
+            sourceLocator: sourceLocatorSchema.optional(),
+          }),
+        )
+        .optional(),
       sourceLocator: sourceLocatorSchema,
       children: z.array(publicTextBlockSchema),
     })
@@ -263,6 +340,7 @@ export const publicProvisionResponseSchema = z
           .object({
             entityId: z.string().min(1),
             kind: z.enum(["article", "recital", "annex", "other"]),
+            contentRole: contentRoleSchema.optional(),
             collectionId: z.enum([
               "articles",
               "recitals",
@@ -285,6 +363,7 @@ export const publicProvisionResponseSchema = z
             previousEntityId: z.string().min(1).nullable(),
             nextEntityId: z.string().min(1).nullable(),
             sourceLocator: sourceLocatorSchema,
+            officialSourceUrl: z.string().url().optional(),
             blocks: z.array(publicTextBlockSchema),
           })
           .strict(),
@@ -387,6 +466,7 @@ export const publicProvisionRelationshipsResponseSchema = z
             documentId: z.string().min(1),
             documentShortName: z.string().min(1),
             kind: z.string().min(1),
+            contentRole: contentRoleSchema.optional(),
             label: z.string().min(1),
             title: z.string().nullable(),
           })

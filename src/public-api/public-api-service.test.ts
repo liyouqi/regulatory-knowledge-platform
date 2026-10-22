@@ -41,7 +41,7 @@ describe("Public API v1 service contract", () => {
     expect(payload).toMatchObject({
       meta: {
         apiVersion: "v1",
-        contractVersion: "1.3.0",
+        contractVersion: "1.5.0",
         profilePolicy: "deployment-fixed",
         runtime: { profileId: "full-corpus" },
       },
@@ -272,5 +272,84 @@ describe("Public API v1 service contract", () => {
       status: 429,
       response: { error: { code: "RATE_LIMIT_EXCEEDED" } },
     });
+  });
+});
+
+describe("AMF published source integration", () => {
+  it("resolves separate source articles and exposes explicit unknown publication dates", () => {
+    const ids: string[] = [];
+    for (const number of ["212-19", "212-19-bis"]) {
+      const payload = success(
+        service?.resolveLaw(`AMF RG article ${number}`, undefined, {
+          jurisdiction: "FR",
+        }),
+      );
+      expect(payload.data.bestMatch?.document).toMatchObject({
+        id: "fr:amf:rg",
+        language: "fr",
+        publicationDate: null,
+        publicationDateBasis: "aggregate-with-multiple-component-publications",
+      });
+      const target = payload.data.bestMatch?.target;
+      if (!target) throw new Error("Expected exact AMF article");
+      ids.push(target.entityId);
+      expect(target.number).toBe(number);
+      const exact = success(service?.getProvision(target.entityId));
+      expect(exact.data.document.publicationDate).toBeNull();
+      expect(exact.data.provision.officialSourceUrl).toContain(
+        "/article/212-19/",
+      );
+    }
+    expect(new Set(ids).size).toBe(2);
+    const structure = success(service?.getLawStructure("fr:amf:rg"));
+    expect(structure.data.document.publicationDate).toBeNull();
+    expect(structure.data.scopedSourceNotes).toHaveLength(64);
+    expect(structure.data.scopedSourceNotes?.[0]).toMatchObject({
+      scope: "document",
+      ownerId: "fr:amf:rg",
+      position: 2,
+    });
+    expect(
+      structure.data.collections.find(
+        (collection) => collection.id === "articles",
+      )?.count,
+    ).toBe(1821);
+  });
+
+  it("keeps scoped publisher context outside citation entities", () => {
+    if (!repository) throw new Error("Missing runtime repository");
+    const document = repository
+      .listDocumentViews()
+      .find((entry) => entry.id === "fr:amf:rg");
+    if (!document) throw new Error("Missing published AMF document");
+    expect(document.provisions).toHaveLength(1821);
+    expect(document.scopedSourceNotes).toHaveLength(64);
+    const citation = new CitationContextService(repository, [document]);
+    for (const note of document.scopedSourceNotes ?? [])
+      expect(citation.findByEntityId(note.block.id)).toBeNull();
+    const article = document.provisions.find(
+      (entry) => entry.number === "212-48",
+    );
+    if (!article) throw new Error("Missing AMF article");
+    const context = citation.findByEntityId(article.id);
+    expect(context?.document).toMatchObject({
+      jurisdiction: "FR",
+      language: "fr",
+      sourceStatus: { textAsOfBasis: "publisher-version-date" },
+    });
+    expect(
+      context?.textSegments.every(
+        (segment) => segment.contentRole === "operative-text",
+      ),
+    ).toBe(true);
+    expect(context?.textSegments.map((segment) => segment.text).join("")).toBe(
+      article.blocks
+        .flatMap((block) => block.orderedContent)
+        .filter(
+          (run) => run.type === "text" && run.contentRole === "operative-text",
+        )
+        .map((run) => (run.type === "text" ? run.text : ""))
+        .join(""),
+    );
   });
 });

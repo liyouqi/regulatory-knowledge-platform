@@ -19,7 +19,9 @@ afterAll(() => {
 
 describe("runtime artifact verification", () => {
   it("validates the read-only runtime services against one manifest", () => {
-    expect(verifyRuntimeArtifact(databasePath)).toMatchObject({
+    expect(
+      verifyRuntimeArtifact(databasePath, new Set(["eu:32022R2554"])),
+    ).toMatchObject({
       profileId: "full-corpus",
       profileVersion: "1.0.0",
       profileHash: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
@@ -39,5 +41,13 @@ describe("runtime artifact verification", () => {
       bytes: expect.any(Number),
       input: databasePath,
     });
+  });
+  it("rejects wrong exact identity even when counts match, including an empty expected set", () => {
+    expect(() =>
+      verifyRuntimeArtifact(databasePath, new Set(["eu:unknown"])),
+    ).toThrow("missing [eu:unknown], unexpected [eu:32022R2554]");
+    expect(() => verifyRuntimeArtifact(databasePath, new Set())).toThrow(
+      "unexpected [eu:32022R2554]",
+    );
   });
 });

@@ -64,6 +64,8 @@ Supervisory decisions 0→1 is complete with CNPD `18FR/2022`: one normalized De
 
 ## Financial-domain 1→100 queues
 
+The [2026-10-20 European financial-coverage master plan](financial-coverage-expansion-plan.md) supersedes the initial seven-document expansion slice. It inventories 206 EU legal Works across 15 domains, 32 European countries across 12 national coverage dimensions, and 85 named national discovery seeds. EU-27 national laws, local implementing measures and supervisory practice are a core workstream; EEA-EFTA, UK and Switzerland have separate scopes. See the [country-dimension design](financial-country-dimension-plan.md), [EU inventory](financial-eu-coverage-catalog.csv), [country matrix](financial-country-coverage-matrix.csv) and [national discovery catalogue](financial-national-discovery-catalog.csv). These are planning inputs, not published coverage or production registry entries. Small batches control implementation and review cost without limiting the overall scope; validate each batch through the existing onboarding gates before updating the historical statuses below.
+
 | Domain | Representative next slice | Scale-out after validation | Status |
 |---|---|---|---|
 | Banking governance | completed CSSF → EBA implementation relation | governance, remuneration, fit-and-proper, internal control | 0→1 complete |

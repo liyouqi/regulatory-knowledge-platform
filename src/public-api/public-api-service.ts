@@ -60,10 +60,18 @@ function documentReference(document: DocumentView) {
     shortName: document.shortName,
     officialTitle: document.officialTitle,
     documentType: document.documentType,
+    ...(document.language ? { language: document.language } : {}),
     celex: document.celex,
     localId: document.localId,
     sourceUrl: document.sourceUrl,
+    ...(document.sourceStatus ? { sourceStatus: document.sourceStatus } : {}),
     asOf: document.asOf,
+    ...(document.publicationDate !== undefined
+      ? { publicationDate: document.publicationDate }
+      : {}),
+    ...(document.publicationDateBasis
+      ? { publicationDateBasis: document.publicationDateBasis }
+      : {}),
     provenance: document.provenance,
   };
 }
@@ -87,6 +95,28 @@ function textBlock(
     entityId: block.id,
     kind: block.kind,
     marker: block.marker,
+    contentRole: block.contentRole,
+    ...(block.contentLayout
+      ? {
+          contentLayout: block.contentLayout,
+          orderedContent: block.orderedContent.filter(
+            (entry): entry is Extract<typeof entry, { type: "text" }> =>
+              entry.type === "text",
+          ),
+          sourceNotes: block.orderedContent.flatMap((entry, contentIndex) =>
+            entry.type === "text" && entry.contentRole === "source-note"
+              ? [
+                  {
+                    contentRole: "source-note" as const,
+                    contentIndex,
+                    text: entry.text,
+                    sourceLocator: entry.sourceLocator ?? block.sourceLocator,
+                  },
+                ]
+              : [],
+          ),
+        }
+      : {}),
     text: block.text,
     sourceLocator: block.sourceLocator,
     children: block.children.map(textBlock),
@@ -408,6 +438,9 @@ export class PublicApiService {
             lastChecked: document.lastChecked,
             canonicalBuildId: document.buildId,
           },
+          ...(document.scopedSourceNotes
+            ? { scopedSourceNotes: document.scopedSourceNotes }
+            : {}),
           collections: document.collections.map((collection) => ({
             id: collection.id,
             label: collection.label,
@@ -458,6 +491,7 @@ export class PublicApiService {
           provision: {
             entityId: provision.id,
             kind: provision.kind,
+            contentRole: provision.contentRole,
             collectionId: provision.collectionId,
             number: provision.number,
             label: provision.label,
@@ -466,10 +500,11 @@ export class PublicApiService {
             previousEntityId: provision.previousId ?? null,
             nextEntityId: provision.nextId ?? null,
             sourceLocator: provision.sourceLocator,
+            officialSourceUrl: provision.officialSourceUrl,
             blocks: provision.blocks.map(textBlock),
           },
           source: {
-            officialUrl: document.sourceUrl,
+            officialUrl: provision.officialSourceUrl ?? document.sourceUrl,
             sourceSnapshotId: document.sourceSnapshotId,
             sourceVersion: document.sourceVersion,
             asOf: document.asOf,
@@ -533,6 +568,7 @@ export class PublicApiService {
             documentId: context.document.id,
             documentShortName: context.document.shortName,
             kind: context.target.kind,
+            contentRole: context.target.contentRole,
             label: context.target.label,
             title: context.target.title,
           },

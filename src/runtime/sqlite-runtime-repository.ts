@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import Database from "better-sqlite3";
@@ -16,6 +17,10 @@ import {
   type DocumentCaseLawRelationshipsResponse,
   documentCaseLawRelationshipsResponseSchema,
 } from "../shared/case-law";
+import {
+  type CountryDefinition,
+  countryDatasetSchema,
+} from "../shared/country";
 import {
   type DocumentVersionChain,
   type DocumentVersionEdge,
@@ -47,7 +52,6 @@ import {
   type ProvisionRelationshipsResponse,
   type RelationshipPreview,
   documentRelationshipsResponseSchema,
-  documentViewSchema,
   explorerDocumentSchema,
   familyLevel2ResponseSchema,
   provisionRelationshipsResponseSchema,
@@ -89,6 +93,7 @@ import {
   type SupervisoryDecisionFinding,
   documentSupervisoryDecisionsResponseSchema,
 } from "../shared/supervisory-decision";
+import { parseVerifiedDocumentView } from "./verify-amf-document";
 
 type LawSearchSource = Pick<
   SourceDefinition,
@@ -96,6 +101,7 @@ type LawSearchSource = Pick<
 > & { celex?: string; localId?: string };
 
 interface DocumentPayloadRow {
+  documentId: string;
   readerPayload: string;
 }
 
@@ -873,6 +879,9 @@ function manifestValue(database: Database.Database, key: string): string {
 }
 
 export class SqliteRuntimeRepository {
+  readonly countryCount: number;
+  readonly countryDatasetVersion: string;
+  readonly countryDatasetHash: string;
   readonly buildId: string;
   readonly profileId: string;
   readonly profileVersion: string;
@@ -912,6 +921,23 @@ export class SqliteRuntimeRepository {
   readonly dossierSourceCount: number;
   readonly unresolvedReferenceCount: number;
   private readonly database: Database.Database;
+  private readonly documentPayloadCache = new Map<
+    string,
+    { serialized: string; document: DocumentView }
+  >();
+
+  private readDocumentPayload(row: DocumentPayloadRow): DocumentView {
+    let cached = this.documentPayloadCache.get(row.documentId);
+    if (!cached || cached.serialized !== row.readerPayload) {
+      const document = parseVerifiedDocumentView(JSON.parse(row.readerPayload));
+      if (document.id !== row.documentId)
+        throw new Error("Runtime Reader document identity mismatch");
+      cached = { serialized: row.readerPayload, document };
+      this.documentPayloadCache.set(row.documentId, cached);
+    }
+    // Callers may edit their copy; validation state remains private to this repository.
+    return structuredClone(cached.document);
+  }
 
   constructor(databasePath = DEFAULT_RUNTIME_DATABASE_PATH) {
     const resolvedPath = resolve(databasePath);
@@ -929,6 +955,27 @@ export class SqliteRuntimeRepository {
         throw new Error(
           `Unsupported runtime database schema ${schemaVersion}; expected ${RUNTIME_DATABASE_SCHEMA_VERSION}`,
         );
+      }
+      this.countryCount = Number(manifestValue(this.database, "countryCount"));
+      this.countryDatasetVersion = manifestValue(
+        this.database,
+        "countryDatasetVersion",
+      );
+      this.countryDatasetHash = manifestValue(
+        this.database,
+        "countryDatasetHash",
+      );
+      const countryDataset = countryDatasetSchema.parse({
+        schemaVersion: "1.0.0",
+        datasetVersion: this.countryDatasetVersion,
+        countries: this.listCountries(),
+      });
+      const countryHash = `sha256:${createHash("sha256").update(JSON.stringify(countryDataset)).digest("hex")}`;
+      if (
+        countryDataset.countries.length !== this.countryCount ||
+        countryHash !== this.countryDatasetHash
+      ) {
+        throw new Error("Runtime country directory differs from its manifest");
       }
       this.buildId = manifestValue(this.database, "buildId");
       this.profileId = manifestValue(this.database, "profileId");
@@ -1121,6 +1168,32 @@ export class SqliteRuntimeRepository {
       this.database.close();
       throw error;
     }
+  }
+
+  listCountries(): CountryDefinition[] {
+    return (
+      this.database
+        .prepare(
+          "SELECT payload_json AS payload FROM country_directory ORDER BY code",
+        )
+        .all() as Array<{ payload: string }>
+    ).map((row) => JSON.parse(row.payload) as CountryDefinition);
+  }
+
+  listCountryDocumentSummaries(): Array<
+    DocumentSummary & { jurisdiction: string }
+  > {
+    const jurisdictions = new Map(
+      (
+        this.database
+          .prepare("SELECT id, jurisdiction FROM documents")
+          .all() as Array<{ id: string; jurisdiction: string }>
+      ).map((row) => [row.id, row.jurisdiction]),
+    );
+    return this.listDocumentSummaries().map((document) => ({
+      ...document,
+      jurisdiction: jurisdictions.get(document.id) ?? "",
+    }));
   }
 
   listDocumentSummaries(): DocumentSummary[] {
@@ -1657,7 +1730,7 @@ export class SqliteRuntimeRepository {
           document.official_title AS documentOfficialTitle,
           document.source_url AS documentSourceUrl,
           document.source_version AS documentSourceVersion,
-          document.publication_date AS documentAsOf,
+          document.as_of_date AS documentAsOf,
           event.event_type AS eventType,
           event.event_date AS eventDate,
           event.label,
@@ -1928,38 +2001,36 @@ export class SqliteRuntimeRepository {
   listDocumentViews(): DocumentView[] {
     const rows = this.database
       .prepare(`
-        SELECT dv.reader_payload_json AS readerPayload
+        SELECT dv.document_id AS documentId, dv.reader_payload_json AS readerPayload
         FROM document_views dv
         JOIN documents d ON d.id = dv.document_id
         ORDER BY d.display_order ASC
       `)
       .all() as DocumentPayloadRow[];
-    return rows.map((row) =>
-      documentViewSchema.parse(JSON.parse(row.readerPayload)),
-    );
+    return rows.map((row) => this.readDocumentPayload(row));
   }
 
   findDocument(documentId: string): DocumentView | null {
     const row = this.database
       .prepare(`
-        SELECT reader_payload_json AS readerPayload
+        SELECT document_id AS documentId, reader_payload_json AS readerPayload
         FROM document_views
         WHERE document_id = ?
       `)
       .get(documentId) as DocumentPayloadRow | undefined;
-    return row ? documentViewSchema.parse(JSON.parse(row.readerPayload)) : null;
+    return row ? this.readDocumentPayload(row) : null;
   }
 
   findDocumentBySlug(slug: string): DocumentView | null {
     const row = this.database
       .prepare(`
-        SELECT dv.reader_payload_json AS readerPayload
+        SELECT dv.document_id AS documentId, dv.reader_payload_json AS readerPayload
         FROM document_views dv
         JOIN documents d ON d.id = dv.document_id
         WHERE d.slug = ?
       `)
       .get(slug) as DocumentPayloadRow | undefined;
-    return row ? documentViewSchema.parse(JSON.parse(row.readerPayload)) : null;
+    return row ? this.readDocumentPayload(row) : null;
   }
 
   listRegulatoryDomains(): RegulatoryDomain[] {
@@ -2634,6 +2705,7 @@ export class SqliteRuntimeRepository {
   }
 
   close(): void {
+    this.documentPayloadCache.clear();
     this.database.close();
   }
 }

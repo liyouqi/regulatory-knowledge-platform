@@ -1,11 +1,18 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  setTimeout as yieldForIo,
+  setImmediate as yieldToEventLoop,
+} from "node:timers/promises";
+import Database from "better-sqlite3";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import { loadDocumentViews } from "../data/document-repository";
+import { loadAmfSourceRegistrySync } from "../ingestion/amf-source-registry";
 import { loadCssfSourceRegistrySync } from "../ingestion/cssf-source-registry";
 import { loadEbaSourceRegistrySync } from "../ingestion/eba-source-registry";
+import { loadNationalSourceRegistrySync } from "../ingestion/national-source-registry";
 import { loadSourceRegistrySync } from "../ingestion/source-registry";
 import { buildRuntimeDatabase } from "../search/sqlite-search-index";
 import { SqliteRuntimeRepository } from "./sqlite-runtime-repository";
@@ -17,14 +24,23 @@ const sources = [
   ...loadSourceRegistrySync(),
   ...loadCssfSourceRegistrySync(),
   ...loadEbaSourceRegistrySync(),
+  ...loadNationalSourceRegistrySync(),
+  ...loadAmfSourceRegistrySync().filter((source) => source.status === "active"),
 ];
 const dora = documents.find((document) => document.slug === "dora");
 if (!dora) throw new Error("DORA test document is unavailable");
 let repository: SqliteRuntimeRepository | undefined;
 
-beforeAll(() => {
+beforeAll(async () => {
   buildRuntimeDatabase(documents, sources, databasePath);
   repository = new SqliteRuntimeRepository(databasePath);
+  // Allow test-runner communication after synchronous fixture work.
+  await yieldToEventLoop();
+});
+
+afterEach(async () => {
+  // Process pending worker messages between synchronous test cases.
+  await yieldForIo(0);
 });
 
 afterAll(() => {
@@ -39,7 +55,45 @@ describe("SQLite runtime repository", () => {
       expect(repository?.findDocument(document.id)).toEqual(document);
       expect(repository?.findDocumentBySlug(document.slug)).toEqual(document);
     }
-  }, 30_000);
+  }, 60_000);
+
+  it("isolates cached Reader results from caller changes", () => {
+    const first = repository?.findDocument(dora.id);
+    if (!first) throw new Error("Missing DORA Reader");
+    first.officialTitle = "changed by caller";
+    first.provisions[0].blocks[0].text = "changed nested block";
+    expect(repository?.findDocument(dora.id)).toEqual(dora);
+    expect(repository?.findDocumentBySlug(dora.slug)).toEqual(dora);
+    const listed = repository?.listDocumentViews();
+    const listedDora = listed?.find((document) => document.id === dora.id);
+    if (!listedDora) throw new Error("Missing listed DORA Reader");
+    listedDora.provisions.length = 0;
+    expect(repository?.findDocument(dora.id)).toEqual(dora);
+  });
+
+  it("revalidates changed serialized payloads and rejects invalid AMF dates", () => {
+    expect(repository?.findDocument("fr:amf:rg")?.publicationDate).toBeNull();
+    const writer = new Database(databasePath);
+    const row = writer
+      .prepare(
+        "SELECT reader_payload_json payload FROM document_views WHERE document_id = ?",
+      )
+      .get("fr:amf:rg") as { payload: string };
+    const update = writer.prepare(
+      "UPDATE document_views SET reader_payload_json = ? WHERE document_id = ?",
+    );
+    try {
+      const invalid = JSON.parse(row.payload);
+      invalid.publicationDate = "2026-09-11";
+      update.run(JSON.stringify(invalid), "fr:amf:rg");
+      expect(() => repository?.findDocument("fr:amf:rg")).toThrow();
+      expect(() => repository?.findDocumentBySlug("amf-rg")).toThrow();
+    } finally {
+      update.run(row.payload, "fr:amf:rg");
+      writer.close();
+    }
+    expect(repository?.findDocument("fr:amf:rg")?.publicationDate).toBeNull();
+  });
 
   it("returns an Explorer payload identical to the canonical projection", () => {
     for (const document of documents) {
@@ -130,8 +184,8 @@ describe("SQLite runtime repository", () => {
   });
 
   it("returns reviewed cross-file Topics and exact assignments", () => {
-    expect(repository?.listRegulatoryTopics()).toHaveLength(3);
-    expect(repository?.listTopicAssignments()).toHaveLength(27);
+    expect(repository?.listRegulatoryTopics()).toHaveLength(4);
+    expect(repository?.listTopicAssignments()).toHaveLength(33);
     expect(
       repository?.listTopicAssignments("topic:major-ict-incident-reporting"),
     ).toHaveLength(4);
@@ -150,8 +204,8 @@ describe("SQLite runtime repository", () => {
     });
     expect(repository).toMatchObject({
       regulatoryTopicTaxonomyId: "taxonomy:regulatory-topic",
-      topicCount: 3,
-      topicAssignmentCount: 27,
+      topicCount: 4,
+      topicAssignmentCount: 33,
     });
   });
 
@@ -327,6 +381,7 @@ describe("SQLite runtime repository", () => {
     const crdSixChain = repository?.findDocumentVersionChain("eu:32024L1619");
     const amldChain = repository?.findDocumentVersionChain("eu:32015L0849");
     const highRiskChain = repository?.findDocumentVersionChain("eu:32016R1675");
+    const amfChain = repository?.findDocumentVersionChain("fr:amf:rg");
     const addedBankingChains = [
       "eu:32014L0049",
       "eu:32014L0059",
@@ -399,6 +454,24 @@ describe("SQLite runtime repository", () => {
       "eu:32024R1700",
       "eu:32020R0447",
       "eu:32018R1229",
+      "eu:32009L0065",
+      "eu:32011L0061",
+      "eu:32013R0231",
+      "eu:32010L0043",
+      "eu:32016R0438",
+      "eu:32014R0596",
+      "eu:32017R1129",
+      "eu:32014R1286",
+      "eu:32016R1011",
+      "eu:32019R2033",
+      "eu:32019L2034",
+      "eu:32010L0044",
+      "eu:32017R1131",
+      "eu:32015R0760",
+      "de:gii:bjnr182210017",
+      "de:gii:bjnr099010021",
+      "de:gii:bjnr198110013",
+      "de:gii:bjnr008810961",
     ].map((documentId) => repository?.findDocumentVersionChain(documentId));
 
     expect(chain).toMatchObject({
@@ -504,6 +577,15 @@ describe("SQLite runtime repository", () => {
           bankingChain?.nodes.length === 2 && bankingChain.edges.length === 1,
       ),
     ).toBe(true);
+    expect(amfChain).toMatchObject({
+      documentId: "fr:amf:rg",
+      coverage: "source-status-only",
+      loadedVersionId: "version:fr:amf:rg:consolidated:2026-09-11",
+    });
+    expect(amfChain?.nodes).toHaveLength(2);
+    expect(amfChain?.edges.map((edge) => edge.relationType)).toEqual([
+      "CURRENT_VERSION_LINK",
+    ]);
     expect(repository?.findDocumentVersionChain(dora.id)).toBeNull();
     expect(repository?.findDocumentVersionChain("eu:unknown")).toBeNull();
     expect(repository?.versionNodeCount).toBe(
@@ -514,6 +596,7 @@ describe("SQLite runtime repository", () => {
         (crdSixChain?.nodes.length ?? 0) +
         (amldChain?.nodes.length ?? 0) +
         (highRiskChain?.nodes.length ?? 0) +
+        (amfChain?.nodes.length ?? 0) +
         addedBankingChains.reduce(
           (sum, bankingChain) => sum + (bankingChain?.nodes.length ?? 0),
           0,
@@ -532,6 +615,7 @@ describe("SQLite runtime repository", () => {
         (crdSixChain?.edges.length ?? 0) +
         (amldChain?.edges.length ?? 0) +
         (highRiskChain?.edges.length ?? 0) +
+        (amfChain?.edges.length ?? 0) +
         addedBankingChains.reduce(
           (sum, bankingChain) => sum + (bankingChain?.edges.length ?? 0),
           0,
@@ -639,7 +723,8 @@ describe("SQLite runtime repository", () => {
       ),
     ).toBe(true);
     expect(repository?.lifecycleRelationshipCount).toBe(535);
-    expect(repository?.externalWorkCount).toBe(456);
+    // Five previously external Works are now loaded by the financial batch.
+    expect(repository?.externalWorkCount).toBe(451);
     expect(
       repository?.findDocumentLifecycleRelationships("eu:unknown"),
     ).toBeNull();

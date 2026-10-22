@@ -42,7 +42,7 @@ const topicDocumentSchema = z
     slug: z.string().regex(/^[a-z0-9-]+$/),
     shortName: z.string().min(1),
     officialTitle: z.string().min(1),
-    jurisdiction: z.enum(["EU", "LU"]),
+    jurisdiction: z.enum(["EU", "LU", "DE", "FR"]),
     documentType: z.enum([
       "regulation",
       "directive",

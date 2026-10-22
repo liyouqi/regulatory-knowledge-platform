@@ -90,7 +90,7 @@ describe("Document lookup", () => {
     const catalog = listRegulatoryTopics();
     const topic = findRegulatoryTopic("major-ict-incident-reporting");
 
-    expect(catalog.topics).toHaveLength(3);
+    expect(catalog.topics).toHaveLength(4);
     expect(catalog.topics).toContainEqual(
       expect.objectContaining({
         id: "topic:major-ict-incident-reporting",
@@ -413,7 +413,7 @@ describe("Document lookup", () => {
 
     expect(graph.scope).toBe("global");
     expect(graph.nodes.filter((node) => node.kind === "document")).toHaveLength(
-      101,
+      121,
     );
     expect(graph.nodes).toContainEqual(
       expect.objectContaining({
@@ -696,7 +696,7 @@ describe("Document lookup", () => {
       ]),
     );
     expect(findRegulatoryPath("unknown-domain")).toBeNull();
-  });
+  }, 30_000);
 
   it("serves exact document definitions for Reader term previews", () => {
     const response = listDocumentDefinitions("eu:32022R2554");

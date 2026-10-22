@@ -17,6 +17,11 @@ import {
 } from "../applicability/applicability-rule";
 import { toExplorerView } from "../canonical/to-explorer-view";
 import {
+  countryDatasetHash,
+  loadCountryDataset,
+  normalizeCountryDataset,
+} from "../countries/country-directory";
+import {
   DEFAULT_SUPERVISORY_DECISIONS_PATH,
   SUPERVISORY_DECISION_BUILDER,
   SUPERVISORY_DECISION_BUILDER_VERSION,
@@ -105,11 +110,11 @@ import {
   type RuntimeSourceDefinition,
   compileEditionProfile,
 } from "../runtime/edition-profile";
+import { parseVerifiedDocumentView } from "../runtime/verify-amf-document";
 import {
   type BodyBlock,
   type DocumentView,
   type ProvisionView,
-  documentViewSchema,
   explorerDocumentSchema,
 } from "../shared/legal";
 import {
@@ -137,7 +142,7 @@ import {
 } from "../versions/document-version-chain";
 import { normalizeSearchText } from "./current-document-search";
 
-export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.8.0";
+export const RUNTIME_DATABASE_SCHEMA_VERSION = "5.12.0";
 export const DEFAULT_RUNTIME_DATABASE_PATH = resolve(
   process.cwd(),
   "data/artifacts/runtime/regulatory.sqlite",
@@ -157,6 +162,9 @@ export interface RuntimeDatabaseManifest {
   regulatoryTopicTaxonomyVersion: string;
   regulatoryTopicTaxonomyReviewedAt: string;
   documentCount: number;
+  countryCount: number;
+  countryDatasetVersion: string;
+  countryDatasetHash: string;
   recordCount: number;
   definitionCount: number;
   relationshipCount: number;
@@ -195,6 +203,7 @@ export interface RuntimeDatabaseManifest {
 }
 
 export interface RuntimeDatabaseBuildOptions {
+  countryDataset?: ReturnType<typeof loadCountryDataset>;
   reviewValidationMode?: ReviewValidationMode;
 }
 
@@ -253,7 +262,10 @@ function completeBlockText(block: BodyBlock): string {
   const children = new Map(block.children.map((child) => [child.id, child]));
   return block.orderedContent
     .map((item) => {
-      if (item.type === "text") return item.text;
+      if (item.type === "text")
+        return item.contentRole && item.contentRole !== "operative-text"
+          ? ""
+          : item.text;
       if (item.type === "resource") return "";
       const child = children.get(item.childId);
       if (!child) {
@@ -322,6 +334,7 @@ function blockRows(
   blocks: BodyBlock[],
 ): IndexRow[] {
   return blocks.flatMap((block) => {
+    if (block.contentRole && block.contentRole !== "operative-text") return [];
     const current: IndexRow[] = block.text.trim()
       ? [
           {
@@ -347,22 +360,27 @@ function blockRows(
 
 function indexRows(documents: DocumentView[]): IndexRow[] {
   return documents.flatMap((document) =>
-    document.provisions.flatMap((provision) => [
-      {
-        recordId: `${provision.id}:heading`,
-        provisionId: provision.id,
-        documentId: document.id,
-        kind: provision.kind,
-        label: provision.label,
-        title: provision.title ?? null,
-        marker: null,
-        path: provision.path,
-        heading: [provision.label, provision.title].filter(Boolean).join(" "),
-        body: "",
-        scope: "heading" as const,
-      },
-      ...blockRows(document, provision, provision.blocks),
-    ]),
+    document.provisions
+      .filter(
+        (provision) =>
+          !provision.contentRole || provision.contentRole === "operative-text",
+      )
+      .flatMap((provision) => [
+        {
+          recordId: `${provision.id}:heading`,
+          provisionId: provision.id,
+          documentId: document.id,
+          kind: provision.kind,
+          label: provision.label,
+          title: provision.title ?? null,
+          marker: null,
+          path: provision.path,
+          heading: [provision.label, provision.title].filter(Boolean).join(" "),
+          body: "",
+          scope: "heading" as const,
+        },
+        ...blockRows(document, provision, provision.blocks),
+      ]),
   );
 }
 
@@ -394,6 +412,7 @@ function runtimeBuildId(
   documentExpressionMetadataDataset: ReturnType<
     typeof loadDocumentExpressionMetadataDataset
   >,
+  countryDataset: ReturnType<typeof loadCountryDataset>,
 ): string {
   const input = documents
     .map((document) => `${document.id}@${document.buildId}`)
@@ -439,6 +458,7 @@ function runtimeBuildId(
         `${REGULATORY_DOSSIER_BUILDER}@${REGULATORY_DOSSIER_BUILDER_VERSION}`,
         JSON.stringify(dossierDataset),
         JSON.stringify(documentExpressionMetadataDataset),
+        countryDatasetHash(countryDataset),
         input,
       ].join("\n"),
     )
@@ -736,6 +756,10 @@ export function buildRuntimeDatabase(
     ...cellarRelationships,
     ...(relatedRecitalBuild?.relationships ?? []),
   ];
+  const countryDataset = options.countryDataset
+    ? normalizeCountryDataset(options.countryDataset)
+    : loadCountryDataset();
+  const countriesHash = countryDatasetHash(countryDataset);
   const buildId = runtimeBuildId(
     compilation.profile,
     profileHash,
@@ -758,6 +782,7 @@ export function buildRuntimeDatabase(
     ebaQaDetails,
     dossierDataset,
     documentExpressionMetadataDataset,
+    countryDataset,
   );
   const builtAt = new Date().toISOString();
   let completed = false;
@@ -772,6 +797,10 @@ export function buildRuntimeDatabase(
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
       ) STRICT;
+      CREATE TABLE country_directory (
+        code TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL
+      ) STRICT;
       CREATE TABLE documents (
         id TEXT PRIMARY KEY,
         jurisdiction TEXT NOT NULL,
@@ -781,7 +810,8 @@ export function buildRuntimeDatabase(
         short_name TEXT NOT NULL,
         official_title TEXT NOT NULL,
         document_type TEXT NOT NULL,
-        publication_date TEXT NOT NULL,
+        publication_date TEXT,
+        as_of_date TEXT NOT NULL,
         source_url TEXT NOT NULL,
         source_status_json TEXT,
         last_checked TEXT NOT NULL,
@@ -793,6 +823,7 @@ export function buildRuntimeDatabase(
         measure_type TEXT NOT NULL CHECK (measure_type IN ('primary-act', 'rts', 'its', 'guideline', 'qa', 'other')),
         default_path TEXT NOT NULL,
         display_order INTEGER NOT NULL,
+        CHECK ((jurisdiction = 'FR' AND publication_date IS NULL) OR (jurisdiction <> 'FR' AND publication_date IS NOT NULL)),
         CHECK (celex IS NOT NULL OR local_id IS NOT NULL)
       ) STRICT;
       CREATE TABLE document_views (
@@ -802,7 +833,7 @@ export function buildRuntimeDatabase(
       ) STRICT;
       CREATE TABLE document_expression_metadata (
         document_id TEXT PRIMARY KEY REFERENCES documents(id),
-        language TEXT NOT NULL CHECK (language = 'en'),
+        language TEXT NOT NULL CHECK (language IN ('en', 'de', 'fr')),
         issuers_json TEXT NOT NULL,
         text_kind TEXT NOT NULL CHECK (text_kind IN (
           'original_oj', 'consolidated', 'original_publication'
@@ -1388,12 +1419,12 @@ export function buildRuntimeDatabase(
     const insertDocument = database.prepare(`
       INSERT INTO documents (
         id, jurisdiction, slug, celex, local_id, short_name, official_title, document_type,
-        publication_date, source_url, source_status_json, last_checked, source_version,
+        publication_date, as_of_date, source_url, source_status_json, last_checked, source_version,
         canonical_build_id, provenance, family_id, regulatory_level,
         measure_type, default_path, display_order
       ) VALUES (
         @id, @jurisdiction, @slug, @celex, @localId, @shortName, @officialTitle, @documentType,
-        @publicationDate, @sourceUrl, @sourceStatusJson, @lastChecked, @sourceVersion,
+        @publicationDate, @asOfDate, @sourceUrl, @sourceStatusJson, @lastChecked, @sourceVersion,
         @canonicalBuildId, @provenance, @familyId, @regulatoryLevel,
         @measureType, @defaultPath, @displayOrder
       )
@@ -1758,7 +1789,11 @@ export function buildRuntimeDatabase(
           shortName: document.shortName,
           officialTitle: document.officialTitle,
           documentType: document.documentType,
-          publicationDate: document.asOf,
+          publicationDate:
+            document.jurisdiction === "FR"
+              ? document.publicationDate
+              : document.asOf,
+          asOfDate: document.asOf,
           sourceUrl: document.sourceUrl,
           sourceStatusJson: document.sourceStatus
             ? JSON.stringify(document.sourceStatus)
@@ -1775,7 +1810,7 @@ export function buildRuntimeDatabase(
         });
         insertDocumentView.run(
           document.id,
-          JSON.stringify(documentViewSchema.parse(document)),
+          JSON.stringify(parseVerifiedDocumentView(document)),
           JSON.stringify(explorer),
         );
         aliases.forEach((alias, index) => {
@@ -1936,7 +1971,16 @@ export function buildRuntimeDatabase(
           buildId,
         });
       }
+      const insertCountry = database.prepare(
+        "INSERT INTO country_directory (code, payload_json) VALUES (?, ?)",
+      );
+      for (const country of countryDataset.countries) {
+        insertCountry.run(country.code, JSON.stringify(country));
+      }
       const manifestEntries = {
+        countryCount: String(countryDataset.countries.length),
+        countryDatasetVersion: countryDataset.datasetVersion,
+        countryDatasetHash: countriesHash,
         schemaVersion: RUNTIME_DATABASE_SCHEMA_VERSION,
         buildId,
         builtAt,
@@ -2120,6 +2164,9 @@ export function buildRuntimeDatabase(
     regulatoryTopicTaxonomyVersion: regulatoryTopicBuild.taxonomyVersion,
     regulatoryTopicTaxonomyReviewedAt: regulatoryTopicBuild.taxonomyReviewedAt,
     documentCount: documents.length,
+    countryCount: countryDataset.countries.length,
+    countryDatasetVersion: countryDataset.datasetVersion,
+    countryDatasetHash: countriesHash,
     recordCount: rows.length,
     definitionCount: definitions.length,
     relationshipCount: relationships.length,
